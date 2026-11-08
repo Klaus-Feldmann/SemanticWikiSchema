@@ -2,32 +2,32 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\DependentSubjectGuard;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
+use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\DependentSubjectGuard
+ * @covers \ProfessionalWiki\SWS\Application\DependentSubjectGuard
  */
 class DependentSubjectGuardTest extends TestCase {
 

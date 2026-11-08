@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
 
 /**
  * What a graph store may be called, wherever the name comes from.
  *
  * A store name is how a scoped rebuild is addressed and what its run records are filed under, so the
- * same two rules have to hold for a name out of `NeoWikiSparqlStores` and for one an extension
+ * same two rules have to hold for a name out of `SWSSparqlStores` and for one an extension
  * registers. They were only applied to the first, and a plugin taking a name the records cannot hold
  * got a store whose runs it could never find again.
  */

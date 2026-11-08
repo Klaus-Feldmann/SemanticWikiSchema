@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Validation;
+namespace ProfessionalWiki\SWS\Domain\Validation;
 
 class ViolationDiff {
 

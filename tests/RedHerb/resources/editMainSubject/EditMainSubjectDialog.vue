@@ -27,7 +27,7 @@
 <script>
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 const DIALOG_STATE_KEY = require( './constants.js' ).DIALOG_STATE_KEY;
 
 // @vue/component
@@ -41,8 +41,8 @@ module.exports = exports = {
 	setup: function () {
 		const state = vue.inject( DIALOG_STATE_KEY );
 		const subjectStore = nw.useSubjectStore();
-		const schemaRepo = nw.NeoWikiServices.getSchemaRepository();
-		const subjectRepo = nw.NeoWikiServices.getSubjectRepository();
+		const schemaRepo = nw.SWSServices.getSchemaRepository();
+		const subjectRepo = nw.SWSServices.getSubjectRepository();
 
 		const label = vue.ref( '' );
 		const editorRef = vue.ref( null );
@@ -63,7 +63,7 @@ module.exports = exports = {
 		function loadSubjectAndSchema( subjectIdText ) {
 			const subjectId = new nw.SubjectId( subjectIdText );
 			// Editing UIs read through the repositories rather than the stores
-			// (NeoWiki ADR 30 / ADR 16), so the editor always opens on freshly
+			// (SWS ADR 30 / ADR 16), so the editor always opens on freshly
 			// fetched data instead of the page-load payload the stores hold.
 			// getSubjectForEditing, not getSubject: a save replaces the current
 			// revision, not the published one.

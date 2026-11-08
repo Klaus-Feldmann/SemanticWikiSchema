@@ -1,0 +1,62 @@
+[
+	{
+		"name": "sws_relation",
+		"comment": "One row per distinct Subject, relation property and target on a page, as of the revision the page publishes. Written with sws_subject. A target from another Source has no row; a target that does not exist has one.",
+		"columns": [
+			{
+				"name": "swsr_page_id",
+				"comment": "Page whose subject slot holds the Subject",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true
+				}
+			},
+			{
+				"name": "swsr_subject_id",
+				"comment": "Subject holding the Relation",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			},
+			{
+				"name": "swsr_property",
+				"comment": "Name of the relation property, cut to 255 bytes on a character boundary",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 255
+				}
+			},
+			{
+				"name": "swsr_target_id",
+				"comment": "Id of the target Subject, bare",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			}
+		],
+		"indexes": [
+			{
+				"name": "swsr_target_id",
+				"comment": "Index for finding the Subjects that relate to a target",
+				"columns": [
+					"swsr_target_id",
+					"swsr_property",
+					"swsr_subject_id"
+				],
+				"unique": false
+			}
+		],
+		"pk": [
+			"swsr_page_id",
+			"swsr_subject_id",
+			"swsr_property",
+			"swsr_target_id"
+		]
+	}
+]

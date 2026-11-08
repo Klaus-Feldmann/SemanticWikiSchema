@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence;
+namespace ProfessionalWiki\SWS\Persistence;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
 
 /**
  * For the paths that reproject a graph store: a graph rebuild reads replicas, so what it reprojects may be

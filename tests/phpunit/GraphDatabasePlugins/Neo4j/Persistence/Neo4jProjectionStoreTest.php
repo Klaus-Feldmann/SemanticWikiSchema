@@ -2,41 +2,41 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use Laudis\Neo4j\Types\CypherMap;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageDateTime;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdaterFactory;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PageDateTime;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdaterFactory;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPageProperties;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestPageProperties;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jNodeLabels
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jNodeLabels
  * @group Database
  */
-class Neo4jProjectionStoreTest extends NeoWikiIntegrationTestCase {
+class Neo4jProjectionStoreTest extends SWSIntegrationTestCase {
 
 	private const GUID_1 = 'sTestNQS1111111';
 	private const GUID_2 = 'sTestNQS1111112';
@@ -56,7 +56,7 @@ class Neo4jProjectionStoreTest extends NeoWikiIntegrationTestCase {
 	}
 
 	protected function newProjectionStore(): GraphDatabasePlugin {
-		return NeoWikiExtension::getInstance()->newNeo4jProjectionStore(
+		return SWSExtension::getInstance()->newNeo4jProjectionStore(
 			new InMemorySchemaLookup(
 				TestSchema::build( name: TestSubject::DEFAULT_SCHEMA_ID ),
 				TestSchema::build( name: self::SCHEMA_ID_A ),
@@ -71,7 +71,7 @@ class Neo4jProjectionStoreTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newProjectionStoreForWiki( string $wikiId ): GraphDatabasePlugin {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return new Neo4jProjectionStore(
 			client: $extension->getNeo4jClient(),
@@ -266,7 +266,7 @@ class Neo4jProjectionStoreTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testTheHasSubjectRelationSaysWhetherTheSubjectIsADependentSubject(): void {
-		$store = NeoWikiExtension::getInstance()->newNeo4jProjectionStore( new InMemorySchemaLookup(
+		$store = SWSExtension::getInstance()->newNeo4jProjectionStore( new InMemorySchemaLookup(
 			TestSchema::build( name: TestSubject::DEFAULT_SCHEMA_ID ),
 			TestSchema::build( name: 'Birth', subjectsAreDependent: true )
 		) );
@@ -876,7 +876,7 @@ class Neo4jProjectionStoreTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newProjectionStoreWithLocationRelation( string $wikiId = self::WIKI_ID ): GraphDatabasePlugin {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return new Neo4jProjectionStore(
 			client: $extension->getNeo4jClient(),

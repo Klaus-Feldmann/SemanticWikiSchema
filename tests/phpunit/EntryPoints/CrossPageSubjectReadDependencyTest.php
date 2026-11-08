@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Extension\Scribunto\ScribuntoContent;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\ParseTimePermissionFixtures;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
 
 /**
  * A parse that reads the Subjects of another page depends on that page, the way a page depends on a
@@ -25,13 +25,13 @@ use ProfessionalWiki\NeoWiki\Tests\ParseTimePermissionFixtures;
  * Needs the integration base and the database for the real parser, the Lua library, and the pages
  * and subject-to-page index the reads go through.
  *
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\ParserPageDependencyRecorder
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectResolver
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiValueParserFunction
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Scribunto\ScribuntoLuaLibrary
+ * @covers \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder
+ * @covers \ProfessionalWiki\SWS\Application\SubjectResolver
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSValueParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary
  * @group Database
  */
-class CrossPageSubjectReadDependencyTest extends NeoWikiIntegrationTestCase {
+class CrossPageSubjectReadDependencyTest extends SWSIntegrationTestCase {
 
 	use ParseTimePermissionFixtures;
 
@@ -46,7 +46,7 @@ class CrossPageSubjectReadDependencyTest extends NeoWikiIntegrationTestCase {
 	private const string READ_SUBJECT_ID = 'sreadsubject111';
 	private const string TARGET_SUBJECT_ID = 'stargetsubject1';
 
-	private const string MODULE_CODE = "local nw = require( 'mw.neowiki' )\n"
+	private const string MODULE_CODE = "local nw = require( 'mw.sws' )\n"
 		. "local p = {}\n"
 		. "function p.getValue( frame ) nw.getValue( 'Motto', { page = frame.args[1] } ) end\n"
 		. "function p.getAll( frame ) nw.getAll( 'Motto', { subject = frame.args[1] } ) end\n"
@@ -104,21 +104,21 @@ class CrossPageSubjectReadDependencyTest extends NeoWikiIntegrationTestCase {
 	public function testReadingAValueByPageNameDependsOnThatPage(): void {
 		$this->assertContains(
 			self::READ_PAGE,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Motto | page=' . self::READ_PAGE . ' }}' )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Motto | page=' . self::READ_PAGE . ' }}' )
 		);
 	}
 
 	public function testReadingAValueBySubjectIdDependsOnThePageHostingTheSubject(): void {
 		$this->assertContains(
 			self::READ_PAGE,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Motto | subject=' . self::READ_SUBJECT_ID . ' }}' )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Motto | subject=' . self::READ_SUBJECT_ID . ' }}' )
 		);
 	}
 
 	public function testShowingARelationOfItsOwnSubjectDependsOnThePageHostingTheTarget(): void {
 		$this->assertContains(
 			self::TARGET_PAGE,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Owner }}', self::READ_PAGE )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Owner }}', self::READ_PAGE )
 		);
 	}
 
@@ -139,21 +139,21 @@ class CrossPageSubjectReadDependencyTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertContains(
 			'Schema:' . self::SELECT_SCHEMA,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Status }}', self::SELECT_PAGE )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Status }}', self::SELECT_PAGE )
 		);
 	}
 
 	public function testReadingItsOwnSubjectsDoesNotMakeThePageDependOnItself(): void {
 		$this->assertNotContains(
 			self::READ_PAGE,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Owner }}', self::READ_PAGE )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Owner }}', self::READ_PAGE )
 		);
 	}
 
 	public function testReadingAPageThatDoesNotExistDependsOnIt(): void {
 		$this->assertContains(
 			self::MISSING_PAGE,
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Motto | page=' . self::MISSING_PAGE . ' }}' )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Motto | page=' . self::MISSING_PAGE . ' }}' )
 		);
 	}
 
@@ -166,7 +166,7 @@ class CrossPageSubjectReadDependencyTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertNotContains(
 			'Special:Version',
-			$this->pagesTheParseDependsOn( '{{#neowiki_value: Motto | page=Special:Version }}' )
+			$this->pagesTheParseDependsOn( '{{#sws_value: Motto | page=Special:Version }}' )
 		);
 	}
 

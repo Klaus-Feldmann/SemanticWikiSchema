@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigSource;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigSource;
 
 class StubWikiConfigSource implements WikiConfigSource {
 

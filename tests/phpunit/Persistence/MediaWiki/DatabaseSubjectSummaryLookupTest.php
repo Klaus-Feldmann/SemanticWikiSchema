@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySort;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\Rdbms\DBQueryTimeoutError;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\IDatabase;
@@ -30,11 +30,11 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectSummaryLookup
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\LowestPageRows
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
-class DatabaseSubjectSummaryLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseSubjectSummaryLookupTest extends SWSIntegrationTestCase {
 
 	// Ids sort by creation time, so these four were created in this order.
 	private const string OLDEST = 'sTestDSS1111111';

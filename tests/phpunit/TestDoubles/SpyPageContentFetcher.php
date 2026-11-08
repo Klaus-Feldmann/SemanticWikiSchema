@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Page\PageIdentityValue;
@@ -10,7 +10,7 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\MutableRevisionRecord;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
 
 /**
  * A PageContentFetcher on a wiki without a revision policy: every existing page publishes its latest

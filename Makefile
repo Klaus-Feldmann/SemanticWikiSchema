@@ -1,4 +1,4 @@
-# NeoWiki extension dev environment.
+# SWS extension dev environment.
 # Single entry point for both the Docker dev stack and developer tooling.
 # Issue #120.
 
@@ -20,16 +20,16 @@ override MARIADB_PORT := $(or $(strip $(MARIADB_PORT)),3306)
 # ---- Project namespace and ports ---------------------------------------------
 
 # Derive a unique project name from the extension directory.
-# Main checkout: mediawiki/extensions/NeoWiki/            -> neowiki-neowiki
-# Worktree:      mediawiki/extensions/NeoWiki-feature-x/  -> neowiki-neowiki-feature-x
+# Main checkout: mediawiki/extensions/SWS/            -> sws-sws
+# Worktree:      mediawiki/extensions/SWS-feature-x/  -> sws-sws-feature-x
 # Characters compose rejects in a project name, such as dots, become hyphens.
-# A copy without .git, such as an unpacked release archive, always gets neowiki: its directory,
-# such as NeoWiki-0.1.0/, changes with each version, and a new name starts a new stack on empty
+# A copy without .git, such as an unpacked release archive, always gets sws: its directory,
+# such as SWS-0.1.0/, changes with each version, and a new name starts a new stack on empty
 # volumes. No checkout derives that name, so an archive never lands on a dev stack's volumes.
 ifeq ($(wildcard .git),)
-PROJECT_NAME := neowiki
+PROJECT_NAME := sws
 else
-PROJECT_NAME := $(shell echo "neowiki-$(notdir $(CURDIR))" | tr A-Z a-z | tr -c 'a-z0-9_\n-' -)
+PROJECT_NAME := $(shell echo "sws-$(notdir $(CURDIR))" | tr A-Z a-z | tr -c 'a-z0-9_\n-' -)
 endif
 
 PORT_RANGE_START := 8484
@@ -110,11 +110,11 @@ endif
 # holds. Without that file, a git checkout runs master's image, and a copy without .git, such as master's "Download
 # ZIP", runs none, which _require-image-tag refuses. Blank counts as unset, as for MARIADB_HOST above, and a set value
 # loses the spaces an inline comment in Docker/.env leaves behind it.
-DEMO_IMAGE := ghcr.io/professionalwiki/neowiki
-ifeq ($(strip $(NEOWIKI_IMAGE_TAG)),)
-override NEOWIKI_IMAGE_TAG := $(strip $(or $(shell cat Docker/image-tag 2>/dev/null),$(if $(wildcard .git),master)))
+DEMO_IMAGE := ghcr.io/professionalwiki/sws
+ifeq ($(strip $(SWS_IMAGE_TAG)),)
+override SWS_IMAGE_TAG := $(strip $(or $(shell cat Docker/image-tag 2>/dev/null),$(if $(wildcard .git),master)))
 else
-override NEOWIKI_IMAGE_TAG := $(strip $(NEOWIKI_IMAGE_TAG))
+override SWS_IMAGE_TAG := $(strip $(SWS_IMAGE_TAG))
 endif
 
 # ---- Compose invocations -----------------------------------------------------
@@ -190,7 +190,7 @@ doctor: ## Diagnose dev-environment prerequisites (Docker runtime)
 # version this copy holds. Only the targets that pull, run or build the image depend on this, so
 # down, logs and remove still work.
 _require-image-tag:
-	$(if $(NEOWIKI_IMAGE_TAG),,$(error This copy names no demo image: get a release from https://github.com/ProfessionalWiki/NeoWiki/releases/latest, or set NEOWIKI_IMAGE_TAG))
+	$(if $(SWS_IMAGE_TAG),,$(error This copy names no demo image: get a release from https://github.com/ProfessionalWiki/NeoWiki/releases/latest, or set SWS_IMAGE_TAG))
 
 # up and demo run no migration, so they refuse a stack whose mediawiki container runs another image
 # than the one they would start, as after checking out another version or pulling a newer master;
@@ -199,7 +199,7 @@ _require-image-tag:
 _require-matching-image:
 	@container="$$(docker ps -a -q --filter label=com.docker.compose.project=$(PROJECT_NAME) \
 		--filter label=com.docker.compose.service=mediawiki --filter label=com.docker.compose.oneoff=False)"; \
-	wanted="$(DEMO_IMAGE):$$NEOWIKI_IMAGE_TAG"; \
+	wanted="$(DEMO_IMAGE):$$SWS_IMAGE_TAG"; \
 	if [ -n "$$container" ] && \
 		[ "$$(docker inspect -f '{{.Image}}' $$container)" != "$$(docker image inspect -f '{{.Id}}' "$$wanted" 2>/dev/null)" ]; then \
 		echo "This stack's mediawiki container does not run $$wanted. make upgrade moves a demo stack to it and migrates; make dev restarts a dev stack." >&2; \
@@ -280,7 +280,7 @@ bootstrap: ## Clone MW core into Docker/mediawiki/ and prep gitignored files (id
 			--branch "$${MW_BRANCH:-REL1_43}" \
 			"$${MW_GIT_URL:-https://github.com/wikimedia/mediawiki}" \
 			Docker/mediawiki; \
-		echo "Fetching the bundled extensions/skins NeoWiki loads..."; \
+		echo "Fetching the bundled extensions/skins SWS loads..."; \
 		git -C Docker/mediawiki submodule update --init --recursive --depth 1 \
 			extensions/CodeEditor \
 			extensions/ParserFunctions \
@@ -318,7 +318,7 @@ endif
 .PHONY: _ensure-frontend-bundle
 _ensure-frontend-bundle:
 ifeq ($(filter node,$(ACTIVE_PROFILES)),)
-	@if [ ! -f resources/ext.neowiki/dist/neowiki.js ]; then \
+	@if [ ! -f resources/ext.sws/dist/sws.js ]; then \
 		echo "No frontend bundle and no node watcher selected; building once..."; \
 		$(DC_DEV) run --rm node sh -c 'npm install && npm run build' < /dev/null; \
 	fi
@@ -450,8 +450,8 @@ install-db:
 	$(EXEC_MW_ROOT) rm LocalSettings.php
 	$(EXEC_MW_ROOT) mv __LocalSettings.php LocalSettings.php
 	$(EXEC_MW_ROOT) php maintenance/run.php update --quick
-	echo '{{subst:int:neowiki-main-page-text}}' | $(EXEC_MW_ROOT) env OXIGRAPH_URL= QLEVER_URL= \
-		php maintenance/run.php edit --user 'MediaWiki default' --summary 'NeoWiki starter page' 'Main Page'
+	echo '{{subst:int:sws-main-page-text}}' | $(EXEC_MW_ROOT) env OXIGRAPH_URL= QLEVER_URL= \
+		php maintenance/run.php edit --user 'MediaWiki default' --summary 'SWS starter page' 'Main Page'
 
 # Runs before every PHP test target.
 #
@@ -487,20 +487,20 @@ test-backends-stop: ## Stop the test-only backends (make phpunit restarts them o
 
 .PHONY: composer-install composer-update
 
-composer-install: ## Install composer deps for NeoWiki
+composer-install: ## Install composer deps for SWS
 ifeq ($(INSIDE_CONTAINER),1)
 	composer install --optimize-autoloader
 else
 	$(DC_DEV) exec -T -e HOME=/tmp -e COMPOSER_HOME=/tmp/composer $(EXEC_USER) mediawiki \
-		bash -c 'cd extensions/NeoWiki && make composer-install' < /dev/null
+		bash -c 'cd extensions/SWS && make composer-install' < /dev/null
 endif
 
-composer-update: ## Update composer deps for NeoWiki
+composer-update: ## Update composer deps for SWS
 ifeq ($(INSIDE_CONTAINER),1)
 	composer update
 else
 	$(DC_DEV) exec -T -e HOME=/tmp -e COMPOSER_HOME=/tmp/composer $(EXEC_USER) mediawiki \
-		bash -c 'cd extensions/NeoWiki && make composer-update' < /dev/null
+		bash -c 'cd extensions/SWS && make composer-update' < /dev/null
 endif
 
 # ---- PHP code quality (dual-mode: works inside or outside container) ---------
@@ -521,9 +521,9 @@ else
 endif
 else
 ifdef filter
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make phpunit filter=$(filter)' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make phpunit filter=$(filter)' < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make phpunit' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make phpunit' < /dev/null
 endif
 endif
 
@@ -531,49 +531,49 @@ perf: test-backends ## Run performance test group
 ifeq ($(INSIDE_CONTAINER),1)
 	composer phpunit -- --group Performance < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make perf' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make perf' < /dev/null
 endif
 
 dbschema: ## Regenerate the per-DBMS SQL from the abstract schema in sql/
 ifeq ($(INSIDE_CONTAINER),1)
 	composer dbschema < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make dbschema' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make dbschema' < /dev/null
 endif
 
 phpcs:
 ifeq ($(INSIDE_CONTAINER),1)
 	vendor/bin/phpcs -p -s --standard=$$(pwd)/phpcs.xml < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make phpcs' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make phpcs' < /dev/null
 endif
 
 stan:
 ifeq ($(INSIDE_CONTAINER),1)
 	vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=2G < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make stan' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make stan' < /dev/null
 endif
 
 stan-baseline:
 ifeq ($(INSIDE_CONTAINER),1)
 	vendor/bin/phpstan analyse --configuration=phpstan.neon --memory-limit=2G --generate-baseline < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make stan-baseline' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make stan-baseline' < /dev/null
 endif
 
 psalm:
 ifeq ($(INSIDE_CONTAINER),1)
 	vendor/bin/psalm --config=psalm.xml --no-diff < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make psalm' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make psalm' < /dev/null
 endif
 
 psalm-baseline:
 ifeq ($(INSIDE_CONTAINER),1)
 	vendor/bin/psalm --config=psalm.xml --set-baseline=psalm-baseline.xml < /dev/null
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make psalm-baseline' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make psalm-baseline' < /dev/null
 endif
 
 # ---- TypeScript (always runs in the node sidecar) ----------------------------
@@ -587,7 +587,7 @@ endif
 _wait-node:
 	@$(DC_DEV) up -d node
 	@for i in $$(seq 1 60); do \
-		if [ -f resources/ext.neowiki/node_modules/.package-lock.json ]; then \
+		if [ -f resources/ext.sws/node_modules/.package-lock.json ]; then \
 			exit 0; \
 		fi; \
 		sleep 1; \
@@ -602,33 +602,33 @@ ts-ci:
 	$(MAKE) --no-print-directory ts-build
 	$(MAKE) --no-print-directory ts-lint
 
-ts-install: _wait-node ## npm install for NeoWiki frontend
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm install' < /dev/null
+ts-install: _wait-node ## npm install for SWS frontend
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm install' < /dev/null
 
-ts-update: _wait-node ## npm update for NeoWiki frontend
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm update' < /dev/null
+ts-update: _wait-node ## npm update for SWS frontend
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm update' < /dev/null
 
 ts-build: _wait-node ## Build TS bundle (one-shot; the watcher runs as a sidecar)
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run build' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run build' < /dev/null
 
 ts-build-watch: _wait-node ## Run the TS build watcher one-shot (the node sidecar already runs this)
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run build:watch' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run build:watch' < /dev/null
 
 ts-test: _wait-node ## Run vitest (use filter=X for a single test)
 ifdef filter
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run test -- $(filter)' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run test -- $(filter)' < /dev/null
 else
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run test' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run test' < /dev/null
 endif
 
 ts-test-watch: _wait-node ## Run vitest in watch mode
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run test:watch' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run test:watch' < /dev/null
 
 ts-coverage: _wait-node ## TS test coverage report
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run coverage' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run coverage' < /dev/null
 
 ts-lint: _wait-node ## Run TS linter
-	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.neowiki && npm run lint' < /dev/null
+	$(EXEC_NODE) sh -c 'cd /workspace/resources/ext.sws && npm run lint' < /dev/null
 
 # ---- Maintenance -------------------------------------------------------------
 
@@ -644,11 +644,11 @@ reset: ## Wipe the stack's volumes and reseed demo data (recreates the dev stack
 	$(MAKE) --no-print-directory install-db
 	$(MAKE) --no-print-directory import-demo-data
 
-import-demo-data: ## Import the NeoWiki demo subjects
-	$(EXEC_MW_ROOT) php maintenance/run.php NeoWiki:ImportDemoData
+import-demo-data: ## Import the SWS demo subjects
+	$(EXEC_MW_ROOT) php maintenance/run.php SemanticWikiSchema:ImportDemoData
 
 rebuild-graph-databases: ## Rebuild every configured backend's projection from MariaDB
-	$(EXEC_MW_ROOT) php maintenance/run.php NeoWiki:RebuildGraphDatabases
+	$(EXEC_MW_ROOT) php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases
 
 update-dot-php: ## Run MW maintenance/update.php
 	$(EXEC_MW_ROOT) php maintenance/run.php update --quick
@@ -712,14 +712,14 @@ perf-generate: _require-pages ## Generate a synthetic wiki XML dump (pages=N [su
 	@mkdir -p $(PERF_DIR)
 ifeq ($(INSIDE_CONTAINER),1)
 	@rm -f $(PERF_DUMP).part
-	php ../../maintenance/run.php NeoWiki:GeneratePerformanceDump \
+	php ../../maintenance/run.php SemanticWikiSchema:GeneratePerformanceDump \
 		--pages $(pages) \
 		--subjects-per-page $(or $(subjects),10) \
 		--seed $(or $(seed),1) \
 		--output $(PERF_DUMP).part < /dev/null
 	@mv $(PERF_DUMP).part $(PERF_DUMP)
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make perf-generate pages=$(pages) subjects=$(subjects) seed=$(seed)' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make perf-generate pages=$(pages) subjects=$(subjects) seed=$(seed)' < /dev/null
 endif
 
 perf-import: ## Import perf/dump.xml, reporting elapsed time and throughput
@@ -738,7 +738,7 @@ ifeq ($(INSIDE_CONTAINER),1)
 		printf "\n"; \
 	}'
 else
-	$(EXEC_MW) bash -c 'cd extensions/NeoWiki && make perf-import' < /dev/null
+	$(EXEC_MW) bash -c 'cd extensions/SWS && make perf-import' < /dev/null
 endif
 
 # Both halves are written beside their final names and moved into place only once both are
@@ -782,4 +782,4 @@ perf-restore: _require-snapshot _require-neo ## Restore perf/snapshot/, replacin
 
 .PHONY: wiki-production-image
 wiki-production-image: _require-image-tag ## Build the prebuilt ghcr image
-	docker build Docker --file Docker/Dockerfile --pull --target final-mw -t "$(DEMO_IMAGE):$$NEOWIKI_IMAGE_TAG"
+	docker build Docker --file Docker/Dockerfile --pull --target final-mw -t "$(DEMO_IMAGE):$$SWS_IMAGE_TAG"

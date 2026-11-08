@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\LayoutContentHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContentHandler;
+use ProfessionalWiki\SWS\SWSExtension;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Content\LayoutContentHandler
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Content\LayoutContentHandler
  * @group Database
  */
 class LayoutContentHandlerValidateSaveTest extends MediaWikiIntegrationTestCase {
 
 	private function validate( string $json, string $name = 'CompanyOverview' ): StatusValue {
 		$handler = new LayoutContentHandler( LayoutContent::CONTENT_MODEL_ID );
-		$title = Title::makeTitle( NeoWikiExtension::NS_LAYOUT, $name );
+		$title = Title::makeTitle( SWSExtension::NS_LAYOUT, $name );
 		$params = new ValidationParams( $title->toPageIdentity(), 0 );
 
 		return $handler->validateSave( new LayoutContent( $json ), $params );

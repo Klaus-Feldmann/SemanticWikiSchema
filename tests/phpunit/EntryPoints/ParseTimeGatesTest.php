@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Parser\ParserOptions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\ParseTimePermissionFixtures;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
 
 /**
  * Parse-time reads run as the user the page is parsed for, not as the request's user. The request
  * belongs to a sysop throughout; only the parser options decide what a parse gets.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\ParserAuthority
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiValueParserFunction
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\ParserAuthority
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSValueParserFunction
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
  * @group Database
  */
-class ParseTimeGatesTest extends NeoWikiIntegrationTestCase {
+class ParseTimeGatesTest extends SWSIntegrationTestCase {
 
 	use ParseTimePermissionFixtures;
 
@@ -54,7 +54,7 @@ class ParseTimeGatesTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function valueFromRestrictedPage(): string {
-		return '{{#neowiki_value: Motto | page=' . self::RESTRICTED_PAGE . ' }}';
+		return '{{#sws_value: Motto | page=' . self::RESTRICTED_PAGE . ' }}';
 	}
 
 	public function testAnonymousParseDoesNotReadTheRestrictedPageEvenThoughTheRequestIsASysops(): void {
@@ -75,7 +75,7 @@ class ParseTimeGatesTest extends NeoWikiIntegrationTestCase {
 		$html = $this->parseAs( ParserOptions::newFromAnon(), '{{#cypher_raw: RETURN 1 AS n }}' );
 
 		$this->assertStringContainsString( 'You do not have permission to run Cypher queries.', $html );
-		$this->assertStringNotContainsString( 'mw-neowiki-cypher-result', $html );
+		$this->assertStringNotContainsString( 'mw-sws-cypher-result', $html );
 	}
 
 	public function testParseForAUserWithTheQueryRightRunsTheQuery(): void {
@@ -84,7 +84,7 @@ class ParseTimeGatesTest extends NeoWikiIntegrationTestCase {
 
 		$html = $this->parseAs( $this->asSysop(), '{{#cypher_raw: RETURN 1 AS n }}' );
 
-		$this->assertStringContainsString( 'mw-neowiki-cypher-result', $html );
+		$this->assertStringContainsString( 'mw-sws-cypher-result', $html );
 	}
 
 	public function testParseTimeQueriesUseTheDefaultTierEvenForAUserWithHighLimits(): void {
@@ -104,7 +104,7 @@ class ParseTimeGatesTest extends NeoWikiIntegrationTestCase {
 		$html = $this->parseAs( ParserOptions::newFromAnon(), '{{#sparql_raw: SELECT * WHERE { ?s ?p ?o } }}' );
 
 		$this->assertStringContainsString( 'You do not have permission to run SPARQL queries.', $html );
-		$this->assertStringNotContainsString( 'mw-neowiki-sparql-result', $html );
+		$this->assertStringNotContainsString( 'mw-sws-sparql-result', $html );
 	}
 
 }

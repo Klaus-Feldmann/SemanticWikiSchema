@@ -37,8 +37,8 @@
 <!-- becomes -->
 <path stroke="#202122" stroke-width="1.5" d="M364,186H410" marker-end="url(#arrow)"/>
 
-<!-- NeoWiki -->
-<text x="567" y="40" text-anchor="middle" font-size="15" font-weight="bold" fill="#202122">NeoWiki</text>
+<!-- SWS -->
+<text x="567" y="40" text-anchor="middle" font-size="15" font-weight="bold" fill="#202122">SWS</text>
 <rect x="422" y="56" width="290" height="96" fill="none" stroke="#039" stroke-width="1.5"/>
 <text x="434" y="78" font-size="14" font-weight="bold" fill="#000">Rijksmuseum</text>
 <rect x="434" y="85" width="56" height="16" rx="3" fill="#EAECF0"/>

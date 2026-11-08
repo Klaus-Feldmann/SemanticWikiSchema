@@ -1,20 +1,86 @@
 {
   "dist/tools/extensions/index.js": {
     "before": "38555767d5eb095e381803c343fa94e6eedf159892166e9324b71a9b6b7b131e",
-    "after": "5481385337b4b513c7b48010727d52c914cd3437096e0b844b296fe269b2e29d"
+    "after": "a6133e618704632d47b2da48528f397bac058dfb528160dc2535074abda3d6d2",
+    "acceptedBefore": [
+      "38555767d5eb095e381803c343fa94e6eedf159892166e9324b71a9b6b7b131e",
+      "5481385337b4b513c7b48010727d52c914cd3437096e0b844b296fe269b2e29d"
+    ]
   },
-  "dist/tools/extensions/neowiki/index.js": {
-    "before": "3ec1a968b6b6dece69c6f7b6c2370e8ee28ac2b321e22dc50db7b6070f546311",
-    "after": "a63fdc69a4f0bbe4383fb1bf57955987e71d3b5942bc3cceb8c638f9e40e504a",
-    "previousPatched": "e78ae58399560e88ce36ad379c3a4920b07fb730976a6d00c5557b817796d25b"
-  },
-  "dist/tools/extensions/neowikibase/index.js": {
+  "dist/tools/extensions/sws/sws-validate-subject.js": {
     "before": null,
-    "after": "4fe4612db3fbec59e4d78334fa227bad087007630049ff1f1a3010a40aa91769",
-    "previousPatched": "3f7087e4086d460cf678363b363fd40d386a6e1343481b86c0545e7bec366d37"
+    "after": "f3417f39f71191066b14207c5d70c0d30b469b5ff4fc25837471bcdf52f0ebdd"
   },
-  "dist/tools/extensions/neowikibase/neowikibase-get-data-view.js": {
+  "dist/tools/extensions/sws/sws-get-subject.js": {
     "before": null,
-    "after": "e322336c43b805654d8106b1360e17f82a282c919add0835967c638757a48e31"
+    "after": "933f1e0e0169228fce9dc30325cffb4d04a9e3dd6bb35c5a175217de00ba2b13"
+  },
+  "dist/tools/extensions/sws/sws-cypher-query.js": {
+    "before": null,
+    "after": "251ca0dbf5554a9a6fbeba3b2b8a4c692526ef5ee3cd1d32081b6c8c4d0b8f11"
+  },
+  "dist/tools/extensions/sws/swsRequest.js": {
+    "before": null,
+    "after": "d1410915dd6d6f7c2375e823625feae250f30251decc58e8cd1b27931ad9d459"
+  },
+  "dist/tools/extensions/sws/sws-search-subjects.js": {
+    "before": null,
+    "after": "fd099da5a88a391f4005459fd50d0dcad4bc37a87c811a2b55f4d2402694609b"
+  },
+  "dist/tools/extensions/sws/index.js": {
+    "before": null,
+    "after": "6844a6b4627808f4d79a2924e5bf4d59f6e7c418b431bce6755cdf1be548bc3d"
+  },
+  "dist/tools/extensions/sws/pageId.js": {
+    "before": null,
+    "after": "0b797315756948cd123aadc010fad4ee91401f68d5900167d0940c4336a88b55"
+  },
+  "dist/tools/extensions/sws/statements.js": {
+    "before": null,
+    "after": "bd99c5577370343e390bc3049b93cb08409cc54166dc9df33031727a91854dca"
+  },
+  "dist/tools/extensions/sws/sws-update-subject.js": {
+    "before": null,
+    "after": "7568bad9e187864965613ea0216e8bb64907526b44df9253c8a013eca670b233"
+  },
+  "dist/tools/extensions/sws/sws-create-subject.js": {
+    "before": null,
+    "after": "15ebd41a769d8537534872e2f5cee68c628d932beb098e57d0fb71b5ea8955be"
+  },
+  "dist/tools/extensions/sws/sws-delete-subject.js": {
+    "before": null,
+    "after": "bfc5c5397ddb33f3fbf8af7b552c6b3c833deb3d4e56fbcbddc0102e155f7126"
+  },
+  "dist/tools/extensions/sws/sws-get-page-subjects.js": {
+    "before": null,
+    "after": "70795aeef2654acfa0e2bbbc200586db654ca127feb3a91ab7923e7d6eff61bc"
+  },
+  "dist/tools/extensions/sws/sws-get-schema.js": {
+    "before": null,
+    "after": "b2ac891c0a315ae44abc15b8574e8f61f8fd784d08fff8711cb01b4f35072ad5"
+  },
+  "dist/tools/extensions/sws/sws-list-schemas.js": {
+    "before": null,
+    "after": "6b750c931e73a973d8eb3c6d12a10967808a9dc2fa19cd264eebed8fe0b5937c"
+  },
+  "dist/tools/extensions/sws/sws-mint-subject-ids.js": {
+    "before": null,
+    "after": "bb811d6154546927582b9dc91ba60b30500fe5233b66d9ff42c2fceb8380810b"
+  },
+  "dist/tools/extensions/sws/sws-set-main-subject.js": {
+    "before": null,
+    "after": "6c55970108a2ff184c14e4c56af94e3a5627d761e2c299c55a17f492b6f24ba2"
+  },
+  "dist/tools/extensions/sws/subjects.js": {
+    "before": null,
+    "after": "8484727f773d936e639322925c85d2a4034e8697a167e9f3611b3c680efc810d"
+  },
+  "dist/tools/extensions/swsbase/index.js": {
+    "before": null,
+    "after": "715e3855a30247353e2611508581082b5ab2641f461c56f942a35de001322f01"
+  },
+  "dist/tools/extensions/swsbase/swsbase-get-data-view.js": {
+    "before": null,
+    "after": "4328db5a9b4fbb78ffdc646509a9c980d906e3fc603c14ef2dfbaa1b0aa7539f"
   }
 }

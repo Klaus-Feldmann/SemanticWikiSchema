@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\UpdateStatement;
+namespace ProfessionalWiki\SWS\Application\Actions\UpdateStatement;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
-use ProfessionalWiki\NeoWiki\Domain\Validation\ViolationDiff;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\ViolationDiff;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 /**
  * Sets or removes one Statement of a Subject, leaving its other Statements and its label alone.

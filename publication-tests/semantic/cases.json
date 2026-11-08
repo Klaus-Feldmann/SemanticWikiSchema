@@ -42,8 +42,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -87,8 +87,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -132,8 +132,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -177,8 +177,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -222,8 +222,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -267,8 +267,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -312,8 +312,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -357,8 +357,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -378,7 +378,7 @@
       "statements": {
         "Feld": {
           "values": [
-            "{{NeoWiki}}"
+            "{{SWS}}"
           ]
         }
       }
@@ -402,8 +402,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -449,8 +449,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -497,8 +497,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -542,8 +542,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -587,8 +587,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -632,8 +632,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -677,8 +677,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -722,8 +722,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -767,8 +767,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -812,8 +812,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -857,8 +857,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -902,8 +902,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -947,8 +947,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -992,8 +992,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1037,8 +1037,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1082,8 +1082,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1127,8 +1127,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1172,8 +1172,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1217,8 +1217,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1262,8 +1262,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1307,8 +1307,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1352,8 +1352,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1397,8 +1397,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1448,8 +1448,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1499,8 +1499,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1550,8 +1550,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1600,8 +1600,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1654,8 +1654,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1725,8 +1725,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1798,8 +1798,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1869,8 +1869,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1942,8 +1942,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -1997,8 +1997,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2052,8 +2052,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2107,8 +2107,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2172,8 +2172,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2237,8 +2237,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2302,8 +2302,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2347,8 +2347,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2392,8 +2392,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2437,8 +2437,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2483,8 +2483,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2528,8 +2528,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2578,8 +2578,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2628,8 +2628,8 @@
         "label": "Eigene label",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2678,8 +2678,8 @@
         "label": "Quellentitel",
         "caption": "Eigene caption",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2728,8 +2728,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Eigene captionPage",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2779,7 +2779,7 @@
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
         "field": "Eigene field",
-        "subject": "NeoWiki-Subjekt"
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2828,7 +2828,7 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
+        "field": "SWS-Feld",
         "subject": "Eigene subject"
       }
     }
@@ -2876,8 +2876,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2937,8 +2937,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -2978,8 +2978,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3066,8 +3066,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3114,8 +3114,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3162,8 +3162,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3210,8 +3210,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3258,8 +3258,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3306,8 +3306,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3354,8 +3354,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3402,8 +3402,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3450,8 +3450,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3498,8 +3498,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3546,8 +3546,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3594,8 +3594,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3642,8 +3642,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3690,8 +3690,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3738,8 +3738,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3786,8 +3786,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   },
@@ -3834,8 +3834,8 @@
         "label": "Quellentitel",
         "caption": "Quellenbezeichnung",
         "captionPage": "Quellenbezeichnungsseite",
-        "field": "NeoWiki-Feld",
-        "subject": "NeoWiki-Subjekt"
+        "field": "SWS-Feld",
+        "subject": "SWS-Subjekt"
       }
     }
   }

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 use InvalidArgumentException;
 

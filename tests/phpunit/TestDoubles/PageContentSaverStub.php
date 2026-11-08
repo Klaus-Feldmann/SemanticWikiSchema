@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Content;
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 /**
  * A saver that persists nothing and reports the outcome the test asked for, so the import action can

@@ -6,7 +6,7 @@ order: 7
 
 A Source supplies Subjects and Schemas from somewhere other than this wiki's revision slots — another wiki of a
 farm, an on-wiki SMW or Wikibase store, a remote instance. Implement `Source` and register it with
-`NeoWikiRegistrar::addSource()`:
+`SWSRegistrar::addSource()`:
 
 ```php
 $registrar->addSource( 'myext_catalog', new CatalogSource() );
@@ -33,7 +33,7 @@ degrades rather than breaking. Sourced Subjects are read-only, and rendering the
 today a Source's Subjects are reachable by id and as relation targets. See
 [ADR 23](../adr/023-subject-sources.md).
 
-Your Source vouches for everything it returns: NeoWiki serves it to every reader of the wiki and performs no
+Your Source vouches for everything it returns: SWS serves it to every reader of the wiki and performs no
 per-user authorization on it, because a sourced Subject has no page here to authorize against. If your data has
 restrictions of its own, serve only the part that is unrestricted — a question you answer without knowing who is
 asking. Per-user granularity for sourced data does not exist yet.

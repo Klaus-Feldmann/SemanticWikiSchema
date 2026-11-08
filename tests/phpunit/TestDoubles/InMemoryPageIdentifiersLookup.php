@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
 
 class InMemoryPageIdentifiersLookup implements PageIdentifiersLookup {
 

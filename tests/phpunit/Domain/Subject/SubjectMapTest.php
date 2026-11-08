@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Subject;
+namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap
+ * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectMap
  */
 class SubjectMapTest extends TestCase {
 

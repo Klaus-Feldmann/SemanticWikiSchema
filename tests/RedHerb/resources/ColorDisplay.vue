@@ -20,7 +20,7 @@
 
 <script>
 const vue = require( 'vue' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 
 // Display intentionally checks format only and ignores input-time
 // constraints like allowedColors: a stored value that was valid when

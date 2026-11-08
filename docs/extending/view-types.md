@@ -5,14 +5,14 @@ order: 3
 # View Types
 
 A View Type renders a Subject in a particular visual format; `infobox` is the only built-in one. View Types are
-frontend-only: register a Vue component through the `neowiki.registration` hook from your
+frontend-only: register a Vue component through the `sws.registration` hook from your
 [frontend module](extending.md#frontend-module):
 
 ```javascript
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 const RedHerbCard = require( './RedHerbCard.vue' );
 
-mw.hook( 'neowiki.registration' ).add( ( registrar ) => {
+mw.hook( 'sws.registration' ).add( ( registrar ) => {
 	registrar.registerViewType( {
 		typeName: 'redherb-card',
 		component: RedHerbCard
@@ -37,8 +37,8 @@ The card opens the shared `nw.SubjectEditorDialog` when `canEditSubject` is true
 
 ```javascript
 const { editingSubject, editingSchema, editorOpen, openEditor } = nw.useSubjectEditor(
-	nw.NeoWikiServices.getSubjectRepository(),
-	nw.NeoWikiServices.getSchemaRepository()
+	nw.SWSServices.getSubjectRepository(),
+	nw.SWSServices.getSchemaRepository()
 );
 ```
 

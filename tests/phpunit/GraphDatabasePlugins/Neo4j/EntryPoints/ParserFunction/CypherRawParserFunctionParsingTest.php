@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
 
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Types\CypherMap;
@@ -10,20 +10,20 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubRawQueryAuthorizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 
 /**
  * What a reader ends up with, rather than what the parser function returns: the corruption this
  * guards against happens in MediaWiki's parser, after the function has handed its text back, so it
  * is invisible to a test that only inspects the return value.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
  * @group Database
  */
 class CypherRawParserFunctionParsingTest extends MediaWikiIntegrationTestCase {

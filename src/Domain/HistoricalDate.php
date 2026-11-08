@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain;
+namespace ProfessionalWiki\SWS\Domain;
 
 /** Wikipedia-convention dates in historical era numbering, without a year zero.
  * The lexical precision is significant: 1458 is not shorthand for 1458-01-01.
  */
 readonly class HistoricalDate {
-	public const string RDF_DATATYPE = 'urn:neowiki:datatype:historical-date:wikipedia:historical-era';
+	public const string RDF_DATATYPE = 'urn:sws:datatype:historical-date:wikipedia:historical-era';
 	public const string PATTERN = '^(-?)((?!0000)[0-9]{4})(?:-(0[1-9]|1[0-2])(?:-(0[1-9]|[12][0-9]|3[01]))?)?$';
 
 	private function __construct(

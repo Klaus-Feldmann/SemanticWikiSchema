@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use LogicException;
 use MediaWiki\Page\PageIdentity;
-use ProfessionalWiki\NeoWiki\Application\SubjectContentRepository;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Application\SubjectContentRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 
 class InMemorySubjectContentRepository implements SubjectContentRepository {
 

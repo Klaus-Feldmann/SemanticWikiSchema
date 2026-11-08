@@ -3,7 +3,7 @@
 
 	const Vue = require( 'vue' );
 	const codex = require( './codex.js' );
-	const nw = require( 'ext.neowiki' );
+	const nw = require( 'ext.sws' );
 	const CreateSubjectDialog = require( './CreateSubjectDialog.vue' );
 	const DIALOG_OPEN_KEY = require( './constants.js' ).DIALOG_OPEN_KEY;
 
@@ -22,8 +22,8 @@
 
 		const app = Vue.createMwApp( CreateSubjectDialog )
 			.directive( 'tooltip', codex.CdxTooltip );
-		app.use( nw.NeoWikiExtension.getInstance().getPinia() );
-		nw.NeoWikiServices.registerServices( app );
+		app.use( nw.SWSExtension.getInstance().getPinia() );
+		nw.SWSServices.registerServices( app );
 		app.provide( DIALOG_OPEN_KEY, open );
 		app.mount( host );
 		mounted = true;

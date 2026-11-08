@@ -1,12 +1,12 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSchemas;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSchemas;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSchemas
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSchemas
  */
 class SpecialSchemasTest extends SpecialPageTestBase {
 
@@ -21,13 +21,13 @@ class SpecialSchemasTest extends SpecialPageTestBase {
 		[ $output ] = $this->executeSpecialPage();
 
 		$this->assertStringContainsString(
-			'id="ext-neowiki-schemas"',
+			'id="ext-sws-schemas"',
 			$output
 		);
 	}
 
 	public function testLoadsTheFrontendModule(): void {
-		$this->assertContains( 'ext.neowiki', $this->outputOf( $this->newSpecialPage() )->getModules() );
+		$this->assertContains( 'ext.sws', $this->outputOf( $this->newSpecialPage() )->getModules() );
 	}
 
 	public function testTheHelpLinkLeadsToTheDocs(): void {

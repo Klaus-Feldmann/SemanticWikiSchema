@@ -1,0 +1,66 @@
+<?php
+
+declare( strict_types = 1 );
+
+namespace ProfessionalWiki\SWS\Tests;
+
+use MediaWiki\Page\PageIdentity;
+use MediaWiki\Permissions\Authority;
+use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
+
+/**
+ * SWS-specific Authority fixtures on top of core's MockAuthorityTrait. Use this trait
+ * INSTEAD of MockAuthorityTrait (it re-exposes all of its methods); using both in one class
+ * is a trait-method collision.
+ */
+trait SWSMockAuthorityTrait {
+
+	use MockAuthorityTrait;
+
+	/**
+	 * Holds the wiki-global 'read' right, but cannot read any specific page
+	 * (as under a restricted namespace, $wgWhitelistRead, or an ACL extension).
+	 */
+	private function authorityWithGlobalReadButNoPageRead(): Authority {
+		$canReadGloballyButNotPerPage = static fn ( string $permission, ?PageIdentity $page = null ): bool =>
+			$permission === 'read' && $page === null;
+
+		return $this->mockRegisteredAuthority( $canReadGloballyButNotPerPage );
+	}
+
+	/**
+	 * Can read and edit every page except the one with this id, which it cannot read at all. Lets a
+	 * write touching two pages be denied on exactly one of them.
+	 */
+	private function authorityThatCannotReadPageId( int $pageId ): Authority {
+		$deniesOnePage = static fn ( string $permission, ?PageIdentity $page = null ): bool =>
+			$page === null || $page->getId() !== $pageId;
+
+		return $this->mockRegisteredAuthority( $deniesOnePage );
+	}
+
+	/**
+	 * Can read every page and edit every page except the one with this id. That page is readable, so
+	 * its existence is already public: a write to it is answered with 403, not the not-found shape.
+	 */
+	private function authorityThatCannotEditPageId( int $pageId ): Authority {
+		$deniesEditOnOnePage = static fn ( string $permission, ?PageIdentity $page = null ): bool =>
+			$permission === 'read' || $page === null || $page->getId() !== $pageId;
+
+		return $this->mockRegisteredAuthority( $deniesEditOnOnePage );
+	}
+
+	/**
+	 * Can read every page and holds the wiki-global 'edit' right, but cannot edit any specific page
+	 * (as under page protection or an ACL extension that grants read but denies edit). Such a page
+	 * is readable, so its existence is already public: a write to it is answered with 403, not the
+	 * not-found shape reserved for pages the caller cannot read.
+	 */
+	private function authorityWithGlobalEditButNoPageEdit(): Authority {
+		$canReadAnyPageAndEditGloballyButNotPerPage = static fn ( string $permission, ?PageIdentity $page = null ): bool =>
+			$permission === 'read' || ( $permission === 'edit' && $page === null );
+
+		return $this->mockRegisteredAuthority( $canReadAnyPageAndEditGloballyButNotPerPage );
+	}
+
+}

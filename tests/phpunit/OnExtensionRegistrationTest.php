@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::onExtensionRegistration
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::poweredByBadge
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::requireComposerLibraries
+ * @covers \ProfessionalWiki\SWS\SWSExtension::onExtensionRegistration
+ * @covers \ProfessionalWiki\SWS\SWSExtension::poweredByBadge
+ * @covers \ProfessionalWiki\SWS\SWSExtension::requireComposerLibraries
  */
 class OnExtensionRegistrationTest extends TestCase {
 
@@ -22,9 +22,9 @@ class OnExtensionRegistrationTest extends TestCase {
 	 */
 	private const CHANGED_GLOBALS = [
 		'wgRestAPIAdditionalRouteFiles',
-		'wgNeoWikiNeo4jInternalWriteUrl',
-		'wgNeoWikiNeo4jInternalReadUrl',
-		'wgNeoWikiSparqlStores',
+		'wgSWSNeo4jInternalWriteUrl',
+		'wgSWSNeo4jInternalReadUrl',
+		'wgSWSSparqlStores',
 		'wgFooterIcons',
 		'wgExtensionAssetsPath',
 		'wgCirrusSearchWeights',
@@ -46,7 +46,7 @@ class OnExtensionRegistrationTest extends TestCase {
 		// Clear the CI env overrides so the config-value path is exercised deterministically.
 		$this->snapshotAndClearNeo4jEnvOverrides();
 		$GLOBALS['wgRestAPIAdditionalRouteFiles'] = [];
-		$GLOBALS['wgNeoWikiSparqlStores'] = null;
+		$GLOBALS['wgSWSSparqlStores'] = null;
 	}
 
 	protected function tearDown(): void {
@@ -60,62 +60,62 @@ class OnExtensionRegistrationTest extends TestCase {
 	}
 
 	public function testAddsCypherRouteFileWhenConfigured(): void {
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = 'bolt://write:7687';
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = 'bolt://read:7687';
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = 'bolt://write:7687';
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = 'bolt://read:7687';
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertCount( 1, $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 		$this->assertStringEndsWith( 'neo4jRoutes.json', $GLOBALS['wgRestAPIAdditionalRouteFiles'][0] );
 	}
 
 	public function testAddsNoRouteFileWhenUnconfigured(): void {
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = null;
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = null;
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = null;
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = null;
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertSame( [], $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 	}
 
 	public function testPreservesExistingRouteFiles(): void {
 		$GLOBALS['wgRestAPIAdditionalRouteFiles'] = [ '/existing/routes.json' ];
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = 'bolt://write:7687';
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = 'bolt://read:7687';
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = 'bolt://write:7687';
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = 'bolt://read:7687';
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertContains( '/existing/routes.json', $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 		$this->assertCount( 2, $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 	}
 
 	public function testAddsSparqlRouteFileWhenStoreConfigured(): void {
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = null;
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = null;
-		$GLOBALS['wgNeoWikiSparqlStores'] = [ [ 'updateUrl' => 'https://qlever.example/api' ] ];
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = null;
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = null;
+		$GLOBALS['wgSWSSparqlStores'] = [ [ 'updateUrl' => 'https://qlever.example/api' ] ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertCount( 1, $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 		$this->assertStringEndsWith( 'sparqlRoutes.json', $GLOBALS['wgRestAPIAdditionalRouteFiles'][0] );
 	}
 
 	public function testAddsNoSparqlRouteFileWithoutStore(): void {
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = null;
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = null;
-		$GLOBALS['wgNeoWikiSparqlStores'] = [];
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = null;
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = null;
+		$GLOBALS['wgSWSSparqlStores'] = [];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertSame( [], $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 	}
 
 	public function testAddsBothRouteFilesWhenNeo4jAndSparqlConfigured(): void {
-		$GLOBALS['wgNeoWikiNeo4jInternalWriteUrl'] = 'bolt://write:7687';
-		$GLOBALS['wgNeoWikiNeo4jInternalReadUrl'] = 'bolt://read:7687';
-		$GLOBALS['wgNeoWikiSparqlStores'] = [ [ 'updateUrl' => 'https://qlever.example/api' ] ];
+		$GLOBALS['wgSWSNeo4jInternalWriteUrl'] = 'bolt://write:7687';
+		$GLOBALS['wgSWSNeo4jInternalReadUrl'] = 'bolt://read:7687';
+		$GLOBALS['wgSWSSparqlStores'] = [ [ 'updateUrl' => 'https://qlever.example/api' ] ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertCount( 2, $GLOBALS['wgRestAPIAdditionalRouteFiles'] );
 	}
@@ -123,11 +123,11 @@ class OnExtensionRegistrationTest extends TestCase {
 	public function testRegistersThePoweredByBadgeForTheRunningMediaWiki(): void {
 		$this->givenOnlyTheMediaWikiBadge();
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertSame(
-			NeoWikiExtension::poweredByBadge( '/w/extensions', MW_VERSION ),
-			$GLOBALS['wgFooterIcons']['poweredbyneowiki']['neowiki']
+			SWSExtension::poweredByBadge( '/w/extensions', MW_VERSION ),
+			$GLOBALS['wgFooterIcons']['poweredbysws']['sws']
 		);
 	}
 
@@ -139,7 +139,7 @@ class OnExtensionRegistrationTest extends TestCase {
 				'alt' => 'Powered by Semantic WikiSchema',
 				'lang' => 'en',
 			],
-			NeoWikiExtension::poweredByBadge( '/w/extensions', '1.43.8' )
+			SWSExtension::poweredByBadge( '/w/extensions', '1.43.8' )
 		);
 	}
 
@@ -161,33 +161,33 @@ class OnExtensionRegistrationTest extends TestCase {
 					],
 				],
 			],
-			NeoWikiExtension::poweredByBadge( '/w/extensions', '1.44.0' )
+			SWSExtension::poweredByBadge( '/w/extensions', '1.44.0' )
 		);
 	}
 
 	public function testMediaWiki144DevelopmentBuildsGetTheCompactIcon(): void {
-		$this->assertArrayHasKey( 'sources', NeoWikiExtension::poweredByBadge( '/w/extensions', '1.44.0-alpha' ) );
+		$this->assertArrayHasKey( 'sources', SWSExtension::poweredByBadge( '/w/extensions', '1.44.0-alpha' ) );
 	}
 
 	public function testAddsTheBadgeAsItsOwnBlockAfterTheMediaWikiOne(): void {
 		$this->givenOnlyTheMediaWikiBadge();
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertSame( [ 'poweredby', 'poweredbyneowiki' ], array_keys( $GLOBALS['wgFooterIcons'] ) );
+		$this->assertSame( [ 'poweredby', 'poweredbysws' ], array_keys( $GLOBALS['wgFooterIcons'] ) );
 	}
 
 	public function testKeepsAPreconfiguredPoweredByBadge(): void {
 		$this->givenOnlyTheMediaWikiBadge();
-		$GLOBALS['wgFooterIcons']['poweredbyneowiki']['neowiki'] = false;
+		$GLOBALS['wgFooterIcons']['poweredbysws']['sws'] = false;
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertFalse( $GLOBALS['wgFooterIcons']['poweredbyneowiki']['neowiki'] );
+		$this->assertFalse( $GLOBALS['wgFooterIcons']['poweredbysws']['sws'] );
 	}
 
 	public function testBadgeImagesExistWhereTheyAreRegistered(): void {
-		$badge = NeoWikiExtension::poweredByBadge( '/w/extensions', '1.44.0' );
+		$badge = SWSExtension::poweredByBadge( '/w/extensions', '1.44.0' );
 
 		$this->assertFileExists( $this->fileBehind( $badge['src'] ) );
 		$this->assertFileExists( $this->fileBehind( $badge['sources'][0]['srcset'] ) );
@@ -197,29 +197,29 @@ class OnExtensionRegistrationTest extends TestCase {
 		$this->expectException( Exception::class );
 		$this->expectExceptionMessage( 'composer update' );
 
-		NeoWikiExtension::requireComposerLibraries( 'ProfessionalWiki\NeoWiki\Tests\NoSuchLibraryClass' );
+		SWSExtension::requireComposerLibraries( 'ProfessionalWiki\SWS\Tests\NoSuchLibraryClass' );
 	}
 
 	public function testWeightsTheSubjectFieldIntoCirrusSearchQueries(): void {
 		$GLOBALS['wgCirrusSearchWeights'] = [ 'text' => 1 ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertSame( [ 'text' => 1, 'neowiki_text' => 1 ], $GLOBALS['wgCirrusSearchWeights'] );
+		$this->assertSame( [ 'text' => 1, 'sws_text' => 1 ], $GLOBALS['wgCirrusSearchWeights'] );
 	}
 
 	public function testKeepsTheSubjectFieldWeightTheAdministratorConfigured(): void {
-		$GLOBALS['wgCirrusSearchWeights'] = [ 'neowiki_text' => 5 ];
+		$GLOBALS['wgCirrusSearchWeights'] = [ 'sws_text' => 5 ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertSame( [ 'neowiki_text' => 5 ], $GLOBALS['wgCirrusSearchWeights'] );
+		$this->assertSame( [ 'sws_text' => 5 ], $GLOBALS['wgCirrusSearchWeights'] );
 	}
 
 	public function testAddsNoWeightWithoutCirrusSearch(): void {
 		$GLOBALS['wgCirrusSearchWeights'] = null;
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
 		$this->assertNull( $GLOBALS['wgCirrusSearchWeights'] );
 	}
@@ -227,18 +227,18 @@ class OnExtensionRegistrationTest extends TestCase {
 	public function testSearchesTheSubjectNamespaceByDefault(): void {
 		$GLOBALS['wgNamespacesToBeSearchedDefault'] = [ NS_MAIN => true ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertTrue( $GLOBALS['wgNamespacesToBeSearchedDefault'][NeoWikiExtension::NS_SUBJECT] );
+		$this->assertTrue( $GLOBALS['wgNamespacesToBeSearchedDefault'][SWSExtension::NS_SUBJECT] );
 		$this->assertTrue( $GLOBALS['wgNamespacesToBeSearchedDefault'][NS_MAIN] );
 	}
 
 	public function testKeepsTheSubjectNamespaceSearchTheAdministratorConfigured(): void {
-		$GLOBALS['wgNamespacesToBeSearchedDefault'] = [ NS_MAIN => true, NeoWikiExtension::NS_SUBJECT => false ];
+		$GLOBALS['wgNamespacesToBeSearchedDefault'] = [ NS_MAIN => true, SWSExtension::NS_SUBJECT => false ];
 
-		NeoWikiExtension::onExtensionRegistration();
+		SWSExtension::onExtensionRegistration();
 
-		$this->assertFalse( $GLOBALS['wgNamespacesToBeSearchedDefault'][NeoWikiExtension::NS_SUBJECT] );
+		$this->assertFalse( $GLOBALS['wgNamespacesToBeSearchedDefault'][SWSExtension::NS_SUBJECT] );
 	}
 
 	private function fileBehind( string $url ): string {

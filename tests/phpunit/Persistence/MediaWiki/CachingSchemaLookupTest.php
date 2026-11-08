@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CachingSchemaLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPageContentFetcher;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\ObjectCache\EmptyBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
 
@@ -26,7 +26,7 @@ use Wikimedia\ObjectCache\WANObjectCache;
  * The shared tier is PublishedPageJsonLookup's, so these run with a shared cache that stores nothing,
  * as on a wiki with $wgMainCacheType = CACHE_NONE: every read past the process-local tier reads the page.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CachingSchemaLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup
  */
 class CachingSchemaLookupTest extends TestCase {
 

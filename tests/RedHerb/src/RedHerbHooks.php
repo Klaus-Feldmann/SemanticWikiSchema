@@ -4,13 +4,13 @@ declare( strict_types = 1 );
 
 namespace ProfessionalWiki\RedHerb;
 
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiRegistrar;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
 
 class RedHerbHooks {
 
-	public static function onNeoWikiRegistration( NeoWikiRegistrar $registrar ): void {
+	public static function onSWSRegistration( SWSRegistrar $registrar ): void {
 		$registrar->addPropertyType( new ColorType() );
 		$registrar->addNeo4jValueBuilder( ColorType::NAME, static fn( $value ) => $value->toScalars() );
 		$registrar->addRdfValueMapper(

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Severity;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
 use ProfessionalWiki\RedHerb\ColorProperty;
 use ProfessionalWiki\RedHerb\ColorType;
 

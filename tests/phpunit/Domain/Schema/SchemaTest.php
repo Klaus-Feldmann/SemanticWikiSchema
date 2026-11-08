@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Schema
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Schema
  */
 class SchemaTest extends TestCase {
 

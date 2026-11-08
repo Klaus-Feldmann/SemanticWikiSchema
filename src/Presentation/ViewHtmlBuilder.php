@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\SubjectContentRepository;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Application\SubjectContentRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 use Throwable;
 
 class ViewHtmlBuilder {
@@ -50,9 +50,9 @@ class ViewHtmlBuilder {
 
 	public static function mainSubjectInFullPlaceholderHtml( string $subjectId ): string {
 		return Html::element( 'div', [
-			'id' => 'ext-neowiki-main-subject',
-			'class' => 'ext-neowiki-ui',
-			'data-mw-neowiki-subject-id' => $subjectId,
+			'id' => 'ext-sws-main-subject',
+			'class' => 'ext-sws-ui',
+			'data-mw-sws-subject-id' => $subjectId,
 		] );
 	}
 
@@ -61,17 +61,17 @@ class ViewHtmlBuilder {
 	 * since the Sanitizer drops data-mw-* attributes.
 	 */
 	public static function containsMainSubjectInFull( string $html ): bool {
-		return preg_match( '/<div id="ext-neowiki-main-subject"(?: [\w-]+="[^"]*")* data-mw-neowiki-subject-id="/', $html ) === 1;
+		return preg_match( '/<div id="ext-sws-main-subject"(?: [\w-]+="[^"]*")* data-mw-sws-subject-id="/', $html ) === 1;
 	}
 
 	public static function viewPlaceholderHtml( string $subjectId, ?string $layoutName = null ): string {
 		$attributes = [
-			'class' => 'ext-neowiki-view',
-			'data-mw-neowiki-subject-id' => $subjectId,
+			'class' => 'ext-sws-view',
+			'data-mw-sws-subject-id' => $subjectId,
 		];
 
 		if ( $layoutName !== null ) {
-			$attributes['data-mw-neowiki-layout-name'] = $layoutName;
+			$attributes['data-mw-sws-layout-name'] = $layoutName;
 		}
 
 		return Html::element( 'div', $attributes );

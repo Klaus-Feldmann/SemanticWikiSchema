@@ -6,8 +6,8 @@ namespace ProfessionalWiki\RedHerb;
 
 use MediaWiki\Hook\SidebarBeforeOutputHook;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 use Skin;
 
 class RedHerbSidebarHook implements SidebarBeforeOutputHook {
@@ -23,7 +23,7 @@ class RedHerbSidebarHook implements SidebarBeforeOutputHook {
 
 		$title = $skin->getTitle();
 		if ( $title !== null && $title->exists() ) {
-			$extension = NeoWikiExtension::getInstance();
+			$extension = SWSExtension::getInstance();
 			$hints = $extension->newSubjectPermissionHints( $skin->getAuthority() );
 			$pageId = new PageId( $title->getArticleID() );
 

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use DateTime;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Contracts\TransactionInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Types\CypherMap;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageValue;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageValueType;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageValue;
+use ProfessionalWiki\SWS\Domain\Page\PageValueType;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 readonly class Neo4jProjectionStore implements GraphDatabasePlugin {
 

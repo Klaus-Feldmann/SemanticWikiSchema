@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\RestGetMainSubjectPresenter;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\RestGetMainSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetMainSubjectApi extends SimpleHandler {
@@ -17,7 +17,7 @@ class GetMainSubjectApi extends SimpleHandler {
 	public function run( int $pageId ): Response {
 		$presenter = new RestGetMainSubjectPresenter();
 
-		NeoWikiExtension::getInstance()->newGetMainSubjectQuery( $presenter, $this->getAuthority() )->execute( $pageId );
+		SWSExtension::getInstance()->newGetMainSubjectQuery( $presenter, $this->getAuthority() )->execute( $pageId );
 
 		return $this->getResponseFactory()->createJson( $presenter->getJsonArray() );
 	}

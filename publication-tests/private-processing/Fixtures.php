@@ -10,11 +10,11 @@ use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIdentity;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingResult;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIdentity;
+use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingResult;
 $services=MediaWikiServices::getInstance();
 $admin=$services->getUserFactory()->newFromName('TestAdmin');
 $GLOBALS['services']=$services; $GLOBALS['admin']=$admin;
@@ -22,7 +22,7 @@ function saveTestPage(string $name, $main, $neo=null) {
  global $services,$admin;
  $page=$services->getWikiPageFactory()->newFromTitle(Title::newFromText($name));
  $updater=$page->newPageUpdater($admin);$updater->setContent('main',$main);
- if ($neo!==null) {$updater->setContent('neo',$neo);}
+ if ($neo!==null) {$updater->setContent('sws',$neo);}
  $rev=$updater->saveRevision(CommentStoreComment::newUnsavedComment('isolated private integration fixture'),0);
  if (!$rev && $updater->getStatus()->isOK()) {$rev=$page->getRevisionRecord();}
  if (!$rev) {throw new RuntimeException('Save failed: '.$name.' '.$updater->getStatus()->getWikiText());}
@@ -34,14 +34,14 @@ $u=ProcessingIdentity::get();
 checkTest($u->isSystemUser() && $u->isAllowed('read') && !$u->isAllowed('edit') && !$u->isAllowed('delete'),'noninteractive read-only identity');
 
 $dir=$GLOBALS['IP'] . '/extensions/SemanticWikiSchema/integrations/smw/Wikiseiten/';
-foreach (['NeoWiki'=>'Modul-NeoWiki.lua','NeoWiki/API'=>'Modul-NeoWiki-API.lua','NeoWiki/config'=>'Modul-NeoWiki-config.lua'] as $name=>$file) {
+foreach (['SWS'=>'Modul-SWS.lua','SWS/API'=>'Modul-SWS-API.lua','SWS/config'=>'Modul-SWS-config.lua'] as $name=>$file) {
  saveTestPage('Modul:'.$name,new MediaWiki\Extension\Scribunto\ScribuntoContent(file_get_contents($dir.$file)));
 }
-saveTestPage('Vorlage:NeoWiki',new WikitextContent(file_get_contents($dir.'Vorlage-NeoWiki.wikitext')));
+saveTestPage('Vorlage:SWS',new WikitextContent(file_get_contents($dir.'Vorlage-SWS.wikitext')));
 
 $schema=['title'=>'ProcessingTest','propertyDefinitions'=>[
  'Name'=>['type'=>'text'],
- 'Programm'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'{{NeoWiki}}{{#set:Verarbeitungstest=Vollständig}}']
+ 'Programm'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'{{SWS}}{{#set:Verarbeitungstest=Vollständig}}']
 ]];
 saveTestPage('Schema:ProcessingTest',new SchemaContent(json_encode($schema)));
 $subject=['mainSubject'=>'sProcessingTest','subjects'=>['sProcessingTest'=>['label'=>'Processing fixture','schema'=>'ProcessingTest','statements'=>['Name'=>['type'=>'text','value'=>['Privater Wert']]]]]];
@@ -57,4 +57,4 @@ $data=SMW\Services\ServicesFactory::getInstance()->getStore()->getSemanticData(S
 echo 'PROPERTIES '.json_encode(array_keys($data->getProperties()),JSON_UNESCAPED_UNICODE)."\n";
 checkTest(isset($data->getProperties()['Verarbeitungstest']),'schema annotation persisted in private wiki');
 checkTest(isset($data->getProperties()['Manuell']),'manual annotation preserved');
-checkTest(isset($data->getProperties()['Name']),'actual Modul:NeoWiki annotations persisted');
+checkTest(isset($data->getProperties()['Name']),'actual Modul:SWS annotations persisted');

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
 use WeakMap;
 
 /**

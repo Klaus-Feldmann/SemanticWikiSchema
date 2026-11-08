@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 use MediaWiki\Config\ServiceOptions;
 use MediaWiki\Deferred\DeferredUpdates;
@@ -10,15 +10,15 @@ use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The headline write+query loop, exercised against a REAL, live SPARQL 1.1 store with REAL HTTP — no
@@ -31,9 +31,9 @@ use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
  * overwrite, and that one query can join across them.
  *
  * Each subclass names one live store, so the loop runs once per SPARQL engine the development stack
- * ships — keeping NeoWiki honest about targeting SPARQL 1.1 itself rather than one implementation's
+ * ships — keeping SWS honest about targeting SPARQL 1.1 itself rather than one implementation's
  * dialect and defaults. Those defaults differ in ways a query can silently come to depend on, most
- * sharply whether an unscoped query sees the named graphs NeoWiki writes into: SPARQL 1.1 leaves
+ * sharply whether an unscoped query sees the named graphs SWS writes into: SPARQL 1.1 leaves
  * that to the store — QLever always unions them in, a strict store keeps them out.
  *
  * Deliberately does NOT skip when a store is unreachable: any unset setting the store cannot be
@@ -44,7 +44,7 @@ use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
  * Each subclass carries its own `@covers` and `@group Database`; MediaWiki reads the group off the
  * concrete class alone.
  */
-abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
+abstract class QuerySparqlEndToEndTestCase extends SWSIntegrationTestCase {
 
 	private const string PAGE_NAME = 'Sparql query system test page';
 	private const string LABEL_PREDICATE = 'http://www.w3.org/2000/01/rdf-schema#label';
@@ -96,7 +96,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	}
 
 	protected function tearDown(): void {
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		parent::tearDown();
 	}
 
@@ -127,13 +127,13 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	 */
 	private function configureStoresForProjections( string ...$projections ): void {
 		$this->overrideConfigValue(
-			'NeoWikiSparqlStores',
+			'SWSSparqlStores',
 			array_map(
 				fn ( string $projection ): array => $this->storeEntryFor( $projection ),
 				$projections
 			)
 		);
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	/**
@@ -160,7 +160,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	public function testALiveStoreAcceptsTheLivenessProbe(): void {
 		$this->expectNotToPerformAssertions();
 
-		NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins()['native']->initialize();
+		SWSExtension::getInstance()->getNamedGraphDatabasePlugins()['native']->initialize();
 	}
 
 	public function testSubjectLabelRoundTripsThroughTheSparqlQueryService(): void {
@@ -246,7 +246,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 		$subjectId = TestSubject::uniqueId();
 		$this->configureBothProjectionsAndSavePage( $subjectId );
 
-		$namespaces = NeoWikiExtension::getInstance()->getRdfNamespaces();
+		$namespaces = SWSExtension::getInstance()->getRdfNamespaces();
 		$subjectIri = $namespaces->subject( $subjectId )->value;
 
 		$bindings = $this->runQuery(
@@ -321,7 +321,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	 * @return array<string, string>
 	 */
 	private function queryClassesByGraphOf( SubjectId $subjectId ): array {
-		$namespaces = NeoWikiExtension::getInstance()->getRdfNamespaces();
+		$namespaces = SWSExtension::getInstance()->getRdfNamespaces();
 		$subjectIri = $namespaces->subject( $subjectId )->value;
 
 		$bindings = $this->runQuery(
@@ -351,9 +351,9 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	 * @return list<string> The rdfs:label literal values bound to the Subject, via the query service.
 	 */
 	private function queryLabelsOf( SubjectId $subjectId ): array {
-		$subjectIri = NeoWikiExtension::getInstance()->getRdfNamespaces()->subject( $subjectId )->value;
+		$subjectIri = SWSExtension::getInstance()->getRdfNamespaces()->subject( $subjectId )->value;
 
-		// GRAPH-scoped, because NeoWiki writes each page into a named graph and never the default
+		// GRAPH-scoped, because SWS writes each page into a named graph and never the default
 		// graph. See queryLabelsWithoutGraphScopeOf() for what dropping the clause costs. No DISTINCT:
 		// its callers configure one projection, so one graph must hold the label, and scoping by GRAPH
 		// makes that cardinality observable — collapsing it would hide a page projected twice.
@@ -371,7 +371,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	 * @return list<string>
 	 */
 	private function queryLabelsWithoutGraphScopeOf( SubjectId $subjectId ): array {
-		$subjectIri = NeoWikiExtension::getInstance()->getRdfNamespaces()->subject( $subjectId )->value;
+		$subjectIri = SWSExtension::getInstance()->getRdfNamespaces()->subject( $subjectId )->value;
 
 		return $this->labelsFrom(
 			'SELECT ?label WHERE { <' . $subjectIri . '> <' . self::LABEL_PREDICATE . '> ?label }'
@@ -392,7 +392,7 @@ abstract class QuerySparqlEndToEndTestCase extends NeoWikiIntegrationTestCase {
 	 * @return list<array<string, array<string, string>>> The query's solution bindings.
 	 */
 	private function runQuery( string $sparql ): array {
-		return NeoWikiExtension::getInstance()->newSparqlQueryService( $this->getTestSysop()->getUser() )->execute(
+		return SWSExtension::getInstance()->newSparqlQueryService( $this->getTestSysop()->getUser() )->execute(
 			new SparqlQueryRequest(
 				sparql: $sparql,
 				limits: new SparqlQueryLimits( 30 ),

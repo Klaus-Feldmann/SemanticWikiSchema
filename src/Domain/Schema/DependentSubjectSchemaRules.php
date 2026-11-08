@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Schema;
+namespace ProfessionalWiki\SWS\Domain\Schema;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\RelationProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
 
 /**
  * Schemas that do not resolve are ignored.

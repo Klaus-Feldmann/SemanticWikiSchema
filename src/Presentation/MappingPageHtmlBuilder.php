@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use Closure;
 use MediaWiki\Cache\LinkBatchFactory;
@@ -12,7 +12,7 @@ use MediaWiki\Linker\LinkTarget;
 use MediaWiki\Parser\Sanitizer;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 use stdClass;
 
 /**
@@ -22,7 +22,7 @@ use stdClass;
  */
 class MappingPageHtmlBuilder {
 
-	private const string SECTION_ID_PREFIX = 'ext-neowiki-mapping-schema-';
+	private const string SECTION_ID_PREFIX = 'ext-sws-mapping-schema-';
 
 	/** @var list<LinkTarget> */
 	private array $schemaLinks = [];
@@ -56,7 +56,7 @@ class MappingPageHtmlBuilder {
 
 		$html = Html::rawElement(
 			'div',
-			[ 'class' => 'ext-neowiki-mapping-page' ],
+			[ 'class' => 'ext-sws-mapping-page' ],
 			$this->versionHtml( $mapping )
 				. $this->schemasOverviewHtml( $schemas )
 				. $this->prefixesHtml( $mapping->prefixes ?? null )
@@ -81,7 +81,7 @@ class MappingPageHtmlBuilder {
 		$titles = [];
 
 		foreach ( get_object_vars( $schemas ) as $name => $schema ) {
-			$title = $this->titleFactory->makeTitleSafe( NeoWikiExtension::NS_SCHEMA, (string)$name );
+			$title = $this->titleFactory->makeTitleSafe( SWSExtension::NS_SCHEMA, (string)$name );
 
 			if ( $title !== null && $title->getText() === (string)$name ) {
 				$titles[(string)$name] = $title;
@@ -96,8 +96,8 @@ class MappingPageHtmlBuilder {
 	private function versionHtml( stdClass $mapping ): string {
 		return Html::element(
 			'div',
-			[ 'class' => 'ext-neowiki-mapping-page__version' ],
-			wfMessage( 'neowiki-mapping-page-version' )->numParams( $mapping->version )->inContentLanguage()->text()
+			[ 'class' => 'ext-sws-mapping-page__version' ],
+			wfMessage( 'sws-mapping-page-version' )->numParams( $mapping->version )->inContentLanguage()->text()
 		);
 	}
 
@@ -106,10 +106,10 @@ class MappingPageHtmlBuilder {
 			return $this->emptyStateHtml();
 		}
 
-		return $this->headingHtml( 'neowiki-mapping-page-schemas-heading' )
+		return $this->headingHtml( 'sws-mapping-page-schemas-heading' )
 			. Html::rawElement(
 				'table',
-				[ 'class' => 'wikitable ext-neowiki-mapping-page__schemas' ],
+				[ 'class' => 'wikitable ext-sws-mapping-page__schemas' ],
 				$this->overviewHeadHtml() . Html::rawElement( 'tbody', [], $this->overviewRowsHtml( $schemas ) )
 			);
 	}
@@ -118,9 +118,9 @@ class MappingPageHtmlBuilder {
 		return Html::rawElement( 'thead', [], Html::rawElement(
 			'tr',
 			[],
-			$this->headerCellHtml( 'neowiki-mapping-page-schema-column' )
-				. $this->headerCellHtml( 'neowiki-mapping-page-class-column' )
-				. $this->headerCellHtml( 'neowiki-mapping-page-properties-column' )
+			$this->headerCellHtml( 'sws-mapping-page-schema-column' )
+				. $this->headerCellHtml( 'sws-mapping-page-class-column' )
+				. $this->headerCellHtml( 'sws-mapping-page-properties-column' )
 		) );
 	}
 
@@ -200,10 +200,10 @@ class MappingPageHtmlBuilder {
 			return '';
 		}
 
-		return $this->headingHtml( 'neowiki-mapping-page-prefixes-heading' )
+		return $this->headingHtml( 'sws-mapping-page-prefixes-heading' )
 			. Html::rawElement(
 				'table',
-				[ 'class' => 'wikitable ext-neowiki-mapping-page__prefixes' ],
+				[ 'class' => 'wikitable ext-sws-mapping-page__prefixes' ],
 				$this->prefixHeadHtml() . Html::rawElement( 'tbody', [], $rows )
 			);
 	}
@@ -212,8 +212,8 @@ class MappingPageHtmlBuilder {
 		return Html::rawElement( 'thead', [], Html::rawElement(
 			'tr',
 			[],
-			$this->headerCellHtml( 'neowiki-mapping-page-prefix-column' )
-				. $this->headerCellHtml( 'neowiki-mapping-page-namespace-column' )
+			$this->headerCellHtml( 'sws-mapping-page-prefix-column' )
+				. $this->headerCellHtml( 'sws-mapping-page-namespace-column' )
 		) );
 	}
 
@@ -280,8 +280,8 @@ class MappingPageHtmlBuilder {
 	private function emptyStateHtml(): string {
 		return Html::element(
 			'p',
-			[ 'class' => 'ext-neowiki-mapping-page__empty' ],
-			wfMessage( 'neowiki-mapping-page-no-schemas' )->inContentLanguage()->text()
+			[ 'class' => 'ext-sws-mapping-page__empty' ],
+			wfMessage( 'sws-mapping-page-no-schemas' )->inContentLanguage()->text()
 		);
 	}
 

@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * Fans a page event out to every registered graph database plugin.
@@ -14,7 +14,7 @@ use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
  * run. That is what update.php's initialization needs, so an unreachable backend is reported rather
  * than passed over. The hook-facing production wiring wraps each plugin in a
  * FailureIsolatingGraphDatabasePlugin so a projection failure never aborts the triggering user
- * operation; see NeoWikiExtension. A rebuild uses neither composite: it is scoped to one store and
+ * operation; see SWSExtension. A rebuild uses neither composite: it is scoped to one store and
  * addresses that store's plugin directly.
  */
 class CompositeGraphDatabasePlugin implements GraphDatabasePlugin {

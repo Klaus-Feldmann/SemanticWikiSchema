@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\Content\ContentHandler;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubSearchEngine;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubSearchEngine;
 use SearchEngine;
 use WikiPage;
 
@@ -19,13 +19,13 @@ use WikiPage;
  * MediaWiki's own hook plumbing — the path CirrusSearch indexes a page by.
  *
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onSearchIndexFields
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onSearchDataForIndex2
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchIndexFields
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchDataForIndex2
  */
-class SubjectSearchFieldHooksTest extends NeoWikiIntegrationTestCase {
+class SubjectSearchFieldHooksTest extends SWSIntegrationTestCase {
 
 	public function testTheSubjectTextFieldIsDeclared(): void {
-		$this->assertArrayHasKey( 'neowiki_text', $this->newEngine()->getSearchIndexFields() );
+		$this->assertArrayHasKey( 'sws_text', $this->newEngine()->getSearchIndexFields() );
 	}
 
 	public function testThePagesSubjectsFillTheField(): void {
@@ -35,7 +35,7 @@ class SubjectSearchFieldHooksTest extends NeoWikiIntegrationTestCase {
 			statements: new StatementList( [ TestStatement::build( property: 'City', value: 'Amsterdam' ) ] )
 		) );
 
-		$this->assertSame( "Rijksmuseum\nAmsterdam", $this->searchIndexDataOf( 'Museum page' )['neowiki_text'] );
+		$this->assertSame( "Rijksmuseum\nAmsterdam", $this->searchIndexDataOf( 'Museum page' )['sws_text'] );
 	}
 
 	/**

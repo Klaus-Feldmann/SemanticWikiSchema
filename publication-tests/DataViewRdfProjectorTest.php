@@ -1,8 +1,8 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use NeoWikiBaseBridge\DataViewRdfProjector;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\{Iri, Literal, RdfNamespaces, RdfFormat};
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
+use SWSBaseBridge\DataViewRdfProjector;
+use ProfessionalWiki\SWS\Domain\Rdf\{Iri, Literal, RdfNamespaces, RdfFormat};
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
 use pietercolpaert\hardf\{TriGParser, Util};
 use Psr\Log\NullLogger;
 

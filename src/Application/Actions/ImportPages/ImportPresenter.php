@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\ImportPages;
+namespace ProfessionalWiki\SWS\Application\Actions\ImportPages;
 
 interface ImportPresenter {
 

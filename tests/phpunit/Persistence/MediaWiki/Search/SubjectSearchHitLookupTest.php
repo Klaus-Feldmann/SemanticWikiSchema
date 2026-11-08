@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Search;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Search;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingSubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingSubjectSearchHitBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use TestLogger;
 
 /**
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search\SubjectSearchHitLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
  */
-class SubjectSearchHitLookupTest extends NeoWikiIntegrationTestCase {
+class SubjectSearchHitLookupTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string PAGE_NAME = 'SubjectSearchHitLookupTest Museum';
 	private const string OTHER_PAGE_NAME = 'SubjectSearchHitLookupTest Gallery';
@@ -104,7 +104,7 @@ class SubjectSearchHitLookupTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newRealHits(): SubjectSearchHitLookup {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return $this->newHits(
 			new SubjectSearchHitBuilder(

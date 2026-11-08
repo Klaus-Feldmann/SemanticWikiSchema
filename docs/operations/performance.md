@@ -5,7 +5,7 @@ order: 4
 
 # Performance
 
-How fast NeoWiki writes data, so you can judge whether it keeps up with your collection. The sizes and speeds it is
+How fast SWS writes data, so you can judge whether it keeps up with your collection. The sizes and speeds it is
 built to sustain are recorded in [ADR 29: Scalability Targets](../adr/029-scalability-targets.md). Read and query
 performance is not measured yet.
 
@@ -14,7 +14,7 @@ performance is not measured yet.
 Neo4j projection only, against a graph already holding a million nodes — this corpus projects roughly one node per
 Subject.
 
-| Measured | NeoWiki | Bulk import | Full rebuild | Validation |
+| Measured | SWS | Bulk import | Full rebuild | Validation |
 |---|---|---:|---:|---:|
 | 2026-08-01 | `851f44ae` | 602 Subjects/second | ~600 Subjects/second | 1.65 ms/Subject |
 
@@ -66,10 +66,10 @@ Bulk import is MediaWiki's `importDump.php`, run with secondary link updates off
 afterwards); loading over the REST API instead pays interactive-save latency per Subject. Backend validation does not
 run on the import path, so the import figures are unvalidated writes — the REST saves are validated — and validation is
 also measured on its own: 20 000 validations of one Subject in a single process. The rebuild figure is
-[`NeoWiki:RebuildGraphDatabases`](maintenance.md#rebuilding-the-graph) re-projecting the whole wiki. Interactive save is
+[`SemanticWikiSchema:RebuildGraphDatabases`](maintenance.md#rebuilding-the-graph) re-projecting the whole wiki. Interactive save is
 the median of 60 to 100 REST subject creates and replaces, with the store at the size above; QLever's figures at 100 000
 and 200 000 Subjects come from a wiki grown in 10 000-Subject imports.
-The corpus is synthetic, from `NeoWiki:GeneratePerformanceDump`: ten Subjects per page, twelve Statements per Subject,
+The corpus is synthetic, from `SemanticWikiSchema:GeneratePerformanceDump`: ten Subjects per page, twelve Statements per Subject,
 three of them relations to Subjects on other pages.
 
 ## Measure it yourself
@@ -81,7 +81,7 @@ make perf-generate pages=1000   # writes a dump of 1 000 pages carrying 10 000 S
 make perf-import                # imports it, reporting pages and Subjects per second
 ```
 
-To time a rebuild of what you imported, run [`NeoWiki:RebuildGraphDatabases`](maintenance.md#rebuilding-the-graph)
+To time a rebuild of what you imported, run [`SemanticWikiSchema:RebuildGraphDatabases`](maintenance.md#rebuilding-the-graph)
 under `time`.
 
 A stock development stack projects into QLever alone, which matches no column above. Start it with `services=neo`

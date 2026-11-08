@@ -2,54 +2,54 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleValue;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectContentRepository;
-use ProfessionalWiki\NeoWiki\Application\SubjectResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectContentRepository;
-use ProfessionalWiki\NeoWiki\Application\SubjectLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\NullPageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Application\SubjectContentRepository;
+use ProfessionalWiki\SWS\Application\SubjectResolver;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectContentRepository;
+use ProfessionalWiki\SWS\Application\SubjectLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\NullPageDependencyRecorder;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageDependencyRecorder;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectResolver
+ * @covers \ProfessionalWiki\SWS\Application\SubjectResolver
  */
 class SubjectResolverTest extends TestCase {
 

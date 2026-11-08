@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Rdf;
+namespace ProfessionalWiki\SWS\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfSerializer;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /**
  * Exports one Subject's outbound bounded description as a self-contained RDF document, placed in the

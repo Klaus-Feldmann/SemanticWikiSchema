@@ -1,16 +1,16 @@
 <?php
 
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 $namespaceNames = [];
 
 $namespaceNames['en'] = [
-	NeoWikiExtension::NS_SCHEMA => 'Schema',
-	NeoWikiExtension::NS_SCHEMA + 1 => 'Schema_talk',
-	NeoWikiExtension::NS_LAYOUT => 'Layout',
-	NeoWikiExtension::NS_LAYOUT + 1 => 'Layout_talk',
-	NeoWikiExtension::NS_MAPPING => 'Mapping',
-	NeoWikiExtension::NS_MAPPING + 1 => 'Mapping_talk',
-	NeoWikiExtension::NS_SUBJECT => 'Subject',
-	NeoWikiExtension::NS_SUBJECT + 1 => 'Subject_talk',
+	SWSExtension::NS_SCHEMA => 'Schema',
+	SWSExtension::NS_SCHEMA + 1 => 'Schema_talk',
+	SWSExtension::NS_LAYOUT => 'Layout',
+	SWSExtension::NS_LAYOUT + 1 => 'Layout_talk',
+	SWSExtension::NS_MAPPING => 'Mapping',
+	SWSExtension::NS_MAPPING + 1 => 'Mapping_talk',
+	SWSExtension::NS_SUBJECT => 'Subject',
+	SWSExtension::NS_SUBJECT + 1 => 'Subject_talk',
 ];

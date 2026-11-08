@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestData;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use ProfessionalWiki\SWS\Tests\Data\TestData;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
  */
 class SubjectContentDataDeserializerTest extends TestCase {
 
@@ -41,7 +41,7 @@ class SubjectContentDataDeserializerTest extends TestCase {
 
 	private function newDeserializer( ?LoggerInterface $logger = null ): SubjectContentDataDeserializer {
 		return new SubjectContentDataDeserializer(
-			new StatementDeserializer( NeoWikiExtension::getInstance()->getPropertyTypeLookup(), TestSubjectIds::newParser() ),
+			new StatementDeserializer( SWSExtension::getInstance()->getPropertyTypeLookup(), TestSubjectIds::newParser() ),
 			$logger ?? new NullLogger(),
 			TestSources::newSchemaReferenceParser()
 		);
@@ -53,7 +53,7 @@ class SubjectContentDataDeserializerTest extends TestCase {
 	 * existed are read under the name of the Schema they name, with nothing migrated.
 	 */
 	public function testSlotWrittenWithAnotherSpellingIsReadUnderTheSchemasName(): void {
-		$subjects = NeoWikiExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize(
+		$subjects = SWSExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize(
 			<<<'JSON'
 {
 	"subjects": {

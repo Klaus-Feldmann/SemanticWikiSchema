@@ -7,17 +7,17 @@
   },
   "changes": "Left 50px linked title thumbnail, own-image priority and current image snapshot; Schema-ordered derived values and configured links in expanded tables; Q-ID row below title and source-qualified descriptions below image/title; only resolved source-label/ID pairs; configurable endpoint/base; relative assets; unrelated demos omitted.",
   "generated": {
-    "helperName": "neowiki-qids-acff75ba4a03.js",
-    "commonName": "common-qids-864699ad0a6a.js",
-    "entryName": "envendpoint-qids-0802653af0b3.js"
+    "helperName": "sws-qids-3d683ff40cca.js",
+    "commonName": "common-qids-ff085d6ffe9a.js",
+    "entryName": "envendpoint-qids-d5fb85b7c35a.js"
   },
   "assets": {
     "common-BzxewltY.css": "a3b13868eb0fc86d4f9dabb6946e8e63247b917fee2268144d3735f96a7504d1",
-    "common-qids-864699ad0a6a.js": "df908f0c7ec04c0df689fed176e784c1cd60827b50564f3a95b5030a1e571489",
-    "common-qids-864699ad0a6a.js.map": "76e24d619719fbee908877211faf1c8907ca7a14d09b45c56a75869aa269a324",
-    "envendpoint-qids-0802653af0b3.js": "087def1759b95dc9ab8632f965523e7c7e6a9af9758f77a7cc9cc2d3a420cfac",
-    "envendpoint-qids-0802653af0b3.js.map": "fe69709387d1f90ad1f187806257bbb1af6f9a79f1c971f4c0697f992f87e3bb",
-    "neowiki-qids-acff75ba4a03.js": "a96a8e6972ed784e007afe693d945494d06e23e3726c00f7a5c13b5b478d6fb2",
-    "neowiki-qids-acff75ba4a03.js.map": "f0534f30e8700fd0f393e3408b48db3cc443375895a82513480bd9dac19cdc51"
+    "common-qids-ff085d6ffe9a.js": "c5cd2758a166a2453845721493a1776e83d0a95a1021c8d02526522703fe947e",
+    "common-qids-ff085d6ffe9a.js.map": "79b5f477ee4382bab8c096ea078d39fc5b0db30ee91077d0911d61afd837155a",
+    "envendpoint-qids-d5fb85b7c35a.js": "0d844a0ea35e521cb7ea3b2cebd67954a44a5402ddb3c245a328f82250585f97",
+    "envendpoint-qids-d5fb85b7c35a.js.map": "520550fc673bb0adb235308cc88adfd9fb4b4888c8cbbded9f4f248bb8eead7b",
+    "sws-qids-3d683ff40cca.js": "0270ca06f38ff23adfa11beacc8aa7ea174337588a6ed90f1750bf9a9067ea29",
+    "sws-qids-3d683ff40cca.js.map": "cc736a69d82cc58b6616c23ca12e63a24531aba61297b07e08249fe07ae8758c"
   }
 }

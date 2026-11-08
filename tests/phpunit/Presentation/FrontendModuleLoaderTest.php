@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
@@ -12,12 +12,12 @@ use MediaWiki\Permissions\SimpleAuthority;
 use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentityValue;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\Presentation\FrontendModuleLoader;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Presentation\FrontendModuleLoader;
 use Skin;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\FrontendModuleLoader
+ * @covers \ProfessionalWiki\SWS\Presentation\FrontendModuleLoader
  * @group Database
  */
 class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
@@ -32,24 +32,24 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 	private array $addedJsConfigVars = [];
 
 	public function testAddsCoreModuleWhenNoExtensionsHandleHook(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertSame( [ 'ext.neowiki' ], $this->addedModules );
+		$this->assertSame( [ 'ext.sws' ], $this->addedModules );
 	}
 
 	public function testAddsCoreModuleStyles(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertSame( [ 'ext.neowiki.styles' ], $this->addedModuleStyles );
+		$this->assertSame( [ 'ext.sws.styles' ], $this->addedModuleStyles );
 	}
 
 	public function testAppendsModulesContributedByExtensions(): void {
 		$this->setTemporaryHook(
-			'NeoWikiGetFrontendModules',
+			'SWSGetFrontendModules',
 			static function ( array &$modules ): void {
 				$modules[] = 'ext.redherb-test';
 			}
@@ -57,7 +57,7 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 
 		$this->newLoader()->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertSame( [ 'ext.neowiki', 'ext.redherb-test' ], $this->addedModules );
+		$this->assertSame( [ 'ext.sws', 'ext.redherb-test' ], $this->addedModules );
 	}
 
 	public function testPassesOutputAndSkinToHookHandlers(): void {
@@ -67,7 +67,7 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 		$receivedOut = null;
 		$receivedSkin = null;
 		$this->setTemporaryHook(
-			'NeoWikiGetFrontendModules',
+			'SWSGetFrontendModules',
 			static function ( array &$modules, OutputPage $hookOut, Skin $hookSkin )
 				use ( &$receivedOut, &$receivedSkin ): void {
 				$receivedOut = $hookOut;
@@ -82,69 +82,69 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function testEmitsConfiguredValidationDebounceJsConfigVar(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader( 450 )->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertSame( 450, $this->addedJsConfigVars['wgNeoWikiValidationDebounceMs'] ?? null );
+		$this->assertSame( 450, $this->addedJsConfigVars['wgSWSValidationDebounceMs'] ?? null );
 	}
 
 	public function testEmitsWhetherValidationIsEnforcedAsJsConfigVar(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader( validationEnforced: true )->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertTrue( $this->addedJsConfigVars['wgNeoWikiEnforceValidation'] ?? null );
+		$this->assertTrue( $this->addedJsConfigVars['wgSWSEnforceValidation'] ?? null );
 	}
 
 	public function testEmitsFalseWhenValidationIsNotEnforced(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader( validationEnforced: false )->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertFalse( $this->addedJsConfigVars['wgNeoWikiEnforceValidation'] ?? null );
+		$this->assertFalse( $this->addedJsConfigVars['wgSWSEnforceValidation'] ?? null );
 	}
 
 	public function testEmitsThatSubjectCountsAreAvailableToAViewerWhoMayQuery(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->load(
 			$this->newCapturingOutputPage( self::viewerWith( [ AuthorityBasedRawQueryAuthorizer::RIGHT ] ) ),
 			$this->createMock( Skin::class )
 		);
 
-		$this->assertTrue( $this->addedJsConfigVars['wgNeoWikiSubjectCountsAvailable'] ?? null );
+		$this->assertTrue( $this->addedJsConfigVars['wgSWSSubjectCountsAvailable'] ?? null );
 	}
 
 	public function testEmitsThatSubjectCountsAreUnavailableToAViewerWhoMayNotQuery(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->load(
 			$this->newCapturingOutputPage( self::viewerWith( [] ) ),
 			$this->createMock( Skin::class )
 		);
 
-		$this->assertFalse( $this->addedJsConfigVars['wgNeoWikiSubjectCountsAvailable'] ?? null );
+		$this->assertFalse( $this->addedJsConfigVars['wgSWSSubjectCountsAvailable'] ?? null );
 	}
 
 	public function testEmitsThatTheWikiIsSubjectFirstAsJsConfigVar(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader( subjectFirst: true )->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertTrue( $this->addedJsConfigVars['wgNeoWikiSubjectFirst'] ?? null );
+		$this->assertTrue( $this->addedJsConfigVars['wgSWSSubjectFirst'] ?? null );
 	}
 
 	public function testEmitsFalseOnAPageFirstWiki(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader( subjectFirst: false )->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertFalse( $this->addedJsConfigVars['wgNeoWikiSubjectFirst'] ?? null );
+		$this->assertFalse( $this->addedJsConfigVars['wgSWSSubjectFirst'] ?? null );
 	}
 
 	public function testEmitsThatTheViewerMayEditThePagesSubjects(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->loadWithSubjectPermissions(
 			$this->newCapturingOutputPage(),
@@ -152,11 +152,11 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 			true
 		);
 
-		$this->assertTrue( $this->addedJsConfigVars['wgNeoWikiCanEditPageSubjects'] ?? null );
+		$this->assertTrue( $this->addedJsConfigVars['wgSWSCanEditPageSubjects'] ?? null );
 	}
 
 	public function testEmitsThatTheViewerMayNotEditThePagesSubjects(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->loadWithSubjectPermissions(
 			$this->newCapturingOutputPage(),
@@ -164,11 +164,11 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 			false
 		);
 
-		$this->assertFalse( $this->addedJsConfigVars['wgNeoWikiCanEditPageSubjects'] ?? null );
+		$this->assertFalse( $this->addedJsConfigVars['wgSWSCanEditPageSubjects'] ?? null );
 	}
 
 	public function testLoadsTheFrontendModuleAlongsideThePermission(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->loadWithSubjectPermissions(
 			$this->newCapturingOutputPage(),
@@ -176,15 +176,15 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 			true
 		);
 
-		$this->assertSame( [ 'ext.neowiki' ], $this->addedModules );
+		$this->assertSame( [ 'ext.sws' ], $this->addedModules );
 	}
 
 	public function testLeavesTheDeniedReasonToPagesCarryingTheButton(): void {
-		$this->clearHook( 'NeoWikiGetFrontendModules' );
+		$this->clearHook( 'SWSGetFrontendModules' );
 
 		$this->newLoader()->load( $this->newCapturingOutputPage(), $this->createMock( Skin::class ) );
 
-		$this->assertArrayNotHasKey( 'wgNeoWikiCreateSubjectPageDeniedReason', $this->addedJsConfigVars );
+		$this->assertArrayNotHasKey( 'wgSWSCreateSubjectPageDeniedReason', $this->addedJsConfigVars );
 	}
 
 	public function testTellsAViewerWhoMayNotEditWhoMayCreateSubjectPages(): void {
@@ -251,8 +251,8 @@ class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {
 		$out = $context->getOutput();
 		$this->newLoader()->loadCreateSubjectPageDeniedReason( $out );
 
-		$this->assertArrayHasKey( 'wgNeoWikiCreateSubjectPageDeniedReason', $out->getJsConfigVars() );
-		return $out->getJsConfigVars()['wgNeoWikiCreateSubjectPageDeniedReason'];
+		$this->assertArrayHasKey( 'wgSWSCreateSubjectPageDeniedReason', $out->getJsConfigVars() );
+		return $out->getJsConfigVars()['wgSWSCreateSubjectPageDeniedReason'];
 	}
 
 	private function newLoader(

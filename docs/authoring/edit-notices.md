@@ -4,7 +4,7 @@ order: 4
 ---
 # Edit Notices
 
-Interface messages shown in the Subject editor and the Subject creator. NeoWiki ships no notices, so nothing appears
+Interface messages shown in the Subject editor and the Subject creator. SWS ships no notices, so nothing appears
 until you create one.
 
 ## Add a notice
@@ -13,19 +13,19 @@ Create the interface message whose key matches the scope you want:
 
 | Create | Shown when editing |
 |---|---|
-| `MediaWiki:Neowiki-editnotice-{ns}` | Any Subject in namespace `{ns}` |
-| `MediaWiki:Neowiki-editnotice-{ns}-{dbkey}` | A Subject on one page |
-| `MediaWiki:Neowiki-editnotice-schema-{Schema}` | A Subject of one Schema, anywhere |
+| `MediaWiki:Sws-editnotice-{ns}` | Any Subject in namespace `{ns}` |
+| `MediaWiki:Sws-editnotice-{ns}-{dbkey}` | A Subject on one page |
+| `MediaWiki:Sws-editnotice-schema-{Schema}` | A Subject of one Schema, anywhere |
 
 `{ns}` is the numeric namespace ID, `0` for the main namespace. `{dbkey}` and `{Schema}` use underscores for spaces,
 and `{dbkey}` drops the namespace prefix, so `Help:New York` is `12-New_York` and a Schema named `Control Document`
 is `schema-Control_Document`.
 
 Where the namespace has subpages enabled, a notice covers the page and everything beneath it:
-`Neowiki-editnotice-4-Handbook` also applies to `Project:Handbook/Chapter1`. Elsewhere slashes become dashes, so
+`Sws-editnotice-4-Handbook` also applies to `Project:Handbook/Chapter1`. Elsewhere slashes become dashes, so
 `Foo/Bar` in the main namespace is `0-Foo-Bar`.
 
-To warn anyone editing a Person Subject, create `MediaWiki:Neowiki-editnotice-schema-Person`:
+To warn anyone editing a Person Subject, create `MediaWiki:Sws-editnotice-schema-Person`:
 
 ```
 Check the [[Project:Naming|naming convention]] before changing a person's name.
@@ -36,7 +36,7 @@ Check the [[Project:Naming|naming convention]] before changing a person's name.
 Magic words resolve against the page being edited, so `{{PAGENAME}}` is that page's name.
 
 To style a notice, target it in CSS by its key: each one is wrapped in
-`<div class="ext-neowiki-edit-notice" data-mw-neowiki-editnotice-key="...">`.
+`<div class="ext-sws-edit-notice" data-mw-sws-editnotice-key="...">`.
 
 ## When several notices match
 
@@ -51,4 +51,4 @@ notices.
 
 ## From an extension
 
-Extensions can add notices of their own — see [Extending NeoWiki](../extending/edit-notices.md).
+Extensions can add notices of their own — see [Extending SWS](../extending/edit-notices.md).

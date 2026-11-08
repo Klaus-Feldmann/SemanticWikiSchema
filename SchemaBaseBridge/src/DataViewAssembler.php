@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\Domain\HistoricalDate;
-use ProfessionalWiki\NeoWiki\Domain\HistoricalCalendar;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\HistoricalDate;
+use ProfessionalWiki\SWS\Domain\HistoricalCalendar;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
 
 /** Lossless read model. Never feed this response into a subject replacement endpoint. */
 final class DataViewAssembler {
@@ -43,7 +43,7 @@ final class DataViewAssembler {
 						'calendar' => $date->year === 1582 && ( $date->month === null || $date->month === 10 && $date->day === null ) ? 'mixed' : HistoricalCalendar::calendar( $date->year, $date->month ?? 1, $date->day ?? 1 ) ];
 				}
 				if ( $type === 'image' && is_string( $part ) ) {
-					$image = \ProfessionalWiki\NeoWiki\Domain\ImageReference::parse( $part );
+					$image = \ProfessionalWiki\SWS\Domain\ImageReference::parse( $part );
 					$value += $image === null ? [ 'status' => 'unresolved' ] : [ 'repository' => $image->repository, 'filename' => $image->filename ];
 				}
 				if ( $type === 'date' || $type === 'dateTime' ) { $value['calendar'] = 'gregorian'; }

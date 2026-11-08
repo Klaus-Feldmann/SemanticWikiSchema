@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
 
 final class WikidataPagePropertyProvider implements PagePropertyProvider {
 	public function getProperties( PagePropertyProviderContext $context ): array {

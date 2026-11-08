@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readImageResponse,createImageLoader,selectedImageReference,createThumbnail} from '../source/neoWikiGraphImage.js';
-import {orderedRows,readPresentation} from '../source/neoWikiFields.js';
+import {readImageResponse,createImageLoader,selectedImageReference,createThumbnail} from '../source/swsGraphImage.js';
+import {orderedRows,readPresentation} from '../source/swsFields.js';
 const origin='https://wiki.example';
 const info={reference:'local:Own.jpg',repository:'local',filename:'Own.jpg',descriptionUrl:origin+'/wiki/Datei:Own.jpg',thumbnailUrl:origin+'/images/thumb.jpg',width:122,height:150,mime:'image/jpeg'};
 const data=(overrides={})=>({version:1,repository:'local',mode:'resolve',query:'Own.jpg',items:[info],...overrides});
-function presentation(own=['local:Own.jpg']){return {version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[{name:'Bild',type:'image',predicateLocalName:'Bild',wikiLink:null,externalProperty:{source:'wikidata',id:'P18'},ownImages:own}],fields:new Map([['Bild',{name:'Bild',source:'wikidata',propertyId:'P18',status:'resolved',values:[{kind:'image',reference:'commons:Remote.jpg',filename:'Remote.jpg',repository:'commons'}]}]])};}
+function presentation(own=['local:Own.jpg']){return {version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[{name:'Bild',type:'image',predicateLocalName:'Bild',wikiLink:null,externalProperty:{source:'wikidata',id:'P18'},ownImages:own}],fields:new Map([['Bild',{name:'Bild',source:'wikidata',propertyId:'P18',status:'resolved',values:[{kind:'image',reference:'commons:Remote.jpg',filename:'Remote.jpg',repository:'commons'}]}]])};}
 const native=[{id:origin+'/prop/Bild',name:'Bild',property:{values:[{value:'commons:Stale.jpg'}]}}];
 test('current own image wins over remote claim and stale native projection',()=>{
  const p=presentation();assert.equal(selectedImageReference(p),'local:Own.jpg');const rows=orderedRows(p,native,origin);assert.equal(rows.length,1);assert.equal(rows[0].own[0].reference,'local:Own.jpg');assert.equal(rows[0].values.length,0);
@@ -24,7 +24,7 @@ test('rejects unsafe URLs, oversized previews and incorrect repository identitie
  assert.throws(()=>readImageResponse(data({repository:'commons',items:[{...remote,thumbnailUrl:'https://evil.example/X'}]}),'commons:Own.jpg',origin));
 });
 test('thumbnail API requests are same-origin, source-qualified, batched and retried after errors',async()=>{
- const calls=[];const load=createImageLoader({origin,fetchImpl:async(url,opts)=>{calls.push([url,opts]);return {ok:true,json:async()=>({neowikiimages:data()})};}});
+ const calls=[];const load=createImageLoader({origin,fetchImpl:async(url,opts)=>{calls.push([url,opts]);return {ok:true,json:async()=>({swsimages:data()})};}});
  const [a,b]=await Promise.all([load('local:Own.jpg'),load('local:Own.jpg')]);assert.equal(a,b);assert.equal(calls.length,1);assert.equal(new URL(calls[0][0]).searchParams.get('mode'),'resolve');assert.equal(calls[0][1].credentials,'same-origin');
  let count=0;const failing=createImageLoader({origin,fetchImpl:async()=>{count++;throw new Error('offline');}});await assert.rejects(failing('local:Own.jpg'));await assert.rejects(failing('local:Own.jpg'));assert.equal(count,2);assert.equal(await load('javascript:alert(1)'),null);
 });

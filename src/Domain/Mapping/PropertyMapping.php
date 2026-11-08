@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 /**
- * Maps one NeoWiki property (referenced by name from the Mapping's Schema) to a target-ontology
+ * Maps one SWS property (referenced by name from the Mapping's Schema) to a target-ontology
  * predicate. The predicate and optional datatype are raw CURIEs or absolute IRIs; they are expanded
  * against the Mapping's prefixes by a {@see CurieExpander} at validation and projection time.
  */

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use MediaWiki\Maintenance\LoggedUpdateMaintenance;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 
@@ -34,7 +34,7 @@ class RebuildSubjectPageIndex extends LoggedUpdateMaintenance {
 	}
 
 	protected function getUpdateKey(): string {
-		return 'neowiki-rebuild-subject-page-index';
+		return 'sws-rebuild-subject-page-index';
 	}
 
 	protected function doDBUpdates(): bool {
@@ -43,11 +43,11 @@ class RebuildSubjectPageIndex extends LoggedUpdateMaintenance {
 		// --noschema skips it entirely, and either way the table this fills is not there. Reported as
 		// not done, so the run that does create the table still fills it.
 		if ( !$this->indexTableExists() ) {
-			$this->output( "The NeoWiki subject -> page index table does not exist yet; nothing to rebuild.\n" );
+			$this->output( "The SWS subject -> page index table does not exist yet; nothing to rebuild.\n" );
 			return false;
 		}
 
-		$this->output( "Rebuilding the NeoWiki subject -> page index...\n" );
+		$this->output( "Rebuilding the SWS subject -> page index...\n" );
 
 		// Left at 0 when there is nothing to index, so the closing line is right either way.
 		$indexed = 0;
@@ -67,7 +67,7 @@ class RebuildSubjectPageIndex extends LoggedUpdateMaintenance {
 	}
 
 	/**
-	 * Built from MediaWiki's services alone: update.php runs this on wikis whose NeoWiki configuration
+	 * Built from MediaWiki's services alone: update.php runs this on wikis whose SWS configuration
 	 * is not readable yet, and nothing here depends on that configuration.
 	 */
 	private function newRebuilder(): DatabaseSubjectPageIndexRebuilder {

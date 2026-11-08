@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use Exception;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
 
 /**
  * Fails for one page and contributes nothing for the rest, as a provider owning state outside the

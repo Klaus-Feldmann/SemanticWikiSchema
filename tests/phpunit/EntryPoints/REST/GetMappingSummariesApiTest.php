@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetMappingSummariesApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetMappingSummariesApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetMappingSummariesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetMappingSummariesApi
  * @group Database
  */
-class GetMappingSummariesApiTest extends NeoWikiIntegrationTestCase {
+class GetMappingSummariesApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	public function testReturnsEmptyResultWhenNoMappings(): void {
@@ -231,7 +231,7 @@ JSON
 		$beta = (int)$this->getDb()->newSelectQueryBuilder()
 			->select( 'page_id' )
 			->from( 'page' )
-			->where( [ 'page_namespace' => NeoWikiExtension::NS_MAPPING, 'page_title' => 'Beta' ] )
+			->where( [ 'page_namespace' => SWSExtension::NS_MAPPING, 'page_title' => 'Beta' ] )
 			->caller( __METHOD__ )
 			->fetchField();
 

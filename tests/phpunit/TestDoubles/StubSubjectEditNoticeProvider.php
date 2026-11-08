@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeProvider;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
 
 class StubSubjectEditNoticeProvider implements SubjectEditNoticeProvider {
 

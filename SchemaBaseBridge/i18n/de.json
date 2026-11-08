@@ -4,9 +4,9 @@
 			"AufEinWort"
 		]
 	},
-	"neowikibasebridge-unavailable": "Die Seite ist nicht verfügbar.",
-	"neowikibasebridge-property-invalid": "Ungültige Eigenschaftssuche.",
-	"neowikibasebridge-property-unavailable": "Die Eigenschaftssuche ist derzeit nicht verfügbar.",
-	"neowikibasebridge-name": "SchemaBaseBridge",
-	"neowikibasebridge-desc": "Verknüpft Semantic WikiSchema mit Wikidata und lokalem Wikibase und stellt Quellenwerte, Beschreibungen und Herkunftsinformationen für Datenansichten, Graph Explorer, Exporte und strukturierte Abfragen bereit."
+	"swsbasebridge-unavailable": "Die Seite ist nicht verfügbar.",
+	"swsbasebridge-property-invalid": "Ungültige Eigenschaftssuche.",
+	"swsbasebridge-property-unavailable": "Die Eigenschaftssuche ist derzeit nicht verfügbar.",
+	"swsbasebridge-name": "SchemaBaseBridge",
+	"swsbasebridge-desc": "Verknüpft Semantic WikiSchema mit Wikidata und lokalem Wikibase und stellt Quellenwerte, Beschreibungen und Herkunftsinformationen für Datenansichten, Graph Explorer, Exporte und strukturierte Abfragen bereit."
 }

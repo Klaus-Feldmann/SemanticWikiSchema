@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Subject;
+namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Subject\Subject
+ * @covers \ProfessionalWiki\SWS\Domain\Subject\Subject
  */
 class SubjectTest extends TestCase {
 

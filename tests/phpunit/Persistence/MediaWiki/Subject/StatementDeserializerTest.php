@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualText;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\UnregisteredTypeValue;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Value\UnregisteredTypeValue;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\StatementDeserializer
- * @covers \ProfessionalWiki\NeoWiki\Application\ValueDeserializer
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer
+ * @covers \ProfessionalWiki\SWS\Application\ValueDeserializer
  */
 class StatementDeserializerTest extends TestCase {
 

@@ -2,41 +2,41 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
 
 use Closure;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NothingToCancelException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NullRebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\CancellingRebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyRebuildJobQueue;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToCancelException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\CancellingRebuildBatchObserver;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use TestLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Jobs\GraphRebuildJob
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\MediaWikiRebuildJobQueue
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Jobs\GraphRebuildJob
+ * @covers \ProfessionalWiki\SWS\Infrastructure\MediaWikiRebuildJobQueue
  * @group Database
  */
-class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
+class BackgroundGraphRebuildTest extends SWSIntegrationTestCase {
 
 	private const STORE = 'background-store';
 
@@ -48,7 +48,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testAStartedRebuildIsQueuedAndHasProjectedNothingYet(): void {
@@ -381,7 +381,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testABatchOfARunNothingWasFiledUnderProjectsNothingAndSaysSo(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->createSubjectPages( 'Page nobody projects' );
 		$store = new SpyGraphDatabasePlugin();
 		$this->registerStore( $store );
@@ -405,7 +405,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newCoordinator( int $batchSize = GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE ): GraphRebuildCoordinator {
-		return NeoWikiExtension::getInstance()->newGraphRebuildCoordinator( $batchSize );
+		return SWSExtension::getInstance()->newGraphRebuildCoordinator( $batchSize );
 	}
 
 	/**
@@ -424,7 +424,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newCoordinatorWithJobQueue( SpyRebuildJobQueue $jobQueue ): GraphRebuildCoordinator {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return new GraphRebuildCoordinator(
 			stores: $extension->getNamedGraphDatabasePlugins(),
@@ -442,7 +442,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 	 * backend that has been unconfigured since the rebuild was queued.
 	 */
 	private function newCoordinatorWithoutTheStoreItRebuilds( LoggerInterface $logger ): GraphRebuildCoordinator {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return new GraphRebuildCoordinator(
 			stores: [],
@@ -460,7 +460,7 @@ class BackgroundGraphRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newRunRepository(): RebuildRunRepository {
-		return NeoWikiExtension::getInstance()->newRebuildRunRepository();
+		return SWSExtension::getInstance()->newRebuildRunRepository();
 	}
 
 	private function readRun( RebuildRun $run ): ?RebuildRun {

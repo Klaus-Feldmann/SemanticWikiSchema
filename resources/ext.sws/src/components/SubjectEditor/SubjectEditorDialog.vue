@@ -1,0 +1,1150 @@
+<template>
+	<div class="ext-sws-subject-editor-container">
+		<!-- Codex switches `cdx-dialog--dividers` on by itself only when the dialog body scrolls,
+			which this body never does: the navigator and the form each scroll inside it. The
+			dividers are what the rule between those two surfaces runs into, so ask by name. -->
+		<CdxDialog
+			:open="visible"
+			class="ext-sws-ui ext-sws-subject-editor-dialog cdx-dialog--dividers"
+			:class="{ 'ext-sws-subject-editor-dialog--wide': showsNavigator }"
+			:title="dialogTitle"
+			:subtitle="headerSubjectId"
+			:use-close-button="true"
+			@update:open="onDialogUpdateOpen"
+		>
+			<!-- Only the navigator's surface is ever conditionally rendered, and the panes container
+				is deliberately unkeyed: a pane must never unmount, because its unsaved values live in
+				the ValueInput refs inside it. -->
+			<div
+				ref="content"
+				class="ext-sws-subject-editor-dialog__content"
+				:style="{ '--ext-sws-pane-size': paneSize.cssSize.value }"
+				:inert="saving || undefined"
+				:aria-busy="pending || undefined"
+			>
+				<EditNoticeList :notices="notices" />
+
+				<div
+					v-if="showsNavigator"
+					:id="navigatorId"
+					class="ext-sws-subject-editor-dialog__surface"
+				>
+					<OpenSubjectList
+						:subjects="openSubjects"
+						:active-id="activePaneId"
+						:unsaved-ids="unsavedIds"
+						@select="showPane"
+					/>
+				</div>
+
+				<!-- On the navigator's own condition: the second track exists only alongside it,
+					and a divider outside that would hold a track open for a column that is
+					not there. -->
+				<PaneDivider
+					v-if="showsNavigator"
+					class="ext-sws-subject-editor-dialog__divider"
+					:label="$i18n( 'sws-subject-editor-resize-navigator' ).text()"
+					:controls="navigatorId"
+					:size="paneSize.size.value"
+					:min="paneSize.minSize.value"
+					:max="paneSize.maxSize.value"
+					:disabled="!paneSize.resizable.value"
+					@resize="paneSize.resizeTo"
+					@commit="paneSize.persist"
+				/>
+
+				<div class="ext-sws-subject-editor-dialog__surface">
+					<div class="ext-sws-subject-editor-dialog__panels">
+						<CdxProgressBar
+							v-if="pending"
+							:aria-label="$i18n( 'sws-subject-editor-loading' ).text()"
+						/>
+						<div
+							v-for="pane in panes"
+							v-show="pane.id === activePaneId"
+							:id="`ext-sws-panel-${ pane.id }`"
+							:key="pane.id"
+							tabindex="-1"
+						>
+							<SubjectEditPane
+								:ref="( el ) => setPaneRef( pane.id, el )"
+								:subject="pane.subject"
+								:schema="pane.schema"
+								:nested="pane.id !== rootPaneId"
+								:is-new="pane.isNew"
+								:unsaved-target-ids="unsavedTargetIds"
+								:can-edit-schema="pane.id === rootPaneId && canEditSchema"
+								@edit-relation-target="openRelationTargetFromForm"
+								@edit-schema="openSchemaEditor( pane.id )"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<template
+				v-if="!pending"
+				#footer
+			>
+				<CdxMessage
+					v-if="partialSave !== null"
+					:inline="true"
+					type="warning"
+					class="ext-sws-subject-editor-dialog__partial-save"
+				>
+					{{ partialSaveMessage }}
+				</CdxMessage>
+
+				<!-- Whatever the host has to ask alongside the save, such as which page a Subject
+					being created goes on. Above the actions, so the question is read before the
+					button that answers it. The footer sits outside the body's `inert`, so the host
+					is handed the save's progress to freeze its own controls with. -->
+				<slot name="before-actions" :saving="saving" />
+
+				<SummaryAction
+					help-text=""
+					:footer-text="saveScopeText"
+					:save-button-label="saveButtonLabel"
+					:save-disabled="!anyChanged || saving || props.saveDisabled === true"
+					@save="handleSave"
+				/>
+			</template>
+		</CdxDialog>
+
+		<SchemaEditorDialog
+			:open="isSchemaEditorOpen"
+			:initial-schema="currentSchema"
+			:on-save="props.onSaveSchema"
+			@saved="onSchemaSaved"
+			@update:open="isSchemaEditorOpen = $event"
+		/>
+
+		<CloseConfirmationDialog
+			:open="confirmationOpen"
+			@discard="confirmClose"
+			@keep-editing="cancelClose"
+		/>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { ref, shallowRef, shallowReactive, nextTick, computed, provide, watch, onBeforeUnmount } from 'vue';
+import SubjectEditPane from '@/components/SubjectEditor/SubjectEditPane.vue';
+import type { SubjectEditPaneExposes } from '@/components/SubjectEditor/SubjectEditPane.vue';
+import OpenSubjectList from '@/components/SubjectEditor/OpenSubjectList.vue';
+import SummaryAction from '@/components/common/SummaryAction.vue';
+import EditNoticeList from '@/components/common/EditNoticeList.vue';
+import { CdxDialog, CdxMessage, CdxProgressBar, useGeneratedId } from '@wikimedia/codex';
+import { Subject } from '@/domain/Subject.ts';
+import { enteredSubjectLabel } from '@/domain/enteredSubjectLabel.ts';
+import { SubjectId } from '@/domain/SubjectId.ts';
+import { PageIdentifiers } from '@/domain/PageIdentifiers.ts';
+import { StatementList } from '@/domain/StatementList.ts';
+import { Schema } from '@/domain/Schema.ts';
+import { SubjectCreationKey } from '@/components/common/SubjectCreation.ts';
+import { SubjectIdInUseError } from '@/persistence/SubjectIdInUseError';
+import SchemaEditorDialog from '@/components/SchemaEditor/SchemaEditorDialog.vue';
+import type { SchemaSaveHandler } from '@/components/SchemaEditor/SchemaEditorDialog.vue';
+import CloseConfirmationDialog from '@/components/common/CloseConfirmationDialog.vue';
+import PaneDivider, { PANE_DIVIDER_SIZE } from '@/components/common/PaneDivider.vue';
+import { usePaneSize } from '@/composables/usePaneSize.ts';
+import { useSchemaPermissions } from '@/composables/useSchemaPermissions.ts';
+import { useCloseConfirmation } from '@/composables/useCloseConfirmation.ts';
+import { useSaveGuard } from '@/composables/useSaveGuard.ts';
+import { useEditNotices } from '@/composables/useEditNotices.ts';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { ValidationFailedError } from '@/persistence/ValidationFailedError';
+import { WriteRefusedError } from '@/components/SubjectEditor/WriteRefusedError.ts';
+import type { SaveBlocker } from '@/components/common/SaveBlocker.ts';
+import { SWSServices } from '@/SWSServices.ts';
+import { subjectDisplayName } from '@/presentation/subjectDisplayName.ts';
+import { isSubjectFirst } from '@/wikiMode.ts';
+import { reachableTargetIds, writeOrder } from '@/components/SubjectEditor/SubjectDraftGraph.ts';
+import type { HeldSubject } from '@/components/SubjectEditor/SubjectDraftGraph.ts';
+import { DependentSubjectLoader, loadedSchemasOf } from '@/application/DependentSubjectLoader.ts';
+import { useDependentSubjectEditing } from '@/composables/useDependentSubjectEditing.ts';
+import { focusFirstValueControl } from '@/components/SubjectEditor/valueControlFocus.ts';
+import type { DependentSubjects } from '@/stores/SubjectStore.ts';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
+
+/**
+ * Writes a Subject the wiki holds and its `dependentSubjects` in one write.
+ */
+type SubjectSaveHandler = ( subject: Subject, dependentSubjects: DependentSubjects, comment: string ) => Promise<void>;
+
+/**
+ * Writes a Subject this session invented, carrying the id minted for it, as a Subject of the
+ * given page, together with the Dependent Subjects it hosts. Hosts that leave it out get no create
+ * affordance in the relation fields. A WriteRefusedError stops the save without a message from this
+ * dialog.
+ */
+type SubjectCreateHandler = (
+	subject: Subject,
+	pageId: number,
+	dependentSubjects: DependentSubjects,
+	comment: string
+) => Promise<void>;
+
+/** Told that the whole save is through, by a host that reports it somewhere this dialog cannot. */
+type SaveReporter = () => void;
+
+const props = defineProps<{
+	subject: Subject;
+	schema: Schema;
+	onSave: SubjectSaveHandler;
+	onSaveSchema: SchemaSaveHandler;
+	onCreate?: SubjectCreateHandler;
+	/**
+	 * Whether the root Subject is one the wiki does not hold yet, which the save creates rather
+	 * than updates. It is what the subject creator opens this dialog on.
+	 */
+	rootIsNew?: boolean;
+	/**
+	 * Withholds Save although there are changes, for a host with a question of its own still
+	 * unanswered. It can only withhold: the dialog's own reasons to disable Save still hold.
+	 */
+	saveDisabled?: boolean;
+	/**
+	 * Whether the host holds something of its own that closing would throw away, such as an
+	 * answer given in the footer. Counted alongside the panes' own edits, so the dialog asks
+	 * once for everything a close would discard rather than leaving the host to ask again.
+	 */
+	hostHasUnsavedChanges?: boolean;
+	/**
+	 * Called in place of the success message and the close, for a host that leaves the page once
+	 * the save is through and reports it there.
+	 */
+	onSaved?: SaveReporter;
+	open: boolean;
+}>();
+
+const emit = defineEmits( [ 'update:open' ] );
+
+interface EditPane {
+	id: string;
+	subject: Subject;
+	schema: Schema;
+	// Holds a Subject the server has never seen. Cleared as soon as its create lands, so a save
+	// that fails further down re-runs as an update rather than offering the same id twice.
+	isNew: boolean;
+}
+
+const content = ref<HTMLElement | null>( null );
+
+// Named for the divider to point at, and generated because this dialog opens a schema
+// editor with a divider of its own.
+const navigatorId = useGeneratedId( 'ext-sws-subject-navigator' );
+
+// Its own key rather than the schema editor's: that editor opens inside this dialog, and
+// this one is the wider of the two, so one shared width would be clamped away here.
+const paneSize = usePaneSize( content, {
+	defaultSize: 384,
+	minSize: 256,
+	// Wide enough for the form's own fields and its scrollbar; below it the statement rows
+	// scroll sideways instead of wrapping.
+	minOtherSize: 360,
+	dividerSize: PANE_DIVIDER_SIZE,
+	storageKey: 'sws-subject-editor-pane-size'
+} );
+
+const isSchemaEditorOpen = ref( false );
+// Mirrors the prop so a schema saved through the nested SchemaEditorDialog takes effect here
+// without waiting for the host to pass a new one down.
+const currentSchema = shallowRef<Schema>( props.schema );
+const { canEditSchema, checkEditPermission } = useSchemaPermissions();
+const { notices, loadNotices } = useEditNotices( () => SWSExtension.getInstance().getEditNoticeRepository() );
+const subjectRepository = SWSServices.getSubjectRepository();
+const schemaRepository = SWSServices.getSchemaRepository();
+
+const rootPaneId = computed( (): string => props.subject.getId().text );
+const paneRefs = shallowReactive( new Map<string, SubjectEditPaneExposes>() );
+
+function setPaneRef( id: string, el: unknown ): void {
+	if ( el ) {
+		paneRefs.set( id, el as SubjectEditPaneExposes );
+	} else {
+		paneRefs.delete( id );
+	}
+}
+
+// The root Subject as its pane edits it; for a new root, pointing at the Dependent Subjects it starts with. Null
+// until what the root's form needs has loaded.
+const loadedRoot = shallowRef<Subject | null>( null );
+
+// The form shows complete or not at all.
+const shown = computed( (): boolean => props.open && loadedRoot.value !== null );
+
+// Once reading what the form needs takes a while, the dialog shows that it is reading, rather than leave the control
+// that opened it looking inert.
+const PENDING_DELAY_MS = 300;
+const readingLong = ref( false );
+let pendingTimer: ReturnType<typeof setTimeout> | undefined;
+
+const pending = computed( (): boolean => props.open && loadedRoot.value === null && readingLong.value );
+const visible = computed( (): boolean => shown.value || pending.value );
+
+const extraPanes = shallowRef<EditPane[]>( [] );
+const activePaneId = ref<string>( rootPaneId.value );
+
+// Set when a save wrote some Subjects and then failed: the toast that says so vanishes,
+// and the dialog is still open.
+const partialSave = ref<{ written: number; attempted: number } | null>( null );
+
+const panes = computed( (): EditPane[] => loadedRoot.value === null ? [] : [
+	{
+		id: rootPaneId.value,
+		subject: loadedRoot.value,
+		schema: currentSchema.value,
+		isNew: props.rootIsNew === true
+	},
+	...extraPanes.value
+] );
+
+const activePane = computed( (): EditPane | undefined =>
+	panes.value.find( ( pane ) => pane.id === activePaneId.value ) );
+
+// Subjects this session invented, as the panes editing them currently hold them, so a draft renamed
+// in its pane is renamed everywhere that names it. Read from the draft panes alone: going through
+// editedSubjects would make every rename and relation pick anywhere in the dialog rebuild the menu
+// of every relation field.
+// The root is left out although it may be new: whether a Subject created alongside it may point
+// back at it is open (#1449).
+const draftSubjects = computed( (): Subject[] => panes.value
+	.filter( ( pane ) => pane.isNew && pane.id !== rootPaneId.value )
+	.map( ( pane ) => {
+		const instance = paneRefs.get( pane.id );
+		return instance === undefined ? pane.subject : withLiveLabel( instance );
+	} )
+);
+
+const draftIds = computed( (): string[] => draftSubjects.value.map( ( subject ) => subject.getId().text ) );
+
+const schemaStore = useSchemaStore();
+const dependentSubjectLoader = new DependentSubjectLoader(
+	subjectRepository,
+	schemaRepository,
+	() => schemaStore.fetchAllSchemaSummaries()
+);
+
+const dependentSubjectEditing = useDependentSubjectEditing( dependentSubjectLoader, () => !saving.value, draftIds );
+
+const unsavedTargetIds = dependentSubjectEditing.unsavedTargetIds;
+
+function withSchemas( subjects: readonly Subject[] ): HeldSubject[ 'dependentSubjects' ] {
+	const held: { subject: Subject; schema: Schema }[] = [];
+
+	for ( const subject of subjects ) {
+		const schema = dependentSubjectEditing.schemas.get( subject.getSchemaName() );
+
+		if ( schema !== undefined ) {
+			held.push( { subject, schema } );
+		}
+	}
+
+	return held;
+}
+
+// What the walks below read: a pane's Subject as its own form currently holds it. editedSubjects
+// carries an entry for every pane, so this never falls back.
+function heldSubjects(): HeldSubject[] {
+	return panes.value.map( ( pane ) => ( {
+		id: pane.id,
+		subject: editedSubjects.value.get( pane.id ) as Subject,
+		schema: pane.schema,
+		isNew: pane.isNew,
+		dependentSubjects: withSchemas( paneRefs.get( pane.id )?.editedDependentSubjects ?? [] )
+	} ) );
+}
+
+// Drafts something being edited still points at. One the user has pointed the relation away from is
+// not written, and Save neither waits on it nor leaves it behind.
+/**
+ * Panes the save is committed to writing whatever points at them. The Subjects the wiki already
+ * holds are committed by being there; a root it does not hold is committed by being what the save
+ * exists to write. Everything below follows from that one fact: it anchors the reachability walk,
+ * it is in the write set untouched, it is not something a close would be sorry to lose, and it is
+ * written before the Subjects it points at — which is what lets them be stored on the page its own
+ * write settles.
+ */
+const committedIds = computed( (): string[] =>
+	props.rootIsNew === true ? [ rootPaneId.value ] : [] );
+
+const referencedDraftIds = computed( (): Set<string> =>
+	reachableTargetIds( heldSubjects(), committedIds.value ) );
+
+// A Subject about to be written, as the draft graph wants to see it, with the Dependent Subjects its
+// write carries.
+interface WriteTarget extends HeldSubject {
+	pane: EditPane;
+	dependentSubjectsToWrite: DependentSubjects;
+}
+
+interface DirtyPane {
+	pane: EditPane;
+	instance: SubjectEditPaneExposes;
+}
+
+// The whole save set: the gates, the footer's counts and the write loop all read it. A pane
+// never unmounts while the dialog is open, so a dirty pane is the only place an unsaved edit
+// can live. A Subject this save already wrote drops out until its pane is edited again, so
+// it neither keeps Save enabled nor confirms a discard over nothing.
+// A Subject this session invented counts as unsaved from the moment it exists: nobody has to type
+// into it for the relation pointing at it to need something to point at. It stops counting once
+// nothing points at it any more — an editor that wrote a Subject the user had already turned away
+// from would leave exactly the debris this dialog promises not to.
+const dirtyPanes = computed( (): DirtyPane[] => panes.value
+	.map( ( pane ) => ( { pane, instance: paneRefs.get( pane.id ) } ) )
+	.filter( ( entry ): entry is DirtyPane => entry.instance !== undefined && (
+		entry.pane.isNew ?
+			( committedIds.value.includes( entry.pane.id ) || referencedDraftIds.value.has( entry.pane.id ) ) :
+			entry.instance.hasChanged
+	) )
+);
+
+const unsavedIds = computed( (): string[] => dirtyPanes.value.map( ( { pane } ) => pane.id ) );
+
+const anyChanged = computed( (): boolean => dirtyPanes.value.length > 0 );
+
+// What closing would throw away, which is not the same as what saving would write: an untouched
+// root the save is committed to writing is in the write set, and is nothing the user would be
+// sorry to lose. Everywhere the root already exists the two are the same.
+const hasUnsavedEdits = computed( (): boolean =>
+	props.hostHasUnsavedChanges === true ||
+	// A save that wrote something and then stopped is recorded by the amber line alone, and the
+	// close takes that line with it. What was written is worth a word before it goes.
+	partialSave.value !== null ||
+	dirtyPanes.value.some(
+		( { pane, instance } ) => !committedIds.value.includes( pane.id ) || instance.hasChanged )
+);
+
+// A Subject the wiki does not hold is being created, whoever opened the dialog on it.
+const dialogTitle = computed( (): string => mw.msg(
+	props.rootIsNew === true ? 'sws-subject-creator-title' : 'sws-subject-editor-title'
+) );
+
+const headerSubjectId = computed( (): string | undefined => {
+	if ( props.rootIsNew === true ) {
+		return undefined;
+	}
+
+	const pane = activePane.value;
+
+	return pane === undefined || pane.isNew ? undefined : pane.subject.getId().text;
+} );
+
+const saveButtonLabel = computed( (): string => mw.msg(
+	props.rootIsNew === true ? 'sws-subject-creator-save' : 'sws-subject-editor-save'
+) );
+
+// One copy per mounted pane. A pane's own copy is refreshed on relation changes alone, so
+// the live label is laid over it here and the navigator follows a rename as it is typed.
+const editedSubjects = computed( (): Map<string, Subject> => {
+	const subjects = new Map<string, Subject>();
+
+	for ( const pane of panes.value ) {
+		const instance = paneRefs.get( pane.id );
+		// The pane's own copy until its ref registers, one tick behind the pane being added.
+		// Without it a pane would spend that tick unnamed in the navigator.
+		subjects.set( pane.id, instance === undefined ? pane.subject : withLiveLabel( instance ) );
+	}
+
+	return subjects;
+} );
+
+// Rebuilt only when the label has moved, so an unrenamed Subject keeps the very object the
+// navigator already rendered. The field's text is read the way a write reads it.
+function withLiveLabel( instance: SubjectEditPaneExposes ): Subject {
+	const edited = instance.editedSubject;
+	const label = enteredSubjectLabel( instance.label );
+	return edited.getLabel() === label ? edited : edited.withLabel( label );
+}
+
+// The root Subject's label as its form holds it, for a host that follows the name being given.
+const rootLabel = computed( (): string | null =>
+	editedSubjects.value.get( rootPaneId.value )?.getLabel() ?? null );
+
+// The Subjects the navigator lists, in the order their panes were opened.
+const openSubjects = computed( (): Subject[] => panes.value.map(
+	( pane ) => editedSubjects.value.get( pane.id ) as Subject ) );
+
+// A list of one says nothing the form beside it does not, so the navigator waits for a second
+// Subject — and then stays, because a pane is never unmounted, whatever becomes of the relation
+// that opened it.
+const showsNavigator = computed( (): boolean => extraPanes.value.length > 0 );
+
+const openIds = computed( (): string[] => panes.value.map( ( pane ) => pane.id ) );
+
+// Tells one opening of the dialog from the next. The watcher further down bumps it, for an
+// opening and a replaced root alike, and so does unmounting. A fetch that outlives its opening is
+// dropped by it: the hosts keep this dialog mounted after it closes, so the fetch would otherwise
+// land in the next opening.
+/**
+ * `SchemaEditorDialog` below is bound to the root's Schema, so only the root pane may open it —
+ * a nested pane would put the reader in front of a Schema they did not point at. The pane has a
+ * guard of its own; this one is where the consequence lives.
+ */
+function openSchemaEditor( paneId: string ): void {
+	if ( paneId !== rootPaneId.value ) {
+		return;
+	}
+
+	isSchemaEditorOpen.value = true;
+}
+
+const openEpoch = ref( 0 );
+
+// So a double-click on one target's edit button does not fire a second request. Keyed per
+// opening, or a fetch left over from the last one would stand in for a fresh click.
+const pendingTargetKeys = new Set<string>();
+
+async function openRelationTarget( targetId: SubjectId ): Promise<void> {
+	const id = targetId.text;
+	if ( openIds.value.includes( id ) ) {
+		activePaneId.value = id;
+		return;
+	}
+	const epoch = openEpoch.value;
+	const pendingKey = `${ epoch }:${ id }`;
+	if ( pendingTargetKeys.has( pendingKey ) ) {
+		return;
+	}
+	pendingTargetKeys.add( pendingKey );
+	try {
+		const subject = await subjectRepository.getSubjectForEditing( targetId );
+		const schema = await schemaRepository.getSchema( subject.getSchemaName() );
+		const dependentSubjects = await dependentSubjectLoader.loadFor( subject, schema, dependentSubjectEditing.schemas );
+		if ( epoch !== openEpoch.value ) {
+			return;
+		}
+		dependentSubjectEditing.include( dependentSubjects, false );
+		extraPanes.value = [ ...extraPanes.value, { id, subject, schema, isNew: false } ];
+		activePaneId.value = id;
+	} catch ( error ) {
+		if ( epoch !== openEpoch.value ) {
+			return;
+		}
+		console.error( 'Failed to load relation target for editing:', error );
+		mw.notify( mw.msg( 'sws-subject-editor-target-load-error' ), { type: 'error' } );
+	} finally {
+		pendingTargetKeys.delete( pendingKey );
+	}
+}
+
+// The page a Subject created here is stored on. A subject-first wiki gives it a page of its own,
+// whichever pane it was created from. A page-first wiki stores it on the page holding the Subject
+// whose relation is being filled in, since that is the Subject the new one belongs beside. Panes
+// routinely span pages, so the dialog's own page would be the wrong answer as soon as the user has
+// drilled in. The root stands in for a pane whose Subject arrived without page context.
+function creationPage(): PageIdentifiers | null {
+	if ( isSubjectFirst() ) {
+		return PageIdentifiers.notYetCreated();
+	}
+
+	for ( const subject of [ activePane.value?.subject, props.subject ] ) {
+		if ( subject !== undefined && Number.isInteger( subject.getPageIdentifiers().getPageId() ) ) {
+			return subject.getPageIdentifiers();
+		}
+	}
+
+	return null;
+}
+
+// Creates the Subject a relation field is about to point at, and opens it for editing. Nothing
+// is written: the id is minted, which reserves nothing, and the Subject itself reaches the wiki
+// only when this dialog is saved. The pane is added and made active before this returns, so the
+// relation the caller then records lands in the same render as the pane and its row.
+async function createRelationTarget( schemaName: string, label: string | null ): Promise<Subject | null> {
+	const page = creationPage();
+
+	// A Subject added while the write loop is running would be referenced by a Subject already
+	// written and yet never written itself, so creation is closed for the duration of a save.
+	if ( saving.value || page === null ) {
+		mw.notify( mw.msg( 'sws-subject-editor-create-target-error' ), { type: 'error' } );
+		return null;
+	}
+
+	const epoch = openEpoch.value;
+
+	try {
+		const [ schema, id ] = await Promise.all( [
+			schemaRepository.getSchema( schemaName ),
+			subjectRepository.mintSubjectId()
+		] );
+
+		const started = await dependentSubjectLoader.startFor(
+			new Subject(
+				id,
+				label,
+				// What the server would derive for a Subject with no label of its own (ADR 31).
+				label ?? schemaName,
+				label === null,
+				schemaName,
+				schema.initialStatements(),
+				page,
+				null
+			),
+			schema,
+			dependentSubjectEditing.schemas
+		);
+
+		// The dialog was reopened or given another root while this was in flight, or a save has
+		// started: its panes are gone or already harvested, and a pane added now would belong to
+		// nothing.
+		if ( epoch !== openEpoch.value || saving.value ) {
+			return null;
+		}
+
+		const subject = started.subject;
+
+		dependentSubjectEditing.include( started.dependentSubjects, true );
+		extraPanes.value = [ ...extraPanes.value, { id: id.text, subject, schema, isNew: true } ];
+		activePaneId.value = id.text;
+		focusPane( id.text );
+
+		return subject;
+	} catch ( error ) {
+		// Guarded like openRelationTarget's: a failure that outlives its opening must not report
+		// itself over whatever the dialog is editing now.
+		if ( epoch !== openEpoch.value ) {
+			return null;
+		}
+
+		console.error( 'Failed to create relation target:', error );
+		mw.notify( mw.msg( 'sws-subject-editor-create-target-error' ), { type: 'error' } );
+		return null;
+	}
+}
+
+if ( props.onCreate !== undefined ) {
+	provide( SubjectCreationKey, {
+		create: createRelationTarget,
+		drafts: ( schemaName: string ): readonly Subject[] =>
+			draftSubjects.value.filter( ( subject ) => subject.getSchemaName() === schemaName )
+	} );
+}
+
+// Every listed Subject has a pane already, so this neither fetches nor can fail. Focus stays on
+// the row that was chosen, which is the navigator's own tab stop.
+function showPane( subjectId: SubjectId ): void {
+	activePaneId.value = subjectId.text;
+}
+
+// Navigating from a control inside a form hides the pane that control lives in, so the
+// browser blurs it to <body> and the next Tab restarts at the top of the dialog. The newly
+// shown pane takes the focus instead, as the first pane does when the dialog opens.
+// Activation from the navigator is left alone: focus belongs on the row there.
+async function openRelationTargetFromForm( targetId: SubjectId ): Promise<void> {
+	await openRelationTarget( targetId );
+	await focusPane( targetId.text );
+}
+
+function close(): void {
+	emit( 'update:open', false );
+}
+
+const { confirmationOpen, requestClose, confirmClose, cancelClose } = useCloseConfirmation( hasUnsavedEdits, close );
+
+// Nothing may change or close while the loop below is writing: it harvests every dirty
+// pane up front and marks each one clean as its write lands, so an edit made meanwhile
+// would be reverted by the written copy and left unguarded by the discard confirmation.
+// Bound as `undefined` rather than `false` where it is off. A browser that knows `inert`
+// exposes it as a property, which Vue sets, so `false` would do there; where it is only an
+// attribute, as in jsdom, Vue would write inert="false", which an element reads as present.
+const { saving, save: handleSave } = useSaveGuard( writeDirtyPanes );
+
+function closeRequested(): void {
+	if ( saving.value ) {
+		return;
+	}
+	requestClose();
+}
+
+function onDialogUpdateOpen( value: boolean ): void {
+	if ( !value ) {
+		closeRequested();
+	}
+}
+
+// An opening and a replaced root both start over: a dialog only reaches `open: false` with
+// nothing unsaved or after a confirmed discard (see useCloseConfirmation), so nothing an
+// earlier session opened or reported carries into the next.
+function startSession(): void {
+	openEpoch.value += 1;
+	extraPanes.value = [];
+	activePaneId.value = rootPaneId.value;
+	partialSave.value = null;
+	loadedRoot.value = null;
+	readingLong.value = false;
+	clearTimeout( pendingTimer );
+	pendingTimer = setTimeout( () => {
+		readingLong.value = true;
+	}, PENDING_DELAY_MS );
+	loadRoot();
+}
+
+let focusTimer: ReturnType<typeof setTimeout> | undefined;
+
+async function loadRoot(): Promise<void> {
+	const epoch = openEpoch.value;
+	const root = props.subject;
+	const rootIsNew = props.rootIsNew === true;
+
+	try {
+		const loaded = rootIsNew ?
+			await dependentSubjectLoader.startFor( root, currentSchema.value, new Map() ) :
+			{ subject: root, dependentSubjects: await dependentSubjectLoader.loadFor( root, currentSchema.value, new Map() ) };
+
+		if ( epoch !== openEpoch.value ) {
+			return;
+		}
+
+		clearTimeout( pendingTimer );
+		dependentSubjectEditing.startFrom( loaded.dependentSubjects, rootIsNew );
+		loadedRoot.value = loaded.subject;
+		// A task later: Codex focuses the dialog's first focusable element one or two ticks
+		// after it opens, depending on its version, and would otherwise win. Without scrolling:
+		// the form is at its top already, and focusing the pane itself would shift it by its padding.
+		focusTimer = setTimeout( () => focusPane( rootPaneId.value, { preventScroll: true } ) );
+	} catch ( error ) {
+		if ( epoch !== openEpoch.value ) {
+			return;
+		}
+
+		console.error( 'Failed to load the subject for editing:', error );
+		clearTimeout( pendingTimer );
+		mw.notify( mw.msg( 'sws-subject-editor-load-error' ), { type: 'error' } );
+		close();
+	}
+}
+
+// Fetched per opening: approval state and the viewer's permissions both change
+// without an edit. Keyed on the page being viewed and on the root Subject's Schema.
+watch( () => props.open, ( isOpen ) => {
+	if ( isOpen ) {
+		loadNotices( Number( mw.config.get( 'wgArticleId' ) ), props.subject.getSchemaName() );
+	}
+}, { immediate: true } );
+
+// Immediate, because the hosts render this dialog with v-if: it mounts with open
+// already true, so a deferred watcher would never see the opening that created it.
+// The host can also replace props.subject while the dialog stays open, e.g. saving one subject
+// navigates straight to editing another. One watcher for both, because opening the dialog on
+// another Subject changes both at once, and the root would otherwise be read twice.
+watch( [ () => props.open, () => props.subject ], ( [ isOpen ] ) => {
+	if ( isOpen ) {
+		startSession();
+	}
+}, { immediate: true } );
+
+onBeforeUnmount( () => {
+	clearTimeout( focusTimer );
+	clearTimeout( pendingTimer );
+	openEpoch.value += 1;
+} );
+
+// When no field can take the focus, the pane holds it: that is what its tabindex="-1" is for.
+// Panes share one scroller, so it is the focus's own scrolling that shows a pane opened from
+// further down a form from its top.
+async function focusPane( paneId: string, options?: { preventScroll: boolean } ): Promise<void> {
+	await nextTick();
+
+	const panel = document.getElementById( `ext-sws-panel-${ paneId }` );
+
+	if ( panel !== null ) {
+		focusFirstValueControl( panel, options );
+	}
+}
+
+watch( () => props.subject, ( newSubject ) => {
+	checkEditPermission( newSubject.getSchemaName() );
+}, { immediate: true } );
+
+// Synchronously, so that a session started by the same update loads the root by the new Schema.
+watch( () => props.schema, ( newSchema ) => {
+	currentSchema.value = newSchema;
+}, { flush: 'sync' } );
+
+async function showSubject( id: string ): Promise<void> {
+	await openRelationTarget( new SubjectId( id ) );
+	await nextTick();
+}
+
+const partialSaveMessage = computed( (): string => partialSave.value === null ?
+	'' :
+	mw.message(
+		'sws-subject-editor-partial-save',
+		partialSave.value.written,
+		partialSave.value.attempted
+	).text()
+);
+
+// Counted in pages as well as in Subjects on a page-first wiki, since each page written gets
+// revisions of its own. A Subject with no resolved page counts as a page of its own.
+function pageKeyOf( subject: Subject ): string {
+	const pageId = subject.getPageIdentifiers().getPageId();
+
+	return Number.isInteger( pageId ) ?
+		`page:${ pageId }` :
+		`subject:${ subject.getId().text }`;
+}
+
+const dirtyPageCount = computed( (): number => new Set(
+	dirtyPanes.value.map( ( { pane } ) => pageKeyOf( pane.subject ) )
+).size );
+
+// Said only when it tells the user something the screen does not: the Save button plainly
+// writes the one dirty Subject in front of them. A subject-first wiki counts no pages, since
+// its users need not care which pages store their Subjects.
+const saveScopeText = computed( (): string => {
+	const dirty = unsavedIds.value;
+
+	if ( dirty.length === 0 || ( dirty.length === 1 && dirty[ 0 ] === activePaneId.value ) ) {
+		return '';
+	}
+
+	if ( isSubjectFirst() ) {
+		return mw.message( 'sws-subject-editor-save-scope-subject-first', dirty.length ).text();
+	}
+
+	return mw.message( 'sws-subject-editor-save-scope', dirty.length, dirtyPageCount.value ).text();
+} );
+
+// A pane stops being new the moment its Subject exists on the wiki, so a save that fails further
+// down re-runs as an update rather than offering the same id to the server a second time. The
+// panes are a shallowRef, so the flag is cleared by replacing the entry rather than mutating it.
+function markPaneWritten( id: string ): void {
+	extraPanes.value = extraPanes.value.map(
+		( pane ) => pane.id === id ? { ...pane, isNew: false } : pane
+	);
+}
+
+// A Subject this session invented has to be created rather than replaced, on the page its pane
+// was opened against.
+async function writeSubject(
+	pane: EditPane,
+	subject: Subject,
+	dependentSubjects: DependentSubjects,
+	comment: string
+): Promise<void> {
+	if ( !pane.isNew ) {
+		await props.onSave( subject, dependentSubjects, comment );
+		dependentSubjectEditing.markWritten( dependentSubjects );
+		return;
+	}
+
+	if ( props.onCreate === undefined ) {
+		throw new Error( 'No onCreate handler to create this Subject with' );
+	}
+
+	try {
+		await props.onCreate( subject, pane.subject.getPageIdentifiers().getPageId(), dependentSubjects, comment );
+	} catch ( error ) {
+		// The id was minted for this Subject alone, so the server holding it already means this
+		// very create landed and only its answer was lost. Retrying the create would refuse
+		// forever; recording it as written turns the retry into the update it now needs to be.
+		if ( !( error instanceof SubjectIdInUseError ) ) {
+			throw error;
+		}
+	}
+
+	markPaneWritten( pane.id );
+	dependentSubjectEditing.markWritten( dependentSubjects );
+}
+
+async function writeDirtyPanes( summary: string ): Promise<void> {
+	await nextTick();
+
+	partialSave.value = null;
+
+	// Each flush writes only its own pane's violations, so none has to wait for another. The write
+	// set is read again afterwards rather than before: a validation round trip is awaited here, and
+	// a Subject created inside that window would otherwise go unwritten while the relation naming
+	// it was written.
+	await Promise.all( dirtyPanes.value.map( ( { instance } ) => instance.flushValidation() ) );
+
+	const dirty = dirtyPanes.value;
+
+	// Saving now would silently drop text the user can still see. Checked across every
+	// dirty Subject before any write, or a blocked later one would leave the stack
+	// half written.
+	const blocked = dirty
+		.map( ( entry ) => ( { id: entry.pane.id, blocker: entry.instance.saveBlocker() } ) )
+		.find( ( entry ): entry is { id: string; blocker: SaveBlocker } => entry.blocker !== null );
+
+	if ( blocked !== undefined ) {
+		await showSubject( blocked.id );
+		mw.notify( blocked.blocker.message, { title: blocked.blocker.propertyName, type: 'error' } );
+		return;
+	}
+
+	const savedNames: string[] = [];
+
+	// A Subject an earlier attempt already wrote is not in `dirty`: its pane reset its
+	// changed flag.
+	const targets: WriteTarget[] = [];
+
+	for ( const { pane, instance } of dirty ) {
+		const updated = instance.buildUpdatedSubject();
+		if ( updated === null ) {
+			// A dirty pane with no data to save means it lost its editor ref;
+			// surface this as an error instead of silently discarding the edit. Named after the pane
+			// that failed, which in a nested edit is not the dialog's root Subject.
+			mw.notify( mw.msg( 'sws-subject-editor-error', subjectDisplayName( pane.subject ) ), { type: 'error' } );
+			return;
+		}
+		const dependentSubjects = instance.buildDependentSubjects();
+		targets.push( {
+			id: pane.id,
+			pane,
+			subject: updated,
+			schema: pane.schema,
+			isNew: pane.isNew,
+			dependentSubjects: withSchemas( dependentSubjects ),
+			dependentSubjectsToWrite: dependentSubjectEditing.edited( dependentSubjects )
+		} );
+	}
+
+	const orderedTargets = writeOrder( targets, committedIds.value );
+
+	// Carried out of the loop rather than returned from inside it, so a part-way stop is
+	// reported once, below.
+	let failed = false;
+
+	for ( const { id, pane, subject: updatedSubject, dependentSubjectsToWrite } of orderedTargets ) {
+		const subjectName = subjectDisplayName( updatedSubject );
+
+		try {
+			await writeSubject( pane, updatedSubject, dependentSubjectsToWrite, summary || defaultSummaryFor( pane ) );
+			paneRefs.get( id )?.markWritten();
+			savedNames.push( subjectName );
+		} catch ( error ) {
+			failed = true;
+			// The toast naming the refused Subject vanishes; its pane is what stays.
+			await showSubject( id );
+			reportWriteFailure( error, id, subjectName );
+
+			break;
+		}
+	}
+
+	if ( failed ) {
+		if ( savedNames.length > 0 ) {
+			partialSave.value = { written: savedNames.length, attempted: targets.length };
+		}
+		return;
+	}
+
+	if ( savedNames.length === 0 ) {
+		return;
+	}
+
+	// A host that leaves the page reports the save where it lands, so neither a message that the
+	// navigation takes away nor a close of a dialog that is going with it.
+	if ( props.onSaved !== undefined ) {
+		props.onSaved();
+		return;
+	}
+
+	mw.notify(
+		savedNames.length === 1 ?
+			mw.msg( 'sws-subject-editor-success', savedNames[ 0 ] ) :
+			mw.msg( 'sws-subject-editor-success-multiple', savedNames.length ),
+		{ type: 'success' }
+	);
+	close();
+}
+
+function reportWriteFailure( error: unknown, paneId: string, subjectName: string ): void {
+	// The host has said why, where it can be answered.
+	if ( error instanceof WriteRefusedError ) {
+		return;
+	}
+
+	if ( error instanceof ValidationFailedError ) {
+		paneRefs.get( paneId )?.setServerViolations( error.violations );
+		mw.notify( mw.msg( 'sws-subject-editor-validation-failed', subjectName ), { type: 'error' } );
+		return;
+	}
+
+	mw.notify(
+		error instanceof Error ? error.message : String( error ),
+		{
+			title: mw.msg( 'sws-subject-editor-error', subjectName ),
+			type: 'error'
+		}
+	);
+}
+
+// Said of the write it is attached to, not of the save as a whole: one save can create a Subject
+// and update the one that points at it, on two pages, each getting a revision of its own.
+function defaultSummaryFor( pane: EditPane ): string {
+	return mw.msg( pane.isNew ?
+		'sws-subject-editor-summary-default-create' :
+		'sws-subject-editor-summary-default' );
+}
+
+// The saved Schema may target Schemas the editor has not loaded, which decide how its fields edit.
+const onSchemaSaved = async ( schema: Schema ): Promise<void> => {
+	currentSchema.value = schema;
+
+	const epoch = openEpoch.value;
+	let schemas: Map<string, Schema | null>;
+
+	try {
+		schemas = await dependentSubjectLoader.loadSchemas( [ schema ], dependentSubjectEditing.schemas );
+	} catch ( error ) {
+		console.error( 'Failed to load the Schemas the saved Schema targets:', error );
+		return;
+	}
+
+	if ( epoch === openEpoch.value ) {
+		dependentSubjectEditing.include( { subjects: [], schemas: loadedSchemasOf( schemas ) }, false );
+	}
+};
+
+defineExpose( { hasChanged: hasUnsavedEdits, rootLabel, shown, visible } );
+
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-subject-editor-dialog {
+	/* Overrides, not replications: `.cdx-dialog__header`'s padding is unconditional in Codex,
+		and `align-items: baseline` comes from `--default`, which this header now carries again.
+		Both are deliberate departures — the header is static text beside a 32px close button,
+		so on one line the button sets the height and baseline sits the title high in it. */
+	.cdx-dialog__header {
+		align-items: center;
+		padding-block: @spacing-50;
+	}
+
+	/* The id on the title's line, where Codex stacks a subtitle below it, and centred on the
+		title as the header centres both on the close button. */
+	.cdx-dialog__header__title-group {
+		flex-flow: row wrap;
+		align-items: center;
+		column-gap: @spacing-50;
+
+		/* Trimmed to the capitals and the baseline, so centring lines up the letters: the
+			monospace font leaves more room below its letters than the title's does, which
+			centred the id's line box with its letters high. */
+		.cdx-dialog__header__title,
+		.cdx-dialog__header__subtitle {
+			text-box: trim-both cap alphabetic;
+		}
+
+		/* Directed by its own first letter: an id from another Source may end in punctuation,
+			which a right-to-left page would otherwise move to the front. Sized like the id on
+			the Data tab. */
+		.cdx-dialog__header__subtitle {
+			unicode-bidi: plaintext;
+			font-family: @font-family-monospace;
+			font-size: @font-size-x-small;
+		}
+	}
+
+	&--wide.cdx-dialog {
+		/* Compounds `.cdx-dialog` because Codex sets `max-width: 32rem` on it, in a sheet the
+			component injects at runtime, after our own linked one — so an equal-specificity tie goes
+			to Codex. Drop the compound and the dialog silently narrows to 512px, which no test sees.
+			A literal because the scale stops short: Codex's largest size token is `@size-5600`. */
+		max-width: 80rem;
+	}
+
+	/* `display: grid` hands the bounded height down: the body holds one child, which as a
+		grid item stretches to the body instead of overflowing it. Nothing here has to make the
+		body shrink below its content — Codex's own `overflow-y: auto` already zeroes its
+		automatic minimum size.
+
+		Codex's own 16px/24px padding is dropped here and handed to the regions inside, because
+		the border between the two surfaces is the only rule between the navigator and the form
+		and that padding would hold it short of the header's and the footer's rules. */
+	.cdx-dialog__body {
+		padding: 0;
+		display: grid;
+	}
+
+	/* Scoped to this dialog: the same list appears in the subject creator, whose body keeps
+		Codex's padding. No inset below, because the list sets its own margin there.
+		Codex zeroes the top and bottom insets of the body's own first and last children; the
+		notices escape that only by being a child of `__content` rather than of the body. */
+	&__content > .ext-sws-edit-notices {
+		grid-column: 1 / -1;
+		padding: @spacing-100 @spacing-150 0;
+	}
+
+	/* The notices across the top, the navigator and the form side by side beneath them.
+
+		`minmax( 0, 1fr )` rather than `auto` for the second row: both cells stretch to it and
+		each scrolls itself, which keeps the navigator in view while the form is scrolled. Under
+		`auto` the taller cell sets the row's height, pushing the scrolling up to the dialog body
+		and taking the navigator off-screen with the form.
+
+		No column gap: the divider has a track of its own and draws the rule inside it, so the
+		rule still runs into the header's and the footer's rather than floating short of them.
+
+		jsdom resolves no layout, so the suite cannot see this grid collapse. Measure every change
+		in a browser, at more than one viewport height, with and without an edit notice, and with
+		and without the navigator. */
+	&__content {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto minmax( 0, 1fr );
+		/* Otherwise this grid item takes its whole natural length out of the dialog body's
+			scroller instead of dividing the height the body has. */
+		min-height: 0;
+	}
+
+	/* `--wide` is bound to the same condition as the navigator's own `v-if`. Declaring both
+		columns unconditionally would leave a navigator-wide void beside a form with no
+		navigator to fill it. */
+	/* The reader's width, bounded in script rather than here: the observed width this is
+		divided against is a border box, which `100%` in a track is not. This grid takes no
+		inline padding or border of its own, for the same reason. */
+	&--wide &__content {
+		grid-template-columns: var( --ext-sws-pane-size, @size-2400 ) @spacing-75 minmax( 0, 1fr );
+	}
+
+	/* Both columns of the second row: a scroll container holding one inner element that
+		carries the padding. Scrolling here rather than at the dialog body is what keeps the
+		navigator in view while the form is scrolled, and `min-height: 0` is what lets a grid
+		item shrink below its content at all. */
+	/* Placed rather than flowed: the notices above are conditional, so auto-placement puts
+		these in the notices' row whenever there is no notice. */
+	&__surface,
+	&__divider {
+		grid-row: 2;
+	}
+
+	&__surface {
+		min-width: 0;
+		min-height: 0;
+		overflow-y: auto;
+		/* Held whether or not it scrolls, so the width the divider's bound was worked out
+			against is the width the content actually gets. */
+		scrollbar-gutter: stable;
+	}
+
+	/* The list carries no inset of its own; this dialog gives it the form's, on its padded
+		element rather than on the scroller around it. The gutter is the dialog's 24px less the
+		6px a row already carries, so a row's TEXT lands on that gutter, in line with the
+		notices above and the form beside it, while the row's hover and selected backgrounds
+		keep reaching the 6px further out — a background flush with the text would read as
+		clipped. Nothing on the end side, so the scrollbar sits flush with the divider. */
+	& .ext-sws-open-subject-list {
+		padding: @spacing-100 0 @spacing-100 calc( @spacing-150 - @spacing-35 );
+	}
+
+	/* Every inset the form has, on this padded element rather than on the scroller around it:
+		a padding-bottom inside an overflow container is the one browsers have historically
+		dropped. */
+	&__panels {
+		padding: @spacing-100 @spacing-150;
+	}
+
+	&__partial-save {
+		margin: 0 0 @spacing-50;
+	}
+}
+</style>

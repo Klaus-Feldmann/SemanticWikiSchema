@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception;
 
 use RuntimeException;
 

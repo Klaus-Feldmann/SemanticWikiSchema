@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\MappingLookup;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\MappingLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class WikiPageMappingLookup implements MappingLookup {
 
@@ -24,10 +24,10 @@ class WikiPageMappingLookup implements MappingLookup {
 	}
 
 	public function getMapping( MappingName $name ): ?Mapping {
-		$title = $this->titleFactory->newFromText( $name->getText(), NeoWikiExtension::NS_MAPPING );
+		$title = $this->titleFactory->newFromText( $name->getText(), SWSExtension::NS_MAPPING );
 
 		// A namespace prefix in the name takes the title out of the Mapping namespace.
-		if ( $title === null || $title->getNamespace() !== NeoWikiExtension::NS_MAPPING || !$title->exists() ) {
+		if ( $title === null || $title->getNamespace() !== SWSExtension::NS_MAPPING || !$title->exists() ) {
 			return null;
 		}
 

@@ -4,7 +4,7 @@ order: 6
 ---
 # Graph Model
 
-NeoWiki projects its data into a Neo4j graph for querying ([ADR 3](../adr/003-neo4j-as-graph-database.md)). The graph
+SWS projects its data into a Neo4j graph for querying ([ADR 3](../adr/003-neo4j-as-graph-database.md)). The graph
 is a secondary store; the source of truth is the MediaWiki revision slots it is built from
 ([ADR 4](../adr/004-use-dedicated-slot.md)).
 
@@ -54,7 +54,7 @@ Schema (e.g. `:Subject:Person`, `:Subject:Company`). The Schema label changes if
 A Subject whose Schema cannot be loaded, for example because its Schema page was deleted, has no node, or only a
 [stub](#stub-subject-nodes) while other Subjects relate to it, once its page is next saved or the graph
 [rebuilt](../operations/maintenance.md#rebuilding-the-graph). A warning on the
-[`NeoWiki` channel](../operations/installation.md#logging) names the Schema.
+[`SWS` channel](../operations/installation.md#logging) names the Schema.
 
 ### Fixed properties
 

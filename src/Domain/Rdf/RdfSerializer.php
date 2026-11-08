@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Domain\Rdf;
 
 /**
- * Serializes {@see Quad}s into an RDF document. This is NeoWiki's own port; concrete implementations
+ * Serializes {@see Quad}s into an RDF document. This is SWS's own port; concrete implementations
  * wrap a third-party RDF library so its term representation never leaks into the rest of the codebase.
  */
 interface RdfSerializer {

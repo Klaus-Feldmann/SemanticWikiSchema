@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\SetSubjectsOrdering;
+namespace ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering;
 
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 interface SetSubjectsOrderingPresenter {
 

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -33,7 +33,7 @@ class GetJsonSchemaApi extends SimpleHandler {
 			] );
 		}
 
-		$document = NeoWikiExtension::getInstance()
+		$document = SWSExtension::getInstance()
 			->newJsonSchemaSerializer( $this->getRouteUrl( [ 'schemaName' => $schema->getName()->getText() ] ) )
 			->serialize( $schema );
 
@@ -52,7 +52,7 @@ class GetJsonSchemaApi extends SimpleHandler {
 			return null;
 		}
 
-		return NeoWikiExtension::getInstance()->getSchemaLookup()->getSchema( $name );
+		return SWSExtension::getInstance()->getSchemaLookup()->getSchema( $name );
 	}
 
 	public function getParamSettings(): array {

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSetting;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigLookup;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
 
 /**
  * What the form on the on-wiki configuration page starts from, by the page key of every exposed setting:
  * the value the page sets, which is null for a setting the page leaves to LocalSettings.php, and the
- * LocalSettings.php value as NeoWiki reads it.
+ * LocalSettings.php value as SWS reads it.
  */
 class ConfigEditorJsConfigBuilder {
 

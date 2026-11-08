@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\ReplaceSubject;
+namespace ProfessionalWiki\SWS\Application\Actions\ReplaceSubject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Application\DependentSubjectBuilder;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\NeoWiki\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Validation\ViolationDiff;
+use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
+use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Validation\ViolationDiff;
 
 readonly class ReplaceSubjectAction {
 

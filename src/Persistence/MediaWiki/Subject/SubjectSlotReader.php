@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 
 /**
  * The content of a revision's Subject slot, for reads. Null when the revision has no such slot and

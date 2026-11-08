@@ -21,12 +21,12 @@ namespace MediaWiki {
 }
 namespace {
  require dirname(__DIR__).'/tests/standalone/autoload.php';
- use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\PageType;
- use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\LocalPageTitle;
- use ProfessionalWiki\NeoWiki\Domain\Schema\Property\PageProperty;
- use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
- use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
- use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
+ use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
+ use ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle;
+ use ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty;
+ use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+ use ProfessionalWiki\SWS\Domain\Value\StringValue;
+ use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
  $n=0;function check($ok,$why){global $n;$n++;if(!$ok)throw new \RuntimeException($why);}
  $core=new PropertyCore('',false,null);
  $p=PageProperty::fromPartialJson($core,['pageNamespace'=>102,'multiple'=>true,'uniqueItems'=>true]);
@@ -51,21 +51,21 @@ namespace {
   try{PageProperty::fromPartialJson($core,['pageNamespace'=>$ns]);check(false,'Invalid namespace accepted');}
   catch(\InvalidArgumentException){check(true,'Invalid namespace refused');}
  }
- $lookup=new class implements \ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeLookup{
-  public function getType(string $name):?\ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyType{return $name==='page'?new PageType:null;}
+ $lookup=new class implements \ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup{
+  public function getType(string $name):?\ProfessionalWiki\SWS\Domain\PropertyType\PropertyType{return $name==='page'?new PageType:null;}
  };
- $ids=new class implements \ProfessionalWiki\NeoWiki\Infrastructure\IdGenerator{public function generate():string{return 'sTest1234567890';}};
- $builder=new \ProfessionalWiki\NeoWiki\Application\StatementListBuilder($lookup,$ids,new \ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdParser('local'));
+ $ids=new class implements \ProfessionalWiki\SWS\Infrastructure\IdGenerator{public function generate():string{return 'sTest1234567890';}};
+ $builder=new \ProfessionalWiki\SWS\Application\StatementListBuilder($lookup,$ids,new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser('local'));
  $statements=$builder->build(['Ort'=>['propertyType'=>'page','value'=>['neue_Seite','Werk:Abhandlung']]]);
  check($statements->getStatement(new PropertyName('Ort'))->getValue()->toScalars()===['Neue Seite','Werk:Abhandlung'],'Write boundary failed normalization');
  foreach([['w:Article'],['https://example.org'],['Athen#Antike'],['key'=>'Athen']]as $bad){
   try{$builder->build(['Ort'=>['propertyType'=>'page','value'=>$bad]]);check(false,'Bad write accepted');}
   catch(\InvalidArgumentException){check(true,'Bad write refused');}
  }
- $rdf=\ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry::withCoreMappers();
+ $rdf=\ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry::withCoreMappers();
  $mapped=$rdf->mapValue('page',new StringValue('Werk:Abhandlung'));
- check(count($mapped)===1&&$mapped[0] instanceof \ProfessionalWiki\NeoWiki\Domain\Rdf\Iri,'Page not exported as IRI');
- $neo=\ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders();
+ check(count($mapped)===1&&$mapped[0] instanceof \ProfessionalWiki\SWS\Domain\Rdf\Iri,'Page not exported as IRI');
+ $neo=\ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders();
  check($neo->buildNeo4jValue('page',new StringValue('Werk:Abhandlung'))===['Werk:Abhandlung'],'Neo4j title lost');
  echo "$n page storage/validation/export checks passed (isolated MediaWiki stand-ins).\n";
 }

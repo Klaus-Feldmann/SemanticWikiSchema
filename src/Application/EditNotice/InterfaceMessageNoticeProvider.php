@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\EditNotice;
+namespace ProfessionalWiki\SWS\Application\EditNotice;
 
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeProvider;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
 
 /**
  * Notices wiki admins write as interface messages, following the convention core uses for its own
@@ -15,7 +15,7 @@ use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeProvider;
  */
 readonly class InterfaceMessageNoticeProvider implements SubjectEditNoticeProvider {
 
-	private const string KEY_PREFIX = 'neowiki-editnotice-';
+	private const string KEY_PREFIX = 'sws-editnotice-';
 
 	public function __construct(
 		private EditNoticeMessageRenderer $renderer

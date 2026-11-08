@@ -4,7 +4,7 @@ order: 8
 ---
 # JSON Schema
 
-`GET /neowiki/v0/schema/{schemaName}/json-schema` serves a Schema as a self-contained
+`GET /sws/v0/schema/{schemaName}/json-schema` serves a Schema as a self-contained
 [JSON Schema](https://json-schema.org/) draft 2020-12 document (`application/schema+json`). It answers
 `404` when the Schema does not exist or you may not [read](rest-api.md#permissions) it.
 
@@ -26,7 +26,7 @@ values, except for what the document cannot express:
 - whitespace: the wiki trims each part of a value and drops empty parts before checking it
 - `uniqueLanguages` on `monolingualText` properties
 
-[`POST /neowiki/v0/subject/validate`](validation-codes.md) checks a proposed Subject against the wiki
+[`POST /sws/v0/subject/validate`](validation-codes.md) checks a proposed Subject against the wiki
 itself.
 
 Where the document is stricter than the write endpoints:

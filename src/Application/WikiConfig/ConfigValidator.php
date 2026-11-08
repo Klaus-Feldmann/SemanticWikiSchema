@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Application\WikiConfig;
 
 /**
  * Validates the JSON of the on-wiki configuration page at save time, producing precise per-field errors
@@ -14,8 +14,8 @@ namespace ProfessionalWiki\NeoWiki\Application\WikiConfig;
  */
 class ConfigValidator {
 
-	public const string ERROR_NOT_OBJECT = 'neowiki-config-error-not-object';
-	public const string ERROR_UNKNOWN_KEY = 'neowiki-config-error-unknown-key';
+	public const string ERROR_NOT_OBJECT = 'sws-config-error-not-object';
+	public const string ERROR_UNKNOWN_KEY = 'sws-config-error-unknown-key';
 
 	public function __construct(
 		private ConfigSchema $schema

@@ -2,54 +2,54 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector;
-use ProfessionalWiki\NeoWiki\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeScope;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\PropertyMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\PropertyMappings;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualText;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPageProperties;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
+use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
+use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
+use ProfessionalWiki\SWS\Domain\Mapping\PropertyMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\PropertyMappings;
+use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestPageProperties;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
 use Psr\Log\NullLogger;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
  */
 class OntologyMappingProjectorTest extends TestCase {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Permissions\Authority;
@@ -14,7 +14,7 @@ use MediaWiki\Title\MalformedTitleException;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleParser;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
 
 /**
  * The content a page publishes: its latest revision, unless a registered revision policy substitutes

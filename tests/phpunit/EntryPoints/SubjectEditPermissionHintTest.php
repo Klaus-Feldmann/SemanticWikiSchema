@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onBeforePageDisplay
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
  * @group Database
  */
-class SubjectEditPermissionHintTest extends NeoWikiIntegrationTestCase {
+class SubjectEditPermissionHintTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -30,7 +30,7 @@ class SubjectEditPermissionHintTest extends NeoWikiIntegrationTestCase {
 
 		$out = $this->renderContentPage( $title, $this->getTestSysop()->getAuthority() );
 
-		$this->assertTrue( $out->getJsConfigVars()['wgNeoWikiCanEditPageSubjects'] );
+		$this->assertTrue( $out->getJsConfigVars()['wgSWSCanEditPageSubjects'] );
 	}
 
 	public function testTellsTheFrontendAViewerWhoMayNotEditThePageMayNotEditItsSubjects(): void {
@@ -42,7 +42,7 @@ class SubjectEditPermissionHintTest extends NeoWikiIntegrationTestCase {
 		);
 
 		$this->assertFalse(
-			$out->getJsConfigVars()['wgNeoWikiCanEditPageSubjects'],
+			$out->getJsConfigVars()['wgSWSCanEditPageSubjects'],
 			'The decision must be the one made for the page being viewed.'
 		);
 	}
@@ -56,8 +56,8 @@ class SubjectEditPermissionHintTest extends NeoWikiIntegrationTestCase {
 			$this->authorityThatCannotEditPageId( $title->getArticleID() )
 		);
 
-		$this->assertStringContainsString( 'data-mw-neowiki-create-subject', $editable->getHTML() );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-create-subject', $protected->getHTML() );
+		$this->assertStringContainsString( 'data-mw-sws-create-subject', $editable->getHTML() );
+		$this->assertStringNotContainsString( 'data-mw-sws-create-subject', $protected->getHTML() );
 	}
 
 	private function renderContentPage( Title $title, Authority $authority ): OutputPage {
@@ -69,7 +69,7 @@ class SubjectEditPermissionHintTest extends NeoWikiIntegrationTestCase {
 		$out->setArticleFlag( true );
 		$out->setRevisionId( $title->getLatestRevID() );
 
-		NeoWikiHooks::onBeforePageDisplay( $out, $context->getSkin() );
+		SWSHooks::onBeforePageDisplay( $out, $context->getSkin() );
 
 		return $out;
 	}

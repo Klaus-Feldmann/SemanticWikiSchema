@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\HostSubject;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\HostSubject;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 use stdClass;
 
 /**

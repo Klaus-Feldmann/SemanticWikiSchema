@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageLoader;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageLoader
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader
  * @group Database
  */
-class RdfPageLoaderTest extends NeoWikiIntegrationTestCase {
+class RdfPageLoaderTest extends SWSIntegrationTestCase {
 
 	public function testPageWhoseSubjectSlotDoesNotHoldSubjectContentIsNotLoaded(): void {
 		// The write path refuses to touch such a page, since it cannot tell which Subjects it holds. The
 		// export must not answer for it either: describing it as a page without Subjects would state
-		// something about the page that NeoWiki does not know. Reachable when the content model that
+		// something about the page that SWS does not know. Reachable when the content model that
 		// wrote the slot is no longer installed.
 		$loader = $this->newLoaderFor( $this->newRevisionWithSubjectSlotContent() );
 
@@ -93,7 +93,7 @@ class RdfPageLoaderTest extends NeoWikiIntegrationTestCase {
 
 		return new RdfPageLoader(
 			$factory,
-			NeoWikiExtension::getInstance()->getPagePropertiesBuilder(),
+			SWSExtension::getInstance()->getPagePropertiesBuilder(),
 			$policy ?? new NullRevisionPolicy()
 		);
 	}

@@ -1,11 +1,11 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 
 class ImageSourcesTest extends TestCase {
 	public function testFourSourcesRoundTripAndValidate(): void {

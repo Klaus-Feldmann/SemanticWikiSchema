@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Tests\Domain\GraphDatabase;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\Test\TestLogger;
 use Throwable;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
  */
 class FailureIsolatingGraphDatabasePluginTest extends TestCase {
 
@@ -82,7 +82,7 @@ class FailureIsolatingGraphDatabasePluginTest extends TestCase {
 
 	/**
 	 * The Neo4j client reports what it could not reach by quoting the bolt URI it tried, userinfo and
-	 * all, so relaying its message verbatim writes the store's password to wherever the NeoWiki channel
+	 * all, so relaying its message verbatim writes the store's password to wherever the SWS channel
 	 * is routed — on every save, for as long as the backend is down.
 	 */
 	public function testTheBackendPasswordIsKeptOutOfTheLoggedFailure(): void {

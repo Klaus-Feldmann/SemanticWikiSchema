@@ -36,7 +36,7 @@
 <script>
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 
 // @vue/component
 module.exports = exports = {
@@ -69,7 +69,7 @@ module.exports = exports = {
 				loadedSubjectId.value = null;
 				return;
 			}
-			nw.NeoWikiExtension.getInstance().getStoreStateLoader()
+			nw.SWSExtension.getInstance().getStoreStateLoader()
 				.loadSubjectsAndSchemas( new Set( [ id ] ), new Set() )
 				.then( () => {
 					// The loader never rejects, and the Subject store can hold the picked Subject

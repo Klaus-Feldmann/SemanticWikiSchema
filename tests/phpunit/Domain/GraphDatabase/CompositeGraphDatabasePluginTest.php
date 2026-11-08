@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Tests\Domain\GraphDatabase;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\CompositeGraphDatabasePlugin
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin
  */
 class CompositeGraphDatabasePluginTest extends TestCase {
 
@@ -107,7 +107,7 @@ class CompositeGraphDatabasePluginTest extends TestCase {
 	 * proves that arrangement isolates per plugin: a failing backend in the middle neither aborts the
 	 * fan-out nor starves the plugins before or after it.
 	 *
-	 * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+	 * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
 	 */
 	public function testComposingIsolatedPluginsLetsOneFailWithoutStarvingTheOthers(): void {
 		$spyBefore = new SpyGraphDatabasePlugin();

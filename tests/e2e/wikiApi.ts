@@ -17,7 +17,7 @@ export async function createSubjectPage(
 	request: APIRequestContext,
 	subject: { pageTitle: string; label: string; schema: string; statements: Record<string, object> }
 ): Promise<void> {
-	const response = await request.post( 'rest.php/neowiki/v0/subjects', {
+	const response = await request.post( 'rest.php/sws/v0/subjects', {
 		data: subject,
 		headers: { 'X-CSRF-TOKEN': await csrfToken( request ) }
 	} );

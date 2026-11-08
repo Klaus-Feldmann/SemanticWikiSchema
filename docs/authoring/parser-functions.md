@@ -4,13 +4,13 @@ order: 1
 ---
 # Parser Functions
 
-NeoWiki provides these parser functions for use in wikitext.
+SWS provides these parser functions for use in wikitext.
 
 | If you want to... | Use |
 |-------------------|-----|
 | Render a Subject visually on the page | [`{{#view}}`](#view) |
 | Show the page's Main Subject in full, where you choose | [`{{#main_subject}}`](#main_subject) |
-| Insert one property's value inline as text | [`{{#neowiki_value}}`](#neowiki_value) |
+| Insert one property's value inline as text | [`{{#sws_value}}`](#sws_value) |
 | Add a button that creates a Subject | [`{{#create_subject}}`](#create_subject) |
 | Run a custom Cypher query and see the raw results | [`{{#cypher_raw}}`](#cypher_raw) |
 | Run a custom SPARQL query and see the raw results | [`{{#sparql_raw}}`](#sparql_raw) |
@@ -22,7 +22,7 @@ For definitions of terms like Subject, Schema, and Layout, see the [Glossary](..
 ## Permissions
 
 Every parser function reads as the user the page is parsed for. Subjects that user cannot read are
-treated as absent. `{{#cypher_raw}}` and `{{#sparql_raw}}` need the `neowiki-query` right.
+treated as absent. `{{#cypher_raw}}` and `{{#sparql_raw}}` need the `sws-query` right.
 `{{#view}}` and `{{#main_subject}}` only place a marker at parse time; the Subject they show is fetched
 per viewer over the REST API, under that viewer's permissions. Output of the other functions is
 cached separately for readers with different groups or rights, so it tracks page access only where
@@ -94,17 +94,17 @@ referencing it and those it references.
 
 Any argument produces a visible parser error.
 
-## `{{#neowiki_value}}`
+## `{{#sws_value}}`
 
 Returns the value of a single property from a Subject, formatted as a string.
 
 ### Syntax
 
 ```
-{{#neowiki_value: <propertyName> }}
-{{#neowiki_value: <propertyName> | page=<pageName> }}
-{{#neowiki_value: <propertyName> | subject=<subjectId> }}
-{{#neowiki_value: <propertyName> | separator=<separator> }}
+{{#sws_value: <propertyName> }}
+{{#sws_value: <propertyName> | page=<pageName> }}
+{{#sws_value: <propertyName> | subject=<subjectId> }}
+{{#sws_value: <propertyName> | separator=<separator> }}
 ```
 
 ### Parameters
@@ -148,16 +148,16 @@ HTML-encoded text — a value of `Engineers & Designers` arrives as `Engineers &
 ### Examples
 
 ```
-Founded: {{#neowiki_value: Founded at}}
-Status: {{#neowiki_value: Status | page=ACME Inc}}
-Process owner: {{#neowiki_value: Process owner | subject=s1abc5def6ghi78}}
-Tags: {{#neowiki_value: Tags | separator=;}}
+Founded: {{#sws_value: Founded at}}
+Status: {{#sws_value: Status | page=ACME Inc}}
+Process owner: {{#sws_value: Process owner | subject=s1abc5def6ghi78}}
+Tags: {{#sws_value: Tags | separator=;}}
 ```
 
 Passing a value to another extension's parser function:
 
 ```
-{{#read-confirmation: audience={{#neowiki_value: Target audience}}}}
+{{#read-confirmation: audience={{#sws_value: Target audience}}}}
 ```
 
 ## `{{#create_subject}}`
@@ -227,14 +227,14 @@ For formatted result rendering, build it in a template with Lua
 
 - Only read queries are allowed. Anything that creates, modifies, or deletes data is rejected,
   including `CALL` (even for read-only procedures).
-- Requires the `neowiki-query` right (see [Permissions](#permissions)).
+- Requires the `sws-query` right (see [Permissions](#permissions)).
 - Results are capped at the `maxRows` and stopped at the `timeoutSeconds` of the `default` tier of
-  `$wgNeoWikiQueryLimits` (see [Limits and tiers](../api/query-api.md#limits-and-tiers)); rows beyond
+  `$wgSWSQueryLimits` (see [Limits and tiers](../api/query-api.md#limits-and-tiers)); rows beyond
   the cap are dropped silently.
 - Errors (rejected queries, syntax errors, the database being unavailable, etc.) render as a
   styled error message in place of the result.
 - Output is HTML-escaped, so query results containing `<`, `>`, `&`, etc. display safely.
-- The output is wrapped in `<div class="mw-neowiki-cypher-result"><pre>` and the error message in
+- The output is wrapped in `<div class="mw-sws-cypher-result"><pre>` and the error message in
   `<div class="error">`, so you can target either with CSS.
 
 ### Examples
@@ -264,14 +264,14 @@ document — the standard `head` / `results` structure (or `boolean` for an `ASK
 ### Notes
 
 - Read-only: the query cannot modify the store.
-- Requires the `neowiki-query` right (see [Permissions](#permissions)).
+- Requires the `sws-query` right (see [Permissions](#permissions)).
 - No row cap is applied — the full results document is returned. Queries stop at the `timeoutSeconds`
-  of the `default` tier of `$wgNeoWikiQueryLimits` (see
+  of the `default` tier of `$wgSWSQueryLimits` (see
   [Limits and tiers](../api/query-api.md#limits-and-tiers)).
 - Errors (a query the store rejects, the store being unavailable, etc.) render as a styled error message
   in place of the result.
 - Output is HTML-escaped, so results containing `<`, `>`, `&`, etc. display safely.
-- The output is wrapped in `<div class="mw-neowiki-sparql-result"><pre>` and the error message in
+- The output is wrapped in `<div class="mw-sws-sparql-result"><pre>` and the error message in
   `<div class="error">`, so you can target either with CSS.
 - Pages are projected into named graphs, so which of them an unscoped query reaches depends on the store — see
   [RDF Export](../api/rdf-export.md#iri-scheme).

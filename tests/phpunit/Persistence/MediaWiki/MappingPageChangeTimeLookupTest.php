@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\ProjectionChangeTimeLookup;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPageChangeTimeLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPageChangeTimeLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup
  * @group Database
  */
-class MappingPageChangeTimeLookupTest extends NeoWikiIntegrationTestCase {
+class MappingPageChangeTimeLookupTest extends SWSIntegrationTestCase {
 
 	public function testAProjectionChangedWhenItsMappingPageWasLastEdited(): void {
 		$this->createMapping( 'EDM', '{"version":1,"schemas":{}}' );
@@ -77,7 +77,7 @@ class MappingPageChangeTimeLookupTest extends NeoWikiIntegrationTestCase {
 
 		ConvertibleTimestamp::setFakeTime( '20260202000000' );
 		$page = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle(
-			Title::newFromText( 'EDM', NeoWikiExtension::NS_MAPPING )
+			Title::newFromText( 'EDM', SWSExtension::NS_MAPPING )
 		);
 		$this->assertStatusGood( $page->doUpdateRestrictions(
 			[ 'edit' => 'sysop' ],
@@ -113,7 +113,7 @@ class MappingPageChangeTimeLookupTest extends NeoWikiIntegrationTestCase {
 
 	private function mappingTitle( string $name ): Title {
 		$title = MediaWikiServices::getInstance()->getTitleFactory()
-			->newFromText( $name, NeoWikiExtension::NS_MAPPING );
+			->newFromText( $name, SWSExtension::NS_MAPPING );
 		$this->assertNotNull( $title );
 
 		return $title;

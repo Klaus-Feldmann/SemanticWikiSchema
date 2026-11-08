@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\UnregisteredTypeProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\UnregisteredTypeProperty
  */
 class UnregisteredTypePropertyTest extends PropertyTestCase {
 

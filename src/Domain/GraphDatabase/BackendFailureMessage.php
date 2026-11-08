@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
 
 /**
  * What a graph database backend says when it fails, made safe to keep.

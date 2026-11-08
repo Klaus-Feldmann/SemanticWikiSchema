@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
 use Exception;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Application\PageRebuilder;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Persistence\DeletedPageIdsLookup;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Persistence\PageIdsLookup;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Application\PageRebuilder;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Persistence\DeletedPageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Throwable;
@@ -172,14 +172,14 @@ class GraphRebuildExecutor {
 	}
 
 	/**
-	 * Records what ended the run both on the run and on the NeoWiki channel: the run keeps the reason an
+	 * Records what ended the run both on the run and on the SWS channel: the run keeps the reason an
 	 * operator reads back later, and the log keeps the exception class and backtrace the run cannot hold.
 	 */
 	private function failRun( RebuildRun $run, string $reason, ?Throwable $e ): RebuildRun {
 		$failedRun = $this->recordRun( $run->failed( $reason === '' ? null : $reason ) );
 
 		$this->logger->error(
-			'NeoWiki graph rebuild of store "' . $failedRun->store . '" ended before reconciling the wiki. '
+			'SWS graph rebuild of store "' . $failedRun->store . '" ended before reconciling the wiki. '
 			. self::describeHowToContinue( $failedRun ) . ' Underlying error: ' . $reason,
 			[ 'exception' => $e, 'store' => $failedRun->store, 'cursor' => $failedRun->cursor ]
 		);
@@ -371,7 +371,7 @@ class GraphRebuildExecutor {
 	 */
 	private function logWithdrawnPage( int $pageId ): void {
 		$this->logger->info(
-			'NeoWiki graph rebuild reconciled page ' . $pageId . ': the registered revision policy '
+			'SWS graph rebuild reconciled page ' . $pageId . ': the registered revision policy '
 			. 'publishes no revision of it, so it was withdrawn from the store.',
 			[ 'pageId' => $pageId ]
 		);
@@ -383,7 +383,7 @@ class GraphRebuildExecutor {
 	 */
 	private function logSkippedPage( int $pageId, string $reason ): void {
 		$this->logger->info(
-			'NeoWiki graph rebuild skipped page ' . $pageId . ': ' . $reason . '.',
+			'SWS graph rebuild skipped page ' . $pageId . ': ' . $reason . '.',
 			[ 'pageId' => $pageId ]
 		);
 	}
@@ -465,7 +465,7 @@ class GraphRebuildExecutor {
 
 	private function logPageFailure( string $operation, int $pageId, Throwable $e ): void {
 		$this->logger->error(
-			'NeoWiki graph rebuild failed to ' . $operation . ' page ' . $pageId
+			'SWS graph rebuild failed to ' . $operation . ' page ' . $pageId
 			. '. The rebuild continued, so this page is still out of sync in that store. '
 			. 'Underlying error: ' . BackendFailureMessage::withoutCredentials( $e->getMessage() ),
 			[ 'exception' => $e, 'pageId' => $pageId ]

@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ExportSubjectRdfApi;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ExportSubjectRdfApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\RdfFormatNegotiation
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\RdfFormatNegotiation
  * @group Database
  */
-class ExportSubjectRdfApiTest extends NeoWikiIntegrationTestCase {
+class ExportSubjectRdfApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SCHEMA = 'ExportSubjectRdfApiTestSchema';
 	private const string BERLIN_ID = 'sTestSRA1111111';
@@ -170,7 +170,7 @@ JSON
 
 		$this->assertSame( 404, $response->getStatusCode() );
 		$this->assertStringContainsString(
-			'No NeoWiki data found for subject: ' . self::ABSENT_ID,
+			'No SWS data found for subject: ' . self::ABSENT_ID,
 			$response->getBody()->getContents()
 		);
 	}

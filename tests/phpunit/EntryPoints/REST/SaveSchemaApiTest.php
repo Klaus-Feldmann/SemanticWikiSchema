@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Status\Status;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SaveSchemaApi;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Wikimedia\Rdbms\IDBAccessObject;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SaveSchemaApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SchemaPageWriteApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SchemaPageWriteApi
  * @group Database
  */
-class SaveSchemaApiTest extends NeoWikiIntegrationTestCase {
+class SaveSchemaApiTest extends SWSIntegrationTestCase {
 
 	use RunsSchemaWriteEndpoints;
 
@@ -47,7 +47,7 @@ class SaveSchemaApiTest extends NeoWikiIntegrationTestCase {
 		$response = $this->save( 'Person', self::SCHEMA_JSON );
 
 		$this->assertSame( 201, $response->getStatusCode() );
-		$this->assertSame( 'NeoWikiSchema', $this->getSchemaPageContentModel( 'Person' ) );
+		$this->assertSame( 'SWSSchema', $this->getSchemaPageContentModel( 'Person' ) );
 		$this->assertJsonStringEqualsJsonString( self::SCHEMA_JSON, $this->getSchemaPageText( 'Person' ) );
 	}
 
@@ -121,7 +121,7 @@ class SaveSchemaApiTest extends NeoWikiIntegrationTestCase {
 		$response = $this->save( 'Person', '{ "propertyDefinitions": { "Age": { "minimum": 0 } } }' );
 
 		$this->assertSame( 400, $response->getStatusCode() );
-		$this->assertSame( 'neowiki-schema-invalid', $this->errorKeyOf( $response ) );
+		$this->assertSame( 'sws-schema-invalid', $this->errorKeyOf( $response ) );
 		$this->assertFalse( $this->schemaPageExists( 'Person' ) );
 	}
 
@@ -137,7 +137,7 @@ class SaveSchemaApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testUserWhoMayNotEditSchemasIsRefused(): void {
-		$this->setGroupPermissions( 'user', 'neowiki-schema-edit', false );
+		$this->setGroupPermissions( 'user', 'sws-schema-edit', false );
 
 		$response = $this->saveAs( $this->getTestUser()->getUser(), 'Person', self::SCHEMA_JSON );
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
@@ -10,13 +10,13 @@ use MediaWiki\Message\Message;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectNameMessage;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectNamePresenter;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+use ProfessionalWiki\SWS\Presentation\SubjectNameMessage;
+use ProfessionalWiki\SWS\Presentation\SubjectNamePresenter;
 
 class SpecialSubject extends SpecialPage {
 
@@ -38,9 +38,9 @@ class SpecialSubject extends SpecialPage {
 		$this->addHelpLink( DocumentationUrl::Subjects->value, true );
 
 		$out = $this->getOutput();
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$subjectId = $extension->getSubjectIdParser()->parse( $subPage );
-		$attributes = [ 'id' => 'ext-neowiki-subject' ];
+		$attributes = [ 'id' => 'ext-sws-subject' ];
 
 		if ( $subjectId !== null ) {
 			$pageShowingSubject = $this->pageShowingSubject( $extension, $subjectId );
@@ -54,11 +54,11 @@ class SpecialSubject extends SpecialPage {
 
 			// What the Subject's own view reads; it loads every Mapping the viewer may read.
 			$out->addJsConfigVars( $extension->getSubjectUiJsConfigVars( $this->getAuthority() ) );
-			$attributes['data-mw-neowiki-subject-id'] = $subjectId->text;
+			$attributes['data-mw-sws-subject-id'] = $subjectId->text;
 		}
 		else {
 			$out->addHTML(
-				Html::errorBox( $this->msg( 'neowiki-special-subject-invalid-id' )->escaped() )
+				Html::errorBox( $this->msg( 'sws-special-subject-invalid-id' )->escaped() )
 			);
 		}
 
@@ -74,7 +74,7 @@ class SpecialSubject extends SpecialPage {
 	 * on a subject-first wiki, a content page does so for its Main Subject while automatic rendering is
 	 * on. Null for any other Subject, and for a page the reader may not read.
 	 */
-	private function pageShowingSubject( NeoWikiExtension $extension, SubjectId $subjectId ): ?Title {
+	private function pageShowingSubject( SWSExtension $extension, SubjectId $subjectId ): ?Title {
 		if ( !$extension->isSubjectFirst() || !$extension->shouldAutoRenderMainSubject() ) {
 			return null;
 		}
@@ -97,7 +97,7 @@ class SpecialSubject extends SpecialPage {
 	 * Readers see the revision the wiki publishes, and a page shows its Main Subject in full only on its
 	 * latest revision.
 	 */
-	private function isMainSubjectOfPublishedLatestRevision( NeoWikiExtension $extension, Title $title, SubjectId $subjectId ): bool {
+	private function isMainSubjectOfPublishedLatestRevision( SWSExtension $extension, Title $title, SubjectId $subjectId ): bool {
 		$latest = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
 
 		return $latest !== null
@@ -112,7 +112,7 @@ class SpecialSubject extends SpecialPage {
 	 * any other Subject nobody named by "No label defined" and its id. A Subject this wiki does not hold leaves the
 	 * page's description standing, and so, indistinguishably, does one on a page the reader may not read (#1046).
 	 */
-	private function headBySubject( OutputPage $out, NeoWikiExtension $extension, SubjectId $subjectId ): void {
+	private function headBySubject( OutputPage $out, SWSExtension $extension, SubjectId $subjectId ): void {
 		$presenter = new SubjectNamePresenter();
 
 		$extension->newGetSubjectQuery( $presenter, $this->getAuthority() )->execute(
@@ -145,7 +145,7 @@ class SpecialSubject extends SpecialPage {
 	}
 
 	public function getDescription(): Message {
-		return $this->msg( 'neowiki-special-subject' );
+		return $this->msg( 'sws-special-subject' );
 	}
 
 }

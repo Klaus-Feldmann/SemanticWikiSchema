@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaSummariesApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaSummariesApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaSummariesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaSummariesApi
  * @group Database
  */
-class GetSchemaSummariesApiTest extends NeoWikiIntegrationTestCase {
+class GetSchemaSummariesApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	public function testReturnsEmptyResultWhenNoSchemas(): void {
@@ -182,7 +182,7 @@ JSON
 		$this->getDb()->newUpdateQueryBuilder()
 			->update( 'page' )
 			->set( [ 'page_title' => 'Subject' ] )
-			->where( [ 'page_namespace' => NeoWikiExtension::NS_SCHEMA, 'page_title' => 'Placeholder' ] )
+			->where( [ 'page_namespace' => SWSExtension::NS_SCHEMA, 'page_title' => 'Placeholder' ] )
 			->caller( __METHOD__ )
 			->execute();
 

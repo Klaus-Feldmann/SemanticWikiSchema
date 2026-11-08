@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\GetReferencingSubjects;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetReferencingSubjects;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
-use ProfessionalWiki\NeoWiki\Application\ReferencingSubjectLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestNaming;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
+use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Tests\Data\TestNaming;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
  */
 class GetReferencingSubjectsQueryTest extends TestCase {
 

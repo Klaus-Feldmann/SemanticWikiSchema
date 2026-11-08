@@ -19,7 +19,7 @@ function visit(n){
 }
 visit(ast);assert.ok(className);
 const ownMode=process.argv[2]==='own';
-const testModule=path.join(tmpdir(),'neowiki-date-common-'+(ownMode?'own':'remote')+'-test.mjs');
+const testModule=path.join(tmpdir(),'sws-date-common-'+(ownMode?'own':'remote')+'-test.mjs');
 const modified=original.replace('./'+manifest.generated.helperName,path.join(root,'Graph-Explorer/assets',manifest.generated.helperName));
 fs.writeFileSync(testModule,modified+`\nexport {${className} as TestStandardTemplate};\n`);
 const dom=new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>',{url:'https://aufeinwort.info/graph-explorer/envendpoint.html',pretendToBeVisual:true});
@@ -28,10 +28,10 @@ for(const key of ['window','document','navigator','HTMLElement','HTMLImageElemen
 }
 globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window);
 globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);
-const identityFetch=async(url)=>({ok:true,json:async()=>String(url).includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:'https://aufeinwort.info/page/1152'}}]}}:{neowikibaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{sF16iHXBMTQdHDY:{wikidata:{status:'resolved',id:'Q154751',url:'https://www.wikidata.org/wiki/Q154751'},'wikibase-local':{status:'resolved',id:'Q56',url:'https://aufeinwort.info/wiki/Qwasi:Q56'}}}}}});
+const identityFetch=async(url)=>({ok:true,json:async()=>String(url).includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:'https://aufeinwort.info/page/1152'}}]}}:{swsbaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{sF16iHXBMTQdHDY:{wikidata:{status:'resolved',id:'Q154751',url:'https://www.wikidata.org/wiki/Q154751'},'wikibase-local':{status:'resolved',id:'Q56',url:'https://aufeinwort.info/wiki/Qwasi:Q56'}}}}}});
 globalThis.fetch=async(url)=> {
- if(new URL(url).searchParams.get('action')!=='neowikibasevalues')return identityFetch(url);
- return {ok:true,json:async()=>({neowikibasevalues:{version:1,scope:'current',pageId:1152,mainSubjectId:'sF16iHXBMTQdHDY',presentation:{version:1,language:'en',pageUrlTemplate:'https://aufeinwort.info/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[
+ if(new URL(url).searchParams.get('action')!=='swsbasevalues')return identityFetch(url);
+ return {ok:true,json:async()=>({swsbasevalues:{version:1,scope:'current',pageId:1152,mainSubjectId:'sF16iHXBMTQdHDY',presentation:{version:1,language:'en',pageUrlTemplate:'https://aufeinwort.info/wiki/SWSGRAPHTITLETOKEN',definitions:[
   {name:'Datum',type:'historicalDate',predicateLocalName:'Datum',wikiLink:{},externalProperty:{source:'wikidata',id:'P569'},ownDates:ownMode?['-0346']:[],ownDateParts:ownMode?[[{text:'346 BCE',yearTitle:'346 v. Chr.'}]]:[]}
  ]},fields:[{name:'Datum',source:'wikidata',propertyId:'P569',status:'resolved',values:[{kind:'time',precision:9,calendar:'julian',label:'347 BCE',parts:[{text:'347 BCE',yearTitle:'347 v. Chr.'}]}]}]}})};
 };
@@ -46,8 +46,8 @@ const container=document.getElementById('root');const reactRoot=ReactDOM.createR
 let bubbled=0, resized=0;
 reactRoot.render(React.createElement('div',{onClick:()=>bubbled++,onLoad:()=>resized++},template.renderTemplate(context))); 
 const start=Date.now();
-while((!container.querySelector('.ge-neowiki-qids a') || !container.textContent.includes(ownMode?'346 BCE':'347 BCE'))&&Date.now()-start<30000)await new Promise(r=>setTimeout(r,50));
-const row=container.querySelector('.ge-neowiki-qids');assert.ok(row);
+while((!container.querySelector('.ge-sws-qids a') || !container.textContent.includes(ownMode?'346 BCE':'347 BCE'))&&Date.now()-start<30000)await new Promise(r=>setTimeout(r,50));
+const row=container.querySelector('.ge-sws-qids');assert.ok(row);
 assert.ok(row.textContent.includes('Wikidata: Q154751'),row.textContent);
 assert.ok(row.textContent.includes('Wikibase: Q56'),row.textContent);
 assert.equal(row.previousElementSibling.className,'graph-explorer-standard-template__label');
@@ -73,6 +73,6 @@ template.props={...props,isExpanded:false};
 context.view={model:{getElement:()=>({elementState:undefined})}};
 reactRoot.render(React.createElement('div',{onClick:()=>bubbled++,onLoad:()=>resized++},template.renderTemplate(context))); 
 await new Promise(r=>setTimeout(r,50));
-assert.ok(container.querySelector('.ge-neowiki-qids').textContent.includes('Q154751'));
+assert.ok(container.querySelector('.ge-sws-qids').textContent.includes('Q154751'));
 console.log('Auf-/Zuklappen: Q-Zeile bleibt erhalten.');
 reactRoot.unmount();dom.window.close();

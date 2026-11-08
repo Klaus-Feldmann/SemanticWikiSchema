@@ -7,14 +7,14 @@ it in full.
 
 ## Context
 
-NeoWiki serves two kinds of wiki. In one the page comes first and Subjects hold data about it, as in Semantic
+SWS serves two kinds of wiki. In one the page comes first and Subjects hold data about it, as in Semantic
 MediaWiki or BlueSpice; in the other the Subject comes first and the page only stores it, as in Wikibase, and
 people create and view Subjects without caring about pages. User testing showed both kinds, and they want different
 answers to the same two questions: where a new Subject goes, and where a link to a Subject leads.
 
 ## Decision
 
-A wiki runs in one of two modes, page-first or subject-first. `$wgNeoWikiSubjectFirst` selects which; the default
+A wiki runs in one of two modes, page-first or subject-first. `$wgSWSSubjectFirst` selects which; the default
 is page-first.
 
 | | Page-first | Subject-first |
@@ -31,11 +31,11 @@ Stored data and RDF output are the same on both, and a page may hold several Sub
 ## Consequences
 
 * One switch to document and test, instead of separate toggles whose combinations would each need explaining.
-* `$wgNeoWikiDereferenceSubjectsToHostingPage` is gone. Where a concept URI leads in a browser now follows the mode.
+* `$wgSWSDereferenceSubjectsToHostingPage` is gone. Where a concept URI leads in a browser now follows the mode.
 * Switching an existing wiki's mode moves nothing. Pages keep their titles and namespaces; new Subjects, and all
   links to Subjects, follow the new mode.
 * On a subject-first wiki, editing a label renames nothing, and two Subjects may share a label. The id still shows
-  wherever MediaWiki prints a page title NeoWiki has not hooked yet, tracked in
+  wherever MediaWiki prints a page title SWS has not hooked yet, tracked in
   https://github.com/ProfessionalWiki/NeoWiki/issues/1503.
 * The Data tab as default view, generated labels, a source of labels for links at render time, and per-schema or
   per-user overrides are open decisions of their own.

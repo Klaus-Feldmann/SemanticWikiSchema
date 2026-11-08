@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup
+ * @covers \ProfessionalWiki\SWS\Application\PageSubjectsLookup
  */
 class PageSubjectsLookupTest extends TestCase {
 

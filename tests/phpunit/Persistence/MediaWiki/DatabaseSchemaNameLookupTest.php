@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSchemaNameLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 use MediaWiki\Title\TitleValue;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSchemaNameLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup
  * @group Database
  */
-class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseSchemaNameLookupTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	/**
 	 * @var array<string, int>
@@ -41,10 +41,10 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 	public function testReturnsSchemasOnEmptyInput( string $emptySearch ): void {
 		$this->assertEquals(
 			[
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest1' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest3' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest1' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest3' ),
 			],
 			$this->getLookup()->getSchemaNamesMatching( $emptySearch, 10 )
 		);
@@ -74,8 +74,8 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 	public function testReturnsOnlySchemasMatchingTheSearch(): void {
 		$this->assertEquals(
 			[
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
 			],
 			$this->getLookup()->getSchemaNamesMatching( 'SchemaNameLookupTest2', 10 )
 		);
@@ -91,8 +91,8 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 	public function testLimitRestrictsResults(): void {
 		$this->assertEquals(
 			[
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest1' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest1' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
 			],
 			$this->getLookup()->getSchemaNamesMatching( '', 2 )
 		);
@@ -101,8 +101,8 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 	public function testOffsetSkipsResults(): void {
 		$this->assertEquals(
 			[
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest3' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest22' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest3' ),
 			],
 			$this->getLookup()->getSchemaNamesMatching( '', 10, 2 )
 		);
@@ -111,7 +111,7 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 	public function testLimitAndOffsetCombined(): void {
 		$this->assertEquals(
 			[
-				new TitleValue( NeoWikiExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
+				new TitleValue( SWSExtension::NS_SCHEMA, 'SchemaNameLookupTest21' ),
 			],
 			$this->getLookup()->getSchemaNamesMatching( '', 1, 1 )
 		);
@@ -220,7 +220,7 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 		// it must keep querying past the first batch and yield every Schema exactly once, in strictly
 		// ascending page-ID order — a single truncated batch would drop the tail.
 		$bulk = $this->createBarePages(
-			NeoWikiExtension::NS_SCHEMA,
+			SWSExtension::NS_SCHEMA,
 			'BulkSchema',
 			DatabaseSchemaNameLookup::READABLE_NAMES_BATCH_SIZE + 20
 		);
@@ -240,7 +240,7 @@ class DatabaseSchemaNameLookupTest extends NeoWikiIntegrationTestCase {
 		// batch one comes back full yet yields one short, and the next batch must still be fetched, so the
 		// rows past the boundary arrive and the denied row is the only one absent.
 		$bulk = $this->createBarePages(
-			NeoWikiExtension::NS_SCHEMA,
+			SWSExtension::NS_SCHEMA,
 			'BulkSchema',
 			DatabaseSchemaNameLookup::READABLE_NAMES_BATCH_SIZE + 20
 		);

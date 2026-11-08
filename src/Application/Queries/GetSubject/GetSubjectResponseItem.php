@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetSubject;
+namespace ProfessionalWiki\SWS\Application\Queries\GetSubject;
 
-use ProfessionalWiki\NeoWiki\Application\HostSubject;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Application\HostSubject;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
 
 readonly class GetSubjectResponseItem {
 

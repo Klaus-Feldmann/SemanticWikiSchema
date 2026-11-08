@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
 
 /**
  * Sends a SPARQL 1.1 Query operation to a store's query endpoint and returns the raw response body (a
  * `application/sparql-results+json` document). The read-side sibling of {@see SparqlUpdateEndpoint}.
  *
- * @see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint for why
+ * @see \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint for why
  *      no read-only validator is needed (a query operation cannot express an update).
  */
 interface SparqlQueryEndpoint {

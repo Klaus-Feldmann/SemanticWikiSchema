@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\Utils\MWTimestamp;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\ProjectionChangeTimeLookup;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\Rdbms\IConnectionProvider;
 
 /**
@@ -33,7 +33,7 @@ class MappingPageChangeTimeLookup implements ProjectionChangeTimeLookup {
 	}
 
 	public function getLastChangeTime( string $projection ): ?string {
-		$title = $this->titleFactory->newFromText( $projection, NeoWikiExtension::NS_MAPPING );
+		$title = $this->titleFactory->newFromText( $projection, SWSExtension::NS_MAPPING );
 
 		if ( $title === null ) {
 			return null;

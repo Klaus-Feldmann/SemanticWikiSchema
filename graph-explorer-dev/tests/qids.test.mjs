@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {localSubjectId, readPageId, readIdentities, createIdentityLoader, createNeoWikiQIdRow} from '../source/neoWikiQIds.js';
+import {localSubjectId, readPageId, readIdentities, createIdentityLoader, createSWSQIdRow} from '../source/swsQIds.js';
 const origin = 'https://aufeinwort.info';
 const sid = 'sF16iHXBMTQdHDY';
 const iri = `${origin}/entity/${sid}`;
@@ -38,7 +38,7 @@ test('supports one missing source without losing the other', () => {
 test('deduplicates concurrent requests and uses only GET reads with same-origin cookies', async () => {
   const calls=[];
   const loader=createIdentityLoader({origin,fetchImpl:async (url,opts) => {
-    calls.push([url,opts]); return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings}}:{neowikibaseidentity:identity()}};
+    calls.push([url,opts]); return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings}}:{swsbaseidentity:identity()}};
   }});
   const a=loader(iri), b=loader(iri); assert.equal(a,b); assert.deepEqual(await a,sources);
   assert.equal(calls.length,2);assert.equal(calls[0][1].credentials,'same-origin');assert.equal(calls[1][1].method,undefined);
@@ -56,12 +56,12 @@ test('does not cache request failures as missing identities', async () => {
 });
 test('expires successful cache entries', async () => {
   let clock=0,calls=0;
-  const loader=createIdentityLoader({origin,now:()=>clock,fetchImpl:async(url)=>{calls++;return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings}}:{neowikibaseidentity:identity()}};}});
+  const loader=createIdentityLoader({origin,now:()=>clock,fetchImpl:async(url)=>{calls++;return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings}}:{swsbaseidentity:identity()}};}});
   await loader(iri);await loader(iri);assert.equal(calls,2);clock=60001;await loader(iri);assert.equal(calls,4);
 });
 const React={Component:class{constructor(props){this.props=props;}setState(values){this.state={...this.state,...values};}},createElement:(type,props,...children)=>({type,props,children})};
 test('renders a small row with source labels and separate safe anchors', () => {
-  const Row=createNeoWikiQIdRow(React,{origin,load:async()=>sources});const row=new Row({iri});row.state.identities=sources;
+  const Row=createSWSQIdRow(React,{origin,load:async()=>sources});const row=new Row({iri});row.state.identities=sources;
   const view=row.render();assert.equal(view.props.style.fontSize,'10px');
   const nodes=view.children.flat().filter(x=>x&&typeof x==='object');
   assert.equal(nodes[0].children[0],'Wikidata: ');assert.equal(nodes[1].children[0],'Wikibase: ');
@@ -69,7 +69,7 @@ test('renders a small row with source labels and separate safe anchors', () => {
   let stopped=false;anchor.props.onClick({stopPropagation(){stopped=true;}});assert.ok(stopped);
 });
 test('a response arriving after unmount does not update a removed node', async () => {
-  let finish;const Row=createNeoWikiQIdRow(React,{origin,load:()=>new Promise(resolve=>{finish=resolve;})});
+  let finish;const Row=createSWSQIdRow(React,{origin,load:()=>new Promise(resolve=>{finish=resolve;})});
   const row=new Row({iri});row.componentDidMount();row.componentWillUnmount();finish(sources);await new Promise(resolve=>setImmediate(resolve));
   assert.equal(row.state.identities,null);
 });
@@ -77,7 +77,7 @@ test('a response arriving after unmount does not update a removed node', async (
 for (const source of SOURCES_FOR_TEST()) {
   test(`renders only resolved label and ID: ${source}`, () => {
     const data={wikidata:{status:'missing',id:null,url:null},'wikibase-local':{status:'missing',id:null,url:null},[source]:sources[source]};
-    const Row=createNeoWikiQIdRow(React,{origin,load:async()=>data});const row=new Row({iri});row.state.identities=data;
+    const Row=createSWSQIdRow(React,{origin,load:async()=>data});const row=new Row({iri});row.state.identities=data;
     const children=row.render().children.flat().filter(x=>x&&typeof x==='object');
     assert.equal(children.length,1);assert.equal(children[0].children[0],source==='wikidata'?'Wikidata: ':'Wikibase: ');
     assert.ok(!row.render().children.includes(' · '));
@@ -85,21 +85,21 @@ for (const source of SOURCES_FOR_TEST()) {
 }
 function SOURCES_FOR_TEST(){return ['wikidata','wikibase-local'];}
 test('no row while loading, when both sources are missing, or on failure',()=>{
- const Row=createNeoWikiQIdRow(React,{origin,load:async()=>null});const row=new Row({iri});
+ const Row=createSWSQIdRow(React,{origin,load:async()=>null});const row=new Row({iri});
  assert.equal(row.render(),null);
  row.state.identities={wikidata:{status:'missing'},'wikibase-local':{status:'unavailable'}};
  assert.equal(row.render(),null);row.state={identities:null,failed:true};assert.equal(row.render(),null);
 });
 test('configuration supports a wiki and RDF base under a subdirectory',async()=>{
- globalThis.NeoWikiGraphConfig={baseIri:origin+'/research/',apiUrl:'/research/api.php',sparqlUrl:'/research/sparql'};
+ globalThis.SWSGraphConfig={baseIri:origin+'/research/',apiUrl:'/research/api.php',sparqlUrl:'/research/sparql'};
  try{
   const customIri=origin+'/research/entity/'+sid;
   assert.equal(localSubjectId(customIri,origin),sid);
   assert.equal(readPageId([{page:{type:'uri',value:origin+'/research/page/1152'}}],origin),1152);
   const urls=[];
-  const loader=createIdentityLoader({origin,fetchImpl:async(url)=>{urls.push(url);return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:origin+'/research/page/1152'}}]}}:{neowikibaseidentity:identity()}};}});
+  const loader=createIdentityLoader({origin,fetchImpl:async(url)=>{urls.push(url);return {ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:origin+'/research/page/1152'}}]}}:{swsbaseidentity:identity()}};}});
   assert.deepEqual(await loader(customIri),sources);
   assert.equal(new URL(urls[1]).pathname,'/research/api.php');
   assert.ok(new URL(urls[0]).searchParams.get('query').includes(origin+'/research/ontology/mainSubject'));
- }finally{delete globalThis.NeoWikiGraphConfig;}
+ }finally{delete globalThis.SWSGraphConfig;}
 });

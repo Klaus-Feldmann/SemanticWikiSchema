@@ -4,7 +4,7 @@ order: 4
 ---
 # Architecture
 
-NeoWiki is a MediaWiki extension. It adds structured data to ordinary wiki pages, keeps that data on the page it
+SWS is a MediaWiki extension. It adds structured data to ordinary wiki pages, keeps that data on the page it
 describes, and projects it into graph stores so it can be queried.
 
 ![A page's Subjects projected into Neo4j and a SPARQL store, the native projection in both, an EDM projection defined by a Mapping page, and Cypher and SPARQL queries from parser functions, Lua and the REST API](architecture.svg)
@@ -27,7 +27,7 @@ projection defined by a [Mapping](authoring/mapping-format.md), which expresses 
 CIDOC-CRM.
 
 Queries are written in each backend's own language, Cypher for Neo4j and SPARQL for SPARQL stores, and run from
-parser functions, Lua, and the REST API. NeoWiki deliberately has no query language of its own
+parser functions, Lua, and the REST API. SWS deliberately has no query language of its own
 ([ADR 19](adr/019-graph-database-architecture.md)).
 
 Only those queries need a graph store; everything else reads Subject data from MediaWiki's own tables, so a wiki can
@@ -42,7 +42,7 @@ wiki pages ([ADR 15](adr/015-dedicated-editors.md), [ADR 16](adr/016-frontend-st
 ([ADR 1](adr/001-domain-centric-architecture.md)).
 
 Other MediaWiki extensions can add Property Types, View Types, Page Properties, Subject Sources, graph backends,
-and frontend components ([Extending NeoWiki](extending/extending.md)).
+and frontend components ([Extending SWS](extending/extending.md)).
 
 ## Architecture Decision Records
 

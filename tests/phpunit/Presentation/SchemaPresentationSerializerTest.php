@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestData;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
+use ProfessionalWiki\SWS\Tests\Data\TestData;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SchemaPresentationSerializer
+ * @covers \ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer
  */
 class SchemaPresentationSerializerTest extends TestCase {
 
@@ -194,7 +194,7 @@ class SchemaPresentationSerializerTest extends TestCase {
 	public function testSchemaIntegrityAfterRoundTripSerialization( string $schemaName, string $originalSchemaJson ): void {
 		$originalSchemaArray = json_decode( $originalSchemaJson, true );
 
-		$deserializer = new SchemaPersistenceDeserializer( NeoWikiExtension::getInstance()->getPropertyTypeLookup() );
+		$deserializer = new SchemaPersistenceDeserializer( SWSExtension::getInstance()->getPropertyTypeLookup() );
 		$originalSchema = $deserializer->deserialize( new SchemaName( $schemaName ), json_encode( $originalSchemaArray ) );
 
 		$serialized = $this->serializer->serialize( $originalSchema );

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** A unique best-rank precise statement, or an explicit request for a manual date. */
 final class TimeClaimView

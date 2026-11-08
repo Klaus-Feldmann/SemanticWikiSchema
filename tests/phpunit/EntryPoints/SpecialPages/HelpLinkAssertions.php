@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;

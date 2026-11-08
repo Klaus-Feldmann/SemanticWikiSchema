@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Request\FauxRequest;
@@ -11,27 +11,27 @@ use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\CancelGraphStoreRebuildApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetGraphStoresApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\StartGraphStoreRebuildApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\CancelGraphStoreRebuildApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetGraphStoresApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GraphStoreAdminAccess
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\StartGraphStoreRebuildApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\GraphStoreStatusSerializer
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GraphStoreAdminAccess
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi
+ * @covers \ProfessionalWiki\SWS\Presentation\GraphStoreStatusSerializer
  * @group Database
  */
-class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
+class GraphStoreApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private const STORE = 'rest-store';
@@ -48,7 +48,7 @@ class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testListingTheStoresWithoutTheAdminRightIsRefused(): void {
@@ -111,12 +111,12 @@ class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
 	 * it should contain is editable and nothing reprojects the pages already in it.
 	 */
 	public function testAStoreWhoseMappingChangedSinceItsRebuildIsReportedAsStale(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [
 			'updateUrl' => 'http://sparql.invalid/edm',
 			'projection' => self::PROJECTION,
 			'name' => self::PROJECTION,
 		] ] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		$this->atTime( self::REBUILT_AT, fn () => $this->recordSucceededRun( self::PROJECTION ) );
 		$this->atTime( self::MAPPING_EDITED_AT, fn () => $this->createMapping( self::PROJECTION, self::MAPPING_JSON ) );
 
@@ -273,13 +273,13 @@ class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
 	 * are the one place a store's configuration could leak out of.
 	 */
 	public function testTheReportedStoresCarryNoEndpointOrToken(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [
 			'updateUrl' => 'https://qlever.example/api/neowiki',
 			'accessToken' => 'sekrit',
 			'projection' => 'EDM',
 			'name' => 'EDM',
 		] ] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		$response = $this->executeAsAdmin( new GetGraphStoresApi(), 'GET' );
 		$body = json_encode( $response['body'] );
@@ -293,7 +293,7 @@ class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
 	 * @return array{status: int, body: array<string, mixed>}
 	 */
 	private function executeAsAdmin( Handler $handler, string $method, ?string $storeName = null ): array {
-		return $this->execute( $handler, $method, $storeName, [ 'neowiki-admin' ] );
+		return $this->execute( $handler, $method, $storeName, [ 'sws-admin' ] );
 	}
 
 	/**
@@ -398,7 +398,7 @@ class GraphStoreApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newRunRepository(): RebuildRunRepository {
-		return NeoWikiExtension::getInstance()->newRebuildRunRepository();
+		return SWSExtension::getInstance()->newRebuildRunRepository();
 	}
 
 }

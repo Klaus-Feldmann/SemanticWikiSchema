@@ -1,0 +1,822 @@
+<template>
+	<li
+		:id="domId ?? subjectRowDomId( subject.getId().text )"
+		class="ext-sws-subject-row"
+		:class="{
+			'ext-sws-subject-row--emphasized': emphasized,
+			'ext-sws-subject-row--highlighted': highlighted,
+			'ext-sws-subject-row--focused': focused,
+			'ext-sws-subject-row--expanded': expanded
+		}"
+	>
+		<details :open="expanded">
+			<summary
+				class="ext-sws-subject-row__header"
+				@click.prevent="emit( 'toggle', subject )"
+			>
+				<CdxIcon
+					class="ext-sws-subject-row__chevron"
+					:icon="expanded ? cdxIconCollapse : cdxIconExpand"
+					size="small"
+				/>
+				<template v-if="mainSubjectControl === 'demote'">
+					<CdxButton
+						v-if="canEdit"
+						class="ext-sws-subject-row__main-indicator"
+						weight="quiet"
+						:aria-label="$i18n( 'sws-managesubjects-row-demote' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-demote' ).text()"
+						@click.stop="emit( 'demote', subject )"
+					>
+						<CdxIcon :icon="cdxIconPushPin" />
+					</CdxButton>
+					<CdxIcon
+						v-else
+						class="ext-sws-subject-row__main-indicator"
+						:icon="cdxIconPushPin"
+						:icon-label="$i18n( 'sws-managesubjects-main-subject-indicator' ).text()"
+					/>
+				</template>
+				<span class="ext-sws-subject-row__title">
+					<a
+						v-if="subjectPageUrl !== null"
+						class="ext-sws-subject-row__name"
+						:href="subjectPageUrl"
+						@click.stop
+					>
+						<span class="ext-sws-subject-row__label">
+							{{ displayName }}
+						</span>
+						<CdxIcon
+							class="ext-sws-subject-row__name-arrow"
+							:icon="cdxIconArrowNext"
+							size="x-small"
+						/>
+					</a>
+					<span
+						v-else
+						class="ext-sws-subject-row__label"
+					>
+						{{ displayName }}
+					</span>
+					<span class="ext-sws-subject-row__subtitle">
+						<SchemaNameDisplay
+							v-if="schemaName !== null"
+							class="ext-sws-subject-row__schema"
+							:schema-name="schemaName"
+							@click.stop
+						/>
+						<span class="ext-sws-subject-row__count">
+							{{ $i18n( 'sws-managesubjects-statement-count', statementCount ).text() }}<span v-if="providedStatementCount === null && subject.getPageIdentifiers().getPageId() > 0"> …</span>
+						</span>
+						<span
+							v-if="caption !== null"
+							class="ext-sws-subject-row__caption"
+							:title="caption"
+						>
+							{{ caption }}
+						</span>
+					</span>
+				</span>
+				<span class="ext-sws-subject-row__actions">
+					<CdxButton
+						v-if="canEdit"
+						weight="quiet"
+						:aria-label="$i18n( 'sws-managesubjects-row-edit' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-edit' ).text()"
+						@click.stop="emit( 'edit', subject )"
+					>
+						<CdxIcon :icon="cdxIconEdit" />
+					</CdxButton>
+					<CdxButton
+						weight="quiet"
+						:aria-label="$i18n( 'sws-managesubjects-row-copy-link' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-copy-link' ).text()"
+						@click.stop="emit( 'copy-link', subject )"
+					>
+						<CdxIcon :icon="cdxIconLink" />
+					</CdxButton>
+					<CdxButton
+						v-if="canEdit && mainSubjectControl === 'promote'"
+						weight="quiet"
+						:aria-label="$i18n( 'sws-managesubjects-row-promote' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-promote' ).text()"
+						@click.stop="emit( 'promote', subject )"
+					>
+						<CdxIcon :icon="cdxIconPushPin" />
+					</CdxButton>
+					<CdxButton
+						v-if="canMove"
+						weight="quiet"
+						:aria-label="$i18n( 'sws-managesubjects-row-move' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-move' ).text()"
+						@click.stop="emit( 'move', subject )"
+					>
+						<CdxIcon :icon="cdxIconArticleRedirect" />
+					</CdxButton>
+					<CdxButton
+						v-if="canDelete"
+						weight="quiet"
+						action="destructive"
+						:aria-label="$i18n( 'sws-managesubjects-row-delete' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-delete' ).text()"
+						@click.stop="emit( 'delete', subject )"
+					>
+						<CdxIcon :icon="cdxIconTrash" />
+					</CdxButton>
+					<span
+						v-if="showDragHandle"
+						class="ext-sws-subject-row__drag-handle"
+						:title="$i18n( 'sws-managesubjects-row-drag-handle' ).text()"
+						@click.stop
+					>
+						<CdxIcon
+							:icon="cdxIconDraggable"
+							:aria-hidden="true"
+						/>
+					</span>
+				</span>
+				<span
+					class="ext-sws-subject-row__actions-menu"
+					@click.stop
+				>
+					<CdxMenuButton
+						v-model:selected="menuSelection"
+						:menu-items="menuItems"
+						:aria-label="$i18n( 'sws-managesubjects-row-more' ).text()"
+						:title="$i18n( 'sws-managesubjects-row-more' ).text()"
+						@update:selected="dispatchMenuAction"
+					>
+						<CdxIcon :icon="cdxIconEllipsis" />
+					</CdxMenuButton>
+				</span>
+			</summary>
+			<div class="ext-sws-subject-row__expanded">
+				<SubjectStatementsView :subject="subject" @count-change="providedStatementCount = $event" />
+				<footer class="ext-sws-subject-row__footer">
+					<dl class="ext-sws-subject-row__identifiers">
+						<div class="ext-sws-subject-row__id">
+							<dt class="ext-sws-subject-row__id-label">
+								{{ $i18n( 'sws-managesubjects-id-label' ).text() }}
+							</dt>
+							<dd class="ext-sws-subject-row__id-value">
+								<button
+									type="button"
+									class="ext-sws-subject-row__id-button"
+									:title="$i18n( 'sws-managesubjects-id-copy', subject.getId().text ).text()"
+									:aria-label="$i18n( 'sws-managesubjects-id-copy', subject.getId().text ).text()"
+									@click="copySubjectId"
+								>
+									<data :value="subject.getId().text">
+										{{ subject.getId().text }}
+									</data>
+								</button>
+							</dd>
+						</div>
+						<div
+							v-if="iri"
+							class="ext-sws-subject-row__iri"
+						>
+							<dt class="ext-sws-subject-row__iri-label">
+								{{ $i18n( 'sws-managesubjects-iri-label' ).text() }}
+							</dt>
+							<dd class="ext-sws-subject-row__iri-value">
+								<button
+									type="button"
+									class="ext-sws-subject-row__iri-button"
+									:title="$i18n( 'sws-managesubjects-iri-copy', iri ).text()"
+									:aria-label="$i18n( 'sws-managesubjects-iri-copy', iri ).text()"
+									@click="copySubjectIri"
+								>
+									<data :value="iri">
+										{{ iri }}
+									</data>
+								</button>
+							</dd>
+						</div>
+						<div
+							v-if="page !== null"
+							class="ext-sws-subject-row__page"
+						>
+							<dt class="ext-sws-subject-row__page-label">
+								{{ $i18n( 'sws-special-subject-page-label' ).text() }}
+							</dt>
+							<dd class="ext-sws-subject-row__page-value">
+								<a :href="pageUrl( page.getPageName() )">{{ page.getPageName() }}</a>
+							</dd>
+						</div>
+					</dl>
+					<DataExportButtons
+						:json-label="$i18n( 'sws-managesubjects-export-json' ).text()"
+						:rdf-label="$i18n( 'sws-managesubjects-export-rdf' ).text()"
+						:projections="rdfProjections"
+						v-bind="exportUrls"
+					/>
+				</footer>
+			</div>
+		</details>
+	</li>
+</template>
+
+<script setup lang="ts">
+import { computed, provide, ref } from 'vue';
+import { CdxButton, CdxIcon, CdxMenuButton } from '@wikimedia/codex';
+import type { MenuButtonItemData } from '@wikimedia/codex';
+import {
+	cdxIconArrowNext,
+	cdxIconArticleRedirect,
+	cdxIconCollapse,
+	cdxIconDraggable,
+	cdxIconEdit,
+	cdxIconEllipsis,
+	cdxIconExpand,
+	cdxIconLink,
+	cdxIconPushPin,
+	cdxIconTrash
+} from '@wikimedia/codex-icons';
+import { Subject } from '@/domain/Subject.ts';
+import type { Schema } from '@/domain/Schema.ts';
+import type { PageIdentifiers } from '@/domain/PageIdentifiers.ts';
+import { subjectRowDomId } from '@/presentation/subjectRowAnchor.ts';
+import { subjectLinkUrlFromRow } from '@/presentation/subjectLinks.ts';
+import { RelationTargetUrlKey } from '@/components/Value/ValueDisplayContract.ts';
+import { identifyingSubjectName } from '@/presentation/subjectDisplayName.ts';
+import { schemaNameToShow } from '@/presentation/schemaNameToShow.ts';
+import { rdfProjectionsFor, subjectExportUrls } from '@/presentation/DataExportMenu.ts';
+import { subjectIri } from '@/presentation/subjectIri.ts';
+import { copyToClipboard } from '@/presentation/copyToClipboard.ts';
+import SchemaNameDisplay from '@/components/common/SchemaNameDisplay.vue';
+import SubjectStatementsView from '@/components/SubjectsManager/SubjectStatementsView.vue';
+import DataExportButtons from '@/components/SubjectsManager/DataExportButtons.vue';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
+
+/**
+ * Which Main Subject control the row carries: the pin that demotes the page's Main Subject, the pin
+ * that promotes another Subject to it, or none, on a surface where a page's Main Subject is not a
+ * thing the row can change.
+ */
+type MainSubjectControl = 'none' | 'promote' | 'demote';
+
+const props = withDefaults( defineProps<{
+	subject: Subject;
+	expanded: boolean;
+	/**
+	 * The Subject's own page, which the name links to and the overflow menu offers. Null where the
+	 * reader is on it already.
+	 */
+	subjectPageUrl?: string | null;
+	/**
+	 * Gives the row the prominence a surface's focal Subject gets: the page's Main Subject on the
+	 * Data tab, the Subject a page is about on Special:Subject. Says nothing about either by itself.
+	 */
+	emphasized?: boolean;
+	/** Arrived at through a deep link. */
+	highlighted?: boolean;
+	/** Just acted on, so the eye is drawn back to it. */
+	focused?: boolean;
+	canEdit?: boolean;
+	canDelete?: boolean;
+	/** Whether this surface offers moving the Subject to another page at all. */
+	canMove?: boolean;
+	mainSubjectControl?: MainSubjectControl;
+	showDragHandle?: boolean;
+	/**
+	 * The page the Subject is stored on, linked in the expanded footer. Null where naming it says
+	 * nothing — the reader is on that page or its Data tab — or where the read resolved none.
+	 */
+	page?: PageIdentifiers | null;
+	/**
+	 * A short line about why this Subject is in this list, shown beside the Schema and the statement
+	 * count. Null on a listing where the row's own presence needs no explaining.
+	 */
+	caption?: string | null;
+	/**
+	 * The row's DOM id, for a surface listing the same Subject twice, which must still keep every id
+	 * on the page unique. Defaults to the one id a Subject's row carries everywhere else.
+	 */
+	domId?: string | null;
+}>(), {
+	subjectPageUrl: null,
+	emphasized: false,
+	highlighted: false,
+	focused: false,
+	canEdit: false,
+	canDelete: false,
+	canMove: false,
+	mainSubjectControl: 'none',
+	showDragHandle: false,
+	page: null,
+	caption: null,
+	domId: null
+} );
+
+// Everything the page decides is emitted rather than done here: which Subject a promotion moves
+// aside, what a deletion confirms against, where a copied link points. The two clipboard copies
+// below are the exceptions — they need nothing but this row's own Subject.
+const emit = defineEmits<{
+	toggle: [ subject: Subject ];
+	edit: [ subject: Subject ];
+	promote: [ subject: Subject ];
+	demote: [ subject: Subject ];
+	move: [ subject: Subject ];
+	delete: [ subject: Subject ];
+	'copy-link': [ subject: Subject ];
+}>();
+
+// A reader of these rows is browsing Subjects, so a relation in one follows the rule for links from
+// Subject listings rather than the one for Views, on every surface that mounts the row.
+provide( RelationTargetUrlKey, subjectLinkUrlFromRow );
+
+const schemaStore = useSchemaStore();
+
+const displayName = computed( () => identifyingSubjectName(
+	props.subject,
+	schemaStore.schemas.get( props.subject.getSchemaName() ) as Schema | undefined
+) );
+const schemaName = computed( () => schemaNameToShow( props.subject ) );
+const providedStatementCount = ref<number | null>( null );
+const statementCount = computed( () => providedStatementCount.value ?? props.subject.getNamesOfNonEmptyProperties().length );
+const exportUrls = computed( () => subjectExportUrls( props.subject.getId().text ) );
+const rdfProjections = computed( () => rdfProjectionsFor( [ props.subject.getSchemaName() ] ) );
+
+/**
+ * The Subject's concept URI, shown and copyable in the expanded footer. Empty for a Subject of another
+ * Source, which this wiki mints no IRI for, and then not shown at all.
+ */
+const iri = computed( () => subjectIri( props.subject.getId().text ) );
+
+function pageUrl( pageName: string ): string {
+	return mw.util.getUrl( pageName );
+}
+
+// Opening and editing lead, as what readers and editors want most. The rest run from what changes
+// nothing to what takes the Subject out of the listing, delete last. The inline strip keeps this
+// order and leaves opening to the name.
+const menuItems = computed<MenuButtonItemData[]>( () => {
+	const items: MenuButtonItemData[] = [];
+
+	if ( props.subjectPageUrl !== null ) {
+		items.push( {
+			value: 'open',
+			label: mw.msg( 'sws-managesubjects-row-open' ),
+			icon: cdxIconArrowNext
+		} );
+	}
+
+	if ( props.canEdit ) {
+		items.push( {
+			value: 'edit',
+			label: mw.msg( 'sws-managesubjects-row-edit' ),
+			icon: cdxIconEdit
+		} );
+	}
+
+	// Not permission-gated: read-only users may copy a link too.
+	items.push( {
+		value: 'copy-link',
+		label: mw.msg( 'sws-managesubjects-row-copy-link' ),
+		icon: cdxIconLink
+	} );
+
+	if ( props.canEdit && props.mainSubjectControl === 'promote' ) {
+		items.push( {
+			value: 'promote',
+			label: mw.msg( 'sws-managesubjects-row-promote' ),
+			icon: cdxIconPushPin
+		} );
+	}
+
+	if ( props.canMove ) {
+		items.push( {
+			value: 'move',
+			label: mw.msg( 'sws-managesubjects-row-move' ),
+			icon: cdxIconArticleRedirect
+		} );
+	}
+
+	if ( props.canDelete ) {
+		items.push( {
+			value: 'delete',
+			label: mw.msg( 'sws-managesubjects-row-delete' ),
+			icon: cdxIconTrash,
+			action: 'destructive'
+		} );
+	}
+
+	return items;
+} );
+
+const menuSelection = ref<string | number | null>( null );
+
+// Codex selects an item chosen with the keyboard but never follows a url, so 'open' navigates here.
+function dispatchMenuAction( value: string | number | null ): void {
+	menuSelection.value = null;
+
+	if ( value === 'open' && props.subjectPageUrl !== null ) {
+		window.location.href = props.subjectPageUrl;
+	} else if ( value === 'copy-link' ) {
+		emit( 'copy-link', props.subject );
+	} else if ( value === 'edit' ) {
+		emit( 'edit', props.subject );
+	} else if ( value === 'promote' ) {
+		emit( 'promote', props.subject );
+	} else if ( value === 'move' ) {
+		emit( 'move', props.subject );
+	} else if ( value === 'delete' ) {
+		emit( 'delete', props.subject );
+	}
+}
+
+function copySubjectId(): Promise<void> {
+	const id = props.subject.getId().text;
+
+	return copyToClipboard(
+		id,
+		mw.msg( 'sws-managesubjects-id-copied', id ),
+		mw.msg( 'sws-managesubjects-id-copy-error' )
+	);
+}
+
+function copySubjectIri(): Promise<void> {
+	return copyToClipboard(
+		iri.value,
+		mw.msg( 'sws-managesubjects-iri-copied', iri.value ),
+		mw.msg( 'sws-managesubjects-iri-copy-error' )
+	);
+}
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-subject-row {
+	border: @border-base;
+	border-radius: @border-radius-base;
+	background: @background-color-base;
+	// Baseline zero-color shadow so the focused-state ring can transition in/out smoothly
+	// rather than snap between "none" and a value.
+	box-shadow: @box-shadow-outset-small transparent;
+	transition: @transition-property-base @transition-duration-medium @transition-timing-function-system;
+
+	@media ( prefers-reduced-motion: reduce ) {
+		transition-duration: 0s;
+	}
+	font-size: @font-size-small;
+	line-height: 1.375rem; // Codex 2.0+ line-height-small
+
+	&--emphasized {
+		border-color: @border-color-progressive;
+
+		.ext-sws-subject-row__header {
+			background-color: @background-color-progressive-subtle;
+
+			&:hover {
+				background-color: @background-color-interactive-subtle;
+			}
+
+			&:active {
+				background-color: @background-color-interactive;
+			}
+		}
+	}
+
+	&--highlighted {
+		background: @background-color-progressive-subtle;
+	}
+
+	&--focused {
+		border-color: @border-color-progressive--focus;
+		box-shadow: @box-shadow-outset-small @box-shadow-color-progressive--focus;
+		// Transparent 1px outline for Windows high-contrast mode — Codex focus pattern.
+		outline: @outline-base--focus;
+	}
+
+	&--ghost {
+		opacity: 0.5;
+		background-color: @background-color-interactive-subtle;
+	}
+
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: @spacing-75;
+		padding: @spacing-75 @spacing-100;
+		cursor: pointer;
+		user-select: none;
+		list-style: none;
+		transition-property: background-color, color, border-color, box-shadow;
+		transition-duration: @transition-duration-base;
+		transition-timing-function: @transition-timing-function-system;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&:hover {
+			background-color: @background-color-interactive-subtle;
+		}
+
+		&:active {
+			background-color: @background-color-interactive;
+		}
+
+		&:focus-visible {
+			outline: @outline-base--focus;
+			box-shadow: inset 0 0 0 2px @box-shadow-color-progressive--focus;
+		}
+	}
+
+	&__chevron {
+		flex-shrink: 0;
+		color: @color-subtle;
+	}
+
+	&__main-indicator {
+		flex-shrink: 0;
+
+		// Codex sets an explicit `color` on `.cdx-icon`, matching our class's specificity.
+		// Chain the class to win the cascade regardless of Codex/bundle load order.
+		&.cdx-icon {
+			color: @color-progressive;
+		}
+
+		// When the user can edit, the indicator renders as a quiet CdxButton so clicking it
+		// demotes the subject. Paint the nested icon progressive to match the read-only case.
+		&.cdx-button .cdx-icon {
+			color: @color-progressive;
+		}
+	}
+
+	&__title {
+		display: flex;
+		flex-direction: column;
+		gap: @spacing-12;
+		flex-grow: 1;
+		min-width: 0;
+	}
+
+	&__subtitle {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0 @spacing-50;
+		min-width: 0;
+		font-size: @font-size-small;
+		color: @color-subtle;
+	}
+
+	&__count {
+		white-space: nowrap;
+	}
+
+	&__label,
+	&__caption {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__label {
+		font-size: @font-size-medium;
+		font-weight: @font-weight-bold;
+	}
+
+	/* The way to the Subject's own page. Only as wide as the name and its arrow, so the rest of the
+		header still toggles the row. */
+	&__name {
+		display: inline-flex;
+		align-items: center;
+		gap: @spacing-25;
+		align-self: flex-start;
+		max-width: @size-full;
+		min-width: 0;
+	}
+
+	/* The cue that the name leads somewhere: shown while the name is pointed at or focused where the
+		pointer can hover, and always where it cannot, like the action strip. In the link's colour,
+		which Codex sets on `.cdx-icon` unless told otherwise. */
+	&__name-arrow.cdx-icon {
+		flex-shrink: 0;
+		color: inherit;
+
+		@media ( hover: hover ) {
+			opacity: 0;
+			// Slides the way it points as it appears.
+			transform: translateX( -@spacing-25 );
+			transition: opacity @transition-duration-base @transition-timing-function-system, transform @transition-duration-base @transition-timing-function-system;
+		}
+
+		@media ( prefers-reduced-motion: reduce ) {
+			transition-duration: 0s;
+		}
+	}
+
+	&__identifiers {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		margin: 0;
+		font-size: @font-size-x-small;
+		color: @color-subtle;
+	}
+
+	&__id,
+	&__iri,
+	&__page {
+		display: flex;
+		align-items: baseline;
+		gap: @spacing-25;
+		min-width: 0;
+	}
+
+	&__id-label,
+	&__iri-label,
+	&__page-label {
+		flex-shrink: 0;
+	}
+
+	&__id-value,
+	&__iri-value,
+	&__page-value {
+		display: flex;
+		min-width: 0;
+		margin: 0;
+	}
+
+	/* A page title, not an identifier: no monospace, and long ones ellipsize like the IRI. */
+	&__page-value a {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	&__id-button,
+	&__iri-button {
+		appearance: none;
+		background: transparent;
+		border: 0;
+		padding: 0;
+		cursor: pointer;
+		color: inherit;
+		font: inherit;
+		font-family: @font-family-monospace;
+		// The IRI is a full URL: let a long one ellipsize instead of stretching the footer. The whole
+		// value stays in the button title and is what the click copies.
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&:hover {
+			color: @color-base;
+		}
+	}
+
+	/* The separator belongs to the pair: a row whose badge is withheld draws none. */
+	&__schema + &__count::before,
+	&__count + &__caption::before {
+		content: '•';
+		margin-inline-end: @spacing-50;
+	}
+
+	&__actions {
+		display: inline-flex;
+		gap: @spacing-25;
+		flex-shrink: 0;
+
+		@media ( max-width: @max-width-breakpoint-mobile ) {
+			display: none;
+		}
+
+		@media ( min-width: @min-width-breakpoint-tablet ) and ( hover: hover ) {
+			opacity: 0;
+			transform: translateX( @spacing-50 );
+			transition: opacity @transition-duration-medium @transition-timing-function-system, transform @transition-duration-medium @transition-timing-function-system;
+
+			.ext-sws-subject-row:hover &,
+			.ext-sws-subject-row:has( :focus-visible ) &,
+			.ext-sws-subject-row--highlighted &,
+			.ext-sws-subject-row--expanded & {
+				// :has( :focus-visible ) rather than :focus-within: keyboard focus must reveal the
+				// controls a user is tabbing through, but mouse clicks also focus what they hit (a copy
+				// button, the summary when toggling a row) and would pin the controls visible after the
+				// pointer leaves.
+				opacity: 1;
+				transform: translateX( 0 );
+			}
+		}
+	}
+
+	&__drag-handle {
+		// Set off from the buttons: this is grabbed, not clicked, and delete sits right before it.
+		margin-inline-start: @spacing-50;
+		min-width: @min-size-interactive-pointer;
+		min-height: @min-size-interactive-pointer;
+		padding-inline: @spacing-30;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		cursor: grab;
+
+		&:active {
+			cursor: grabbing;
+		}
+
+		.cdx-icon {
+			color: @color-placeholder;
+		}
+	}
+
+	&__actions-menu {
+		flex-shrink: 0;
+
+		@media ( min-width: @min-width-breakpoint-tablet ) {
+			display: none;
+		}
+
+		@media ( max-width: @max-width-breakpoint-mobile ) and ( hover: hover ) {
+			opacity: 0;
+			transition: opacity @transition-duration-medium @transition-timing-function-system;
+
+			.ext-sws-subject-row:hover &,
+			.ext-sws-subject-row:has( :focus-visible ) &,
+			.ext-sws-subject-row--highlighted &,
+			.ext-sws-subject-row--expanded &,
+			&:has( [ aria-expanded='true' ] ) {
+				// Keyboard-only focus reveal for the same reason as __actions above.
+				opacity: 1;
+			}
+		}
+	}
+
+	&__expanded {
+		padding: @spacing-100;
+		border-top: @border-base;
+		background: @background-color-neutral-subtle;
+	}
+
+	&__footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: @spacing-100;
+		margin-top: @spacing-100;
+		padding-top: @spacing-75;
+		border-top: @border-width-base @border-style-base @border-color-subtle;
+	}
+}
+/* Codex's link colours, less the visited one: a Subject's name reads the same whether or not the
+	reader has been to its page. Every state is spelled out and qualified with `a`, because core
+	colours `a:visited` and underlines `a:hover, a:focus` at (0,1,1), as SchemaNameDisplay explains.
+	Hover and active come after focus, so that they still underline. */
+a.ext-sws-subject-row__name {
+	border-radius: @border-radius-base;
+
+	&,
+	&:visited {
+		color: @color-progressive;
+		text-decoration: @text-decoration-none;
+	}
+
+	&:focus {
+		text-decoration: @text-decoration-none;
+	}
+
+	// Also qualified with `:visited`: Vector paints `a:visited:hover` at (0,2,1), which a bare
+	// `a.<class>:hover` only ties and then loses to on source order.
+	&:hover,
+	&:visited:hover {
+		color: @color-progressive--hover;
+		text-decoration: @text-decoration-underline;
+	}
+
+	&:active,
+	&:visited:active {
+		color: @color-progressive--active;
+		text-decoration: @text-decoration-underline;
+	}
+
+	&:focus-visible {
+		outline: @border-style-base @border-width-thick @outline-color-progressive--focus;
+	}
+
+	// Vector styles every link with Codex's link mixin, which gives a trailing icon the size and
+	// padding of an external-link mark, at (0,3,1). The arrow is only a cue: x-small, spaced by the
+	// link's gap.
+	.ext-sws-subject-row__name-arrow.cdx-icon:last-child {
+		width: @size-icon-x-small;
+		height: @size-icon-x-small;
+		padding-left: 0;
+	}
+
+	&:hover .ext-sws-subject-row__name-arrow,
+	&:focus-visible .ext-sws-subject-row__name-arrow {
+		opacity: 1;
+		transform: translateX( 0 );
+	}
+}
+</style>

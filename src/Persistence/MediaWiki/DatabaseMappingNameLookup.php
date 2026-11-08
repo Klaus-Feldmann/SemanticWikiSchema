@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MappingNameLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MappingNameLookup;
 use Wikimedia\Rdbms\IDatabase;
 
 class DatabaseMappingNameLookup implements MappingNameLookup {
@@ -30,7 +30,7 @@ class DatabaseMappingNameLookup implements MappingNameLookup {
 		$titles = $this->db->newSelectQueryBuilder()
 			->select( 'page_title' )
 			->from( 'page' )
-			->where( [ 'page_namespace' => NeoWikiExtension::NS_MAPPING ] )
+			->where( [ 'page_namespace' => SWSExtension::NS_MAPPING ] )
 			->orderBy( 'page_id ASC' )
 			->caller( __METHOD__ )
 			->fetchFieldValues();
@@ -58,8 +58,8 @@ class DatabaseMappingNameLookup implements MappingNameLookup {
 	 * seeks past the last seen page ID, an unreadable Mapping is never yielded, and a cursor built
 	 * from the yielded keys pages over readable Mappings only (#1062). getMappingNames stays
 	 * unfiltered for the system-context RDF-projection and DumpRdf path, mirroring the split
-	 * between {@see NeoWikiExtension::getRdfProjectionNames} and
-	 * NeoWikiExtension::filterReadableProjectionNames. A page whose title is not a usable Mapping
+	 * between {@see SWSExtension::getRdfProjectionNames} and
+	 * SWSExtension::filterReadableProjectionNames. A page whose title is not a usable Mapping
 	 * name is skipped like in getMappingNames.
 	 *
 	 * @return iterable<int, MappingName> Readable Mapping names keyed by page ID, in page-ID order.
@@ -72,7 +72,7 @@ class DatabaseMappingNameLookup implements MappingNameLookup {
 				->select( [ 'page_id', 'page_title' ] )
 				->from( 'page' )
 				->where( [
-					'page_namespace' => NeoWikiExtension::NS_MAPPING,
+					'page_namespace' => SWSExtension::NS_MAPPING,
 					$this->db->expr( 'page_id', '>', $lastPageId ),
 				] )
 				->orderBy( 'page_id ASC' )
@@ -89,7 +89,7 @@ class DatabaseMappingNameLookup implements MappingNameLookup {
 					continue;
 				}
 
-				$title = $this->titleFactory->newFromText( $name->getText(), NeoWikiExtension::NS_MAPPING );
+				$title = $this->titleFactory->newFromText( $name->getText(), SWSExtension::NS_MAPPING );
 
 				if ( $title !== null && $this->readAuthorizer->authorizeReadByPageTitle( $title ) ) {
 					yield $lastPageId => $name;

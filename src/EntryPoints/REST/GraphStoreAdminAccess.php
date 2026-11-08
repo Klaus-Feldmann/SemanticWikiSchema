@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * The access rule and error shape the graph-store endpoints share.
@@ -17,14 +17,14 @@ use ProfessionalWiki\NeoWiki\NeoWikiExtension;
 trait GraphStoreAdminAccess {
 
 	private function refuseWithoutTheAdminRight(): ?Response {
-		if ( $this->getAuthority()->isAllowed( NeoWikiExtension::ADMIN_RIGHT ) ) {
+		if ( $this->getAuthority()->isAllowed( SWSExtension::ADMIN_RIGHT ) ) {
 			return null;
 		}
 
 		return $this->errorResponse(
 			403,
 			'permissionDenied',
-			'You do not have permission to administer NeoWiki\'s graph stores.'
+			'You do not have permission to administer SWS\'s graph stores.'
 		);
 	}
 

@@ -6,7 +6,7 @@ Status: Draft
 
 ## Context
 
-Four NeoWiki features find Subjects by something other than their id: relation-target suggestions, the Subject list
+Four SWS features find Subjects by something other than their id: relation-target suggestions, the Subject list
 (on Special:Subjects, a Schema's page and Special:Schemas), "Referenced by" on Special:Subject, and the Subject counts
 per Schema. They read the Neo4j Projection, so a wiki without Neo4j, including one with only a SPARQL store, gets none
 of them. [ADR 19](019-graph-database-architecture.md) let such features fall back or degrade without a Graph Store,
@@ -19,12 +19,12 @@ creates a Subject and links to it straight after.
 ## Decision
 
 **Only the query surfaces read Graph Stores**: the Cypher and SPARQL that users write, run from parser functions, Lua
-or the REST API. The four features read MediaWiki tables on every wiki, here `neowiki_subject` and `neowiki_relation`,
+or the REST API. The four features read MediaWiki tables on every wiki, here `sws_subject` and `sws_relation`,
 and a feature that needs Subject data these tables lack extends them. This replaces the fallbacks ADR 19 allowed and
 ADR 32's suggestions from Neo4j.
 
 **The tables follow the published revision**, the one a revision policy chooses, as the Projections do, so lists,
-suggestions and counts show what readers see. `neowiki_subject_page` keeps following the latest revision, so that an
+suggestions and counts show what readers see. `sws_subject_page` keeps following the latest revision, so that an
 editor reaches a Subject before its page is published.
 
 **They are written with the change that alters them**, in its transaction where it has one, so they are never staler
@@ -48,6 +48,6 @@ than the revision they derive from.
   gaps where it is used.
 * **The search index** (CirrusSearch with OpenSearch): its documents are pages, not Subjects; it is updated through the
   job queue, from the latest revision rather than the published one; and it is optional.
-* **More columns on `neowiki_subject_page`**: that index follows the latest revision.
+* **More columns on `sws_subject_page`**: that index follows the latest revision.
 * **Writing after the save commits**, as MediaWiki's link tables are: it would run after the response, so suggestions
   would lag.

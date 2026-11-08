@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Renderer\ContentParseParams;
@@ -11,21 +11,21 @@ use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContentHandler;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContentHandler
- * @covers \ProfessionalWiki\NeoWiki\Presentation\MappingPageHtmlBuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler
+ * @covers \ProfessionalWiki\SWS\Presentation\MappingPageHtmlBuilder
  * @group Database
  */
 class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase {
 
 	private function parserOutput( string $json, string $name = 'EDM' ): ParserOutput {
 		$handler = new MappingContentHandler( MappingContent::CONTENT_MODEL_ID );
-		$page = Title::makeTitle( NeoWikiExtension::NS_MAPPING, $name )->toPageIdentity();
+		$page = Title::makeTitle( SWSExtension::NS_MAPPING, $name )->toPageIdentity();
 		$cpoParams = new ContentParseParams( $page, null, null, true );
 
 		return $handler->getParserOutput( new MappingContent( $json ), $cpoParams );
@@ -56,15 +56,15 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 	public function testEachSchemaSectionHasADeepLinkableId(): void {
 		$html = $this->render( $this->edm() );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-mapping-schema-Person"', $html );
-		$this->assertStringContainsString( 'id="ext-neowiki-mapping-schema-City"', $html );
+		$this->assertStringContainsString( 'id="ext-sws-mapping-schema-Person"', $html );
+		$this->assertStringContainsString( 'id="ext-sws-mapping-schema-City"', $html );
 	}
 
 	public function testSchemaSectionsFollowDocumentOrder(): void {
 		$html = $this->render( $this->edm() );
 
-		$person = strpos( $html, 'id="ext-neowiki-mapping-schema-Person"' );
-		$city = strpos( $html, 'id="ext-neowiki-mapping-schema-City"' );
+		$person = strpos( $html, 'id="ext-sws-mapping-schema-Person"' );
+		$city = strpos( $html, 'id="ext-sws-mapping-schema-City"' );
 
 		// Guarded, because assertLessThan( int, false ) compares as bool and would pass.
 		$this->assertIsInt( $person );
@@ -120,7 +120,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 
 	public function testFormatVersionIsRenderedAsASubtleLine(): void {
 		$this->assertStringContainsString(
-			'ext-neowiki-mapping-page__version',
+			'ext-sws-mapping-page__version',
 			$this->render( $this->edm() )
 		);
 	}
@@ -134,8 +134,8 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 	public function testMappedSchemaPagesAreRegisteredAsLinks(): void {
 		$parserOutput = $this->parserOutput( $this->edm() );
 
-		$this->assertTrue( $this->registersLocalLink( $parserOutput, NeoWikiExtension::NS_SCHEMA, 'Person' ) );
-		$this->assertTrue( $this->registersLocalLink( $parserOutput, NeoWikiExtension::NS_SCHEMA, 'City' ) );
+		$this->assertTrue( $this->registersLocalLink( $parserOutput, SWSExtension::NS_SCHEMA, 'Person' ) );
+		$this->assertTrue( $this->registersLocalLink( $parserOutput, SWSExtension::NS_SCHEMA, 'City' ) );
 	}
 
 	public function testPrefixNamespaceIrisAreRegisteredAsExternalLinks(): void {
@@ -148,7 +148,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 	public function testPrefixesAreRenderedAsClickableExternalLinks(): void {
 		$html = $this->render( $this->edm() );
 
-		$this->assertStringContainsString( 'ext-neowiki-mapping-page__prefixes', $html );
+		$this->assertStringContainsString( 'ext-sws-mapping-page__prefixes', $html );
 		$this->assertStringContainsString( 'href="http://www.europeana.eu/schemas/edm/"', $html );
 	}
 
@@ -177,11 +177,11 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 		$this->assertArrayNotHasKey( 'javascript:alert(1)', $parserOutput->getExternalLinks() );
 	}
 
-	public function testJsonContentAndNeoWikiStyleModulesAreAdded(): void {
+	public function testJsonContentAndSWSStyleModulesAreAdded(): void {
 		$moduleStyles = $this->parserOutput( $this->edm() )->getModuleStyles();
 
 		$this->assertContains( 'mediawiki.content.json', $moduleStyles );
-		$this->assertContains( 'ext.neowiki.styles', $moduleStyles );
+		$this->assertContains( 'ext.sws.styles', $moduleStyles );
 	}
 
 	public function testMissingSchemaIsLinkedAsARedLink(): void {
@@ -197,7 +197,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 
 		$parserOutput = $this->parserOutput( $this->mappingWithSchema( 'Person' ) );
 
-		$this->assertTrue( $this->registersLocalLink( $parserOutput, NeoWikiExtension::NS_SCHEMA, 'Person' ) );
+		$this->assertTrue( $this->registersLocalLink( $parserOutput, SWSExtension::NS_SCHEMA, 'Person' ) );
 		$this->assertStringNotContainsString( 'redlink', $parserOutput->getContentHolderText() );
 	}
 
@@ -216,13 +216,13 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 
 		$this->assertStringContainsString( '<span>Person_x</span>', $parserOutput->getContentHolderText() );
 		$this->assertStringNotContainsString( 'Schema:Person_x', $parserOutput->getContentHolderText() );
-		$this->assertFalse( $this->registersLocalLink( $parserOutput, NeoWikiExtension::NS_SCHEMA, 'Person_x' ) );
+		$this->assertFalse( $this->registersLocalLink( $parserOutput, SWSExtension::NS_SCHEMA, 'Person_x' ) );
 	}
 
 	public function testEmptySchemasShowAFriendlyEmptyState(): void {
 		$html = $this->render( '{ "version": 1, "prefixes": {}, "schemas": {} }' );
 
-		$this->assertStringContainsString( 'ext-neowiki-mapping-page__empty', $html );
+		$this->assertStringContainsString( 'ext-sws-mapping-page__empty', $html );
 		$this->assertStringNotContainsString( 'mw-json', $html );
 	}
 
@@ -230,7 +230,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 		$html = $this->render( '{ "version": 2, "schemas": {} }' );
 
 		$this->assertStringContainsString( 'mw-json', $html );
-		$this->assertStringNotContainsString( 'ext-neowiki-mapping-page', $html );
+		$this->assertStringNotContainsString( 'ext-sws-mapping-page', $html );
 	}
 
 	/**
@@ -250,7 +250,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 
 	public function testInvalidJsonFallsBackToTheDefaultRendering(): void {
 		$this->assertStringNotContainsString(
-			'ext-neowiki-mapping-page',
+			'ext-sws-mapping-page',
 			$this->render( 'this is not valid json' )
 		);
 	}
@@ -260,10 +260,10 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 	 * about a schema's own subtree cannot be satisfied by another schema's section or by the header.
 	 */
 	private function schemaSection( string $html, string $name ): string {
-		$start = strpos( $html, 'id="ext-neowiki-mapping-schema-' . $name . '"' );
+		$start = strpos( $html, 'id="ext-sws-mapping-schema-' . $name . '"' );
 		$this->assertIsInt( $start, "No section rendered for schema $name" );
 
-		$next = strpos( $html, 'id="ext-neowiki-mapping-schema-', $start + 1 );
+		$next = strpos( $html, 'id="ext-sws-mapping-schema-', $start + 1 );
 
 		return $next === false ? substr( $html, $start ) : substr( $html, $start, $next - $start );
 	}
@@ -280,7 +280,7 @@ class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase
 
 	private function createSchemaPage( string $name ): void {
 		$wikiPage = $this->getServiceContainer()->getWikiPageFactory()->newFromTitle(
-			Title::makeTitle( NeoWikiExtension::NS_SCHEMA, $name )
+			Title::makeTitle( SWSExtension::NS_SCHEMA, $name )
 		);
 
 		$updater = $wikiPage->newPageUpdater( $this->getTestSysop()->getUser() );

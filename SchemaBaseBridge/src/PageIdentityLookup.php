@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Permissions\Authority;
@@ -18,7 +18,7 @@ final class PageIdentityLookup {
 			return [ 'status' => 'unavailable' ];
 		}
 		$values = MediaWikiServices::getInstance()->getPageProps()->getProperties( $page, 'unlinkedwikibase_id' );
-		$current = \ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingContext::current()?->currentProperty( $page, 'unlinkedwikibase_id' );
+		$current = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current()?->currentProperty( $page, 'unlinkedwikibase_id' );
 		$id = $current ?? $values[$page->getArticleID()] ?? null;
 		if ( $id === null || $id === '' ) {
 			return [ 'status' => 'missing' ];
@@ -35,7 +35,7 @@ final class PageIdentityLookup {
 		if ( !$registry->isLoaded( 'WikibaseRepository' ) ) {
 			return [ 'status' => 'unavailable' ];
 		}
-		$siteId = MediaWikiServices::getInstance()->getMainConfig()->get( 'NeoWikiBaseBridgeLocalSiteId' );
+		$siteId = MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSBaseBridgeLocalSiteId' );
 		if ( $siteId === null ) {
 			$siteId = $registry->isLoaded( 'WikibaseClient' )
 				? WikibaseClient::getSite()->getGlobalId() : WikiMap::getCurrentWikiId();

@@ -2,44 +2,44 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use InvalidArgumentException;
 use LogicException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildExecutor;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NothingToResumeException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NullRebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\NeoWiki\Application\PageRebuilder;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseRebuildStartLock;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildStartLockUnavailableException;
-use ProfessionalWiki\NeoWiki\Persistence\PageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\CancellingRebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryDeletedPageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\RefusingRebuildStartLock;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyRebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyRebuildJobQueue;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToResumeException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildBatchObserver;
+use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use ProfessionalWiki\SWS\Application\PageRebuilder;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\CancellingRebuildRunRepository;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryDeletedPageIdsLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\RefusingRebuildStartLock;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdsLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildBatchObserver;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
@@ -48,12 +48,12 @@ use Wikimedia\Rdbms\DBUnexpectedError;
 use Wikimedia\RequestTimeout\TimeoutException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildExecutor
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildProgress
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\RebuildProgress
  * @group Database
  */
-class GraphRebuildTest extends NeoWikiIntegrationTestCase {
+class GraphRebuildTest extends SWSIntegrationTestCase {
 
 	private const STORE = 'scoped-store';
 	private const OTHER_STORE = 'other-store';
@@ -76,7 +76,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// The tests rebuild the singleton with test plugins registered; reset it so later tests get a
 		// clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testEveryPageIsProjectedIntoTheScopedStore(): void {
@@ -498,7 +498,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 		return $executor->executeOneBatch(
 			run: $run,
 			store: $store,
-			pageRebuilder: NeoWikiExtension::getInstance()->newPageRebuilderFor( $store ),
+			pageRebuilder: SWSExtension::getInstance()->newPageRebuilderFor( $store ),
 			batchSize: 200,
 			observer: new NullRebuildBatchObserver()
 		);
@@ -846,7 +846,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testTheLoggedPageFailureCarriesNoCredentials(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$pageIds = $this->createSubjectPages( 'Page the store rejects' );
 		$this->registerStore( new SpyGraphDatabasePlugin(
 			refusedPageIds: $pageIds,
@@ -865,7 +865,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testARebuildStartedFromTheWikiIsToldToRebuildRatherThanToResume(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->createSubjectPages( 'Page nobody projects' );
 		$this->registerStore( new ThrowingGraphDatabasePlugin() );
 
@@ -877,7 +877,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 
 	public function testARebuildStartedFromTheShellIsToldHowToResumeIt(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->createSubjectPages( 'Page nobody projects' );
 		$this->registerStore( new ThrowingGraphDatabasePlugin() );
 
@@ -948,12 +948,12 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newCoordinator(): GraphRebuildCoordinator {
-		return NeoWikiExtension::getInstance()
+		return SWSExtension::getInstance()
 			->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE );
 	}
 
 	private function newRunRepository(): RebuildRunRepository {
-		return NeoWikiExtension::getInstance()->newRebuildRunRepository();
+		return SWSExtension::getInstance()->newRebuildRunRepository();
 	}
 
 	/**
@@ -986,7 +986,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 			executor: $this->newExecutor( new InMemoryPageIdsLookup(), new NullLogger() ),
 			jobQueue: new SpyRebuildJobQueue(),
 			newPageRebuilder: static fn ( GraphDatabasePlugin $store ): PageRebuilder
-				=> NeoWikiExtension::getInstance()->newPageRebuilderFor( $store ),
+				=> SWSExtension::getInstance()->newPageRebuilderFor( $store ),
 			logger: new NullLogger(),
 		);
 	}
@@ -1066,7 +1066,7 @@ class GraphRebuildTest extends NeoWikiIntegrationTestCase {
 		return $this->newExecutor( $pageIds, $logger )->execute(
 			run: $this->newRunRepository()->startRun( self::STORE, RebuildTrigger::Cli, RebuildStatus::Running ),
 			store: $store,
-			pageRebuilder: NeoWikiExtension::getInstance()->newPageRebuilderFor( $store ),
+			pageRebuilder: SWSExtension::getInstance()->newPageRebuilderFor( $store ),
 			batchSize: $batchSize,
 			observer: $observer
 		);

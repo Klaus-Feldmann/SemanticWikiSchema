@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\TitleFormatter;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\PagePropertiesSource;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectsToPublish;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
-use ProfessionalWiki\NeoWiki\Persistence\PublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Persistence\SubjectPageIndex;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\PagePropertiesSource;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
+use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -71,7 +71,7 @@ class OnRevisionCreatedHandler {
 		} catch ( UnreadableSubjectsException $exception ) {
 			// Logged rather than thrown: refusing the save would refuse the edit that repairs the page too.
 			$this->logger->warning(
-				'NeoWiki did not publish page {page}: its revision {revision} cannot be read as Subject data, so '
+				'SWS did not publish page {page}: its revision {revision} cannot be read as Subject data, so '
 				. 'the graph stores and the published Subject index keep what they held for the page until it '
 				. 'publishes Subject data that can be. {message}',
 				[

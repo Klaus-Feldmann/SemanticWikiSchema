@@ -9,10 +9,10 @@ require __DIR__ . '/Cases.php';
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingResult;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIncomplete;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingResult;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
 $schema['propertyDefinitions']['Quellenangabe']=['type'=>'url'];
 saveTestPage('Attribut:Quellenangabe',new WikitextContent('[[Datentyp::URL]]'));
 saveTestPage('Attribut:Quellen-URL',new WikitextContent('[[Datentyp::URL]]'));
@@ -33,9 +33,9 @@ checkTest(dataValues($title,'Name')===['Privater Wert'],'copied completion stamp
 $job=$services->getJobFactory()->newJob('smw.update',$title,['forcedUpdate'=>true]);
 checkTest($job->run(),'real SMW UpdateJob executes in private wiki');DeferredUpdates::doUpdates();
 checkTest(dataValues($title,'Name')===['Privater Wert'],'SMW UpdateJob retains source-derived assertions');
-// Removing the subject slot is also intentional and must clear stale NeoWiki-derived assertions.
+// Removing the subject slot is also intentional and must clear stale SWS-derived assertions.
 $page=$services->getWikiPageFactory()->newFromTitle($title);$updater=$page->newPageUpdater($admin);
-$updater->removeSlot('neo');$updater->setContent('main',new WikitextContent('Remaining ordinary article. [[Manuell::Erhalten]]'));
+$updater->removeSlot('sws');$updater->setContent('main',new WikitextContent('Remaining ordinary article. [[Manuell::Erhalten]]'));
 $updater->saveRevision(MediaWiki\CommentStore\CommentStoreComment::newUnsavedComment('remove test subject'),0);DeferredUpdates::doUpdates();
 $processor->refresh($title);DeferredUpdates::doUpdates();
 checkTest(dataValues($title,'Name')===[] && isset(storedProps($title)['Manuell']),'subject removal clears derived data and retains manual data');

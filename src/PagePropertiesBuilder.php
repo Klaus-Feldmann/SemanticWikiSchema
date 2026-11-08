@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki;
+namespace ProfessionalWiki\SWS;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\IContentHandlerFactory;
@@ -12,10 +12,10 @@ use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionStore;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\TitleFormatter;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageProperties;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
 
 readonly class PagePropertiesBuilder implements PagePropertiesSource {
 

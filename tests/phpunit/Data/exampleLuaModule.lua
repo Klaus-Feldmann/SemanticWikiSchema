@@ -1,5 +1,5 @@
 local p = {}
-local neo = require('NeoWiki')
+local neo = require('SWS')
 
 p.neo = neo
 

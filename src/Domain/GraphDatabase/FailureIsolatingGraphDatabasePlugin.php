@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
 
 use Exception;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 use Psr\Log\LoggerInterface;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
@@ -18,7 +18,7 @@ use Wikimedia\RequestTimeout\TimeoutException;
  * The graph projection is derived, rebuildable state (see the RebuildGraphDatabases maintenance
  * script), so a failing backend must not fail the triggering user operation. A throwing plugin is
  * caught at the \Exception boundary — which covers the connection and transaction failures a down
- * Neo4j (or SPARQL endpoint) raises — logged as an error on the NeoWiki channel, and swallowed, so
+ * Neo4j (or SPARQL endpoint) raises — logged as an error on the SWS channel, and swallowed, so
  * the triggering operation still commits.
  *
  * Two kinds of throwable are deliberately let through instead of swallowed:
@@ -32,7 +32,7 @@ use Wikimedia\RequestTimeout\TimeoutException;
  * Isolation is per plugin, so composing several of these (one per backend) lets one backend fail
  * without starving the others. This decorator is used only on the hook-facing write path; a rebuild
  * deliberately projects through its store unwrapped, so it can tell a page it cannot reconcile from a
- * store it cannot reach. See NeoWikiExtension.
+ * store it cannot reach. See SWSExtension.
  */
 class FailureIsolatingGraphDatabasePlugin implements GraphDatabasePlugin {
 
@@ -73,7 +73,7 @@ class FailureIsolatingGraphDatabasePlugin implements GraphDatabasePlugin {
 
 	private function logProjectionFailure( string $operation, PageId $pageId, Exception $e ): void {
 		$this->logger->error(
-			'NeoWiki failed to ' . $operation . ' page ' . $pageId->id . ' in graph backend '
+			'SWS failed to ' . $operation . ' page ' . $pageId->id . ' in graph backend '
 			. $this->plugin::class . '. The triggering operation was not aborted, but this backend is '
 			. 'now out of sync for that page. Run the RebuildGraphDatabases maintenance script to '
 			. 'reconcile it. Underlying error: ' . BackendFailureMessage::withoutCredentials( $e->getMessage() ),

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
 
 /**
  * Cancels the run the first time it is read, after answering with it as it was.

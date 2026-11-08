@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Context\RequestContext;
@@ -11,23 +11,23 @@ use Closure;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
  * Needs the database for the pages whose Subject slots it reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup
  * @group Database
  */
-class SubjectInPlaceOfPageTitleLookupTest extends NeoWikiIntegrationTestCase {
+class SubjectInPlaceOfPageTitleLookupTest extends SWSIntegrationTestCase {
 
 	private const string MAIN_ID = 's1zz1111111azz6';
 	private const string OTHER_ID = 's1zz1111111azz7';
@@ -214,7 +214,7 @@ class SubjectInPlaceOfPageTitleLookupTest extends NeoWikiIntegrationTestCase {
 		$lookup = new SubjectInPlaceOfPageTitleLookup(
 			$this->getServiceContainer()->getRevisionStore(),
 			$this->getDb(),
-			NeoWikiExtension::getInstance()->getRevisionPolicy(),
+			SWSExtension::getInstance()->getRevisionPolicy(),
 			$newReadAuthorizer,
 			$maxPages
 		);

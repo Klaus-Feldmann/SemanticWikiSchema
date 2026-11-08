@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** Presentation only. No SMW syntax or research selection. */
 final class TimePresentation

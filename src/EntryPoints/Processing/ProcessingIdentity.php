@@ -1,14 +1,14 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 use MediaWiki\User\User;
 use RuntimeException;
 
 /** A credential-less system account. Never takes over an existing human account. */
 final class ProcessingIdentity {
-    public const NAME = 'SemanticNeoWiki internal processor';
+    public const NAME = 'SemanticSWS internal processor';
 
     public static function get(): User {
         $user = User::newSystemUser( self::NAME, [ 'steal' => false ] );

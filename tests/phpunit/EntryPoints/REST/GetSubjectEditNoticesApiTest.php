@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectEditNoticesApi;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectEditNoticesApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestGetSubjectEditNoticesPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\TitleBasedSubjectEditNoticeContextFactory
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestGetSubjectEditNoticesPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
+ * @covers \ProfessionalWiki\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory
  * @group Database
  */
-class GetSubjectEditNoticesApiTest extends NeoWikiIntegrationTestCase {
+class GetSubjectEditNoticesApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private function createNoticeMessage( string $messageKey, string $content ): void {
 		$this->insertPage( 'MediaWiki:' . ucfirst( $messageKey ), $content );
@@ -84,29 +84,29 @@ class GetSubjectEditNoticesApiTest extends NeoWikiIntegrationTestCase {
 
 	public function testNamespaceAndPageNoticesAreReturned(): void {
 		$pageId = $this->createPage( 'GetSubjectEditNoticesApiTest_Noticed' );
-		$this->createNoticeMessage( 'neowiki-editnotice-0', 'Namespace wide' );
-		$this->createNoticeMessage( 'neowiki-editnotice-0-GetSubjectEditNoticesApiTest_Noticed', 'This page' );
+		$this->createNoticeMessage( 'sws-editnotice-0', 'Namespace wide' );
+		$this->createNoticeMessage( 'sws-editnotice-0-GetSubjectEditNoticesApiTest_Noticed', 'This page' );
 
 		$this->assertSame(
-			[ 'neowiki-editnotice-0', 'neowiki-editnotice-0-GetSubjectEditNoticesApiTest_Noticed' ],
+			[ 'sws-editnotice-0', 'sws-editnotice-0-GetSubjectEditNoticesApiTest_Noticed' ],
 			$this->noticeKeys( $this->requestNotices( $pageId ) )
 		);
 	}
 
 	public function testSchemaNoticeIsReturnedOnlyWhenTheSchemaIsNamed(): void {
 		$pageId = $this->createPage( 'GetSubjectEditNoticesApiTest_Schema' );
-		$this->createNoticeMessage( 'neowiki-editnotice-schema-Person', 'Editing a Person' );
+		$this->createNoticeMessage( 'sws-editnotice-schema-Person', 'Editing a Person' );
 
 		$this->assertSame( [], $this->noticeKeys( $this->requestNotices( $pageId ) ) );
 		$this->assertSame(
-			[ 'neowiki-editnotice-schema-Person' ],
+			[ 'sws-editnotice-schema-Person' ],
 			$this->noticeKeys( $this->requestNotices( $pageId, schemaName: 'Person' ) )
 		);
 	}
 
 	public function testNoticeBodyIsRenderedHtml(): void {
 		$pageId = $this->createPage( 'GetSubjectEditNoticesApiTest_Html' );
-		$this->createNoticeMessage( 'neowiki-editnotice-0', "'''Approval needed'''" );
+		$this->createNoticeMessage( 'sws-editnotice-0', "'''Approval needed'''" );
 
 		$html = $this->requestNotices( $pageId )['notices'][0]['html'];
 
@@ -116,7 +116,7 @@ class GetSubjectEditNoticesApiTest extends NeoWikiIntegrationTestCase {
 	public function testNoticesOnAnUnreadablePageAreAbsent(): void {
 		$restrictedPageId = $this->createPage( 'GetSubjectEditNoticesApiTest_Restricted' );
 		$plainPageId = $this->createPage( 'GetSubjectEditNoticesApiTest_NoNotices' );
-		$this->createNoticeMessage( 'neowiki-editnotice-0', 'Namespace wide' );
+		$this->createNoticeMessage( 'sws-editnotice-0', 'Namespace wide' );
 
 		$denied = $this->requestNotices(
 			$restrictedPageId,

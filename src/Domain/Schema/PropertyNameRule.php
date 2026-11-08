@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Schema;
+namespace ProfessionalWiki\SWS\Domain\Schema;
 
 enum PropertyNameRule: string {
 

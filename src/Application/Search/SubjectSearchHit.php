@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Search;
+namespace ProfessionalWiki\SWS\Application\Search;
 
 /**
  * What a page's Subjects add to its search result row.

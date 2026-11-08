@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki;
+namespace ProfessionalWiki\SWS;
 
 use Exception;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\Page\PageProperties;
 use Psr\Log\LoggerInterface;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
@@ -22,7 +22,7 @@ use Wikimedia\RequestTimeout\TimeoutException;
  *
  * Used only on the hook-facing write path. The RebuildGraphDatabases maintenance path deliberately
  * runs the undecorated PagePropertiesBuilder, so a page it cannot reconcile is reported as a failure
- * naming its cause rather than as a skip the operator cannot act on. See NeoWikiExtension.
+ * naming its cause rather than as a skip the operator cannot act on. See SWSExtension.
  */
 class FailureIsolatingPagePropertiesSource implements PagePropertiesSource {
 
@@ -39,7 +39,7 @@ class FailureIsolatingPagePropertiesSource implements PagePropertiesSource {
 			throw $e;
 		} catch ( Exception $e ) {
 			$this->logger->error(
-				'NeoWiki did not project page {pageId} because its page properties could not be built: '
+				'SWS did not project page {pageId} because its page properties could not be built: '
 				. '{message}. The graph is out of sync for that page until the cause is resolved.',
 				[
 					'pageId' => $revision->getPageId(),

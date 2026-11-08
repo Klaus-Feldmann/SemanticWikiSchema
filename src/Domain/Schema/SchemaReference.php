@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Schema;
+namespace ProfessionalWiki\SWS\Domain\Schema;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use Stringable;
 
 /**

@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectLabelsApi;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages the Subjects are saved on and the database the suggestions are
  * read from.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectLabelsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi
  * @group Database
  */
-class GetSubjectLabelsApiTest extends NeoWikiIntegrationTestCase {
+class GetSubjectLabelsApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private const string SCHEMA = 'GetSubjectLabelsApiTestSchema';

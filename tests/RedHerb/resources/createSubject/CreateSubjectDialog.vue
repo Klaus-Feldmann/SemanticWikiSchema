@@ -27,7 +27,7 @@
 <script>
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 const DIALOG_OPEN_KEY = require( './constants.js' ).DIALOG_OPEN_KEY;
 
 const SCHEMA_NAME = 'Company';
@@ -43,14 +43,14 @@ module.exports = exports = {
 	setup: function () {
 		const open = vue.inject( DIALOG_OPEN_KEY );
 		const subjectStore = nw.useSubjectStore();
-		const schemaRepo = nw.NeoWikiServices.getSchemaRepository();
+		const schemaRepo = nw.SWSServices.getSchemaRepository();
 
 		const label = vue.ref( '' );
 		const editorRef = vue.ref( null );
 		const loadedSchema = vue.shallowRef( null );
 
 		// Editing UIs read through the repositories rather than the stores
-		// (NeoWiki ADR 30 / ADR 16): the stores hold page state, not editor state.
+		// (SWS ADR 30 / ADR 16): the stores hold page state, not editor state.
 		function loadSchema() {
 			schemaRepo.getSchema( SCHEMA_NAME ).then( ( schema ) => {
 				loadedSchema.value = schema;

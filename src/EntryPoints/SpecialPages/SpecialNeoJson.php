@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\HTMLForm\HTMLForm;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
 use PermissionsError;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 
 class SpecialNeoJson extends SpecialPage {
 
@@ -34,13 +34,13 @@ class SpecialNeoJson extends SpecialPage {
 		$title = $this->buildTitle( $subPage );
 
 		if ( $title === null ) {
-			$this->getOutput()->addWikiMsg( 'neowiki-todo-page-does-not-exist' ); // TODO
+			$this->getOutput()->addWikiMsg( 'sws-todo-page-does-not-exist' ); // TODO
 			return;
 		}
 
 		// Deny early, before rendering the form, for users who cannot edit the page. This is only a
 		// hint: the write itself is authorized in onSubmit().
-		if ( !NeoWikiExtension::getInstance()->newSubjectPermissionHints( $this->getAuthority() )
+		if ( !SWSExtension::getInstance()->newSubjectPermissionHints( $this->getAuthority() )
 				->canEditSubject( new PageId( $title->getId() ) ) ) {
 			throw new PermissionsError( 'edit' );
 		}
@@ -64,7 +64,7 @@ class SpecialNeoJson extends SpecialPage {
 	}
 
 	private function getNeoJson( Title $title ): string {
-		$content = NeoWikiExtension::getInstance()->newSubjectContentRepository( $this->getAuthority() )
+		$content = SWSExtension::getInstance()->newSubjectContentRepository( $this->getAuthority() )
 			->getSubjectContentByPageTitle( $title );
 		return $content?->getText() ?? '';
 	}
@@ -94,16 +94,16 @@ class SpecialNeoJson extends SpecialPage {
 	private function onSubmit( array $formData, Title $title ): bool {
 		// This performs the Subject write, so it needs the binding authorization rather than the
 		// hint that execute() gated the form on.
-		if ( !NeoWikiExtension::getInstance()->newSubjectWriteAuthorizer( $this->getAuthority() )
+		if ( !SWSExtension::getInstance()->newSubjectWriteAuthorizer( $this->getAuthority() )
 				->authorize( new PageId( $title->getId() ) ) ) {
 			throw new PermissionsError( 'edit' );
 		}
 
 		$content = SubjectContent::newFromData(
-			NeoWikiExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize( $formData['json'] )
+			SWSExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize( $formData['json'] )
 		);
 
-		NeoWikiExtension::getInstance()->newSubjectContentRepository( $this->getAuthority() )->editSubjectContent(
+		SWSExtension::getInstance()->newSubjectContentRepository( $this->getAuthority() )->editSubjectContent(
 			$content,
 			new PageId( $title->getId() ),
 			'Update Subject'
@@ -113,12 +113,12 @@ class SpecialNeoJson extends SpecialPage {
 	}
 
 	public function getGroupName(): string {
-		return 'neowiki'; // TODO
+		return 'sws'; // TODO
 	}
 
 	public function getDescription(): Message {
 		return $this->msg(
-			'neowiki-neojson-description',
+			'sws-neojson-description',
 			substr(
 				$this->getContext()->getTitle()->getFullText(),
 				strpos( $this->getContext()->getTitle()->getFullText(), '/' ) + 1

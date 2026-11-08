@@ -2,39 +2,39 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Search;
+namespace ProfessionalWiki\SWS\Tests\Application\Search;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchLanding;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchMatch;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\NeoWiki\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestNaming;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\MarkedMatchesTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
+use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Tests\Data\TestNaming;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\MarkedMatchesTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHitBuilder
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHit
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchLanding
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchMatch
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\MatchedSearchLine
+ * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder
+ * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchHit
+ * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding
+ * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch
+ * @covers \ProfessionalWiki\SWS\Application\Search\MatchedSearchLine
  */
 class SubjectSearchHitBuilderTest extends TestCase {
 

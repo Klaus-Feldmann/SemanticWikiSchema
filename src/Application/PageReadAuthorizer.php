@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * The binding per-page authorization for reading page-backed content: Subjects, Schemas, Layouts

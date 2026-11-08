@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetSubjectsOrderingApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetSubjectsOrderingApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestSetSubjectsOrderingPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestSetSubjectsOrderingPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction
  * @group Database
  */
-class SetSubjectsOrderingApiTest extends NeoWikiIntegrationTestCase {
+class SetSubjectsOrderingApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	// A page id far above anything a fresh test database mints, so it resolves to no page.
 	private const int NONEXISTENT_PAGE_ID = 999999;
@@ -280,7 +280,7 @@ class SetSubjectsOrderingApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function savedSubjects( int $pageId ): PageSubjects {
-		return NeoWikiExtension::getInstance()->getSubjectRepository()
+		return SWSExtension::getInstance()->getSubjectRepository()
 			->getSubjectsByPageId( new PageId( $pageId ) );
 	}
 

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
- * Fixtures for the parse-time permission tests, which live in two class hierarchies (the NeoWiki
+ * Fixtures for the parse-time permission tests, which live in two class hierarchies (the SWS
  * integration base and Scribunto's Lua engine base) and so cannot share a base class.
  */
 trait ParseTimePermissionFixtures {
@@ -33,8 +33,8 @@ trait ParseTimePermissionFixtures {
 	}
 
 	protected function grantTheQueryRightToSysopsOnly(): void {
-		$this->setGroupPermissions( '*', 'neowiki-query', false );
-		$this->setGroupPermissions( 'sysop', 'neowiki-query', true );
+		$this->setGroupPermissions( '*', 'sws-query', false );
+		$this->setGroupPermissions( 'sysop', 'sws-query', true );
 	}
 
 	/**
@@ -42,7 +42,7 @@ trait ParseTimePermissionFixtures {
 	 * rows of a two-row query, while one sized for the default tier gets one.
 	 */
 	protected function capTheDefaultTierAtOneRow(): void {
-		$this->overrideConfigValue( 'NeoWikiQueryLimits', [
+		$this->overrideConfigValue( 'SWSQueryLimits', [
 			'default' => [ 'timeoutSeconds' => 30, 'maxRows' => 1 ],
 			'expensive' => [ 'timeoutSeconds' => 30, 'maxRows' => 100 ],
 		] );
@@ -53,8 +53,8 @@ trait ParseTimePermissionFixtures {
 	 * test using this fails before any HTTP, on the permission gate or on an empty query.
 	 */
 	protected function configureAnUnreachableSparqlStore(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => 'https://sparql.invalid/store' ] ] );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => 'https://sparql.invalid/store' ] ] );
+		SWSExtension::resetInstance();
 	}
 
 }

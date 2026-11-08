@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\Api\ApiMain;
 use MediaWiki\Context\IContextSource;
@@ -56,7 +56,7 @@ final class EntityGateway {
 					static function () use ( $services, $params ): array {
 						$url = 'https://www.wikidata.org/w/api.php?' . http_build_query( $params + [ 'format' => 'json' ] );
 						$raw = $services->getHttpRequestFactory()->get( $url, [ 'timeout' => 10, 'connectTimeout' => 3,
-							'userAgent' => 'NeoWikiBaseBridge/0.5 (' . $services->getMainConfig()->get( 'Server' ) . ')' ], __METHOD__ );
+							'userAgent' => 'SWSBaseBridge/0.5 (' . $services->getMainConfig()->get( 'Server' ) . ')' ], __METHOD__ );
 						$data = is_string( $raw ) ? json_decode( $raw, true ) : null;
 						if ( !is_array( $data ) || isset( $data['error'] ) || !isset( $data['entities'] ) ) {
 							throw new RuntimeException( 'External entity lookup unavailable' );

@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Source;
+namespace ProfessionalWiki\SWS\Tests\Application\Source;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Source\LocalSource;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Application\Source\LocalSource;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Source\LocalSource
+ * @covers \ProfessionalWiki\SWS\Application\Source\LocalSource
  */
 class LocalSourceTest extends TestCase {
 
@@ -63,7 +63,7 @@ class LocalSourceTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\NeoWiki\Domain\Subject\Subject[] $subjects
+	 * @param \ProfessionalWiki\SWS\Domain\Subject\Subject[] $subjects
 	 * @param Schema[] $schemas
 	 */
 	private function newSource( array $subjects = [], array $schemas = [] ): LocalSource {

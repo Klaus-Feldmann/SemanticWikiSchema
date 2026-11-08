@@ -36,7 +36,7 @@
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
 const icons = require( './icons.json' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 
 const COLOR_TYPE_NAME = 'color';
 const HEX_REGEX = require( './hexRegex.js' );
@@ -56,7 +56,7 @@ module.exports = exports = {
 	},
 	emits: [ 'update:modelValue' ],
 	setup: function ( props, ctx ) {
-		const propertyType = nw.NeoWikiServices.getPropertyTypeRegistry().getType( COLOR_TYPE_NAME );
+		const propertyType = nw.SWSServices.getPropertyTypeRegistry().getType( COLOR_TYPE_NAME );
 
 		const stringInput = nw.useStringValueInput(
 			vue.toRef( props, 'modelValue' ),

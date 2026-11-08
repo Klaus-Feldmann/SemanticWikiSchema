@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
 use InvalidArgumentException;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 use TypeError;
 
 /**

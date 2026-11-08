@@ -1,0 +1,324 @@
+<?php
+
+declare( strict_types = 1 );
+
+namespace ProfessionalWiki\SWS\Tests;
+
+use MediaWiki\Config\HashConfig;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\Test\TestLogger;
+use ProfessionalWiki\SWS\SWSConfig;
+use ProfessionalWiki\SWS\SWSConfigFactory;
+use ProfessionalWiki\SWS\SparqlStoreConfig;
+
+/**
+ * @covers \ProfessionalWiki\SWS\SWSConfigFactory
+ */
+class SWSConfigFactoryTest extends TestCase {
+
+	use HandlesNeo4jEnvOverrides;
+
+	protected function setUp(): void {
+		parent::setUp();
+		$this->snapshotAndClearNeo4jEnvOverrides();
+	}
+
+	protected function tearDown(): void {
+		$this->restoreNeo4jEnvOverrides();
+		parent::tearDown();
+	}
+
+	public function testUnsetUrlsProduceNullInsteadOfThrowing(): void {
+		$config = ( new SWSConfigFactory() )->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSRdfBaseUri' => null,
+			'CanonicalServer' => 'https://wiki.example',
+			'SWSNeo4jInternalWriteUrl' => null,
+			'SWSNeo4jInternalReadUrl' => null,
+		] ) );
+
+		$this->assertNull( $config->neo4jInternalWriteUrl );
+		$this->assertNull( $config->neo4jInternalReadUrl );
+		$this->assertFalse( $config->hasNeo4jBackend() );
+	}
+
+	public function testConfiguredUrlsArePassedThrough(): void {
+		$config = ( new SWSConfigFactory() )->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSRdfBaseUri' => null,
+			'CanonicalServer' => 'https://wiki.example',
+			'SWSNeo4jInternalWriteUrl' => 'bolt://write:7687',
+			'SWSNeo4jInternalReadUrl' => 'bolt://read:7687',
+		] ) );
+
+		$this->assertSame( 'bolt://write:7687', $config->neo4jInternalWriteUrl );
+		$this->assertSame( 'bolt://read:7687', $config->neo4jInternalReadUrl );
+		$this->assertTrue( $config->hasNeo4jBackend() );
+	}
+
+	public function testEnvOverrideWinsOverConfigValue(): void {
+		putenv( 'NEO4J_URL_OVERRIDE=bolt://env-write' );
+		putenv( 'NEO4J_URL_READ_OVERRIDE=bolt://env-read' );
+
+		$config = ( new SWSConfigFactory() )->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSRdfBaseUri' => null,
+			'CanonicalServer' => 'https://wiki.example',
+			'SWSNeo4jInternalWriteUrl' => 'bolt://config-write',
+			'SWSNeo4jInternalReadUrl' => 'bolt://config-read',
+		] ) );
+
+		$this->assertSame( 'bolt://env-write', $config->neo4jInternalWriteUrl );
+		$this->assertSame( 'bolt://env-read', $config->neo4jInternalReadUrl );
+	}
+
+	public function testRdfBaseUriDefaultsToTheCanonicalServer(): void {
+		$config = ( new SWSConfigFactory() )->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSNeo4jInternalWriteUrl' => null,
+			'SWSNeo4jInternalReadUrl' => null,
+			'SWSRdfBaseUri' => null,
+			'CanonicalServer' => 'https://wiki.example',
+		] ) );
+
+		$this->assertSame( 'https://wiki.example', $config->rdfBaseUri );
+	}
+
+	public function testConfiguredRdfBaseUriOverridesTheCanonicalServer(): void {
+		$config = ( new SWSConfigFactory() )->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSNeo4jInternalWriteUrl' => null,
+			'SWSNeo4jInternalReadUrl' => null,
+			'SWSRdfBaseUri' => 'https://id.example.org/ns',
+			'CanonicalServer' => 'https://wiki.example',
+		] ) );
+
+		$this->assertSame( 'https://id.example.org/ns', $config->rdfBaseUri );
+	}
+
+	public function testFullSparqlStoreEntryIsParsed(): void {
+		$config = $this->buildSparqlConfig( [ [
+			'updateUrl' => 'https://qlever.example/api',
+			'queryUrl' => 'https://qlever.example/query',
+			'accessToken' => 'secret-token',
+			'projection' => 'edm',
+		] ] );
+
+		$this->assertCount( 1, $config->sparqlStores );
+		$store = $config->sparqlStores[0];
+		$this->assertSame( 'https://qlever.example/api', $store->updateUrl );
+		$this->assertSame( 'https://qlever.example/query', $store->queryUrl );
+		$this->assertSame( 'secret-token', $store->accessToken );
+		$this->assertSame( 'edm', $store->projection );
+	}
+
+	public function testMinimalSparqlStoreEntryAppliesDefaults(): void {
+		$config = $this->buildSparqlConfig( [ [ 'updateUrl' => 'https://qlever.example/api' ] ] );
+
+		$store = $config->sparqlStores[0];
+		$this->assertSame( 'https://qlever.example/api', $store->updateUrl );
+		$this->assertSame( 'https://qlever.example/api', $store->queryUrl );
+		$this->assertNull( $store->accessToken );
+		$this->assertSame( 'native', $store->projection );
+	}
+
+	public function testBlankQueryUrlFallsBackToUpdateUrl(): void {
+		$config = $this->buildSparqlConfig( [ [
+			'updateUrl' => 'https://qlever.example/api',
+			'queryUrl' => '   ',
+		] ] );
+
+		$this->assertSame( 'https://qlever.example/api', $config->sparqlStores[0]->queryUrl );
+	}
+
+	public function testSparqlStoreEntryMissingUpdateUrlIsSkippedWithWarning(): void {
+		$logger = new TestLogger();
+
+		$config = $this->buildSparqlConfig(
+			[ [ 'accessToken' => 'secret-token' ], [ 'updateUrl' => 'https://ok.example/api' ] ],
+			$logger
+		);
+
+		$this->assertCount( 1, $config->sparqlStores );
+		$this->assertSame( 'https://ok.example/api', $config->sparqlStores[0]->updateUrl );
+		$this->assertTrue( $logger->hasWarningRecords() );
+	}
+
+	public function testNonArraySparqlStoreEntryIsSkippedWithWarning(): void {
+		$logger = new TestLogger();
+
+		$config = $this->buildSparqlConfig( [ 'not-an-array', [ 'updateUrl' => 'https://ok.example/api' ] ], $logger );
+
+		$this->assertCount( 1, $config->sparqlStores );
+		$this->assertSame( 'https://ok.example/api', $config->sparqlStores[0]->updateUrl );
+		$this->assertTrue( $logger->hasWarningRecords() );
+	}
+
+	public function testSiblingProjectionsSharingAnEndpointAreBothParsed(): void {
+		$config = $this->buildSparqlConfig( [
+			[ 'updateUrl' => 'https://qlever.example/api', 'projection' => 'native' ],
+			[ 'updateUrl' => 'https://qlever.example/api', 'projection' => 'EDM' ],
+		] );
+
+		$this->assertCount( 2, $config->sparqlStores );
+		$this->assertSame( 'native', $config->sparqlStores[0]->projection );
+		$this->assertSame( 'EDM', $config->sparqlStores[1]->projection );
+		$this->assertSame( 'https://qlever.example/api', $config->sparqlStores[1]->updateUrl );
+	}
+
+	public function testEmptySparqlStoresConfigProducesEmptyList(): void {
+		$this->assertSame( [], $this->buildSparqlConfig( [] )->sparqlStores );
+	}
+
+	/**
+	 * Surrounding whitespace is a typo in every one of these, and a padded name or projection would
+	 * silently fail to match what a rebuild or a Mapping lookup asks for.
+	 */
+	public function testSurroundingWhitespaceIsTrimmedOffEveryConfiguredString(): void {
+		$config = $this->buildSparqlConfig( [ [
+			'updateUrl' => "  https://qlever.example/api\n",
+			'queryUrl' => ' https://qlever.example/query ',
+			'accessToken' => "\tSECRET ",
+			'projection' => ' EDM ',
+			'name' => ' edm-public ',
+		] ] );
+
+		$this->assertEquals(
+			new SparqlStoreConfig(
+				updateUrl: 'https://qlever.example/api',
+				queryUrl: 'https://qlever.example/query',
+				accessToken: 'SECRET',
+				projection: 'EDM',
+				name: 'edm-public',
+			),
+			$config->sparqlStores[0]
+		);
+	}
+
+	public function testSparqlStoreNameDefaultsToItsProjection(): void {
+		$config = $this->buildSparqlConfig( [
+			[ 'updateUrl' => 'https://qlever.example/api' ],
+			[ 'updateUrl' => 'https://qlever.example/api', 'projection' => 'EDM' ],
+		] );
+
+		$this->assertSame( 'native', $config->sparqlStores[0]->name );
+		$this->assertSame( 'EDM', $config->sparqlStores[1]->name );
+	}
+
+	public function testExplicitSparqlStoreNameOverridesTheProjectionDefault(): void {
+		$config = $this->buildSparqlConfig( [
+			[ 'updateUrl' => 'https://qlever.example/api', 'projection' => 'EDM', 'name' => 'edm-public' ],
+		] );
+
+		$this->assertSame( 'edm-public', $config->sparqlStores[0]->name );
+		$this->assertSame( 'EDM', $config->sparqlStores[0]->projection );
+	}
+
+	public function testBlankSparqlStoreNameFallsBackToTheProjection(): void {
+		$config = $this->buildSparqlConfig( [
+			[ 'updateUrl' => 'https://qlever.example/api', 'projection' => 'EDM', 'name' => '   ' ],
+		] );
+
+		$this->assertSame( 'EDM', $config->sparqlStores[0]->name );
+	}
+
+	public function testSparqlStoreEntryWithADuplicateNameIsSkippedWithWarning(): void {
+		$logger = new TestLogger();
+
+		$config = $this->buildSparqlConfig(
+			[
+				[ 'updateUrl' => 'https://first.example/api', 'projection' => 'EDM' ],
+				[ 'updateUrl' => 'https://second.example/api', 'projection' => 'EDM' ],
+				[ 'updateUrl' => 'https://third.example/api', 'projection' => 'native' ],
+			],
+			$logger
+		);
+
+		$this->assertSame(
+			[ 'https://first.example/api', 'https://third.example/api' ],
+			array_map( static fn ( SparqlStoreConfig $store ): string => $store->updateUrl, $config->sparqlStores ),
+			'the first entry claiming a name keeps it, and only the later duplicate is dropped'
+		);
+		$this->assertTrue( $logger->hasWarningThatContains( 'earlier entry' ) );
+	}
+
+	public function testSparqlStoreEntryTakingTheNeo4jNameIsSkippedWithWarning(): void {
+		$logger = new TestLogger();
+
+		$config = $this->buildSparqlConfig(
+			[ [ 'updateUrl' => 'https://qlever.example/api', 'name' => 'neo4j' ] ],
+			$logger
+		);
+
+		$this->assertSame( [], $config->sparqlStores, 'the bundled Neo4j backend keeps its own name' );
+		$this->assertTrue(
+			$logger->hasWarningThatContains( 'reserved' ),
+			'a name nothing else in the configuration claims needs its own reason'
+		);
+	}
+
+	/**
+	 * @dataProvider neo4jNameCasingProvider
+	 */
+	public function testSparqlStoreEntryTakingTheNeo4jNameInAnyCasingIsSkipped( string $name ): void {
+		$config = $this->buildSparqlConfig( [ [ 'updateUrl' => 'https://qlever.example/api', 'name' => $name ] ] );
+
+		$this->assertSame( [], $config->sparqlStores );
+	}
+
+	public function neo4jNameCasingProvider(): iterable {
+		yield 'as written' => [ 'neo4j' ];
+		yield 'capitalized' => [ 'Neo4j' ];
+		yield 'shouted' => [ 'NEO4J' ];
+	}
+
+	public function testSparqlStoreEntryWithANameTooLongToFileRunsUnderIsSkippedWithWarning(): void {
+		$logger = new TestLogger();
+
+		$config = $this->buildSparqlConfig(
+			[ [ 'updateUrl' => 'https://qlever.example/api', 'name' => str_repeat( 'a', 256 ) ] ],
+			$logger
+		);
+
+		$this->assertSame( [], $config->sparqlStores );
+		$this->assertTrue( $logger->hasWarningThatContains( 'longer than' ) );
+	}
+
+	public function testASparqlStoreNameOfTheGreatestLengthTheRunRecordsHoldIsKept(): void {
+		$config = $this->buildSparqlConfig(
+			[ [ 'updateUrl' => 'https://qlever.example/api', 'name' => str_repeat( 'a', 255 ) ] ]
+		);
+
+		$this->assertCount( 1, $config->sparqlStores );
+	}
+
+	public function testExplicitNamesLetSiblingProjectionsRepeatATargetOntology(): void {
+		$config = $this->buildSparqlConfig( [
+			[ 'updateUrl' => 'https://public.example/api', 'projection' => 'EDM', 'name' => 'edm-public' ],
+			[ 'updateUrl' => 'https://internal.example/api', 'projection' => 'EDM', 'name' => 'edm-internal' ],
+		] );
+
+		$this->assertSame(
+			[ 'edm-public', 'edm-internal' ],
+			array_map( static fn ( SparqlStoreConfig $store ): string => $store->name, $config->sparqlStores )
+		);
+	}
+
+	/**
+	 * @param array<int, mixed> $sparqlStores
+	 */
+	private function buildSparqlConfig( array $sparqlStores, ?LoggerInterface $logger = null ): SWSConfig {
+		$factory = $logger === null ? new SWSConfigFactory() : new SWSConfigFactory( $logger );
+
+		return $factory->buildFromMediaWikiConfig( new HashConfig( [
+			'SWSEnableDevelopmentUI' => false,
+			'SWSRdfBaseUri' => null,
+			'CanonicalServer' => 'https://wiki.example',
+			'SWSNeo4jInternalWriteUrl' => null,
+			'SWSNeo4jInternalReadUrl' => null,
+			'SWSSparqlStores' => $sparqlStores,
+		] ) );
+	}
+
+}

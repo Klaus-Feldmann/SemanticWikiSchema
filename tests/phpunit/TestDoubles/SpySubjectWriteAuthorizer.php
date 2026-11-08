@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * Authorizes or denies every write, recording the PageIds it was asked about.

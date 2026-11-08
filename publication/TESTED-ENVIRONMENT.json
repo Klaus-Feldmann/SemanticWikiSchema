@@ -7,12 +7,12 @@
       "version": "3.0.0"
     },
     {
-      "name": "SemanticNeoWiki",
-      "version": "0.1.17+2026-11-06"
+      "name": "SemanticWikiSchema",
+      "version": "0.1.22+2026-11-08"
     },
     {
-      "name": "NeoWikiBaseBridge",
-      "version": "0.19.1+2026-11-05"
+      "name": "SchemaBaseBridge",
+      "version": "0.20.0+2026-11-08"
     },
     {
       "name": "Data Transfer",
@@ -40,7 +40,7 @@
       "name": "WikibaseClient"
     }
   ],
-  "verifiedDate": "2026-11-06",
+  "verifiedDate": "2026-11-08",
   "parser": "legacy",
   "privateProcessing": {
     "anonymousRead": false,
@@ -48,6 +48,6 @@
     "ownValueChangesAndRemoval": "verified via MCP SMW reads",
     "manualAnnotations": "preserved"
   },
-  "runtimeInstallMethod": "guarded file patch over Composer-installed 0.1.9-test",
-  "runtimeEvidence": "Runtime verified on the existing AufEinWort installation after guarded updates. Dependent subjects referenced by the main subject on the same page contribute to automatic SMW annotations. The bundled Graph Explorer accepts language-tagged Wikidata text values."
+  "runtimeInstallMethod": "Database identifier migration from adapted 0.1.20; full extension folder replacement",
+  "runtimeEvidence": "M4 journal: 42 operations complete. User confirmed browser data/edit workflow. MCP SWS schema, subject, dependent relation, search and complete Data-view reads verified. Other environment component versions are retained from the prior environment snapshot, not re-probed on this date."
 }

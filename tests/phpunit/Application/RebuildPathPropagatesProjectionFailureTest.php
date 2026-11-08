@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use RuntimeException;
 
 /**
@@ -18,11 +18,11 @@ use RuntimeException;
  * hook path's failure-isolating decorator instead would swallow the throw and report every page as
  * rebuilt.
  *
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
- * @covers \ProfessionalWiki\NeoWiki\Application\PageRebuilder
+ * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
  * @group Database
  */
-class RebuildPathPropagatesProjectionFailureTest extends NeoWikiIntegrationTestCase {
+class RebuildPathPropagatesProjectionFailureTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -33,7 +33,7 @@ class RebuildPathPropagatesProjectionFailureTest extends NeoWikiIntegrationTestC
 	public function testRebuildPropagatesBackendFailureSoTheRebuildCanReportIt(): void {
 		$this->createPageWithSubjects( 'Rebuild failure page', TestSubject::build() );
 
-		$rebuilder = NeoWikiExtension::getInstance()->newPageRebuilderFor( new ThrowingGraphDatabasePlugin() );
+		$rebuilder = SWSExtension::getInstance()->newPageRebuilderFor( new ThrowingGraphDatabasePlugin() );
 
 		$this->expectException( RuntimeException::class );
 		$this->expectExceptionMessage( ThrowingGraphDatabasePlugin::FAILURE_MESSAGE );

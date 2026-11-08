@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\PropertyType\Types;
+namespace ProfessionalWiki\SWS\Domain\PropertyType\Types;
 
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\RelationProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\ValueType;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\Domain\Value\ValueType;
 
 class RelationType implements PropertyType {
 

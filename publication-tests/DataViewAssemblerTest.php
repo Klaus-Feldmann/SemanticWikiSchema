@@ -1,11 +1,11 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use NeoWikiBaseBridge\DataViewAssembler;
-use ProfessionalWiki\NeoWiki\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption,WikitextProperty};
-use ProfessionalWiki\NeoWiki\Domain\Subject\{Subject,SubjectId,StatementList};
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Value\{StringValue,NumberValue,BooleanValue,UrlValue};
+use SWSBaseBridge\DataViewAssembler;
+use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
+use ProfessionalWiki\SWS\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption,WikitextProperty};
+use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue,BooleanValue,UrlValue};
 final class DataViewAssemblerTest extends TestCase {
  private function view(array $statements,array $properties=[],array $remote=[]):array {
   $subject=new Subject(new SubjectId('sF1FCQPNcwQdw4B'),null,SchemaReference::local(new SchemaName('Person')),new StatementList($statements));
@@ -42,14 +42,14 @@ final class DataViewAssemblerTest extends TestCase {
  }
  public function testExecutableSchemaCodeExcludedButPassiveWikitextPreserved():void {
   $core=new PropertyCore('',false,null);
-  $program=WikitextProperty::fromPartialJson($core,['execute'=>true,'wikitext'=>'{{NeoWiki}}']);
+  $program=WikitextProperty::fromPartialJson($core,['execute'=>true,'wikitext'=>'{{SWS}}']);
   $passive=WikitextProperty::fromPartialJson($core,[]);
   $v=$this->view([$this->st('Programm','wikitext',new StringValue('dormant')),$this->st('Notiz','wikitext',new StringValue('{{Beleg}}'))],['Programm'=>$program,'Notiz'=>$passive]);
   self::assertCount(1,$v['fields']);self::assertSame('Notiz',$v['fields'][0]['name']);self::assertSame('{{Beleg}}',$v['fields'][0]['ownValues'][0]['value']);
  }
  public function testRelationTargetAndUnresolvedDateRetainRawValue():void {
-  $relation=new \ProfessionalWiki\NeoWiki\Domain\Relation\Relation(new \ProfessionalWiki\NeoWiki\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),new SubjectId('sF16iHXBMTQdHDY'));
-  $v=$this->view([$this->st('Bezug','relation',new \ProfessionalWiki\NeoWiki\Domain\Value\RelationValue($relation)),$this->st('Datum','historicalDate',new StringValue('invalid'))]);
+  $relation=new \ProfessionalWiki\SWS\Domain\Relation\Relation(new \ProfessionalWiki\SWS\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),new SubjectId('sF16iHXBMTQdHDY'));
+  $v=$this->view([$this->st('Bezug','relation',new \ProfessionalWiki\SWS\Domain\Value\RelationValue($relation)),$this->st('Datum','historicalDate',new StringValue('invalid'))]);
   self::assertSame('sF16iHXBMTQdHDY',$v['fields'][0]['ownValues'][0]['target']['id']);self::assertSame('unavailable',$v['fields'][0]['ownValues'][0]['target']['status']);self::assertFalse($v['complete']);self::assertSame('invalid',$v['fields'][1]['ownValues'][0]['value']);
  }
 }

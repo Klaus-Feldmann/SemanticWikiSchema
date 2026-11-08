@@ -7,7 +7,7 @@ namespace ProfessionalWiki\RedHerb\Specials;
 use MediaWiki\Html\Html;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class SpecialRedHerbSubjectFinder extends SpecialPage {
 
@@ -22,7 +22,7 @@ class SpecialRedHerbSubjectFinder extends SpecialPage {
 		parent::execute( $subPage );
 
 		$out = $this->getOutput();
-		NeoWikiExtension::getInstance()->newFrontendModuleLoader()->load( $out, $this->getSkin() );
+		SWSExtension::getInstance()->newFrontendModuleLoader()->load( $out, $this->getSkin() );
 		$out->addModules( 'ext.redherb-subject-finder' );
 
 		$out->addHTML( Html::element( 'div', [ 'id' => 'ext-redherb-subject-finder' ] ) );

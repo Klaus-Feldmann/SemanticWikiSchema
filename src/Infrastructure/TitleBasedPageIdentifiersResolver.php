@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
 
 class TitleBasedPageIdentifiersResolver implements PageIdentifiersResolver {
 

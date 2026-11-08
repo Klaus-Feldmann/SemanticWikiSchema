@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\JsonSchemaAssertions;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\UrlProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty
  */
 class UrlPropertyTest extends TestCase {
 
@@ -28,7 +28,7 @@ class UrlPropertyTest extends TestCase {
 		$this->assertArrayNotHasKey(
 			'format',
 			TestProperty::buildUrl()->toJsonSchema()['items'],
-			'format: uri rejects the scheme-less values NeoWiki accepts and accepts the schemes it rejects.'
+			'format: uri rejects the scheme-less values SWS accepts and accepts the schemes it rejects.'
 		);
 	}
 

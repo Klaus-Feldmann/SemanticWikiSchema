@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use FileFetcher\SimpleFileFetcher;
 use Maintenance;
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPresenter;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MediaWikiPageDeleter;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiPageDeleter;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
 use User;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
@@ -37,7 +37,7 @@ class ImportDemoData extends Maintenance implements ImportPresenter {
 		parent::__construct();
 
 		$this->requireExtension( 'SemanticWikiSchema' );
-		$this->addDescription( 'Creates NeoWiki demo data, including schemas and subjects' );
+		$this->addDescription( 'Creates SWS demo data, including schemas and subjects' );
 	}
 
 	/**
@@ -78,11 +78,11 @@ class ImportDemoData extends Maintenance implements ImportPresenter {
 				performer: $user,
 			),
 			schemaContentSource: new SchemaContentSource(
-				NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/Schema',
+				SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/Schema',
 				new SimpleFileFetcher()
 			),
 			subjectPageSource: new SubjectPageSource(
-				NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/Subject',
+				SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/Subject',
 				new SimpleFileFetcher()
 			),
 			pageContentSource: new PageContentSource(
@@ -91,25 +91,25 @@ class ImportDemoData extends Maintenance implements ImportPresenter {
 			),
 			moduleContentSource: new PageContentSource(
 				[
-					NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/Module',
+					SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/Module',
 				],
 				new SimpleFileFetcher()
 			),
 			mediaWikiContentSource: new PageContentSource(
 				[
-					NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/MediaWiki',
+					SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/MediaWiki',
 				],
 				new SimpleFileFetcher()
 			),
 			layoutContentSource: new LayoutContentSource(
-				NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/Layout',
+				SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/Layout',
 				new SimpleFileFetcher()
 			),
 			mappingContentSource: new MappingContentSource(
-				NeoWikiExtension::getInstance()->getNeoWikiRootDirectory() . '/DemoData/Mapping',
+				SWSExtension::getInstance()->getSWSRootDirectory() . '/DemoData/Mapping',
 				new SimpleFileFetcher()
 			),
-			graphStoreProjections: array_filter( NeoWikiExtension::getInstance()->getMappingDefinedStoreProjections() ),
+			graphStoreProjections: array_filter( SWSExtension::getInstance()->getMappingDefinedStoreProjections() ),
 		);
 	}
 
@@ -123,8 +123,8 @@ class ImportDemoData extends Maintenance implements ImportPresenter {
 	 * @return string[]
 	 */
 	private function getPageDirectories(): array {
-		$config = NeoWikiExtension::getInstance()->config;
-		$rootDirectory = NeoWikiExtension::getInstance()->getNeoWikiRootDirectory();
+		$config = SWSExtension::getInstance()->config;
+		$rootDirectory = SWSExtension::getInstance()->getSWSRootDirectory();
 
 		$directories = [ $rootDirectory . '/DemoData/Page' ];
 
@@ -142,7 +142,7 @@ class ImportDemoData extends Maintenance implements ImportPresenter {
 	}
 
 	private function getUser(): User {
-		return User::newSystemUser( 'NeoWiki', [ 'steal' => true ] );
+		return User::newSystemUser( 'SWS', [ 'steal' => true ] );
 	}
 
 	public function presentDone(): void {

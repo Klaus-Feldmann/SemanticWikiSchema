@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\SubjectSummaries;
+namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
 
 /**
  * The Subjects whose data was edited last, newest first. Adding a Subject counts as editing it.

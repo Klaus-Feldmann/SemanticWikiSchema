@@ -1,4 +1,4 @@
-name: NeoWiki CI (shell scripts)
+name: SWS CI (shell scripts)
 
 on:
   workflow_dispatch:

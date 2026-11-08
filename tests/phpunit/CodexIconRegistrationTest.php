@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use PHPUnit\Framework\TestCase;
 
 /**
  * Guards against property-type icons being referenced by the frontend
- * (NeoWikiExtension.ts) without being registered in the ResourceLoader
+ * (SWSExtension.ts) without being registered in the ResourceLoader
  * CodexModule icon allowlist in extension.json.
  *
  * The frontend bundle externalises `@wikimedia/codex-icons` to a curated
@@ -29,13 +29,13 @@ class CodexIconRegistrationTest extends TestCase {
 			associative: true
 		);
 
-		foreach ( $extension['ResourceModules']['ext.neowiki']['packageFiles'] as $packageFile ) {
+		foreach ( $extension['ResourceModules']['ext.sws']['packageFiles'] as $packageFile ) {
 			if ( is_array( $packageFile ) && ( $packageFile['name'] ?? '' ) === 'icons.json' ) {
 				return $packageFile['callbackParam'];
 			}
 		}
 
-		$this->fail( 'No icons.json packageFile found in ext.neowiki module' );
+		$this->fail( 'No icons.json packageFile found in ext.sws module' );
 	}
 
 	/**
@@ -54,7 +54,7 @@ class CodexIconRegistrationTest extends TestCase {
 	/**
 	 * @return iterable<string, array{string}>
 	 *
-	 * Mirrors the icon assignments in resources/ext.neowiki/src/NeoWikiExtension.ts.
+	 * Mirrors the icon assignments in resources/ext.sws/src/SWSExtension.ts.
 	 * Add the corresponding entry here when registering an icon for a new property type.
 	 */
 	public static function propertyTypeIconProvider(): iterable {

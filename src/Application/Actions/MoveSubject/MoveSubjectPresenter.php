@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject;
+namespace ProfessionalWiki\SWS\Application\Actions\MoveSubject;
 
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 interface MoveSubjectPresenter {
 

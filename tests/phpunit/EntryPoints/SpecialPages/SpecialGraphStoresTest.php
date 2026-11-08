@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Context\RequestContext;
@@ -12,15 +12,15 @@ use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\User\User;
 use PermissionsError;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiRegistrar;
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialGraphStores;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Tests\HandlesNeo4jEnvOverrides;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialGraphStores;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Tests\HandlesNeo4jEnvOverrides;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use SpecialPageTestBase;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
@@ -28,8 +28,8 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
  * The page is rendered in qqx, so what is asserted is which message each cell and box uses rather than
  * what that message happens to say in English.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialGraphStores
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\EnforcesRestriction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialGraphStores
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\EnforcesRestriction
  * @group Database
  */
 class SpecialGraphStoresTest extends SpecialPageTestBase {
@@ -47,17 +47,17 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 		parent::setUp();
 
 		$this->setTemporaryHook(
-			'NeoWikiRegistration',
-			static function ( NeoWikiRegistrar $registrar ): void {
+			'SWSRegistration',
+			static function ( SWSRegistrar $registrar ): void {
 				$registrar->addGraphDatabasePlugin( self::STORE, new SpyGraphDatabasePlugin() );
 			}
 		);
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	protected function newSpecialPage(): SpecialGraphStores {
@@ -75,7 +75,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	}
 
 	public function testThePageNamesTheAdminRightAsItsRestriction(): void {
-		$this->assertSame( NeoWikiExtension::ADMIN_RIGHT, $this->newSpecialPage()->getRestriction() );
+		$this->assertSame( SWSExtension::ADMIN_RIGHT, $this->newSpecialPage()->getRestriction() );
 	}
 
 	/**
@@ -91,9 +91,9 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 		[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
 
 		$this->assertStringContainsString( self::STORE, $html );
-		$this->assertStringContainsString( 'neowiki-graphstores-state-neverbuilt', $html );
-		$this->assertStringContainsString( 'neowiki-graphstores-lastrebuild-never', $html );
-		$this->assertStringContainsString( 'neowiki-graphstores-rebuild', $html );
+		$this->assertStringContainsString( 'sws-graphstores-state-neverbuilt', $html );
+		$this->assertStringContainsString( 'sws-graphstores-lastrebuild-never', $html );
+		$this->assertStringContainsString( 'sws-graphstores-rebuild', $html );
 	}
 
 	public function testRebuildingQueuesARun(): void {
@@ -148,7 +148,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 
 		[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
 
-		$this->assertStringContainsString( 'neowiki-graphstores-state-running: 37, 2', $html );
+		$this->assertStringContainsString( 'sws-graphstores-state-running: 37, 2', $html );
 	}
 
 	public function testARebuiltStoreIsShownWithWhenItWasRebuiltAndWhatThatGotThrough(): void {
@@ -158,8 +158,8 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 
 		[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
 
-		$this->assertStringContainsString( 'neowiki-graphstores-state-insync', $html );
-		$this->assertStringContainsString( 'neowiki-graphstores-lastrebuild:', $html );
+		$this->assertStringContainsString( 'sws-graphstores-state-insync', $html );
+		$this->assertStringContainsString( 'sws-graphstores-lastrebuild:', $html );
 	}
 
 	/**
@@ -168,18 +168,18 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	 * an operator can reach without a rebuild having failed, so it has to be reachable on the page too.
 	 */
 	public function testAStoreWhoseMappingChangedSinceItsRebuildIsShownAsStale(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [
 			'updateUrl' => 'http://sparql.invalid/edm',
 			'projection' => self::PROJECTION,
 			'name' => self::PROJECTION,
 		] ] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		$this->atTime( self::REBUILT_AT, fn () => $this->recordSucceededRun( self::PROJECTION ) );
 		$this->atTime( self::MAPPING_EDITED_AT, fn () => $this->createMappingPage( self::PROJECTION ) );
 
 		[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
 
-		$this->assertStringContainsString( 'neowiki-graphstores-state-stale', $html );
+		$this->assertStringContainsString( 'sws-graphstores-state-stale', $html );
 	}
 
 	public function testTheQueuedRebuildIsWhatTheTableThenShows(): void {
@@ -188,8 +188,8 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 
 		[ $html ] = $this->executeSpecialPage( '', null, null, $admin );
 
-		$this->assertStringContainsString( 'neowiki-graphstores-state-queued', $html );
-		$this->assertStringContainsString( 'neowiki-graphstores-cancel', $html );
+		$this->assertStringContainsString( 'sws-graphstores-state-queued', $html );
+		$this->assertStringContainsString( 'sws-graphstores-cancel', $html );
 	}
 
 	public function testCancellingStopsTheQueuedRebuild(): void {
@@ -214,7 +214,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	public function testWhatAnActionDidIsReportedOnThePageItRedirectsTo(): void {
 		[ $html ] = $this->executeSpecialPage( '', $this->newOutcomeRequest( 'queued' ), null, $this->newAdmin() );
 
-		$this->assertStringContainsString( 'neowiki-graphstores-outcome-queued', $html );
+		$this->assertStringContainsString( 'sws-graphstores-outcome-queued', $html );
 	}
 
 	/**
@@ -236,7 +236,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 
 		[ $html ] = $this->executeSpecialPage( '', $request, null, $this->newAdmin() );
 
-		$this->assertStringNotContainsString( 'neowiki-graphstores-outcome-', $html );
+		$this->assertStringNotContainsString( 'sws-graphstores-outcome-', $html );
 	}
 
 	public function testAFormWithoutAValidTokenChangesNothing(): void {
@@ -254,14 +254,14 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	 * A store name is whatever configuration says, and the page renders it back into a form field.
 	 */
 	public function testAStoreNameCarryingMarkupIsEscaped(): void {
-		$this->clearHook( 'NeoWikiRegistration' );
+		$this->clearHook( 'SWSRegistration' );
 		$this->setTemporaryHook(
-			'NeoWikiRegistration',
-			static function ( NeoWikiRegistrar $registrar ): void {
+			'SWSRegistration',
+			static function ( SWSRegistrar $registrar ): void {
 				$registrar->addGraphDatabasePlugin( '"><script>alert(1)</script>', new SpyGraphDatabasePlugin() );
 			}
 		);
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
 
@@ -276,14 +276,14 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	}
 
 	public function testAWikiWithNoGraphStoresIsToldSoInsteadOfShownAnEmptyTable(): void {
-		$this->clearHook( 'NeoWikiRegistration' );
+		$this->clearHook( 'SWSRegistration' );
 		$this->snapshotAndClearNeo4jEnvOverrides();
 		$this->overrideConfigValues( [
-			'NeoWikiNeo4jInternalWriteUrl' => null,
-			'NeoWikiNeo4jInternalReadUrl' => null,
-			'NeoWikiSparqlStores' => [],
+			'SWSNeo4jInternalWriteUrl' => null,
+			'SWSNeo4jInternalReadUrl' => null,
+			'SWSSparqlStores' => [],
 		] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		try {
 			[ $html ] = $this->executeSpecialPage( '', null, null, $this->newAdmin() );
@@ -291,7 +291,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 			$this->restoreNeo4jEnvOverrides();
 		}
 
-		$this->assertStringContainsString( 'neowiki-graphstores-nostores', $html );
+		$this->assertStringContainsString( 'sws-graphstores-nostores', $html );
 	}
 
 	/**
@@ -326,7 +326,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 	}
 
 	private function newRunRepository(): RebuildRunRepository {
-		return NeoWikiExtension::getInstance()->newRebuildRunRepository();
+		return SWSExtension::getInstance()->newRebuildRunRepository();
 	}
 
 	/**
@@ -352,7 +352,7 @@ class SpecialGraphStoresTest extends SpecialPageTestBase {
 
 	private function createMappingPage( string $name ): void {
 		$title = MediaWikiServices::getInstance()->getTitleFactory()
-			->newFromText( $name, NeoWikiExtension::NS_MAPPING );
+			->newFromText( $name, SWSExtension::NS_MAPPING );
 		$this->assertNotNull( $title );
 
 		$updater = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $title )

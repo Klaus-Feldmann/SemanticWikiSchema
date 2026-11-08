@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Source;
+namespace ProfessionalWiki\SWS\Domain\Source;
 
 use Closure;
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /**
  * The Sources this wiki knows, keyed by Source key (ADR 23). A wiki farm is simply more registered
@@ -47,7 +47,7 @@ class SourceRegistry {
 	public function registerSource( string $key, Source|Closure $source ): void {
 		// The local key is exempt from the grammar: it is the wiki's own id rather than anyone's
 		// choice here, and a wiki whose id is not a well-formed Source key must still resolve the bare
-		// ids of its own Subjects. See NeoWikiConfigFactory for what such a wiki loses.
+		// ids of its own Subjects. See SWSConfigFactory for what such a wiki loses.
 		if ( $key !== $this->localSourceKey && !SubjectId::isValidSourceKey( $key ) ) {
 			throw new InvalidArgumentException( "Source key has the wrong format: '$key'" );
 		}

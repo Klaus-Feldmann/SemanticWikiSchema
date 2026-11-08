@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Exception\Neo4jException;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater
  * @group Database
  */
-class Neo4jConstraintUpdaterTest extends NeoWikiIntegrationTestCase {
+class Neo4jConstraintUpdaterTest extends SWSIntegrationTestCase {
 
 	private const string SUBJECT_ID = 'sTestNCU1111111';
 
@@ -54,7 +54,7 @@ class Neo4jConstraintUpdaterTest extends NeoWikiIntegrationTestCase {
 
 	private function newConstraintUpdater(): Neo4jConstraintUpdater {
 		return new Neo4jConstraintUpdater(
-			NeoWikiExtension::getInstance()->getWriteQueryEngine()
+			SWSExtension::getInstance()->getWriteQueryEngine()
 		);
 	}
 
@@ -62,7 +62,7 @@ class Neo4jConstraintUpdaterTest extends NeoWikiIntegrationTestCase {
 		$this->newConstraintUpdater()->createDefaultConstraints();
 
 		$store = $this->newProjectionStore();
-		$wikiId = NeoWikiExtension::getInstance()->config->wikiId;
+		$wikiId = SWSExtension::getInstance()->config->wikiId;
 
 		$store->savePage( TestPage::build( id: 42 ) );
 

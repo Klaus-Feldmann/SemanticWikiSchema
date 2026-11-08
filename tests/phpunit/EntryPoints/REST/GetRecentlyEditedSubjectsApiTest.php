@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**
  * Needs the database for the pages and revisions it lists from.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetRecentlyEditedSubjectsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi
  * @group Database
  */
-class GetRecentlyEditedSubjectsApiTest extends NeoWikiIntegrationTestCase {
+class GetRecentlyEditedSubjectsApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
 
@@ -79,7 +79,7 @@ class GetRecentlyEditedSubjectsApiTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectOnPage( 'sTestGRE1111112', 'Secret', 'Secret' );
 
 		RequestContext::getMain()->setUser( $this->getTestUser()->getUser() );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		$this->setTemporaryHook(
 			'getUserPermissionsErrors',
 			static function ( $title, $user, $action, &$result ): bool {
@@ -110,7 +110,7 @@ class GetRecentlyEditedSubjectsApiTest extends NeoWikiIntegrationTestCase {
 	 */
 	private function get( array $queryParams ): array {
 		return json_decode( $this->executeHandler(
-			NeoWikiExtension::newGetRecentlyEditedSubjectsApi(),
+			SWSExtension::newGetRecentlyEditedSubjectsApi(),
 			new RequestData( [ 'method' => 'GET', 'queryParams' => $queryParams ] )
 		)->getBody()->getContents(), true );
 	}

@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\CreateSubject;
+namespace ProfessionalWiki\SWS\Application\Actions\CreateSubject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Application\DependentSubjectBuilder;
-use ProfessionalWiki\NeoWiki\Application\NewSubjectIdResolver;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\NeoWiki\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersResolver;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
+use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
+use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
+use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 use RuntimeException;
 
 readonly class CreateSubjectAction {

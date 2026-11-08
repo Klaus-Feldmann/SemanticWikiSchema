@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponse;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponse;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 
 /**
- * Keeps the Subject a {@see \ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectQuery}
+ * Keeps the Subject a {@see \ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery}
  * was asked for, for a caller that wants to name it and nothing more.
  */
 class SubjectNamePresenter implements GetSubjectPresenter {

@@ -2,41 +2,41 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Actions;
+namespace ProfessionalWiki\SWS\Tests\Application\Actions;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectAction;
-use ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectPresenter;
-use ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectRequest;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
 use RuntimeException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Severity;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpySubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectAction
+ * @covers \ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction
  */
 class MoveSubjectActionTest extends TestCase {
 

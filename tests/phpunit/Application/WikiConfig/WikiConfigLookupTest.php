@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
 
 use MediaWiki\Config\HashConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubWikiConfigSource;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubWikiConfigSource;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigLookup
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup
  */
 class WikiConfigLookupTest extends TestCase {
 
 	private const PHP_CONFIG = [
-		'NeoWikiSubjectFirst' => false,
-		'NeoWikiAutoRenderMainSubject' => true,
-		'NeoWikiDataLanguages' => [],
+		'SWSSubjectFirst' => false,
+		'SWSAutoRenderMainSubject' => true,
+		'SWSDataLanguages' => [],
 	];
 
 	private function newLookup(
@@ -66,7 +66,7 @@ class WikiConfigLookupTest extends TestCase {
 	}
 
 	public function testAPhpValueOfTheWrongShapeComesDownToWhatItsTypeFallsBackTo(): void {
-		$lookup = $this->newLookup( null, phpConfig: [ 'NeoWikiDataLanguages' => 'de' ] + self::PHP_CONFIG );
+		$lookup = $this->newLookup( null, phpConfig: [ 'SWSDataLanguages' => 'de' ] + self::PHP_CONFIG );
 
 		$this->assertSame( [], $lookup->getEffectiveValue( 'dataLanguages' ) );
 	}
@@ -74,7 +74,7 @@ class WikiConfigLookupTest extends TestCase {
 	public function testAnInvalidPageValueOverAPhpValueOfTheWrongShapeComesDownToWhatItsTypeFallsBackTo(): void {
 		$lookup = $this->newLookup(
 			[ 'subjectFirst' => 'yes' ],
-			phpConfig: [ 'NeoWikiSubjectFirst' => 'yes' ] + self::PHP_CONFIG
+			phpConfig: [ 'SWSSubjectFirst' => 'yes' ] + self::PHP_CONFIG
 		);
 
 		$this->assertFalse( $lookup->getEffectiveValue( 'subjectFirst' ) );
@@ -83,7 +83,7 @@ class WikiConfigLookupTest extends TestCase {
 	public function testThePhpValueIsTheLocalSettingsValueWhateverThePageSets(): void {
 		$lookup = $this->newLookup(
 			[ 'dataLanguages' => [ 'fr' ] ],
-			phpConfig: [ 'NeoWikiDataLanguages' => [ 'de', 'it' ] ] + self::PHP_CONFIG
+			phpConfig: [ 'SWSDataLanguages' => [ 'de', 'it' ] ] + self::PHP_CONFIG
 		);
 
 		$this->assertSame( [ 'de', 'it' ], $lookup->getPhpValue( 'dataLanguages' ) );

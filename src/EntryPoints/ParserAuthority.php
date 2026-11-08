@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\NeoWiki\Infrastructure\UserAccessClass;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * The authority every parse-time read runs against: the user the page is being parsed for. That is
@@ -31,7 +31,7 @@ use ProfessionalWiki\NeoWiki\NeoWikiExtension;
  */
 class ParserAuthority {
 
-	public const string ACCESS_CLASS_OPTION = 'neowikiAccessClass';
+	public const string ACCESS_CLASS_OPTION = 'swsAccessClass';
 
 	public static function of( Parser $parser ): Authority {
 		$parser->getOptions()->getOption( self::ACCESS_CLASS_OPTION );
@@ -53,7 +53,7 @@ class ParserAuthority {
 	/**
 	 * The PageRenderingHash hook body: the parsing user's access class, for a page that recorded the
 	 * option. Every reader gets one, so a page that reads Subjects also stops reusing whatever was
-	 * cached for it before NeoWiki began keying by class.
+	 * cached for it before SWS began keying by class.
 	 *
 	 * @param string[] $usedOptions
 	 */
@@ -63,7 +63,7 @@ class ParserAuthority {
 		}
 
 		$hash .= '!' . self::ACCESS_CLASS_OPTION . '='
-			. NeoWikiExtension::getInstance()->newUserAccessClass()->of( $user );
+			. SWSExtension::getInstance()->newUserAccessClass()->of( $user );
 	}
 
 }

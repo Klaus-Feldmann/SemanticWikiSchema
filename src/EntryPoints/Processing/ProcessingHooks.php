@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 use MediaWiki\Deferred\LinksUpdate\LinksUpdate;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 
 /** Gates ordinary writers instead of relying on the identity of the job-queue runner. */
 final class ProcessingHooks {

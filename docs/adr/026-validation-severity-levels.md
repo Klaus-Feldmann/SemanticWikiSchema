@@ -15,7 +15,7 @@ settled. What is not settled is how strict it should be. A Schema needs to expre
    a preferred range, or messy imported data (the ECHOLOT cultural-heritage scenario).
 2. Hard constraints: edits that violate them are rejected. Example: an identifier that must always be present.
 
-The current mechanism cannot serve both. Enforcement is a per-wiki boolean (`$wgNeoWikiEnforceValidation`): when it
+The current mechanism cannot serve both. Enforcement is a per-wiki boolean (`$wgSWSEnforceValidation`): when it
 is on, a write is rejected with a 422 only if it introduces violations that were not present on the prior revision,
 so pre-existing invalidity never locks a Subject. Every violation blocks except `schema-not-found`, which is
 hardcoded as non-blocking. Validation is thus already two-state in behavior, but which state a violation falls into
@@ -35,7 +35,7 @@ Constraint in the Property Definition: a Constraint marked `error` is hard, one 
 
 Blocking semantics:
 
-* `$wgNeoWikiEnforceValidation` remains the master switch. Severity never blocks a write on its own.
+* `$wgSWSEnforceValidation` remains the master switch. Severity never blocks a write on its own.
 * With enforcement on, a write is rejected only when it introduces new violations of severity `error`. Warnings never
   block. The newly-introduced-violations check from ADR 21 is unchanged, and severity is not part of violation
   identity in that check: changing a Constraint's severity does not make an existing violation count as new.
@@ -122,7 +122,7 @@ Pros:
 Cons:
 
 * Enforcement only bites for authorable Constraints once schema authors mark them `error`: while Schemas are
-  unannotated, flipping `$wgNeoWikiEnforceValidation` on blocks nothing beyond the fixed-`error` conditions.
+  unannotated, flipping `$wgSWSEnforceValidation` on blocks nothing beyond the fixed-`error` conditions.
 * The Schema editor UI must expose a severity control per Constraint.
 * The PHP and TypeScript JSON parsers must handle both the scalar and the object Constraint form.
 * Severity is one more concept schema authors need to understand.
@@ -137,7 +137,7 @@ because it contradicts the invalid-Subjects requirement carried into ADR 21 from
 ### Removing the wiki-level enforcement switch
 
 With per-Constraint severity, the `error` marking could itself be the enforcement opt-in, making
-`$wgNeoWikiEnforceValidation` redundant: errors always block and warnings never do. We keep the switch for two
+`$wgSWSEnforceValidation` redundant: errors always block and warnings never do. We keep the switch for two
 reasons. Schemas are editable wiki pages, so without a wiki-level switch anyone with schema-edit rights could start
 blocking other users' writes; whether writes can be rejected at all should stay an operator decision. And the switch
 is an operational override: during a large import, an admin can lift blocking wiki-wide without demoting severities
@@ -168,6 +168,6 @@ no natural place in it. The object form chosen here does not preclude this restr
 ### Additional tiers and SHACL vocabulary
 
 SHACL has an `sh:Info` tier and calls its most severe level `sh:Violation`. We add no `info` tier because nothing in
-the system needs one and the enum can grow later. We do not use `violation` as a severity name because in NeoWiki
-"Violation" already names the finding itself, whatever its severity. If NeoWiki later emits SHACL-style validation
+the system needs one and the enum can grow later. We do not use `violation` as a severity name because in SWS
+"Violation" already names the finding itself, whatever its severity. If SWS later emits SHACL-style validation
 reports on the RDF side, the mapping is `error` to `sh:Violation` and `warning` to `sh:Warning`.

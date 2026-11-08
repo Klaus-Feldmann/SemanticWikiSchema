@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Application\SubjectCountLookup;
+use ProfessionalWiki\SWS\Application\SubjectCountLookup;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 /**
@@ -25,7 +25,7 @@ class CachingSubjectCountLookup implements SubjectCountLookup {
 	public function getSubjectCountsBySchema(): array {
 		/** @var array<string, int> $counts */
 		$counts = $this->cache->getWithSetCallback(
-			$this->cache->makeKey( 'neowiki-subject-counts', self::CACHE_VERSION ),
+			$this->cache->makeKey( 'sws-subject-counts', self::CACHE_VERSION ),
 			WANObjectCache::TTL_MINUTE,
 			fn (): array => $this->lookup->getSubjectCountsBySchema()
 		);

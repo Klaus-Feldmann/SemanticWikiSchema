@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\NeoWiki\PagePropertiesBuilder;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\PagePropertiesBuilder;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPagePropertyProvider;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\PagePropertiesBuilder
+ * @covers \ProfessionalWiki\SWS\PagePropertiesBuilder
  * @group Database
  */
-class PagePropertiesBuilderTest extends NeoWikiIntegrationTestCase {
+class PagePropertiesBuilderTest extends SWSIntegrationTestCase {
 
 	private const string PAGE_NAME = 'PagePropertiesBuilderTestPage';
 

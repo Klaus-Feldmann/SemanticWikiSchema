@@ -17,7 +17,7 @@ class StaticPagePropertyProvider implements PagePropertyProvider {
 }
 ```
 
-Register with `NeoWikiRegistrar::addPagePropertyProvider()`. Keys from all providers merge into one map, the
+Register with `SWSRegistrar::addPagePropertyProvider()`. Keys from all providers merge into one map, the
 last-registered provider winning a collision, so prefix keys with your extension's name. Example:
 [`src/StaticPagePropertyProvider.php`](https://github.com/ProfessionalWiki/NeoWiki/blob/master/tests/RedHerb/src/StaticPagePropertyProvider.php).
 
@@ -31,17 +31,17 @@ main-slot `content` and its `contentModel` are exposed for content models the pa
 
 ## Refreshing a page's data without an edit
 
-NeoWiki writes a page's graph data on edit, on full rebuild, and on a MediaWiki links refresh that changes the page's
+SWS writes a page's graph data on edit, on full rebuild, and on a MediaWiki links refresh that changes the page's
 `categories` or `parserProperties`, such as one caused by editing a template or module the page uses. When data your
 extension contributes changes outside an edit — an approval extension marking a revision approved — trigger a refresh:
 
 ```php
-$outcome = NeoWikiExtension::getInstance()
+$outcome = SWSExtension::getInstance()
 	->newPageRebuilder()
 	->rebuild( $title );
 ```
 
-NeoWiki re-runs every provider for the page, re-reads its subject slot, and synchronously updates the Page node and
+SWS re-runs every provider for the page, re-reads its subject slot, and synchronously updates the Page node and
 what the Subject list, suggestions, counts and "Referenced by" read; no revision is created. `rebuild()` returns a
 `PageRefreshOutcome`:
 
@@ -49,7 +49,7 @@ what the Subject list, suggestions, counts and "Referenced by" read; no revision
 - `Unpublished` — the [revision policy](revision-policy.md) publishes no revision of the page, so the call withdrew
   it from the graph stores, the Subject list, suggestions, counts and "Referenced by".
 - `SkippedMissingRevision` — the page has no current revision.
-- `SkippedUnreadableSubjects` — the page's subject slot holds content NeoWiki cannot read as Subjects.
+- `SkippedUnreadableSubjects` — the page's subject slot holds content SWS cannot read as Subjects.
 - `SkippedUnreadablePageProperties` — the page's properties could not be built, for instance because a provider or
   the page's own parse threw.
 

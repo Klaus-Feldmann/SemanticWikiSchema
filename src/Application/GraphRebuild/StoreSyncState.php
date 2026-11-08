@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
 /**
  * How far a graph store's contents are from what the wiki now says they should be.

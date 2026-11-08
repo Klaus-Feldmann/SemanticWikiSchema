@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use Exception;
 use Maintenance;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NothingToResumeException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToResumeException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildBatchObserver;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\SWSExtension;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 
@@ -88,7 +88,7 @@ class RebuildGraphDatabases extends Maintenance implements RebuildBatchObserver 
 			return false;
 		}
 
-		$coordinator = NeoWikiExtension::getInstance()
+		$coordinator = SWSExtension::getInstance()
 			->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE );
 		$storeNames = $this->getStoreNames( $coordinator );
 
@@ -230,7 +230,7 @@ class RebuildGraphDatabases extends Maintenance implements RebuildBatchObserver 
 
 		return 'failed on pages ' . implode( ', ', $named )
 			. ( $rest === 0 ? '' : ' and ' . $rest . ' more' )
-			. '. The NeoWiki log channel says why.';
+			. '. The SWS log channel says why.';
 	}
 
 	/**
@@ -258,7 +258,7 @@ class RebuildGraphDatabases extends Maintenance implements RebuildBatchObserver 
 	}
 
 	private function countWhatThereIsToDo(): void {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		$this->totalPages = $extension->newPageIdsLookup()->countPages();
 		$this->totalDeletedPages = $extension->newDeletedPageIdsLookup()->countDeletedPages();

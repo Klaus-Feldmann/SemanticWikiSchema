@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\SubjectSummaries;
+namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
 
-use ProfessionalWiki\NeoWiki\Application\HostSubjectBuilder;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsAtRevisionLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Application\HostSubjectBuilder;
+use ProfessionalWiki\SWS\Application\PageSubjectsAtRevisionLookup;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
 
 /**
  * Adds the Host Subject to the summaries of Dependent Subjects nobody named, read from their pages: a Subject listing

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Application\WikiConfig;
 
 /**
  * One setting exposed on the on-wiki configuration page: the page key admins write, the

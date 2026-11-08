@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Application\WikiConfig;
 
 use InvalidArgumentException;
 use MediaWiki\Config\Config;
@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
  * PHP/LocalSettings configuration, per setting, with the wiki page winning when it sets a valid value.
  *
  * A missing page, an absent key, or a value of the wrong shape falls back to the PHP configuration rather
- * than throwing: a config typo on the page must not take down the wiki (the NeoWikiConfigFactory stance).
+ * than throwing: a config typo on the page must not take down the wiki (the SWSConfigFactory stance).
  * A PHP value of the wrong shape falls back to what its value type comes down to. An invalid page value
  * is logged once so the fallback is not silent; unknown page keys are tolerated for forward
  * compatibility. The page is read at most once (memoized), and only when in-wiki config is enabled.
@@ -62,7 +62,7 @@ class WikiConfigLookup {
 		}
 
 		$this->logger->warning(
-			'Ignoring invalid value for "{key}" on the MediaWiki:NeoWiki configuration page; using the PHP configuration instead.',
+			'Ignoring invalid value for "{key}" on the MediaWiki:SWS configuration page; using the PHP configuration instead.',
 			[ 'key' => $pageKey ]
 		);
 

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\RestUpdateStatementPresenter;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\RestUpdateStatementPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class RemoveStatementApi extends SimpleHandler {
@@ -35,7 +35,7 @@ class RemoveStatementApi extends SimpleHandler {
 		$presenter = new RestUpdateStatementPresenter();
 
 		try {
-			$extension = NeoWikiExtension::getInstance();
+			$extension = SWSExtension::getInstance();
 			$extension->newUpdateStatementAction( $presenter, $this->getAuthority() )->removeStatement(
 				$extension->getSubjectIdParser()->parseOrThrow( $subjectId ),
 				new PropertyName( $propertyName ),

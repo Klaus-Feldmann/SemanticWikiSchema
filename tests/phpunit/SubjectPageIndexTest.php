@@ -2,36 +2,36 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use Throwable;
 
 /**
  * The subject -> page index over the page lifecycle: what a wiki operation leaves the index holding,
  * and what a Subject id then resolves to.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\OnRevisionCreatedHandler
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
  * @group Database
  */
-class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
+class SubjectPageIndexTest extends SWSIntegrationTestCase {
 
 	private const FIRST_ID = 's1zz1111111azz1';
 	private const SECOND_ID = 's1zz1111111azz2';
@@ -132,7 +132,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 	 * whose Subjects nothing told the index about.
 	 */
 	public function testRebuildingIndexesAPageWrittenWithoutTheHook(): void {
-		$pageId = $this->createPageWithoutTellingNeoWiki(
+		$pageId = $this->createPageWithoutTellingSWS(
 			'Unhooked page',
 			$this->subjectSlotJson( self::FIRST_ID )
 		);
@@ -150,7 +150,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 		$json = TestSubject::jsonThatDoesNotDeserialize( self::FIRST_ID );
 		$this->assertDoesNotDeserialize( $json );
 
-		$pageId = $this->createPageWithoutTellingNeoWiki( 'Broken subject page', $json );
+		$pageId = $this->createPageWithoutTellingSWS( 'Broken subject page', $json );
 
 		$this->rebuildIndex();
 
@@ -162,9 +162,9 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 	 * Subjects — not only the ones the first query returned.
 	 */
 	public function testRebuildingReachesEveryPageAcrossBatches(): void {
-		$firstPageId = $this->createPageWithoutTellingNeoWiki( 'Batched page 1', $this->subjectSlotJson( self::FIRST_ID ) );
-		$secondPageId = $this->createPageWithoutTellingNeoWiki( 'Batched page 2', $this->subjectSlotJson( self::SECOND_ID ) );
-		$thirdPageId = $this->createPageWithoutTellingNeoWiki( 'Batched page 3', $this->subjectSlotJson( self::THIRD_ID ) );
+		$firstPageId = $this->createPageWithoutTellingSWS( 'Batched page 1', $this->subjectSlotJson( self::FIRST_ID ) );
+		$secondPageId = $this->createPageWithoutTellingSWS( 'Batched page 2', $this->subjectSlotJson( self::SECOND_ID ) );
+		$thirdPageId = $this->createPageWithoutTellingSWS( 'Batched page 3', $this->subjectSlotJson( self::THIRD_ID ) );
 
 		$this->rebuildIndex( batchSize: 1 );
 
@@ -185,7 +185,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 
 	public function testRebuildingUnindexesAPageThatLostItsSubjectsWithoutTheHook(): void {
 		$pageId = $this->createPageHolding( 'Emptied page', self::FIRST_ID );
-		$this->createPageWithoutTellingNeoWiki( 'Emptied page', $this->subjectSlotJson() );
+		$this->createPageWithoutTellingSWS( 'Emptied page', $this->subjectSlotJson() );
 
 		$this->rebuildIndex();
 
@@ -198,7 +198,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testRebuildingUnindexesAPageThatLostItsSubjectSlotWithoutTheHook(): void {
 		$pageId = $this->createPageHolding( 'Slotless page', self::FIRST_ID );
-		$this->removeSubjectSlotWithoutTellingNeoWiki( 'Slotless page' );
+		$this->removeSubjectSlotWithoutTellingSWS( 'Slotless page' );
 
 		$this->rebuildIndex();
 
@@ -229,7 +229,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 		$pageId = $this->createPageHolding( 'Reprojected page', self::FIRST_ID );
 		$this->emptyIndexOf( $pageId );
 
-		$outcome = NeoWikiExtension::getInstance()
+		$outcome = SWSExtension::getInstance()
 			->newPageRebuilderFor( new SpyGraphDatabasePlugin() )
 			->rebuild( Title::newFromText( 'Reprojected page' ) );
 
@@ -251,7 +251,7 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 	private function emptyIndexOf( int $pageId ): void {
 		$this->getDb()->newDeleteQueryBuilder()
 			->deleteFrom( DatabaseSubjectPageIndex::TABLE )
-			->where( [ 'nwsp_page_id' => $pageId ] )
+			->where( [ 'swssp_page_id' => $pageId ] )
 			->caller( __METHOD__ )
 			->execute();
 
@@ -317,10 +317,10 @@ class SubjectPageIndexTest extends NeoWikiIntegrationTestCase {
 	 */
 	private function indexedSubjectsOf( int $pageId ): array {
 		return $this->getDb()->newSelectQueryBuilder()
-			->select( 'nwsp_subject_id' )
+			->select( 'swssp_subject_id' )
 			->from( DatabaseSubjectPageIndex::TABLE )
-			->where( [ 'nwsp_page_id' => $pageId ] )
-			->orderBy( 'nwsp_subject_id' )
+			->where( [ 'swssp_page_id' => $pageId ] )
+			->orderBy( 'swssp_subject_id' )
 			->caller( __METHOD__ )
 			->fetchFieldValues();
 	}

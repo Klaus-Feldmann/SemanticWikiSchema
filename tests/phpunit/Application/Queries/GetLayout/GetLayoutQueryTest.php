@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\GetLayout;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetLayout;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetLayout\GetLayoutPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetLayout\GetLayoutQuery;
-use ProfessionalWiki\NeoWiki\Application\LayoutLookup;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRules;
-use ProfessionalWiki\NeoWiki\Domain\Layout\Layout;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\Presentation\LayoutPresentationSerializer;
+use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery;
+use ProfessionalWiki\SWS\Application\LayoutLookup;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
+use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetLayout\GetLayoutQuery
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery
  */
 class GetLayoutQueryTest extends TestCase {
 

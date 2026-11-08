@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use PHPUnit\Framework\TestCase;
 
@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * registered in extension.json. That table is the install-free, linkable REST reference, so it must
  * list every registered route and no stale ones.
  *
- * Complements ModuleSpecHandlerNeoWikiTest, which checks the generated OpenAPI spec against the
+ * Complements ModuleSpecHandlerSWSTest, which checks the generated OpenAPI spec against the
  * handlers. This test only compares the documented route list with extension.json: pure file I/O,
  * no database or framework bootstrap needed.
  *
@@ -60,7 +60,7 @@ class RestApiDocsCoverageTest extends TestCase {
 	}
 
 	/**
-	 * @return list<string> e.g. "GET /neowiki/v0/subject/{subjectId}", sorted and unique.
+	 * @return list<string> e.g. "GET /sws/v0/subject/{subjectId}", sorted and unique.
 	 */
 	private function registeredEndpoints(): array {
 		$extensionJson = $this->readJsonArray( __DIR__ . '/../../../../extension.json' );
@@ -98,7 +98,7 @@ class RestApiDocsCoverageTest extends TestCase {
 	}
 
 	/**
-	 * @return list<string> the "METHOD /neowiki/v0/..." spans inside the marked table region.
+	 * @return list<string> the "METHOD /sws/v0/..." spans inside the marked table region.
 	 */
 	private function documentedEndpoints(): array {
 		$contents = file_get_contents( __DIR__ . '/../../../../docs/api/rest-api.md' );
@@ -113,7 +113,7 @@ class RestApiDocsCoverageTest extends TestCase {
 		$region = substr( $contents, $start, $end - $start );
 
 		preg_match_all(
-			'#`(GET|POST|PUT|PATCH|DELETE) (/neowiki/v0/[^\s`]+)`#',
+			'#`(GET|POST|PUT|PATCH|DELETE) (/sws/v0/[^\s`]+)`#',
 			$region,
 			$matches,
 			PREG_SET_ORDER

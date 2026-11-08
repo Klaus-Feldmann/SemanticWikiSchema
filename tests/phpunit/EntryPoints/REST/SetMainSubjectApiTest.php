@@ -2,32 +2,32 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetMainSubjectApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetMainSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestSetMainSubjectPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\SetMainSubject\SetMainSubjectAction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestSetMainSubjectPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectAction
  * @group Database
  */
-class SetMainSubjectApiTest extends NeoWikiIntegrationTestCase {
+class SetMainSubjectApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	// A page id far above anything a fresh test database mints, so it resolves to no page.
 	private const int NONEXISTENT_PAGE_ID = 999999;
@@ -53,7 +53,7 @@ class SetMainSubjectApiTest extends NeoWikiIntegrationTestCase {
 		$body = json_decode( $response->getBody()->getContents(), true );
 		$this->assertSame( 'changed', $body['status'] );
 
-		$pageSubjects = NeoWikiExtension::getInstance()->getSubjectRepository()
+		$pageSubjects = SWSExtension::getInstance()->getSubjectRepository()
 			->getSubjectsByPageId( new PageId( $pageId ) );
 		$this->assertSame( 'sTestSMS1111ch1', $pageSubjects->getMainSubject()?->id->text );
 		$this->assertTrue( $pageSubjects->getOtherSubjects()->hasSubject(
@@ -73,7 +73,7 @@ class SetMainSubjectApiTest extends NeoWikiIntegrationTestCase {
 		$body = json_decode( $response->getBody()->getContents(), true );
 		$this->assertSame( 'changed', $body['status'] );
 
-		$pageSubjects = NeoWikiExtension::getInstance()->getSubjectRepository()
+		$pageSubjects = SWSExtension::getInstance()->getSubjectRepository()
 			->getSubjectsByPageId( new PageId( $pageId ) );
 		$this->assertNull( $pageSubjects->getMainSubject() );
 		$this->assertTrue( $pageSubjects->getOtherSubjects()->hasSubject(

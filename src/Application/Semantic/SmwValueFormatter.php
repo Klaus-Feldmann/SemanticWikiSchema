@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\Application\Semantic;
+namespace ProfessionalWiki\SWS\Application\Semantic;
 use InvalidArgumentException;
 
 final class SmwValueFormatter {

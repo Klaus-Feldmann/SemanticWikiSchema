@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Maintenance\LoggedUpdateMaintenance;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 
@@ -34,18 +34,18 @@ class RebuildPublishedSubjectIndex extends LoggedUpdateMaintenance {
 	}
 
 	protected function getUpdateKey(): string {
-		return 'neowiki-rebuild-published-subject-index';
+		return 'sws-rebuild-published-subject-index';
 	}
 
 	protected function doDBUpdates(): bool {
 		// update.php runs its post-update scripts even when told to apply no schema changes, so the tables can
 		// be missing. Not done, so the run that creates them still fills them.
 		if ( !$this->indexTablesExist() ) {
-			$this->output( "The NeoWiki published Subject index tables do not exist yet; nothing to rebuild.\n" );
+			$this->output( "The SWS published Subject index tables do not exist yet; nothing to rebuild.\n" );
 			return false;
 		}
 
-		$this->output( "Rebuilding the NeoWiki published Subject index...\n" );
+		$this->output( "Rebuilding the SWS published Subject index...\n" );
 
 		$reindexed = 0;
 		$rebuild = $this->newRebuilder()->rebuild();
@@ -77,7 +77,7 @@ class RebuildPublishedSubjectIndex extends LoggedUpdateMaintenance {
 
 		$this->error(
 			'Did not reindex pages ' . implode( ', ', $named ) . ( $rest === 0 ? '' : " and $rest more" )
-			. ': their published Subject data cannot be read. The NeoWiki log channel says why; once they are fixed, '
+			. ': their published Subject data cannot be read. The SWS log channel says why; once they are fixed, '
 			. 'run this script again with --force.'
 		);
 	}
@@ -93,10 +93,10 @@ class RebuildPublishedSubjectIndex extends LoggedUpdateMaintenance {
 		return new DatabasePublishedSubjectIndexRebuilder(
 			db: $this->getPrimaryDB(),
 			revisionLookup: $this->getServiceContainer()->getRevisionLookup(),
-			revisionPolicy: NeoWikiExtension::getInstance()->getRevisionPolicy(),
+			revisionPolicy: SWSExtension::getInstance()->getRevisionPolicy(),
 			titleFormatter: $this->getServiceContainer()->getTitleFormatter(),
-			dependentSubjectRules: NeoWikiExtension::getInstance()->newUnrestrictedDependentSubjectRules(),
-			logger: LoggerFactory::getInstance( 'NeoWiki' ),
+			dependentSubjectRules: SWSExtension::getInstance()->newUnrestrictedDependentSubjectRules(),
+			logger: LoggerFactory::getInstance( 'SWS' ),
 			batchSize: $this->getBatchSize(),
 		);
 	}

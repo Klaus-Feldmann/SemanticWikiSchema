@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetPageSubjects\GetPageSubjectsPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetPageSubjects\GetPageSubjectsResponse;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsResponse;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 
 class RestGetPageSubjectsPresenter implements GetPageSubjectsPresenter {
 

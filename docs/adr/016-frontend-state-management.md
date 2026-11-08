@@ -38,6 +38,6 @@ We decided to keep using Stores because they provide reactivity to child compone
 
 ### Merging The Stores
 
-To have one `NeoWikiStore` instead of `SubjectStore` and `SchemaStore`.
+To have one `SWSStore` instead of `SubjectStore` and `SchemaStore`.
 
 We decided against this because these entities can evolve independently, and in some places we only need Schemas.

@@ -4,7 +4,7 @@ order: 2
 ---
 # Lua API
 
-NeoWiki provides a Scribunto library at `mw.neowiki` for accessing structured data from Lua
+SWS provides a Scribunto library at `mw.sws` for accessing structured data from Lua
 modules. Use Lua when you need to render multiple properties, iterate over collections, or build
 custom output. For simple inline values, the [parser functions](parser-functions.md) are usually
 enough.
@@ -25,7 +25,7 @@ For definitions of terms like Subject, Schema, and Statement, see the [Glossary]
 ## Loading the library
 
 ```lua
-local nw = require('mw.neowiki')
+local nw = require('mw.sws')
 ```
 
 `require` fails on a wiki where the library is [removed](../operations/restricted-content.md#removing-the-lua-library).
@@ -178,7 +178,7 @@ end
 
 Runs a read-only Cypher query against the graph database and returns each row as a Lua table. It
 is available only when a Neo4j graph backend is configured; on a wiki without one,
-`mw.neowiki.query` is nil.
+`mw.sws.query` is nil.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -188,7 +188,7 @@ is available only when a Neo4j graph backend is configured; on a wiki without on
 #### Returns
 
 A 1-indexed Lua table of rows. Each row is a string-keyed table where the keys are the Cypher
-`RETURN` aliases. A query with no rows returns `{}`, and so does any query run without the `neowiki-query` right
+`RETURN` aliases. A query with no rows returns `{}`, and so does any query run without the `sws-query` right
 (see [Permissions](#permissions)), even one that always returns a row, such as a count. Iterating with `ipairs` needs
 no `nil` check; reading `rows[1]` does.
 
@@ -208,7 +208,7 @@ Scalar values come back as strings, numbers, booleans, or `nil`. Nested Cypher l
 
 #### Errors
 
-With the `neowiki-query` right, always throws on failure; wrap in `pcall` if you need graceful degradation.
+With the `sws-query` right, always throws on failure; wrap in `pcall` if you need graceful degradation.
 
 - Empty or whitespace-only `cypher`.
 - Write or non-read-only queries.
@@ -243,7 +243,7 @@ Integer comparisons need an explicit cast in the query — e.g. `WHERE s.year = 
 Runs a read-only SPARQL query against the first configured
 [SPARQL store](../operations/installation.md#optional-sparql-graph-stores) and returns the results as a Lua table.
 The SPARQL counterpart of `nw.query`. It is available only when a SPARQL store is configured; on a wiki
-without one, `mw.neowiki.sparqlQuery` is nil.
+without one, `mw.sws.sparqlQuery` is nil.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
@@ -255,12 +255,12 @@ The W3C [`application/sparql-results+json`](https://www.w3.org/TR/sparql11-resul
 Lua table, preserving its standard structure: `head.vars` and `results.bindings` for a `SELECT`, or
 `boolean` for an `ASK`. Every JSON array (`head.vars`, `results.bindings`) is a 1-indexed Lua sequence;
 each binding is a string-keyed table of RDF terms (`{ type, value, datatype?, ['xml:lang']? }`). Without the
-`neowiki-query` right (see [Permissions](#permissions)), every query returns empty `head.vars` and `results.bindings`
+`sws-query` right (see [Permissions](#permissions)), every query returns empty `head.vars` and `results.bindings`
 and no `boolean`.
 
 #### Errors
 
-With the `neowiki-query` right, always throws on failure; wrap in `pcall` if you need graceful degradation.
+With the `sws-query` right, always throws on failure; wrap in `pcall` if you need graceful degradation.
 
 - Empty or whitespace-only `sparql`.
 - A query the store rejects (e.g. a SPARQL syntax error), or the store being unavailable.
@@ -434,7 +434,7 @@ Notes:
 The [parser function rules](parser-functions.md#permissions) apply: every function reads as the user
 the page is parsed for. In Lua, Subjects and Schemas that user cannot read come back as `nil` or an
 empty table, a relation to such a Subject shows the Subject ID as its label, and `nw.query` and
-`nw.sparqlQuery` return no results without the `neowiki-query` right.
+`nw.sparqlQuery` return no results without the `sws-query` right.
 
 ## Performance
 

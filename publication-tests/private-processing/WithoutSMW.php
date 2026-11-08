@@ -9,12 +9,12 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
 $s=MediaWikiServices::getInstance();$u=$s->getUserFactory()->newFromName('TestAdmin');
 foreach (['Schema:NoSMWProcessing'=>['main'=>new SchemaContent(json_encode(['title'=>'NoSMWProcessing','propertyDefinitions'=>['Programm'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'Privater Schemainhalt']]]))],
-'NoSMWProcessing'=>['main'=>new WikitextContent('Privater Artikel'),'neo'=>new SubjectContent(json_encode(['mainSubject'=>'s123456789abcde','subjects'=>['s123456789abcde'=>['schema'=>'NoSMWProcessing','label'=>'Test','statements'=>[]]]]))]] as $name=>$slots) {
+'NoSMWProcessing'=>['main'=>new WikitextContent('Privater Artikel'),'sws'=>new SubjectContent(json_encode(['mainSubject'=>'s123456789abcde','subjects'=>['s123456789abcde'=>['schema'=>'NoSMWProcessing','label'=>'Test','statements'=>[]]]]))]] as $name=>$slots) {
  $p=$s->getWikiPageFactory()->newFromTitle(Title::newFromText($name));$up=$p->newPageUpdater($u);foreach($slots as $slot=>$content){$up->setContent($slot,$content);}$up->saveRevision(MediaWiki\CommentStore\CommentStoreComment::newUnsavedComment('without SMW test'),0);DeferredUpdates::doUpdates();
 }
 $t=Title::newFromText('NoSMWProcessing');$p=new InternalPageProcessor();$r=$p->prepare($t);$p->refresh($t);DeferredUpdates::doUpdates();

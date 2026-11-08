@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
@@ -11,30 +11,30 @@ use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetReferencingSubjectsApi;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetReferencingSubjectsApi
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestGetReferencingSubjectsPresenter
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
+ * @covers \ProfessionalWiki\SWS\Presentation\RestGetReferencingSubjectsPresenter
  * @group Database
  */
-class GetReferencingSubjectsApiTest extends NeoWikiIntegrationTestCase {
+class GetReferencingSubjectsApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SCHEMA = 'GetReferencingSubjectsTestSchema';
 	private const string TARGET_ID = 'sTestGRS1111111';
@@ -171,12 +171,12 @@ JSON
 	}
 
 	/**
-	 * A write NeoWiki is not told about, such as a history merge, can take a relation away that the index keeps.
+	 * A write SWS is not told about, such as a history merge, can take a relation away that the index keeps.
 	 */
 	public function testSubjectWhoseStatementsNoLongerPointHereIsOmitted(): void {
 		$this->createReferringPage( 'GRSApiTest_Stale', 'sTestGRS1111116', 'Stale' );
 
-		$this->createPageWithoutTellingNeoWiki(
+		$this->createPageWithoutTellingSWS(
 			'GRSApiTest_Stale',
 			SubjectContent::newFromData(
 				new PageSubjects( $this->referrer( 'sTestGRS1111116', 'Stale', [] ), new SubjectMap() )

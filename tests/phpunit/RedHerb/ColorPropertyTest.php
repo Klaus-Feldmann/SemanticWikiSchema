@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\JsonSchemaAssertions;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
 use ProfessionalWiki\RedHerb\ColorProperty;
 use ProfessionalWiki\RedHerb\ColorType;
 

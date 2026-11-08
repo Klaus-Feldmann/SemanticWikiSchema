@@ -1,4 +1,4 @@
-name: NeoWiki CI (RedHerb example)
+name: SWS CI (RedHerb example)
 
 on:
   workflow_dispatch:

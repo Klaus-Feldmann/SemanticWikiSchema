@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphDatabase;
+namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * Projects wiki page changes into a graph database backend.
@@ -21,7 +21,7 @@ use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
  *   reached — including one whose initialize() throws — ends that store's run.
  * - On update.php, the wiring likewise propagates, but the caller reports an initialize() failure and
  *   lets the update continue, since aborting there would only skip the schema updates of the
- *   extensions queued after NeoWiki.
+ *   extensions queued after SWS.
  *
  * The hook path never initializes.
  */

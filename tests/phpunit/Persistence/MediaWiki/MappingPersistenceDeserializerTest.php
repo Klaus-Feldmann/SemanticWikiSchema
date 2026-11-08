@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeScope;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPersistenceDeserializer
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer
  */
 class MappingPersistenceDeserializerTest extends TestCase {
 

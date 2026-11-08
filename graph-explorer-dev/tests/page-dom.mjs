@@ -18,7 +18,7 @@ function visit(n){
  ts.forEachChild(n,visit);
 }
 visit(ast);assert.ok(className);
-const testModule=path.join(os.tmpdir(), 'neowiki-page-common-test.mjs');
+const testModule=path.join(os.tmpdir(), 'sws-page-common-test.mjs');
 const modified=original.replace('./'+manifest.generated.helperName,path.join(root,'Graph-Explorer/assets',manifest.generated.helperName));
 fs.writeFileSync(testModule,modified+`\nexport {${className} as TestStandardTemplate};\n`);
 const dom=new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>',{url:'https://aufeinwort.info/graph-explorer/envendpoint.html',pretendToBeVisual:true});
@@ -30,8 +30,8 @@ globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window)
 
 globalThis.fetch=async(url)=>({ok:true,json:async()=>{
  if(String(url).includes('/sparql?'))return {results:{bindings:[{page:{type:'uri',value:'https://aufeinwort.info/page/1152'}}]}};
- if(String(url).includes('neowikibasevalues'))return {neowikibasevalues:{version:1,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',fields:[],presentation:{version:1,language:'de',pageUrlTemplate:'https://aufeinwort.info/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[{name:'Bezug',type:'page',predicateLocalName:'Bezug',wikiLink:{labelTarget:'Vermerk:Bezug'},externalProperty:null,ownPages:['Werk:Abhandlung','Neue Seite']}]}}};
- return {neowikibaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{}}};
+ if(String(url).includes('swsbasevalues'))return {swsbasevalues:{version:1,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',fields:[],presentation:{version:1,language:'de',pageUrlTemplate:'https://aufeinwort.info/wiki/SWSGRAPHTITLETOKEN',definitions:[{name:'Bezug',type:'page',predicateLocalName:'Bezug',wikiLink:{labelTarget:'Vermerk:Bezug'},externalProperty:null,ownPages:['Werk:Abhandlung','Neue Seite']}]}}};
+ return {swsbaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{}}};
 }});
 const module=await import(testModule);
 const React=module.x(module.y());const ReactDOM=module.v();

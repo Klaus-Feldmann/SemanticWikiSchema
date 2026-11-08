@@ -5,9 +5,9 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 $services->getHookContainer()->register('ParserBeforeInternalParse', static function($parser, &$text, $stripState) {
     // Deterministic stand-in for Q discovery when the schema program enters the full parse.
     if ($parser->getTitle()->getText()==='Relation fixture' && str_contains($text,'identity-fixture')) {
@@ -44,6 +44,6 @@ checkTest(isset($data->getProperties()['Manuell']),'manual annotation preserved'
 checkTest(!isset($data->getProperties()['Forschung']),'relation stays deferred');
 $values=$data->getPropertyValues(new SMW\DIProperty('Einordnung'));
 checkTest(count($values)===1 && $values[0]->getTitle()->getPrefixedText()==='Nur im Kind','dependent value persisted on host page');
-$actual=json_decode($services->getWikiPageFactory()->newFromTitle($title)->getRevisionRecord()->getContent('neo')->getText(),true);
+$actual=json_decode($services->getWikiPageFactory()->newFromTitle($title)->getRevisionRecord()->getContent('sws')->getText(),true);
 checkTest($actual['subjects']===$payload['subjects'],'relation identity and dependent subject stored unchanged');
 echo "DEPENDENT_PROJECTION_OK\n";

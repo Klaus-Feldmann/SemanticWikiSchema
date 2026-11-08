@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readPresentation,orderedRows,localPageUrl,createPresentationLoader,createNeoWikiFields} from '../source/neoWikiFields.js';
+import {readPresentation,orderedRows,localPageUrl,createPresentationLoader,createSWSFields} from '../source/swsFields.js';
 const origin='https://wiki.example',sid='sTest123',iri=origin+'/entity/'+sid;
 const property=(source='wikidata',extra={})=>({name:'Klassifizierung',type:'text',predicateLocalName:'Klassifizierung',wikiLink:{labelTarget:'Konzept:Klassifizierung',externalTarget:'local',...extra},externalProperty:{source,id:'P31'}});
 const native=(name,value)=>({name,id:origin+'/prop/'+name,property:{type:'string',values:[{value,language:'de'}]}});
-function response(source='wikidata',valueLabel='Mensch') {return {version:1,scope:'current',pageId:12,mainSubjectId:sid,presentation:{version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[property(source),{name:'Geburtsort',type:'text',predicateLocalName:'Geburtsort',wikiLink:{values:false},externalProperty:null}]},fields:[{name:'Klassifizierung',source,propertyId:'P31',status:'resolved',values:[{kind:'entity',id:'Q5',label:valueLabel,url:source==='wikidata'?'https://www.wikidata.org/wiki/Q5':origin+'/wiki/Objekt:Q5'}]}]};}
+function response(source='wikidata',valueLabel='Mensch') {return {version:1,scope:'current',pageId:12,mainSubjectId:sid,presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[property(source),{name:'Geburtsort',type:'text',predicateLocalName:'Geburtsort',wikiLink:{values:false},externalProperty:null}]},fields:[{name:'Klassifizierung',source,propertyId:'P31',status:'resolved',values:[{kind:'entity',id:'Q5',label:valueLabel,url:source==='wikidata'?'https://www.wikidata.org/wiki/Q5':origin+'/wiki/Objekt:Q5'}]}]};}
 function rows(data=response(),own=[native('Geburtsort','Frankfurt')]){return orderedRows(readPresentation(data,12,sid,origin),own,origin);}
 test('schema order includes derived field before native values, with label prefix and local value links',()=>{
  const r=rows();assert.deepEqual(r.map(v=>v.name),['Klassifizierung','Geburtsort']);assert.equal(r[0].labelHref,origin+'/wiki/Konzept%3AKlassifizierung');assert.equal(r[0].values[0].href,origin+'/wiki/Mensch');assert.equal(r[1].own[0].href,null);
@@ -30,14 +30,14 @@ test('mismatched subject, historical scope and wrong source bindings never used'
 test('unsafe or cross-source URLs and templates rejected',()=>{
  for(const url of ['javascript:alert(1)',origin+'/wiki/Q5','https://www.wikidata.org/wiki/Q6']){const d=response();d.fields[0].values[0].url=url;assert.throws(()=>readPresentation(d,12,sid,origin));}
  const d=response('wikibase-local');d.fields[0].values[0].url='https://evil.example/Q5';assert.throws(()=>readPresentation(d,12,sid,origin));
- assert.equal(localPageUrl('X','','https://evil.example/NEOWIKIGRAPHTITLETOKEN',origin),null);
+ assert.equal(localPageUrl('X','','https://evil.example/SWSGRAPHTITLETOKEN',origin),null);
 });
 test('local URL construction supports query article paths and rejects title injection',()=>{
- assert.equal(localPageUrl('Mensch','Attribut',origin+'/w/index.php?title=NEOWIKIGRAPHTITLETOKEN',origin),origin+'/w/index.php?title=Attribut%3AMensch');
- for(const title of ['javascript:alert(1)','[X]','X\nY',':X'])assert.equal(localPageUrl(title,'',origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',origin),null);
+ assert.equal(localPageUrl('Mensch','Attribut',origin+'/w/index.php?title=SWSGRAPHTITLETOKEN',origin),origin+'/w/index.php?title=Attribut%3AMensch');
+ for(const title of ['javascript:alert(1)','[X]','X\nY',':X'])assert.equal(localPageUrl(title,'',origin+'/wiki/SWSGRAPHTITLETOKEN',origin),null);
 });
 test('loader batches concurrent callers, uses private current-main API and expires cache',async()=>{
- let clock=0;const calls=[];const loader=createPresentationLoader({origin,now:()=>clock,fetchImpl:async(url,opts)=>{calls.push([url,opts]);return{ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:origin+'/page/12'}}]}}:{neowikibasevalues:response()}};}});
+ let clock=0;const calls=[];const loader=createPresentationLoader({origin,now:()=>clock,fetchImpl:async(url,opts)=>{calls.push([url,opts]);return{ok:true,json:async()=>url.includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:origin+'/page/12'}}]}}:{swsbasevalues:response()}};}});
  const [a,b]=await Promise.all([loader(iri),loader(iri)]);assert.equal(a,b);assert.equal(calls.length,2);assert.equal(new URL(calls[1][0]).searchParams.get('presentation'),'1');assert.equal(calls[1][1].credentials,'same-origin');assert.equal(calls[1][1].cache,'no-store');clock=61000;await loader(iri);assert.equal(calls.length,4);assert.equal(await loader('https://elsewhere/entity/sX'),null);
 });
 test('loader leaves non-main subjects and failures to native rendering and retries errors',async()=>{
@@ -46,7 +46,7 @@ test('loader leaves non-main subjects and failures to native rendering and retri
 });
 test('stale async responses cannot replace another subject and failures keep original rendering',async()=>{
  const React={Component:class{constructor(props){this.props=props;}setState(s){this.state={...this.state,...s};}}};let finish;
- const Row=createNeoWikiFields(React,{origin,load:()=>new Promise(resolve=>finish=resolve)});const row=new Row({iri,fallback:'native'});row.componentDidMount();assert.equal(row.render(),'native');row.componentWillUnmount();finish(readPresentation(response(),12,sid,origin));await new Promise(r=>setImmediate(r));assert.equal(row.render(),'native');
+ const Row=createSWSFields(React,{origin,load:()=>new Promise(resolve=>finish=resolve)});const row=new Row({iri,fallback:'native'});row.componentDidMount();assert.equal(row.render(),'native');row.componentWillUnmount();finish(readPresentation(response(),12,sid,origin));await new Promise(r=>setImmediate(r));assert.equal(row.render(),'native');
 });
 
 test('Unicode and reserved IRI characters match native predicates without URL normalization',()=>{const d=response();d.presentation.definitions[1].name='Tätigkeit';d.presentation.definitions[1].predicateLocalName='Tätigkeit';const r=rows(d,[native('Tätigkeit','Forscher')]);assert.deepEqual(r.map(v=>v.name),['Klassifizierung','Tätigkeit']);assert.equal(r[1].own[0].text,'Forscher');});
@@ -58,15 +58,15 @@ test('image claims remain readable filenames while graph thumbnails are a separa
 });
 
 test('structured URLs keep their label and caption links paired in schema order',()=>{
- const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[{name:'Quellenangabe',type:'url',predicateLocalName:'Quellenangabe',wikiLink:null,externalProperty:null,ownUrls:[{url:'https://de.wikipedia.org/wiki/Regiomontanus?oldid=123&x=2',label:'Regiomontanus',caption:'Wikipedia (de)',captionPage:'Vermerk:Wikipedia'},{url:'https://other.example',label:'Another article',caption:'Other source'}]}]}};
+ const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[{name:'Quellenangabe',type:'url',predicateLocalName:'Quellenangabe',wikiLink:null,externalProperty:null,ownUrls:[{url:'https://de.wikipedia.org/wiki/Regiomontanus?oldid=123&x=2',label:'Regiomontanus',caption:'Wikipedia (de)',captionPage:'Vermerk:Wikipedia'},{url:'https://other.example',label:'Another article',caption:'Other source'}]}]}};
  const before=JSON.stringify(data);const r=rows(data,[]);
  assert.equal(r[0].own[0].text,'Regiomontanus');assert.equal(r[0].own[0].href,data.presentation.definitions[0].ownUrls[0].url);
  assert.equal(r[0].name,'Wikipedia (de)');assert.equal(r[0].labelHref,origin+'/wiki/Vermerk%3AWikipedia');
  assert.equal(r[1].own[0].text,'Another article');assert.equal(r[1].name,'Other source');assert.equal(JSON.stringify(data),before);
 });
 test('URL metadata does not create unrelated extra graph rows',()=>{
- const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[]}};
- assert.equal(rows(data,[{name:'urlEntry',id:'urn:neowiki:aewi:urlEntry',property:{values:[{value:'entry-id'}]}}]).length,0);
+ const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[]}};
+ assert.equal(rows(data,[{name:'urlEntry',id:'urn:sws:aewi:urlEntry',property:{values:[{value:'entry-id'}]}}]).length,0);
 });
 test('malformed structured URL presentation fails rather than displaying mixed records',()=>{
  const d=response();d.presentation.definitions[0].ownUrls=[{url:'https://example.org',label:7}];assert.throws(()=>readPresentation(d,12,sid,origin));
@@ -74,7 +74,7 @@ test('malformed structured URL presentation fails rather than displaying mixed r
 
 
 test('page fields use stored full titles rather than projected RDF URLs',()=>{
- const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[{name:'Werk',type:'page',predicateLocalName:'Werk',wikiLink:{namespace:'Vermerk',values:false},externalProperty:null,ownPages:['Werk:De mathematica perfectione','Neue Seite']}]}};
+ const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[{name:'Werk',type:'page',predicateLocalName:'Werk',wikiLink:{namespace:'Vermerk',values:false},externalProperty:null,ownPages:['Werk:De mathematica perfectione','Neue Seite']}]}};
  const result=orderedRows(readPresentation(data,12,sid,origin),[native('Werk',origin+'/wiki/Werk:De_mathematica_perfectione')],origin);
  assert.deepEqual(result[0].own.map(v=>v.text),['Werk:De mathematica perfectione','Neue Seite']);
  assert.equal(result[0].own[0].href,origin+'/wiki/Werk%3ADe_mathematica_perfectione');
@@ -84,7 +84,7 @@ test('page fields use stored full titles rather than projected RDF URLs',()=>{
 
 
 test('executable schema fields hide even stale native values without executing them',()=>{
- const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/NEOWIKIGRAPHTITLETOKEN',definitions:[{name:'Verarbeitung',type:'wikitext',predicateLocalName:'Verarbeitung',execute:true,wikiLink:null,externalProperty:null}]}};
+ const data={version:1,scope:'current',pageId:12,mainSubjectId:sid,fields:[],presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[{name:'Verarbeitung',type:'wikitext',predicateLocalName:'Verarbeitung',execute:true,wikiLink:null,externalProperty:null}]}};
  assert.equal(rows(data,[native('Verarbeitung','{{NichtAusfuehren}}')]).length,0);
  data.presentation.definitions[0].execute=false;
  assert.equal(rows(data,[native('Verarbeitung','{{NichtAusfuehren}}')])[0].own[0].text,'{{NichtAusfuehren}}');

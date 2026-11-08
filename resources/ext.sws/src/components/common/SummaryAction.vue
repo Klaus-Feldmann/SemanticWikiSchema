@@ -1,0 +1,222 @@
+<template>
+	<div class="ext-sws-summary-action">
+		<CdxAccordion ref="accordionRef" @toggle="onAccordionToggle">
+			<template #title>
+				<span class="ext-sws-summary-action__label">
+					{{ props.label || $i18n( 'sws-edit-summary-label' ).text() }}
+					<span class="ext-sws-summary-action__optional-flag">
+						{{ $i18n( 'cdx-label-optional-flag' ).text() }}
+					</span>
+				</span>
+			</template>
+
+			<CdxField
+				:optional="true"
+				:hide-label="true"
+			>
+				<template #label>
+					{{ props.label || $i18n( 'sws-edit-summary-label' ).text() }}
+				</template>
+
+				<CdxTextArea
+					ref="textAreaRef"
+					v-model="editSummary"
+					:placeholder="props.placeholder || $i18n( 'sws-edit-summary-placeholder' ).text()"
+				/>
+			</CdxField>
+		</CdxAccordion>
+
+		<div
+			v-if="props.helpText"
+			class="ext-sws-summary-action__help-text"
+		>
+			{{ props.helpText }}
+		</div>
+
+		<div
+			class="ext-sws-summary-action__actions"
+			:class="{ 'ext-sws-summary-action__actions--with-text': props.footerText !== '' }"
+		>
+			<p
+				v-if="props.footerText"
+				class="ext-sws-summary-action__footer-text"
+			>
+				{{ props.footerText }}
+			</p>
+
+			<CdxButton
+				ref="saveButton"
+				:action="props.saveButtonAction"
+				weight="primary"
+				:disabled="props.saveDisabled"
+				:accesskey="accessKey"
+				:title="accessKey === undefined ? undefined : props.saveButtonLabel"
+				@click="onSaveClick"
+			>
+				<CdxIcon :icon="props.saveButtonIcon" />
+				{{ props.saveButtonLabel }}
+			</CdxButton>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, onUpdated, ref } from 'vue';
+import { CdxButton, CdxField, CdxIcon, CdxTextArea, CdxAccordion } from '@wikimedia/codex';
+import { cdxIconCheck } from '@wikimedia/codex-icons';
+import type { Icon } from '@wikimedia/codex-icons';
+import { useDialogStack } from '@/composables/useDialogStack.ts';
+import { isAccordionOpen } from '@/codex/accordionOpen.ts';
+
+const props = withDefaults(
+	defineProps<{
+		helpText: string;
+		saveButtonLabel: string;
+		saveDisabled: boolean;
+		// A note about what the save does, shown in the button row. With one, the button
+		// sizes to its label rather than spanning the row.
+		footerText?: string;
+		saveButtonAction?: 'progressive' | 'destructive';
+		saveButtonIcon?: Icon;
+		label?: string;
+		placeholder?: string;
+	}>(),
+	{
+		footerText: '',
+		saveButtonAction: 'progressive',
+		saveButtonIcon: () => cdxIconCheck,
+		// Default to the edit-summary wording; callers such as the delete dialog override these
+		// to label the field a "reason".
+		label: '',
+		placeholder: ''
+	}
+);
+
+const editSummary = ref( '' );
+const accordionRef = ref<InstanceType<typeof CdxAccordion> | null>( null );
+const textAreaRef = ref<InstanceType<typeof CdxTextArea> | null>( null );
+const saveButton = ref<InstanceType<typeof CdxButton> | null>( null );
+
+// Mounted exactly while its dialog is open, so it stands for that dialog in the stack.
+const inFront = useDialogStack( true );
+
+// As in core, a message of "-" or nothing switches the key off.
+const wikiSaveKey = mw.msg( 'accesskey-save' );
+const saveKey = wikiSaveKey === '-' || wikiSaveKey === '' ? undefined : wikiSaveKey;
+
+const accessKey = computed(
+	(): string | undefined => inFront.value && props.saveButtonAction !== 'destructive' ? saveKey : undefined
+);
+
+// Vue resets the title whenever the key or the label changes, which drops the key's name.
+function nameKeyInTooltip(): void {
+	if ( accessKey.value !== undefined && saveButton.value !== null ) {
+		$( saveButton.value.$el ).updateTooltipAccessKeys();
+	}
+}
+
+onMounted( nameKeyInTooltip );
+onUpdated( nameKeyInTooltip );
+
+// A closing dialog stays in the document while it fades out, where its button would still take the key.
+onBeforeUnmount( () => saveButton.value?.$el.removeAttribute( 'accesskey' ) );
+
+const emit = defineEmits<{
+	save: [ summary: string ];
+}>();
+
+const onAccordionToggle = (): void => {
+	if ( isAccordionOpen( accordionRef.value ) && textAreaRef.value ) {
+		const textarea = textAreaRef.value.$el.querySelector( 'textarea' );
+		if ( textarea ) {
+			textarea.focus();
+		}
+	}
+};
+
+const onSaveClick = (): void => {
+	emit( 'save', editSummary.value );
+};
+
+// Lets a parent trigger the save from elsewhere (e.g. Enter in another field) while keeping
+// whatever summary is currently entered, rather than reimplementing the save with an empty one.
+defineExpose( { submit: onSaveClick } );
+
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-summary-action {
+	.cdx-accordion {
+		border-bottom: 0;
+		/* Codex 2.3.2 and later hide an accordion's overflow, which would cut off the header's hover background and focus outline. */
+		overflow: visible;
+
+		> summary {
+			margin-top: -@spacing-50;
+			margin-inline: -@spacing-50;
+		}
+
+		/* Reset the font size from accordion to match CdxField */
+		& .cdx-accordion__header,
+		&__header__title,
+		&__content {
+			font-size: inherit;
+		}
+
+		&__content {
+			padding: 0;
+		}
+	}
+
+	&__optional-flag {
+		color: @color-subtle;
+		font-weight: @font-weight-normal;
+	}
+
+	&__help-text {
+		margin-top: @spacing-50;
+		color: @color-subtle;
+		line-height: @line-height-xx-small;
+
+		/* LESS has trouble with the spacing for the open attribute (Expected identifier but found whitespace [css-syntax-error]). */
+		/* stylelint-disable-next-line @stylistic/selector-attribute-brackets-space-inside */
+		.cdx-accordion:not( [open] ) + & {
+			margin-top: 0;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		margin-top: @spacing-50;
+		gap: @spacing-75;
+
+		.cdx-button {
+			width: @size-full;
+			max-width: @max-width-base;
+		}
+
+		&--with-text {
+			align-items: center;
+			justify-content: space-between;
+
+			.cdx-button {
+				width: auto;
+				flex-shrink: 0;
+			}
+		}
+	}
+
+	&__footer-text {
+		flex: 1;
+		/* Without this a flex item refuses to shrink below its content, pushing the button
+			out of the row instead of wrapping the note. */
+		min-width: 0;
+		margin: 0;
+		color: @color-subtle;
+		font-size: @font-size-small;
+		line-height: @line-height-xx-small;
+	}
+}
+</style>

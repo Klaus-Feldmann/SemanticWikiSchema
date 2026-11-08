@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
-use ProfessionalWiki\NeoWiki\Application\Search\MatchedSearchLine;
+use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
 
 /**
  * Renders what a matcher matched as one readable string, the matched stretches in square brackets:

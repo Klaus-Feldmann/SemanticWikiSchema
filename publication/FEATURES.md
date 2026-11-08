@@ -14,10 +14,10 @@ Saving relevant subjects reparses the hosting page; schema changes enqueue affec
 
 The complete read interface exposes current main/additional subjects with definitions, ordered fields, status, values, descriptions, source identities and relationships. JSON preserves that model. Turtle and TriG include effective assertions, separately described own/source assertions and complete metadata. Raw subject editing APIs, graph-store projections and named stored-value mappings remain separate. A failed complete resolution returns a download error instead of a silently partial file.
 
-The separately distributed MCP patch advertises a complete-view read tool when SchemaBaseBridge or its predecessor NeoWikiBaseBridge is detected. It does not execute schema Wikitext, write SMW or change authentication. Its source/runtime baseline is MediaWiki-MCP 0.20.1; future versions require reconciliation.
+The separately distributed MCP patch advertises a complete-view read tool when SchemaBaseBridge or its predecessor SWSBaseBridge is detected. It does not execute schema Wikitext, write SMW or change authentication. Its source/runtime baseline is MediaWiki-MCP 0.20.1; future versions require reconciliation.
 
 The graph build is a guarded extension of captured Graph Explorer bundles, with exact embedded sources and a matching upstream source reference included. It is not presented as an independently refactored Graph Explorer source distribution. Neo4j/Docker demo compatibility and other parser/backend combinations have not been revalidated for this fork.
 
-The extension registry and Composer installation name are SemanticWikiSchema. Existing neowiki APIs, config keys, data and custom hooks remain stable identifiers. Only the documented MW 1.47 legacy-parser deployment is supported. There is no supported Docker installation.
+The extension registry and Composer installation name are SemanticWikiSchema. Existing sws APIs, config keys, data and custom hooks remain stable identifiers. Only the documented MW 1.47 legacy-parser deployment is supported. There is no supported Docker installation.
 
 Schema presets initialize new subjects without overwriting existing values. URL presets may omit the address; incomplete optional presets are not persisted as source assertions. Individual Lua queries remain read-only, and legacy annotation calls are harmless.

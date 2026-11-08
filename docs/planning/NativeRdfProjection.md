@@ -26,11 +26,11 @@ Everything else this document asked has been answered — see [Decided](#decided
 
 ## Purpose
 
-Why NeoWiki has a projection of its own, and in the shape it has. The projection determines what RDF a triple store
+Why SWS has a projection of its own, and in the shape it has. The projection determines what RDF a triple store
 holds and therefore what SPARQL queries users can write, so it is a design decision rather than a serialization
 detail; [ADR 19](../adr/019-graph-database-architecture.md) puts it behind the SPARQL plugin.
 
-The native projection is RDF in NeoWiki's own vocabulary: lossless, self-sufficient, and the default when no ontology
+The native projection is RDF in SWS's own vocabulary: lossless, self-sufficient, and the default when no ontology
 mapping is configured. It also settles the infrastructure every projection shares — the IRI and namespace regime,
 per-page named graphs, and the store sync. Native and ontology projections are siblings: a store holds one or more,
 each in its own family of per-page named graphs, and is queried in the vocabulary of whichever projection a query
@@ -46,13 +46,13 @@ this document.
 3. **Standard RDF 1.1.** No dependency on RDF-star/RDF 1.2, which is still a Working Draft and not supported by
    QLever. Can be adopted later as an optimization.
 4. **Standard vocabulary where appropriate.** Use established predicates (`rdf:type`, `rdfs:label`) for standard
-   concepts. Use a NeoWiki namespace for domain-specific terms.
+   concepts. Use a SWS namespace for domain-specific terms.
 5. **Per-wiki namespaces.** Each wiki instance mints its own entity and property URIs. Cross-wiki linking is a
    separate concern (via `owl:sameAs` or similar).
 
 ## What it emits
 
-This design has shipped. What NeoWiki actually emits — the IRI and namespace regime, the triples
+This design has shipped. What SWS actually emits — the IRI and namespace regime, the triples
 for Subjects, Statements, Relations and page metadata, the per-page named graphs, and the export endpoints — is
 the [RDF Export reference](../api/rdf-export.md); the [Person → EDM example](../guide/person-to-edm.md) shows a real
 page projected. A configured SPARQL store receives each save as a replace of that page's graph and each deletion as
@@ -65,23 +65,23 @@ that write path, and the targets it is held to, are in the
 - **Ontology mapping.** The [Global Properties](GlobalProperties.md) document concluded that ontology alignment
   (e.g., "Person.Name maps to `foaf:name`") should happen via a separate ontology mapping, not by changing the data
   model. That mapping is designed in [Ontology Mapping](OntologyMapping.md). The projection described here emits
-  NeoWiki-native predicates; an ontology mapping instead projects the data into standard-ontology terms. Ontology
+  SWS-native predicates; an ontology mapping instead projects the data into standard-ontology terms. Ontology
   mappings need to be quite expressive: CIDOC-CRM alignment isn't just predicate renaming — it requires generating
-  intermediate nodes that don't exist in NeoWiki's data. That node synthesis has shipped
+  intermediate nodes that don't exist in SWS's data. That node synthesis has shipped
   ([#1229](https://github.com/ProfessionalWiki/NeoWiki/pull/1229),
   [#1263](https://github.com/ProfessionalWiki/NeoWiki/pull/1263)); the
   [Person → EDM example](../guide/person-to-edm.md) walks a worked case.
   At the ECHOLOT meeting in Bilbao (March 2026), the consortium agreed that wiki admins should be able to define
-  mappings between ontologies they care about and the NeoWiki Schemas of their wiki. This confirmed the
+  mappings between ontologies they care about and the SWS Schemas of their wiki. This confirmed the
   separate-mapping approach, and is why Q2 and Q4 resolved toward keeping the native projection minimal (see
-  [Decided](#decided)). The plan is that NeoWiki provides the mapping
+  [Decided](#decided)). The plan is that SWS provides the mapping
   mechanism, data modellers in the project create standard mapping + Schema bundles (e.g., for CIDOC-CRM), and users
   can optionally install those bundles where relevant.
 - **Schema definitions as RDF.** Schemas could be expressed as RDFS/OWL classes with property constraints (similar
   to SHACL shapes). Valuable for validation and documentation, but a separate concern — see
   [Q10](#q10-schema-namespace-page).
-- **RDF import.** This document covers the outbound direction (NeoWiki data to RDF). Importing RDF data into
-  NeoWiki Subjects is a T3.2/T4.1 concern and has its own challenges (mapping external ontologies to NeoWiki
+- **RDF import.** This document covers the outbound direction (SWS data to RDF). Importing RDF data into
+  SWS Subjects is a T3.2/T4.1 concern and has its own challenges (mapping external ontologies to SWS
   Schemas).
 - **RDF-star / RDF 1.2.** The grant (T3.2) and the D2.1 system spec refer to "native RDF/RDF*" import/export. The
   native projection deliberately targets standard RDF 1.1 (Relation reification, see Design Principle 3), and QLever,
@@ -102,20 +102,20 @@ should mint URIs?
 *Feedback: There is a URI policy being discussed within ECCCH. Aligning with it would be beneficial. To be
 followed up on.*
 
-*As built: the base URI is configurable — `$wgNeoWikiRdfBaseUri`, defaulting to the wiki's canonical URL
+*As built: the base URI is configurable — `$wgSWSRdfBaseUri`, defaulting to the wiki's canonical URL
 (`$wgCanonicalServer`); see the [RDF Export reference](../api/rdf-export.md). What stays open is which value an
 ECCCH-integrated deployment should be given.*
 
 ### Q8: Writer's schema in RDF
 
-NeoWiki Statements record the "writer's schema", the property type at write time
+SWS Statements record the "writer's schema", the property type at write time
 ([ADR 11](../adr/011-include-writers-schema.md)). The projection omits it, as proposed: it is metadata about the
 Statement rather than about the entity, and useful mainly for debugging and round-tripping. Open: whether a
 "full export" mode should carry it. No issue tracks this.
 
 ### Q10: Schema namespace page
 
-Should NeoWiki emit an RDFS/OWL definition for each Schema (as a class) and each Property Definition (as a property
+Should SWS emit an RDFS/OWL definition for each Schema (as a class) and each Property Definition (as a property
 with domain/range)? This would make the RDF self-describing. Tentative answer: yes, but as a separate enhancement,
 not blocking the initial projection. Partner demand recorded (takin, 2026-07-03): an RDFS export of local Schemas is
 wanted as an input for authoring ontology mappings — a wiki's Schemas are effectively its own ontology, and the

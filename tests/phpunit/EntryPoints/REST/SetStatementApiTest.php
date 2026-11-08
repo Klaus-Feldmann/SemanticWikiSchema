@@ -2,35 +2,35 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\WikiMap\WikiMap;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetStatementApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetStatementApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi
  * @group Database
  */
-class SetStatementApiTest extends NeoWikiIntegrationTestCase {
+class SetStatementApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SUBJECT_ID = 'sTestSS11111111';
 
@@ -78,7 +78,7 @@ class SetStatementApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function getSubjectFromRepository(): Subject {
-		$subject = NeoWikiExtension::getInstance()
+		$subject = SWSExtension::getInstance()
 			->newSubjectRepository()
 			->getSubject( new SubjectId( self::SUBJECT_ID ) );
 
@@ -519,7 +519,7 @@ class SetStatementApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testEnforcementBlockedReturns422(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 		$this->createSubjectPage();
 
 		$response = $this->executeHandler(

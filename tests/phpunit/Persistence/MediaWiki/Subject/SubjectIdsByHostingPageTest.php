@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectIdsByHostingPage;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectIdsByHostingPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectIdsByHostingPage
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectIdsByHostingPage
  */
 class SubjectIdsByHostingPageTest extends TestCase {
 

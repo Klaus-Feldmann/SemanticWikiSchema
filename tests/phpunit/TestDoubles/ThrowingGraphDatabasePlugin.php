@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 use RuntimeException;
 
 /**
@@ -19,7 +19,7 @@ class ThrowingGraphDatabasePlugin implements GraphDatabasePlugin {
 
 	/**
 	 * @param string $message What the backend reports on failure. A real client quotes the connection
-	 *        URI it tried, so tests about how NeoWiki relays that message pass one in.
+	 *        URI it tried, so tests about how SWS relays that message pass one in.
 	 */
 	public function __construct(
 		private readonly string $message = self::FAILURE_MESSAGE

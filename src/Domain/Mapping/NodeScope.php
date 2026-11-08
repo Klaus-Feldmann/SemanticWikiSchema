@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 /**
  * How many instances of a {@see NodeMapping} a Subject gets.

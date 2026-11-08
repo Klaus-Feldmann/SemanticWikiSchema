@@ -2,48 +2,48 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
 use Psr\Log\LogLevel;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPageProperties;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestPageProperties;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 use Psr\Log\NullLogger;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector
  */
 class RdfPageProjectorTest extends TestCase {
 
@@ -71,29 +71,29 @@ class RdfPageProjectorTest extends TestCase {
 	}
 
 	public function testExecutableWikitextDoesNotExportDormantSubjectValues(): void {
-		$property = \ProfessionalWiki\NeoWiki\Domain\Schema\Property\WikitextProperty::fromPartialJson(
-			new \ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore( '', false, null ), [ 'execute' => true, 'wikitext' => '{{NeoWiki}}' ] );
+		$property = \ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty::fromPartialJson(
+			new \ProfessionalWiki\SWS\Domain\Schema\PropertyCore( '', false, null ), [ 'execute' => true, 'wikitext' => '{{SWS}}' ] );
 		$schema = TestSchema::build( name: 'Company', properties: new PropertyDefinitions( [ 'Auswertung' => $property ] ) );
 		$subject = TestSubject::build( id: self::ACME_ID, schemaName: new SchemaName( 'Company' ), statements: new StatementList( [
 			TestStatement::build( 'Auswertung', new StringValue( '{{NichtAusfuehren}}' ), 'wikitext' ),
 		] ) );
 		$output = $this->serialize( $this->newProjector( new InMemorySchemaLookup( $schema ) )->projectPage( TestPage::build( id: 42, mainSubject: $subject ) ) );
 		$this->assertStringNotContainsString( 'NichtAusfuehren', $output );
-		$this->assertStringNotContainsString( '{{NeoWiki}}', $output );
+		$this->assertStringNotContainsString( '{{SWS}}', $output );
 	}
 
 	public function testStructuredUrlsKeepDirectLinksAndEntryMetadataTogether(): void {
 		$entry = [ 'url' => 'https://example.org/?a=1&b=2', 'label' => 'Article', 'caption' => 'Website', 'captionPage' => 'Vermerk:Quelle' ];
 		$subject = TestSubject::build( id: self::ACME_ID, schemaName: new SchemaName( 'Company' ), statements: new StatementList( [
-			TestStatement::build( 'Website', new \ProfessionalWiki\NeoWiki\Domain\Value\UrlValue( [ $entry ] ), 'url' ),
+			TestStatement::build( 'Website', new \ProfessionalWiki\SWS\Domain\Value\UrlValue( [ $entry ] ), 'url' ),
 		] ) );
 		$quads = $this->newProjector( new InMemorySchemaLookup( $this->companySchema() ) )->projectPage( TestPage::build( id: 42, mainSubject: $subject ) );
 		$iri = $this->ns->subject( new SubjectId( self::ACME_ID ) );
 		$this->assertTrue( $quads->contains( $this->quad( $iri, $this->ns->property( 'Website' ), new Iri( $entry['url'] ) ) ) );
 		$node = new Iri( $iri->value . '/url/Website/0' );
-		$this->assertTrue( $quads->contains( $this->quad( $iri, new Iri( 'urn:neowiki:aewi:urlEntry' ), $node ) ) );
+		$this->assertTrue( $quads->contains( $this->quad( $iri, new Iri( 'urn:sws:aewi:urlEntry' ), $node ) ) );
 		foreach ( [ 'label', 'caption', 'captionPage' ] as $key ) {
-			$this->assertTrue( $quads->contains( $this->quad( $node, new Iri( 'urn:neowiki:aewi:url:' . $key ), RdfLiteralFactory::typed( $entry[$key], 'string' ) ) ) );
+			$this->assertTrue( $quads->contains( $this->quad( $node, new Iri( 'urn:sws:aewi:url:' . $key ), RdfLiteralFactory::typed( $entry[$key], 'string' ) ) ) );
 		}
 	}
 
@@ -121,8 +121,8 @@ class RdfPageProjectorTest extends TestCase {
 
 	public function testSelectLabelsFollowSchemaWithoutChangingStoredIds(): void {
 		$property = TestProperty::buildSelect( options: [
-			new \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption( 'o3mCfVwqD2CoPZ2', 'Abschrift' ),
-			new \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption( 'oYcntVhGv5wRnWL', 'Abhandlung' ),
+			new \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption( 'o3mCfVwqD2CoPZ2', 'Abschrift' ),
+			new \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption( 'oYcntVhGv5wRnWL', 'Abhandlung' ),
 		], multiple: true );
 		$value = new StringValue( 'o3mCfVwqD2CoPZ2', 'oYcntVhGv5wRnWL', 'deleted-option' );
 		$subject = TestSubject::build(
@@ -137,8 +137,8 @@ class RdfPageProjectorTest extends TestCase {
 		$page = TestPage::build( id: 42, mainSubject: $subject );
 		foreach ( [ 'Abschrift', 'Neue Bezeichnung' ] as $label ) {
 			$current = $label === 'Abschrift' ? $property : TestProperty::buildSelect( options: [
-				new \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption( 'o3mCfVwqD2CoPZ2', $label ),
-				new \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption( 'oYcntVhGv5wRnWL', 'Abhandlung' ),
+				new \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption( 'o3mCfVwqD2CoPZ2', $label ),
+				new \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption( 'oYcntVhGv5wRnWL', 'Abhandlung' ),
 			], multiple: true );
 			$lookup = new InMemorySchemaLookup( TestSchema::build(
 				name: 'Werk', properties: new PropertyDefinitions( [ 'New field name' => $current ] )
@@ -161,7 +161,7 @@ class RdfPageProjectorTest extends TestCase {
 		foreach ( [ 'Werk' => 'Abschrift', 'Other' => 'Andere Bedeutung' ] as $name => $label ) {
 			$lookup = new InMemorySchemaLookup( TestSchema::build(
 				name: $name, properties: new PropertyDefinitions( [ 'Kind' => TestProperty::buildSelect( options: [
-					new \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption( 'same-id', $label ),
+					new \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption( 'same-id', $label ),
 				] ) ] )
 			) );
 			foreach ( [ new StringValue( 'same-id' ), new StringValue() ] as $value ) {

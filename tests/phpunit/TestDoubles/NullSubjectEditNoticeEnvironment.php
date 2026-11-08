@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\EditNotice\SubjectEditNoticeEnvironment;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeContext;
+use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeEnvironment;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
 
 class NullSubjectEditNoticeEnvironment implements SubjectEditNoticeEnvironment {
 

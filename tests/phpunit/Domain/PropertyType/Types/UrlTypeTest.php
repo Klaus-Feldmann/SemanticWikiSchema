@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\PropertyType\Types;
+namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType
+ * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType
  */
 class UrlTypeTest extends TestCase {
 

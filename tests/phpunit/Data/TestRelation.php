@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Data;
+namespace ProfessionalWiki\SWS\Tests\Data;
 
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\IncrementalIdGenerator;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Tests\TestDoubles\IncrementalIdGenerator;
 
 /**
- * @see \ProfessionalWiki\NeoWiki\Domain\Relation\Relation
+ * @see \ProfessionalWiki\SWS\Domain\Relation\Relation
  */
 class TestRelation {
 

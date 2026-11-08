@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
 use Psr\Log\LogLevel;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfStreamWriter
+ * @covers \ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer
+ * @covers \ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfStreamWriter
  */
 class HardfRdfSerializerTest extends TestCase {
 

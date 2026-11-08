@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use StatusValue;
 
 /**
@@ -24,14 +24,14 @@ use StatusValue;
  *
  * The counterpart of RebuildPathPropagatesProjectionFailureTest, which guards the opposite need on
  * the maintenance path. Both are wiring tests on purpose: the decorator has its own unit tests, but
- * without these nothing would catch NeoWikiExtension being rewired to the propagating composite,
+ * without these nothing would catch SWSExtension being rewired to the propagating composite,
  * which would silently restore the outage-hard-fails-the-edit behavior that #1028 removed.
  *
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+ * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
  * @group Database
  */
-class HookPathIsolatesProjectionFailureTest extends NeoWikiIntegrationTestCase {
+class HookPathIsolatesProjectionFailureTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -43,7 +43,7 @@ class HookPathIsolatesProjectionFailureTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// The tests rebuild the singleton with extra plugins registered; reset it so later tests get a
 		// clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testEditCommitsWhenABackendIsDown(): void {

@@ -2,8 +2,8 @@ import type { ExtensionPack } from './types.ts';
 import { smwPack } from './smw/index.ts';
 import { bucketPack } from './bucket/index.ts';
 import { cargoPack } from './cargo/index.ts';
-import { neowikiPack } from './neowiki/index.ts';
-import { neowikiBasePack } from './neowikibase/index.ts';
+import { swsPack } from './sws/index.ts';
+import { swsBasePack } from './swsbase/index.ts';
 import { wikibasePack } from './wikibase/index.ts';
 
 export type { ExtensionPack } from './types.ts';
@@ -96,8 +96,8 @@ export const extensionPacks: readonly ExtensionPack[] = [
 	smwPack,
 	bucketPack,
 	cargoPack,
-	neowikiPack,
-	neowikiBasePack,
+	swsPack,
+	swsBasePack,
 	wikibasePack,
 ];
 

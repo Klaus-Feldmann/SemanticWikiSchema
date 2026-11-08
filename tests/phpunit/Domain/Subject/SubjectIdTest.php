@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Subject;
+namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubIdGenerator;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId
+ * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectId
  */
 class SubjectIdTest extends TestCase {
 

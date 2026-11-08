@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
 
 /**
  * {{#sparql_raw: <query> }} — outputs the W3C `application/sparql-results+json` document as pretty
  * JSON text, exactly like {{#cypher_raw}} renders its rows. The read-side sibling of
- * {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction}.
+ * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction}.
  */
 class SparqlRawParserFunction {
 
@@ -43,7 +43,7 @@ class SparqlRawParserFunction {
 		$json = json_encode( $result->document, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 
 		if ( $json === false ) {
-			return $this->formatError( $parser->msg( 'neowiki-sparql-raw-error-json-encode' )->text() );
+			return $this->formatError( $parser->msg( 'sws-sparql-raw-error-json-encode' )->text() );
 		}
 
 		return $this->formatResult( $json );
@@ -53,7 +53,7 @@ class SparqlRawParserFunction {
 	 * @return array{0: string, noparse: true, isHTML: true}
 	 */
 	private function formatResult( string $json ): array {
-		return $this->asHtml( '<div class="mw-neowiki-sparql-result"><pre>' . htmlspecialchars( $json ) . '</pre></div>' );
+		return $this->asHtml( '<div class="mw-sws-sparql-result"><pre>' . htmlspecialchars( $json ) . '</pre></div>' );
 	}
 
 	/**

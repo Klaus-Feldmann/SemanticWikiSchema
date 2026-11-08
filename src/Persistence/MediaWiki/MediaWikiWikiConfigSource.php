@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Permissions\Authority;
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigSource;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigSource;
 use Throwable;
 
 /**
@@ -65,7 +65,7 @@ class MediaWikiWikiConfigSource implements WikiConfigSource {
 			return $decoded;
 		}
 
-		$this->logger->warning( 'The MediaWiki:NeoWiki configuration page is not a JSON object; ignoring it.' );
+		$this->logger->warning( 'The MediaWiki:SWS configuration page is not a JSON object; ignoring it.' );
 
 		return null;
 	}

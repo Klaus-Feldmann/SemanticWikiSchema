@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySort;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
 use stdClass;
 use Wikimedia\Rdbms\DBQueryTimeoutError;
 use Wikimedia\Rdbms\IExpression;
@@ -34,8 +34,8 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
 class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 
 	private const string ALIAS = 'subject';
-	private const string SUBJECT_ID = self::ALIAS . '.nws_subject_id';
-	private const string NAME_KEY = self::ALIAS . '.nws_display_name_key';
+	private const string SUBJECT_ID = self::ALIAS . '.swss_subject_id';
+	private const string NAME_KEY = self::ALIAS . '.swss_display_name_key';
 
 	private const int OVERFETCH_FACTOR = 4;
 
@@ -122,9 +122,9 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 		return match ( $sort ) {
 			SubjectSummarySort::Newest => null,
 			SubjectSummarySort::Name => self::NAME_KEY,
-			SubjectSummarySort::Schema => self::ALIAS . '.nws_schema',
-			SubjectSummarySort::Page => self::ALIAS . '.nws_page_key',
-			SubjectSummarySort::Edited => self::ALIAS . '.nws_edited',
+			SubjectSummarySort::Schema => self::ALIAS . '.swss_schema',
+			SubjectSummarySort::Page => self::ALIAS . '.swss_page_key',
+			SubjectSummarySort::Edited => self::ALIAS . '.swss_edited',
 		};
 	}
 
@@ -183,11 +183,11 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 
 		$builder = $db->newSelectQueryBuilder()
 			->select( [
-				'nws_subject_id', 'nws_schema', 'nws_display_name', 'nws_display_name_key', 'nws_page_key', 'nws_edited',
+				'swss_subject_id', 'swss_schema', 'swss_display_name', 'swss_display_name_key', 'swss_page_key', 'swss_edited',
 				'page_id', 'page_namespace', 'page_title',
 			] )
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE, self::ALIAS )
-			->join( 'page', null, 'page_id = ' . self::ALIAS . '.nws_page_id' )
+			->join( 'page', null, 'page_id = ' . self::ALIAS . '.swss_page_id' )
 			->where( $runConditions )
 			->orderBy( $orderColumns, $direction )
 			->limit( $limit )
@@ -197,9 +197,9 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 			->caller( __METHOD__ );
 
 		if ( $query->schemaName === null ) {
-			$builder->andWhere( [ self::ALIAS . '.nws_dependent' => 0 ] );
+			$builder->andWhere( [ self::ALIAS . '.swss_dependent' => 0 ] );
 		} else {
-			$builder->andWhere( [ self::ALIAS . '.nws_schema' => $query->schemaName->getText() ] );
+			$builder->andWhere( [ self::ALIAS . '.swss_schema' => $query->schemaName->getText() ] );
 		}
 
 		if ( $query->search !== '' ) {
@@ -233,7 +233,7 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 		$containingKey = new LikeValue( $db->anyString(), CaseInsensitiveKey::of( $search ), $db->anyString() );
 
 		return $db->expr( self::NAME_KEY, IExpression::LIKE, $containingKey )
-			->or( self::ALIAS . '.nws_page_key', IExpression::LIKE, $containingKey )
+			->or( self::ALIAS . '.swss_page_key', IExpression::LIKE, $containingKey )
 			->or( self::SUBJECT_ID, IExpression::LIKE, new LikeValue( $search, $db->anyString() ) );
 	}
 
@@ -247,9 +247,9 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 	 * @return array{summary: SubjectSummary, title: Title, cursor: SubjectSummaryCursor}
 	 */
 	private function toRow( stdClass $row, SubjectSummaryQuery $query ): array {
-		$id = (string)$row->nws_subject_id;
-		$schemaName = (string)$row->nws_schema;
-		$name = $row->nws_display_name === null ? null : (string)$row->nws_display_name;
+		$id = (string)$row->swss_subject_id;
+		$schemaName = (string)$row->swss_schema;
+		$name = $row->swss_display_name === null ? null : (string)$row->swss_display_name;
 		$title = $this->titleFactory->newFromRow( $row );
 
 		return [
@@ -260,7 +260,7 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 				schemaName: $schemaName,
 				pageId: $title->getId(),
 				pageTitle: $title->getPrefixedText(),
-				lastEdited: (string)ConvertibleTimestamp::convert( TS_ISO_8601, $row->nws_edited ),
+				lastEdited: (string)ConvertibleTimestamp::convert( TS_ISO_8601, $row->swss_edited ),
 				hostSubject: null,
 			),
 			'title' => $title,
@@ -271,10 +271,10 @@ class DatabaseSubjectSummaryLookup implements SubjectSummaryLookup {
 	private function sortValueOf( stdClass $row, SubjectSummarySort $sort ): string|int|null {
 		return match ( $sort ) {
 			SubjectSummarySort::Newest => null,
-			SubjectSummarySort::Name => $row->nws_display_name_key === null ? null : (string)$row->nws_display_name_key,
-			SubjectSummarySort::Schema => (string)$row->nws_schema,
-			SubjectSummarySort::Page => (string)$row->nws_page_key,
-			SubjectSummarySort::Edited => (int)ConvertibleTimestamp::convert( TS_UNIX, $row->nws_edited ),
+			SubjectSummarySort::Name => $row->swss_display_name_key === null ? null : (string)$row->swss_display_name_key,
+			SubjectSummarySort::Schema => (string)$row->swss_schema,
+			SubjectSummarySort::Page => (string)$row->swss_page_key,
+			SubjectSummarySort::Edited => (int)ConvertibleTimestamp::convert( TS_UNIX, $row->swss_edited ),
 		};
 	}
 

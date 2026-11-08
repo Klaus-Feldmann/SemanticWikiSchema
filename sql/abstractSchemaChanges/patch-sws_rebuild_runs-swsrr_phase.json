@@ -1,0 +1,232 @@
+{
+	"before": {
+		"name": "sws_rebuild_runs",
+		"comment": "One row per graph rebuild run. A run reprojects the wiki into exactly one graph store, so rebuilding every store is one row each. The row carries the progress a resumed run picks up from, and outlives the run as its record.",
+		"columns": [
+			{
+				"name": "swsrr_id",
+				"type": "integer",
+				"options": {
+					"autoincrement": true,
+					"unsigned": true,
+					"notnull": true
+				}
+			},
+			{
+				"name": "swsrr_store",
+				"comment": "Name of the graph store this run rebuilds, as configured (see SparqlStoreConfig::$name and Neo4jPlugin::STORE_NAME)",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 255
+				}
+			},
+			{
+				"name": "swsrr_status",
+				"comment": "queued, running, succeeded, failed or cancelled",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			},
+			{
+				"name": "swsrr_cursor",
+				"comment": "Page id the run last dealt with in its current phase. A resumed run continues after it. 0 before the phase has read a page.",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_processed",
+				"comment": "Pages projected into the store so far",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_failed",
+				"comment": "Pages the run could not reconcile, having failed to project or to remove them",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_trigger",
+				"comment": "What started the run: cli, api, ui or auto",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			},
+			{
+				"name": "swsrr_started",
+				"type": "mwtimestamp",
+				"options": {
+					"notnull": true
+				}
+			},
+			{
+				"name": "swsrr_finished",
+				"comment": "When the run reached a terminal status. Null while it is running.",
+				"type": "mwtimestamp",
+				"options": {
+					"notnull": false
+				}
+			},
+			{
+				"name": "swsrr_error",
+				"comment": "The store-level error that failed the run. Null unless it failed.",
+				"type": "blob",
+				"options": {
+					"notnull": false,
+					"length": 65530
+				}
+			}
+		],
+		"indexes": [
+			{
+				"name": "swsrr_store_started",
+				"comment": "Index for finding a store's active run, and its most recent one",
+				"columns": [
+					"swsrr_store",
+					"swsrr_started"
+				],
+				"unique": false
+			}
+		],
+		"pk": [
+			"swsrr_id"
+		]
+	},
+	"after": {
+		"name": "sws_rebuild_runs",
+		"comment": "One row per graph rebuild run. A run reprojects the wiki into exactly one graph store, so rebuilding every store is one row each. The row carries the progress a resumed run picks up from, and outlives the run as its record.",
+		"columns": [
+			{
+				"name": "swsrr_id",
+				"type": "integer",
+				"options": {
+					"autoincrement": true,
+					"unsigned": true,
+					"notnull": true
+				}
+			},
+			{
+				"name": "swsrr_store",
+				"comment": "Name of the graph store this run rebuilds, as configured (see SparqlStoreConfig::$name and Neo4jPlugin::STORE_NAME)",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 255
+				}
+			},
+			{
+				"name": "swsrr_status",
+				"comment": "queued, running, succeeded, failed or cancelled",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			},
+			{
+				"name": "swsrr_phase",
+				"comment": "Which half of the rebuild the run is in: pages (reprojecting the wiki's pages) or deletions (removing the pages MediaWiki no longer has). The cursor is a position within this phase.",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32,
+					"default": "pages"
+				}
+			},
+			{
+				"name": "swsrr_cursor",
+				"comment": "Page id the run last dealt with in its current phase. A resumed run continues after it. 0 before the phase has read a page.",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_processed",
+				"comment": "Pages projected into the store so far",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_failed",
+				"comment": "Pages the run could not reconcile, having failed to project or to remove them",
+				"type": "integer",
+				"options": {
+					"notnull": true,
+					"unsigned": true,
+					"default": 0
+				}
+			},
+			{
+				"name": "swsrr_trigger",
+				"comment": "What started the run: cli, api, ui or auto",
+				"type": "binary",
+				"options": {
+					"notnull": true,
+					"length": 32
+				}
+			},
+			{
+				"name": "swsrr_started",
+				"type": "mwtimestamp",
+				"options": {
+					"notnull": true
+				}
+			},
+			{
+				"name": "swsrr_finished",
+				"comment": "When the run reached a terminal status. Null while it is running.",
+				"type": "mwtimestamp",
+				"options": {
+					"notnull": false
+				}
+			},
+			{
+				"name": "swsrr_error",
+				"comment": "The store-level error that failed the run. Null unless it failed.",
+				"type": "blob",
+				"options": {
+					"notnull": false,
+					"length": 65530
+				}
+			}
+		],
+		"indexes": [
+			{
+				"name": "swsrr_store_started",
+				"comment": "Index for finding a store's active run, and its most recent one",
+				"columns": [
+					"swsrr_store",
+					"swsrr_started"
+				],
+				"unique": false
+			}
+		],
+		"pk": [
+			"swsrr_id"
+		]
+	}
+}

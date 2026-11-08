@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Application\Exception;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application\Exception;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException
  */
 class QueryExceptionTest extends TestCase {
 

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
 
 /**
  * Which of the given Subjects each page hosts. Subjects hosted by no page are absent, so a page

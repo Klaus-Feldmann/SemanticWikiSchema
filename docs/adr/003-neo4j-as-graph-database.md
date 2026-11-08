@@ -23,14 +23,14 @@ MediaWiki query language. It is more concise than SPARQL and has a more intuitiv
 
 Use Neo4j as initial graph database.
 
-Consider neo4j as part of NeoWiki's public API. This means consumers can directly read from the graph database.
+Consider neo4j as part of SWS's public API. This means consumers can directly read from the graph database.
 
 ## Consequences
 
-* A Neo4j instance will be needed to run NeoWiki.
+* A Neo4j instance will be needed to run SWS.
 * We do not need to develop and maintain our own persistence solution.
 * We can use existing tools and libraries to work with Neo4j.
 * Users will be able to use Cypher queries.
 * Various parts of the software will bind to Cypher and Neo4j. Additional implementation and
   abstractions will need to be created to support other graph databases.
-* Potential out-of-the-box visualization options that can be integrated into NeoWiki.
+* Potential out-of-the-box visualization options that can be integrated into SWS.

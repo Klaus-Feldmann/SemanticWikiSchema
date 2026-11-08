@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use ProfessionalWiki\RedHerb\Specials\SpecialRedHerbContentPageCount;
 
 /**
  * @covers \ProfessionalWiki\RedHerb\Specials\SpecialRedHerbContentPageCount
  * @group Database
  */
-class SpecialRedHerbContentPageCountTest extends NeoWikiIntegrationTestCase {
+class SpecialRedHerbContentPageCountTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();

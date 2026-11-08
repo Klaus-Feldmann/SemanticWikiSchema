@@ -4,7 +4,7 @@ order: 2
 ---
 # Subject-first wikis
 
-A NeoWiki wiki runs in one of two modes, page-first or subject-first, for all its Subjects. Both store each Subject on a
+A SWS wiki runs in one of two modes, page-first or subject-first, for all its Subjects. Both store each Subject on a
 wiki page, with full version history.
 
 **Page-first**, the default: each page is about one thing, and its Subjects hold data about it, as in Semantic

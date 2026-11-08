@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\HookContainer\HookContainer;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\PermissionStatus;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
 use Skin;
 
 class FrontendModuleLoader {
@@ -31,22 +31,22 @@ class FrontendModuleLoader {
 	}
 
 	public function load( OutputPage $out, Skin $skin ): void {
-		$out->addModules( 'ext.neowiki' );
-		$out->addModuleStyles( 'ext.neowiki.styles' );
+		$out->addModules( 'ext.sws' );
+		$out->addModuleStyles( 'ext.sws.styles' );
 
 		$out->addJsConfigVars( [
-			'wgNeoWikiValidationDebounceMs' => $this->validationDebounceMs,
-			'wgNeoWikiEnforceValidation' => $this->validationEnforced,
-			'wgNeoWikiSubjectFirst' => $this->subjectFirst,
-			'wgNeoWikiDataLanguages' => $this->dataLanguages,
+			'wgSWSValidationDebounceMs' => $this->validationDebounceMs,
+			'wgSWSEnforceValidation' => $this->validationEnforced,
+			'wgSWSSubjectFirst' => $this->subjectFirst,
+			'wgSWSDataLanguages' => $this->dataLanguages,
 			// The counts include Subjects on pages the viewer may not read, so only a viewer who may run queries
 			// gets them.
-			'wgNeoWikiSubjectCountsAvailable' => $out->getAuthority()->isAllowed( AuthorityBasedRawQueryAuthorizer::RIGHT ),
+			'wgSWSSubjectCountsAvailable' => $out->getAuthority()->isAllowed( AuthorityBasedRawQueryAuthorizer::RIGHT ),
 		] );
 
 		/** @var list<string> $modules populated by hook handlers */
 		$modules = [];
-		$this->hookContainer->run( 'NeoWikiGetFrontendModules', [ &$modules, $out, $skin ] );
+		$this->hookContainer->run( 'SWSGetFrontendModules', [ &$modules, $out, $skin ] );
 
 		$out->addModules( $modules );
 	}
@@ -57,7 +57,7 @@ class FrontendModuleLoader {
 	 */
 	public function loadCreateSubjectPageDeniedReason( OutputPage $out ): void {
 		$out->addJsConfigVars( [
-			'wgNeoWikiCreateSubjectPageDeniedReason' => $this->subjectPageCreationDeniedReason( $out ),
+			'wgSWSCreateSubjectPageDeniedReason' => $this->subjectPageCreationDeniedReason( $out ),
 		] );
 	}
 
@@ -93,7 +93,7 @@ class FrontendModuleLoader {
 		$this->load( $out, $skin );
 
 		$out->addJsConfigVars( [
-			'wgNeoWikiCanEditPageSubjects' => $canEditPageSubjects,
+			'wgSWSCanEditPageSubjects' => $canEditPageSubjects,
 		] );
 	}
 

@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectQuery;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\RestGetSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\RestGetSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetSubjectApi extends SimpleHandler {
@@ -24,7 +24,7 @@ class GetSubjectApi extends SimpleHandler {
 
 	public function run( string $subjectId ): Response {
 		// Validate the ID shape first, so a malformed value is a clean 400 rather than becoming a 500.
-		$parsedId = NeoWikiExtension::getInstance()->getSubjectIdParser()->parse( $subjectId );
+		$parsedId = SWSExtension::getInstance()->getSubjectIdParser()->parse( $subjectId );
 
 		if ( $parsedId === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
@@ -73,7 +73,7 @@ class GetSubjectApi extends SimpleHandler {
 			return $this->newQueryForLatestRevision( $presenter, $subjectId );
 		}
 
-		return NeoWikiExtension::getInstance()->newGetSubjectQuery( $presenter, $this->getAuthority() );
+		return SWSExtension::getInstance()->newGetSubjectQuery( $presenter, $this->getAuthority() );
 	}
 
 	private function newQueryForRevisionId( RestGetSubjectPresenter $presenter, int $revisionId ): GetSubjectQuery|Response {
@@ -88,7 +88,7 @@ class GetSubjectApi extends SimpleHandler {
 			] );
 		}
 
-		return NeoWikiExtension::getInstance()->newGetSubjectQueryForRevision( $presenter, $revision, $this->getAuthority() );
+		return SWSExtension::getInstance()->newGetSubjectQueryForRevision( $presenter, $revision, $this->getAuthority() );
 	}
 
 	private function revisionIsReadable( RevisionRecord $revision ): bool {
@@ -97,12 +97,12 @@ class GetSubjectApi extends SimpleHandler {
 	}
 
 	private function revisionPolicyPermits( RevisionRecord $revision ): bool {
-		return NeoWikiExtension::getInstance()->getRevisionPolicy()
+		return SWSExtension::getInstance()->getRevisionPolicy()
 			->revisionIsReadableBy( $revision, $this->getAuthority() );
 	}
 
 	private function revisionPageIsReadable( int $pageId ): bool {
-		return NeoWikiExtension::getInstance()
+		return SWSExtension::getInstance()
 			->newPageReadAuthorizer( $this->getAuthority() )
 			->authorizeReadByPageId( new PageId( $pageId ) );
 	}
@@ -121,11 +121,11 @@ class GetSubjectApi extends SimpleHandler {
 			return $this->getResponseFactory()->createJson( $presenter->getJsonArray() );
 		}
 
-		return NeoWikiExtension::getInstance()->newGetSubjectQueryForRevision( $presenter, $revision, $this->getAuthority() );
+		return SWSExtension::getInstance()->newGetSubjectQueryForRevision( $presenter, $revision, $this->getAuthority() );
 	}
 
 	private function getLatestRevisionOfReadableSubjectPage( SubjectId $subjectId ): ?RevisionRecord {
-		$pageIdentifiers = NeoWikiExtension::getInstance()
+		$pageIdentifiers = SWSExtension::getInstance()
 			->newSubjectHostingPageResolver( $this->getAuthority() )
 			->resolveReadableHostingPage( $subjectId );
 

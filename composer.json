@@ -2,7 +2,7 @@
 	"name": "aufeinwort/semantic-wikischema",
 	"type": "mediawiki-extension",
 	"license": "GPL-2.0-or-later",
-	"description": "Independent NeoWiki fork for research: Wikidata/Wikibase sources, schema-driven SMW annotations and MCP access.",
+	"description": "Schema-based research data entry with Wikidata/Wikibase sources, automatic SMW annotations and MCP access.",
 	"keywords": [
 		"MediaWiki",
 		"knowledge graph",
@@ -64,12 +64,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"ProfessionalWiki\\NeoWiki\\": "src/"
+			"ProfessionalWiki\\SWS\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"ProfessionalWiki\\NeoWiki\\Tests\\": "tests/phpunit/"
+			"ProfessionalWiki\\SWS\\Tests\\": "tests/phpunit/"
 		}
 	},
 	"scripts": {
@@ -78,21 +78,21 @@
 			"cd ${MW_INSTALL_PATH:-../..} && if [ -f phpunit.xml.template ]; then composer phpunit:config; fi && vendor/bin/phpunit -c extensions/SemanticWikiSchema/phpunit.xml.dist --bootstrap tests/phpunit/bootstrap.php"
 		],
 		"dbschema": [
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_rebuild_runs.json --sql sql/mysql/neowiki_rebuild_runs.sql --type mysql",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_rebuild_runs.json --sql sql/sqlite/neowiki_rebuild_runs.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_rebuild_runs.json --sql sql/postgres/neowiki_rebuild_runs.sql --type postgres",
-			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-neowiki_rebuild_runs-nwrr_phase.json --sql sql/mysql/patch-neowiki_rebuild_runs-nwrr_phase.sql --type mysql",
-			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-neowiki_rebuild_runs-nwrr_phase.json --sql sql/sqlite/patch-neowiki_rebuild_runs-nwrr_phase.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-neowiki_rebuild_runs-nwrr_phase.json --sql sql/postgres/patch-neowiki_rebuild_runs-nwrr_phase.sql --type postgres",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject_page.json --sql sql/mysql/neowiki_subject_page.sql --type mysql",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject_page.json --sql sql/sqlite/neowiki_subject_page.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject_page.json --sql sql/postgres/neowiki_subject_page.sql --type postgres",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject.json --sql sql/mysql/neowiki_subject.sql --type mysql",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject.json --sql sql/sqlite/neowiki_subject.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_subject.json --sql sql/postgres/neowiki_subject.sql --type postgres",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_relation.json --sql sql/mysql/neowiki_relation.sql --type mysql",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_relation.json --sql sql/sqlite/neowiki_relation.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/neowiki_relation.json --sql sql/postgres/neowiki_relation.sql --type postgres"
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_rebuild_runs.json --sql sql/mysql/sws_rebuild_runs.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_rebuild_runs.json --sql sql/sqlite/sws_rebuild_runs.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_rebuild_runs.json --sql sql/postgres/sws_rebuild_runs.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_rebuild_runs-swsrr_phase.json --sql sql/mysql/patch-sws_rebuild_runs-swsrr_phase.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_rebuild_runs-swsrr_phase.json --sql sql/sqlite/patch-sws_rebuild_runs-swsrr_phase.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_rebuild_runs-swsrr_phase.json --sql sql/postgres/patch-sws_rebuild_runs-swsrr_phase.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject_page.json --sql sql/mysql/sws_subject_page.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject_page.json --sql sql/sqlite/sws_subject_page.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject_page.json --sql sql/postgres/sws_subject_page.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject.json --sql sql/mysql/sws_subject.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject.json --sql sql/sqlite/sws_subject.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject.json --sql sql/postgres/sws_subject.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/mysql/sws_relation.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/sqlite/sws_relation.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/postgres/sws_relation.sql --type postgres"
 		]
 	},
 	"scripts-descriptions": {
@@ -108,7 +108,7 @@
 	"extra": {
 		"installer-name": "SemanticWikiSchema",
 		"branch-alias": {
-			"dev-semantic-0.1.19": "0.1.x-dev"
+			"dev-semantic-0.1.22": "0.1.x-dev"
 		}
 	},
 	"conflict": {

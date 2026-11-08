@@ -5,7 +5,7 @@ outline: deep
 ---
 # Glossary
 
-Definitions of NeoWiki terms. Concepts are capitalized. Used in the code and UI
+Definitions of SWS terms. Concepts are capitalized. Used in the code and UI
 ([Ubiquitous Language](https://softwaresystemdesign.com/domain-driven-design/ubiquitous-language/)).
 
 ## Core concepts
@@ -41,11 +41,11 @@ Statements have
 
 Example: Property Name "age" with Value `42` and Property Type `number`.
 
-NeoWiki Statements are not equivalent to Wikibase Statements. The latter have a rank, qualifiers, references, and an ID. For similar modeling, NeoWiki uses Subjects (multiple per page). See [Qualifiers and References](qualifiers-and-references.md) for how to model these.
+SWS Statements are not equivalent to Wikibase Statements. The latter have a rank, qualifiers, references, and an ID. For similar modeling, SWS uses Subjects (multiple per page). See [Qualifiers and References](qualifiers-and-references.md) for how to model these.
 
 #### Value
 
-Values have a type, for instance, `string`. This is called the **Value Type**. NeoWiki has a predefined list of
+Values have a type, for instance, `string`. This is called the **Value Type**. SWS has a predefined list of
 these Value Types; each Property Type stores its values as one of them — a `url` property's value is a StringValue.
 
 String, Relation and MonolingualText Values can hold multiple **parts**. For instance, a `url` property's value could
@@ -108,7 +108,7 @@ A Property Definition has:
 #### Property Type
 
 The kind of data a Property Definition holds, and how it is edited and displayed. Examples: "text", "url",
-"number", "relation". Extensions can define additional Property Types ([Extending NeoWiki](extending/extending.md)).
+"number", "relation". Extensions can define additional Property Types ([Extending SWS](extending/extending.md)).
 Each Property Type stores its values as one of the Value Types.
 
 *Avoid: "Value Format", "format" — former names of this concept.*
@@ -191,7 +191,7 @@ properties are hidden.
 
 ### Graph Store
 
-A Graph Store is a database that NeoWiki projects wiki data into so it can be queried, such as Neo4j or SPARQL-capable
+A Graph Store is a database that SWS projects wiki data into so it can be queried, such as Neo4j or SPARQL-capable
 stores. A wiki can have several Graph Stores, each identified by name. Each holds one or more Projections.
 
 *Avoid: "graph database", "graph backend", "triple store" (as names for this concept).*
@@ -201,7 +201,7 @@ stores. A wiki can have several Graph Stores, each identified by name. Each hold
 A Projection is a derived, query-optimized copy of the wiki's data in a Graph Store
 ([ADR 19](adr/019-graph-database-architecture.md)). Page content remains the source of truth; a Projection can
 be rebuilt from it at any time. Every Projection is one of two kinds: the built-in **native projection**,
-which uses NeoWiki's own vocabulary, or an **ontology projection**, defined by a Mapping. Export and query
+which uses SWS's own vocabulary, or an **ontology projection**, defined by a Mapping. Export and query
 surfaces select a Projection by name.
 
 *Avoid: "base mapping", "target ontology" — former names for the native and ontology projections.*
@@ -218,7 +218,7 @@ A key-value pair stored on the Page node in graph Projections. Page Properties a
 itself, as opposed to Subject Statements, which are structured data about the entities described on the page.
 
 Built-in Page Properties include `name`, `namespaceId`, `creationTime`, `lastUpdated`, `categories`, and `lastEditor`.
-Extensions can contribute additional Page Properties (see [Extending NeoWiki](extending/extending.md)).
+Extensions can contribute additional Page Properties (see [Extending SWS](extending/extending.md)).
 
 ## Extending
 

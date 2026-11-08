@@ -1,0 +1,134 @@
+<template>
+	<div class="datetime-attributes cdx-field">
+		<NeoNestedField :optional="true">
+			<template #label>
+				{{ $i18n( 'sws-property-editor-range' ).text() }}
+			</template>
+
+			<CdxField
+				class="datetime-attributes__minimum ext-sws-severity-field"
+				:status="minimumMessage === null ? 'default' : 'error'"
+				:messages="minimumMessage === null ? {} : { error: minimumMessage }"
+			>
+				<template #label>
+					{{ $i18n( 'sws-property-editor-minimum' ).text() }}
+				</template>
+
+				<NeoNativeInput
+					input-type="datetime-local"
+					:model-value="minimumInput"
+					@update:model-value="updateMinimum"
+					@unparseable-change="minimumUnparseable = $event"
+				/>
+				<SeverityInput
+					v-if="property.minimum !== undefined"
+					:constraint="$i18n( 'sws-property-editor-minimum' ).text()"
+					:model-value="property.constraintSeverities?.minimum"
+					@update:model-value="updateSeverity( 'minimum', $event )"
+				/>
+			</CdxField>
+
+			<CdxField
+				class="datetime-attributes__maximum ext-sws-severity-field"
+				:status="maximumMessage === null ? 'default' : 'error'"
+				:messages="maximumMessage === null ? {} : { error: maximumMessage }"
+			>
+				<template #label>
+					{{ $i18n( 'sws-property-editor-maximum' ).text() }}
+				</template>
+
+				<NeoNativeInput
+					input-type="datetime-local"
+					:model-value="maximumInput"
+					@update:model-value="updateMaximum"
+					@unparseable-change="maximumUnparseable = $event"
+				/>
+				<SeverityInput
+					v-if="property.maximum !== undefined"
+					:constraint="$i18n( 'sws-property-editor-maximum' ).text()"
+					:model-value="property.constraintSeverities?.maximum"
+					@update:model-value="updateSeverity( 'maximum', $event )"
+				/>
+			</CdxField>
+		</NeoNestedField>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import { CdxField } from '@wikimedia/codex';
+import { DateTimeProperty } from '@/domain/propertyTypes/DateTime.ts';
+import { fromLocalInputValue, toLocalInputValue } from '@/domain/propertyTypes/dateTimeConversion.ts';
+import { AttributesEditorEmits, AttributesEditorExposes, AttributesEditorProps } from '@/components/SchemaEditor/Property/AttributesEditorContract.ts';
+import NeoNestedField from '@/components/common/NeoNestedField.vue';
+import SeverityInput from '@/components/SchemaEditor/Property/SeverityInput.vue';
+import NeoNativeInput from '@/components/common/NeoNativeInput.vue';
+import { withConstraintSeverity } from '@/domain/PropertyDefinition.ts';
+import type { Severity } from '@/domain/Severity.ts';
+
+const props = defineProps<AttributesEditorProps<DateTimeProperty>>();
+const emit = defineEmits<AttributesEditorEmits<DateTimeProperty>>();
+
+const minimumInput = ref( toLocalInputValue( props.property.minimum ) );
+const maximumInput = ref( toLocalInputValue( props.property.maximum ) );
+const minimumError = ref<string | null>( null );
+const maximumError = ref<string | null>( null );
+const minimumUnparseable = ref<string | null>( null );
+const maximumUnparseable = ref<string | null>( null );
+
+const minimumMessage = computed( () => minimumUnparseable.value ?? minimumError.value );
+const maximumMessage = computed( () => maximumUnparseable.value ?? maximumError.value );
+
+watch( () => props.property.minimum, ( newVal ) => {
+	minimumInput.value = toLocalInputValue( newVal );
+} );
+
+watch( () => props.property.maximum, ( newVal ) => {
+	maximumInput.value = toLocalInputValue( newVal );
+} );
+
+// datetime-local wire values are always `YYYY-MM-DDTHH:mm` in a single
+// timezone (host local), so lexicographic ordering matches chronological.
+// The regex guards against malformed values bypassing the ordering check.
+const DATETIME_LOCAL_WIRE_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+function minExceedsMax( min: string, max: string ): boolean {
+	return DATETIME_LOCAL_WIRE_FORMAT.test( min ) &&
+		DATETIME_LOCAL_WIRE_FORMAT.test( max ) &&
+		min > max;
+}
+
+const updateMinimum = ( value: string ): void => {
+	minimumInput.value = value;
+
+	if ( minExceedsMax( value, maximumInput.value ) ) {
+		minimumError.value = mw.message( 'sws-property-editor-min-exceeds-max' ).text();
+		return;
+	}
+
+	minimumError.value = null;
+	maximumError.value = null;
+	emit( 'update:property', { minimum: fromLocalInputValue( value ) } );
+};
+
+const updateMaximum = ( value: string ): void => {
+	maximumInput.value = value;
+
+	if ( minExceedsMax( minimumInput.value, value ) ) {
+		maximumError.value = mw.message( 'sws-property-editor-min-exceeds-max' ).text();
+		return;
+	}
+
+	maximumError.value = null;
+	minimumError.value = null;
+	emit( 'update:property', { maximum: fromLocalInputValue( value ) } );
+};
+
+const updateSeverity = ( constraint: 'minimum' | 'maximum', severity: Severity ): void => {
+	emit( 'update:property', withConstraintSeverity( props.property, constraint, severity ) );
+};
+
+defineExpose<AttributesEditorExposes>( {
+	unparseableInputMessage: (): string | null => minimumUnparseable.value ?? maximumUnparseable.value
+} );
+</script>

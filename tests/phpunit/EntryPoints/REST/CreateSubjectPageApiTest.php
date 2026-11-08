@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectPageApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectPageApi
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\CreateSubjectPage\CreateSubjectPageAction
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestCreateSubjectPagePresenter
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi
+ * @covers \ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction
+ * @covers \ProfessionalWiki\SWS\Presentation\RestCreateSubjectPagePresenter
  * @group Database
  */
-class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
+class CreateSubjectPageApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private const string SCHEMA = 'Employee';
@@ -114,7 +114,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testTitlesThePageByTheSubjectIdOnASubjectFirstWikiWhateverTheLabel(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$body = $this->bodyOf( $this->create( [ 'label' => 'Amsterdam' ] ) );
 
@@ -124,15 +124,15 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testAnswersTheSubjectNamespaceAsThePagesNamespaceOnASubjectFirstWiki(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$body = $this->bodyOf( $this->create( [] ) );
 
-		$this->assertSame( NeoWikiExtension::NS_SUBJECT, $body['subject']['pageNamespaceId'] );
+		$this->assertSame( SWSExtension::NS_SUBJECT, $body['subject']['pageNamespaceId'] );
 	}
 
 	public function testNamesAnUnlabelledSubjectAfterItsSchemaOnASubjectFirstWiki(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$body = $this->bodyOf( $this->create( [] ) );
 
@@ -141,8 +141,8 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testCreatesThePageInTheMainNamespaceOnASubjectFirstWikiThatChoseIt(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
-		$this->overrideConfigValue( 'NeoWikiSubjectPageNamespace', NS_MAIN );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectPageNamespace', NS_MAIN );
 
 		$body = $this->bodyOf( $this->create( [ 'label' => 'Amsterdam' ] ) );
 
@@ -151,7 +151,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testAnswersBadRequestForAPageTitleOnASubjectFirstWiki(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$response = $this->create( [ 'label' => 'Amsterdam', 'pageTitle' => 'Delft' ] );
 
@@ -161,7 +161,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testTakesAnEmptyPageTitleOnASubjectFirstWikiAsNoneAsked(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$body = $this->bodyOf( $this->create( [ 'label' => 'Amsterdam', 'pageTitle' => ' ' ] ) );
 
@@ -251,9 +251,9 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 		$this->assertSame(
 			(string)Title::newFromText( 'Amsterdam' )->getId(),
 			(string)$this->getDb()->newSelectQueryBuilder()
-				->select( 'nwsp_page_id' )
+				->select( 'swssp_page_id' )
 				->from( DatabaseSubjectPageIndex::TABLE )
-				->where( [ 'nwsp_subject_id' => $body['subjectId'] ] )
+				->where( [ 'swssp_subject_id' => $body['subjectId'] ] )
 				->caller( __METHOD__ )
 				->fetchField()
 		);
@@ -323,7 +323,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 		$this->setTemporaryHook(
 			'MultiContentSave',
 			static function ( $renderedRevision, $user, $summary, $flags, $hookStatus ): bool {
-				$hookStatus->fatal( 'neowiki-test-save-refused' );
+				$hookStatus->fatal( 'sws-test-save-refused' );
 				return false;
 			}
 		);
@@ -331,7 +331,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 		$response = $this->create( [ 'label' => 'Amsterdam' ] );
 
 		$this->assertSame( 500, $response->getStatusCode() );
-		$this->assertStringContainsString( 'neowiki-test-save-refused', $this->bodyOf( $response )['message'] );
+		$this->assertStringContainsString( 'sws-test-save-refused', $this->bodyOf( $response )['message'] );
 	}
 
 	public function testRefusesACallerWhoMayNotCreatePages(): void {
@@ -368,7 +368,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	 * Subject they proposed either.
 	 */
 	public function testRefusesACallerWhoMayNotCreatePagesBeforeValidating(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 		$this->createSchema(
 			'EnforcementSchema',
 			'{"title":"EnforcementSchema","propertyDefinitions":{"Required":{"type":"text","required":{"severity":"error"}}}}'
@@ -396,7 +396,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testReportsValidationFailuresAsTheOtherCreateEndpointsDo(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 		$this->createSchema(
 			'EnforcementSchema',
 			'{"title":"EnforcementSchema","propertyDefinitions":{"Required":{"type":"text","required":{"severity":"error"}}}}'
@@ -534,7 +534,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function subjectNamespaceTitleOf( string $subjectId ): string {
-		return Title::makeTitleSafe( NeoWikiExtension::NS_SUBJECT, $subjectId )->getPrefixedText();
+		return Title::makeTitleSafe( SWSExtension::NS_SUBJECT, $subjectId )->getPrefixedText();
 	}
 
 	private function mainSubjectIdOf( string $pageName ): ?string {
@@ -544,7 +544,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 			return null;
 		}
 
-		return NeoWikiExtension::getInstance()->newSubjectRepository()
+		return SWSExtension::getInstance()->newSubjectRepository()
 			->getSubjectsByPageId( new PageId( $title->getId() ) )
 			->getMainSubject()?->getId()->text;
 	}
@@ -561,7 +561,7 @@ class CreateSubjectPageApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function storedSubject( string $subjectId ): ?Subject {
-		return NeoWikiExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $subjectId ) );
+		return SWSExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $subjectId ) );
 	}
 
 }

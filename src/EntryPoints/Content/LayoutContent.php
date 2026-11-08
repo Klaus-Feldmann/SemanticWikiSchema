@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\EntryPoints\Content;
 
 use MediaWiki\Content\JsonContent;
 
 class LayoutContent extends JsonContent {
 
-	public const string CONTENT_MODEL_ID = 'NeoWikiLayout';
+	public const string CONTENT_MODEL_ID = 'SWSLayout';
 
 	public function __construct( string $text, string $modelId = self::CONTENT_MODEL_ID ) {
 		parent::__construct(

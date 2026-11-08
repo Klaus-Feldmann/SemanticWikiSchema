@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ParserFailureCheck as Check;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ParserFailureCheck as Check;
 final class ParserFailureCheckTest extends TestCase {
     public function testGermanAndEnglishCoreWarning(): void {
         foreach ([

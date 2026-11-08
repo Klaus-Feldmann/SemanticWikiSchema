@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Interwiki\ClassicInterwikiLookup;
 use MediaWiki\Language\RawMessage;
@@ -12,28 +12,28 @@ use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Parser\ParserOutputFlags;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\CreateSubjectParserFunction;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\CreateSubjectParserFunction;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 
 /**
  * Runs against a real wiki: title existence, content namespaces and normalization are MediaWiki's answers.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\CreateSubjectParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\CreateSubjectParserFunction
  * @group Database
  */
-class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
+class CreateSubjectParserFunctionTest extends SWSIntegrationTestCase {
 
 	private const string SCHEMA_NAME = 'Person';
 	private const string MAIN_SUBJECT_ID = 's11111111111111';
@@ -72,9 +72,9 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testEmitsButtonPlaceholderWithoutArguments(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->helpPage ) );
 
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-text', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-page=', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-text', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-page=', $html );
 	}
 
 	public function testIgnoresAnEmptyArgument(): void {
@@ -87,8 +87,8 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 			$this->callOn( $this->contentPage, 'schema=' . self::SCHEMA_NAME, 'text=Add a person' )
 		);
 
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="' . self::SCHEMA_NAME . '"', $html );
-		$this->assertStringContainsString( 'data-mw-neowiki-text="Add a person"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-schema="' . self::SCHEMA_NAME . '"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-text="Add a person"', $html );
 	}
 
 	public function testEmitsTheSchemaNameAsItsPageIsTitled(): void {
@@ -96,27 +96,27 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'schema=person_record' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="Person record"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-schema="Person record"', $html );
 	}
 
 	public function testAcceptsTheSchemaNamespacePrefix(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'schema=Schema:' . self::SCHEMA_NAME ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="' . self::SCHEMA_NAME . '"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-schema="' . self::SCHEMA_NAME . '"', $html );
 	}
 
 	public function testReportsAPageOutsideTheSchemaNamespaceAsAnUnknownSchema(): void {
 		$result = $this->callOn( $this->contentPage, 'schema=' . $this->helpPage->getPrefixedText() );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-unknown-schema', 'Help:Using subjects' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-unknown-schema', 'Help:Using subjects' );
 	}
 
 	public function testTreatsEmptyValuesAsAbsent(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->helpPage, 'schema=', 'text= ', 'page=' ) );
 
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-text', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-page=', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-text', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-page=', $html );
 	}
 
 	public function testEscapesTheTextAttribute(): void {
@@ -125,7 +125,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 		);
 
 		$this->assertStringContainsString(
-			'data-mw-neowiki-text="&lt;/div&gt;&lt;script&gt;alert(1)&lt;/script&gt;"',
+			'data-mw-sws-text="&lt;/div&gt;&lt;script&gt;alert(1)&lt;/script&gt;"',
 			$html
 		);
 	}
@@ -133,21 +133,21 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testEmitsTheHostPageMainSubjectFlagWithoutAPageArgument(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-has-main-subject="true"', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-page=', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-has-main-subject="true"', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-page=', $html );
 	}
 
 	public function testEmitsNoHostPageAttributeOnAnIneligiblePage(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->helpPage ) );
 
-		$this->assertStringNotContainsString( 'data-mw-neowiki-page-has-main-subject', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-page-has-main-subject', $html );
 	}
 
 	public function testPageThisEmitsThisPageAndItsMainSubjectFlag(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'page=this' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page="this"', $html );
-		$this->assertStringContainsString( 'data-mw-neowiki-page-has-main-subject="true"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page="this"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-has-main-subject="true"', $html );
 	}
 
 	public function testPageThisEmitsFalseWhenThePageHasNoMainSubject(): void {
@@ -155,14 +155,14 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$html = $this->assertRendersButton( $this->callOn( $emptyPage, 'page=this' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-has-main-subject="false"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-has-main-subject="false"', $html );
 	}
 
 	public function testPageThisFallsBackToNewOnAnIneligiblePage(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->helpPage, 'page=this' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page="new"', $html );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-page-has-main-subject', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page="new"', $html );
+		$this->assertStringNotContainsString( 'data-mw-sws-page-has-main-subject', $html );
 	}
 
 	public function testMarksItsOutputAsDependingOnThePageId(): void {
@@ -191,7 +191,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testPageNewEmitsANewPage(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'page=new' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page="new"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page="new"', $html );
 	}
 
 	public function testNamedPageEmitsItsTitleAndCurrentId(): void {
@@ -199,8 +199,8 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'page=The target page' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-title="The target page"', $html );
-		$this->assertStringContainsString( 'data-mw-neowiki-page-id="' . $target->getId() . '"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-title="The target page"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-id="' . $target->getId() . '"', $html );
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testKeepsTheHostPageMainSubjectFlagWithAFixedPage( string $pageArgument ): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, $pageArgument ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-has-main-subject="true"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-has-main-subject="true"', $html );
 	}
 
 	public static function fixedPageArgumentProvider(): iterable {
@@ -220,14 +220,14 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testNamedPageThatDoesNotExistEmitsIdZero(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'page=Not a page yet' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-title="Not a page yet"', $html );
-		$this->assertStringContainsString( 'data-mw-neowiki-page-id="0"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-title="Not a page yet"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-id="0"', $html );
 	}
 
 	public function testNormalizesTheNamedPageToItsPrefixedTitle(): void {
 		$html = $this->assertRendersButton( $this->callOn( $this->contentPage, 'page=help:using_subjects' ) );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-title="Help:Using subjects"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-title="Help:Using subjects"', $html );
 	}
 
 	public function testAcceptsAnExistingPageOutsideTheMainNamespace(): void {
@@ -235,7 +235,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 			$this->callOn( $this->contentPage, 'page=' . $this->helpPage->getPrefixedText() )
 		);
 
-		$this->assertStringContainsString( 'data-mw-neowiki-page-id="' . $this->helpPage->getId() . '"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-page-id="' . $this->helpPage->getId() . '"', $html );
 	}
 
 	public function testRejectsAMissingPageOutsideTheMainNamespace(): void {
@@ -243,7 +243,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertRendersError(
 			$result,
-			'neowiki-create-subject-error-uncreatable-page',
+			'sws-create-subject-error-uncreatable-page',
 			'Help:Not a page yet'
 		);
 	}
@@ -253,7 +253,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertRendersError(
 			$result,
-			'neowiki-create-subject-error-uncreatable-page-subject-first',
+			'sws-create-subject-error-uncreatable-page-subject-first',
 			'Not a page yet'
 		);
 	}
@@ -269,7 +269,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertRendersError(
 			$result,
-			'neowiki-create-subject-error-uncreatable-page-subject-first',
+			'sws-create-subject-error-uncreatable-page-subject-first',
 			'Help:Not a page yet'
 		);
 	}
@@ -300,14 +300,14 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testAddsTheFrontendModules(): void {
 		$output = $this->parserOutputOf( $this->helpPage );
 
-		$this->assertContains( 'ext.neowiki', $output->getModules() );
-		$this->assertContains( 'ext.neowiki.styles', $output->getModuleStyles() );
+		$this->assertContains( 'ext.sws', $output->getModules() );
+		$this->assertContains( 'ext.sws.styles', $output->getModuleStyles() );
 	}
 
 	public function testReportsASchemaThatDoesNotExist(): void {
 		$result = $this->callOn( $this->contentPage, 'schema=No such schema' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-unknown-schema', 'No such schema' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-unknown-schema', 'No such schema' );
 	}
 
 	public function testReportsASchemaWhoseSubjectsAreDependent(): void {
@@ -315,19 +315,19 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$result = $this->callOn( $this->contentPage, 'schema=Birth' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-dependent-subjects', 'Birth' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-dependent-subjects', 'Birth' );
 	}
 
 	public function testReportsAnInvalidSchemaNameAsUnknown(): void {
 		$result = $this->callOn( $this->contentPage, 'schema=Page' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-unknown-schema', 'Page' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-unknown-schema', 'Page' );
 	}
 
 	public function testReportsAnUnparsablePageTitle(): void {
 		$result = $this->callOn( $this->contentPage, 'page=Broken [ title' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-invalid-page' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-invalid-page' );
 	}
 
 	public function testReportsInterwikiAndSpecialPageTitles(): void {
@@ -337,11 +337,11 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertRendersError(
 			$this->callOn( $this->contentPage, 'page=en:Somewhere else' ),
-			'neowiki-create-subject-error-invalid-page'
+			'sws-create-subject-error-invalid-page'
 		);
 		$this->assertRendersError(
 			$this->callOn( $this->contentPage, 'page=Special:Watchlist' ),
-			'neowiki-create-subject-error-invalid-page'
+			'sws-create-subject-error-invalid-page'
 		);
 	}
 
@@ -349,7 +349,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 		$output = $this->parserOutputOf( $this->contentPage, 'schema=No such schema' );
 
 		$this->assertContains(
-			[ NeoWikiExtension::NS_SCHEMA, 'No_such_schema', 0 ],
+			[ SWSExtension::NS_SCHEMA, 'No_such_schema', 0 ],
 			$this->linksOf( $output )
 		);
 	}
@@ -357,26 +357,26 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 	public function testReportsAPositionalArgument(): void {
 		$result = $this->callOn( $this->contentPage, self::SCHEMA_NAME );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-positional', self::SCHEMA_NAME );
+		$this->assertRendersError( $result, 'sws-create-subject-error-positional', self::SCHEMA_NAME );
 	}
 
 	public function testReportsAnUnknownArgumentName(): void {
 		$result = $this->callOn( $this->contentPage, 'layout=Finances' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-unknown-arg', 'layout' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-unknown-arg', 'layout' );
 	}
 
 	public function testReportsAnArgumentWithAnEmptyName(): void {
 		$result = $this->callOn( $this->contentPage, '=Finances' );
 
-		$this->assertRendersError( $result, 'neowiki-create-subject-error-unknown-arg', '=Finances' );
+		$this->assertRendersError( $result, 'sws-create-subject-error-unknown-arg', '=Finances' );
 	}
 
 	public function testEmitsNoButtonAlongsideAnError(): void {
 		$result = $this->callOn( $this->contentPage, 'schema=No such schema' );
 
 		$this->assertIsString( $result );
-		$this->assertStringNotContainsString( 'ext-neowiki-create-subject-button', $result );
+		$this->assertStringNotContainsString( 'ext-sws-create-subject-button', $result );
 	}
 
 	public function testEscapesTheOffendingValueInAnError(): void {
@@ -412,7 +412,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 		return new CreateSubjectParserFunction(
 			new PageSubjectsLookup( $this->subjectRepository ),
 			$subjectFirst,
-			static fn (): SchemaLookup => NeoWikiExtension::getInstance()->getSchemaLookup()
+			static fn (): SchemaLookup => SWSExtension::getInstance()->getSchemaLookup()
 		);
 	}
 
@@ -435,7 +435,7 @@ class CreateSubjectParserFunctionTest extends NeoWikiIntegrationTestCase {
 		$this->assertIsArray( $result, 'Expected a placeholder array; got an error string.' );
 		$this->assertTrue( $result['isHTML'] );
 		$this->assertTrue( $result['noparse'] );
-		$this->assertStringContainsString( 'class="ext-neowiki-create-subject-button"', $result[0] );
+		$this->assertStringContainsString( 'class="ext-sws-create-subject-button"', $result[0] );
 
 		return $result[0];
 	}

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Content\WikitextContent;
@@ -12,23 +12,23 @@ use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the pages whose Subjects the view reads and the revisions a diff compares.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onBeforePageDisplay
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onDifferenceEngineRenderRevisionAddParserOutput
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onParserAfterTidy
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onOutputPageParserOutput
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\MainSubjectParserFunction
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::shouldAutoRenderMainSubject
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserAfterTidy
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onOutputPageParserOutput
+ * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
+ * @covers \ProfessionalWiki\SWS\SWSExtension::shouldAutoRenderMainSubject
  * @group Database
  */
-class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
+class AutoRenderMainSubjectTest extends SWSIntegrationTestCase {
 
 	private const string SUBJECT_ID = 's1zz1111111azz1';
 	private const string OTHER_SUBJECT_ID = 's1zz1111111azz2';
@@ -36,7 +36,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	private const string PAGE_NAME = 'Auto render page';
 	private const string PAGE_TEXT = 'Text of the page';
 
-	private const string IN_FULL = 'id="ext-neowiki-main-subject"';
+	private const string IN_FULL = 'id="ext-sws-main-subject"';
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -48,9 +48,9 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	 * @dataProvider wikiModeProvider
 	 */
 	public function testDoesNotAutoRenderMainSubjectWhenConfigDisabled( bool $subjectFirst ): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', $subjectFirst );
+		$this->overrideConfigValue( 'SWSSubjectFirst', $subjectFirst );
 		$this->createPageWithMainSubjectAndText();
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 
 		$html = $this->renderRequest( [] );
 
@@ -72,11 +72,11 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 
 	public function testRendersAppContainerWhenAutoRenderDisabled(): void {
 		$this->createPageWithMainSubjectAndText();
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 
 		$html = $this->renderRequest( [] );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-app"', $html );
+		$this->assertStringContainsString( 'id="ext-sws-app"', $html );
 	}
 
 	public function testNoMainSubjectIsShownAboveADiff(): void {
@@ -104,7 +104,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testDoesNotAutoRenderMainSubjectOnADiffWhenConfigDisabled(): void {
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 
 		$html = $this->renderDiffOfASubjectEdit();
 
@@ -114,7 +114,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	public function testRendersAppContainerOnADiff(): void {
 		$html = $this->renderDiffOfASubjectEdit();
 
-		$this->assertStringContainsString( 'id="ext-neowiki-app"', $html );
+		$this->assertStringContainsString( 'id="ext-sws-app"', $html );
 	}
 
 	public function testAPageFirstWikiShowsTheMainSubjectOfAPageWithoutTextAsAnInfobox(): void {
@@ -130,7 +130,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	 * @dataProvider pageTextProvider
 	 */
 	public function testASubjectFirstWikiShowsTheMainSubjectInFullBelowThePageText( string $text ): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithText( $text );
 
 		$html = $this->renderRequest( [] );
@@ -139,7 +139,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->assertAppearsInOrder( $html, $text, self::IN_FULL );
 		// The frontend mounts the Subject UI on this element, and the focus styles apply under its class.
 		$this->assertStringContainsString( self::viewOf( self::SUBJECT_ID ), $inFull );
-		$this->assertStringContainsString( 'ext-neowiki-ui', $inFull );
+		$this->assertStringContainsString( 'ext-sws-ui', $inFull );
 		$this->assertFalse( $this->showsAnInfobox( $html ) );
 	}
 
@@ -149,17 +149,17 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testASubjectFirstWikiGivesTheSubjectUiItsConfiguration(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithMainSubjectAndText();
 
-		$this->assertArrayHasKey( 'wgNeoWikiSubjectIriBase', $this->viewPage( [] )->getJsConfigVars() );
+		$this->assertArrayHasKey( 'wgSWSSubjectIriBase', $this->viewPage( [] )->getJsConfigVars() );
 	}
 
 	/**
 	 * @dataProvider wikiModeProvider
 	 */
 	public function testAnOldRevisionShowsTheMainSubjectItHeldAsAnInfobox( bool $subjectFirst ): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', $subjectFirst );
+		$this->overrideConfigValue( 'SWSSubjectFirst', $subjectFirst );
 		$oldRevision = $this->createPageWithText( self::PAGE_TEXT );
 		$this->changeSubjectsOfPage( self::PAGE_NAME, TestSubject::build( id: self::OTHER_SUBJECT_ID ) );
 
@@ -171,7 +171,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testADiffOnASubjectFirstWikiShowsTheMainSubjectAsAnInfobox(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$html = $this->renderDiffOfASubjectEdit();
 
@@ -184,7 +184,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testAPagePlacingItsMainSubjectShowsItInFullThereAndNowhereElse( bool $subjectFirst ): void {
 		$this->skipWhereParsoidParses();
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', $subjectFirst );
+		$this->overrideConfigValue( 'SWSSubjectFirst', $subjectFirst );
 		$this->createPageWithText( "Before it.\n\n{{#main_subject: }}\n\nAfter it." );
 
 		$html = $this->renderRequest( [] );
@@ -281,10 +281,10 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 
 	public function testAPagePlacingItsMainSubjectGivesTheSubjectUiItsConfigurationWithAutomaticRenderingOff(): void {
 		$this->skipWhereParsoidParses();
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 		$this->createPageWithText( '{{#main_subject: }}' );
 
-		$this->assertArrayHasKey( 'wgNeoWikiSubjectIriBase', $this->viewPage( [] )->getJsConfigVars() );
+		$this->assertArrayHasKey( 'wgSWSSubjectIriBase', $this->viewPage( [] )->getJsConfigVars() );
 	}
 
 	private function skipWhereParsoidParses(): void {
@@ -336,13 +336,13 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 		$context->setTitle( Title::newFromText( self::PAGE_NAME ) );
 
 		Article::newFromTitle( $context->getTitle(), $context )->view();
-		NeoWikiHooks::onBeforePageDisplay( $context->getOutput(), $context->getSkin() );
+		SWSHooks::onBeforePageDisplay( $context->getOutput(), $context->getSkin() );
 
 		return $context->getOutput();
 	}
 
 	private static function viewOf( string $subjectId ): string {
-		return 'data-mw-neowiki-subject-id="' . $subjectId . '"';
+		return 'data-mw-sws-subject-id="' . $subjectId . '"';
 	}
 
 	private static function htmlAboveTheDiff( string $html ): string {
@@ -365,7 +365,7 @@ class AutoRenderMainSubjectTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function showsAnInfobox( string $html ): bool {
-		return preg_match( '/class="[^"]*\bext-neowiki-view\b/', $html ) === 1;
+		return preg_match( '/class="[^"]*\bext-sws-view\b/', $html ) === 1;
 	}
 
 	private function assertAppearsInOrder( string $html, string ...$parts ): void {

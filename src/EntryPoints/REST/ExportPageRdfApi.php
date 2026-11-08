@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use Exception;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
@@ -29,7 +29,7 @@ class ExportPageRdfApi extends SimpleHandler {
 	use ReadOnlyEndpoint;
 
 	public function run( int $pageId ): Response {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$projectionName = $this->getValidatedParams()['projection'] ?? RdfPageProjector::PROJECTION;
 		$resolution = $extension->resolveRdfProjection( $projectionName );
 
@@ -74,8 +74,8 @@ class ExportPageRdfApi extends SimpleHandler {
 		} catch ( TimeoutException | DBError $e ) {
 			throw $e;
 		} catch ( Exception $e ) {
-			LoggerFactory::getInstance( 'NeoWiki' )->error(
-				'NeoWiki could not export page {pageId} as RDF: {message}',
+			LoggerFactory::getInstance( 'SWS' )->error(
+				'SWS could not export page {pageId} as RDF: {message}',
 				[
 					'pageId' => $pageId,
 					'message' => BackendFailureMessage::withoutCredentials( $e->getMessage() ),
@@ -95,7 +95,7 @@ class ExportPageRdfApi extends SimpleHandler {
 
 	private function noDataResponse( int $pageId ): Response {
 		return $this->getResponseFactory()->createHttpError( 404, [
-			'message' => 'No NeoWiki data found for page: ' . $pageId,
+			'message' => 'No SWS data found for page: ' . $pageId,
 		] );
 	}
 
@@ -120,7 +120,7 @@ class ExportPageRdfApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'RDF projection to produce: "native" (default) for NeoWiki-native vocabulary, or the name of a Mapping page (e.g. "EDM"). An unknown projection returns 400.',
+				self::PARAM_DESCRIPTION => 'RDF projection to produce: "native" (default) for SWS-native vocabulary, or the name of a Mapping page (e.g. "EDM"). An unknown projection returns 400.',
 			],
 		];
 	}

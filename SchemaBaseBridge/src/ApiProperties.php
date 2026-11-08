@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use ApiBase;
 use MediaWiki\Api\ApiMain;
@@ -26,7 +26,7 @@ final class ApiProperties extends ApiBase {
 			( $p['mode'] === 'resolve' && preg_match( '/\AP[1-9][0-9]*\z/', $query ) !== 1 ) ||
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $p['language'] ) !== 1
 		) {
-			$this->dieWithError( 'neowikibasebridge-property-invalid', 'invalidinput' );
+			$this->dieWithError( 'swsbasebridge-property-invalid', 'invalidinput' );
 		}
 		$language = $p['language'];
 		$params = $p['mode'] === 'resolve' ? [ 'action' => 'wbgetentities', 'ids' => $query,
@@ -67,14 +67,14 @@ final class ApiProperties extends ApiBase {
 				'source' => $p['source'], 'mode' => $p['mode'], 'query' => $query, 'items' => $items ] );
 		} catch ( Throwable ) {
 			wfDebugLog( 'SchemaBaseBridge', 'Property lookup failed for source ' . $p['source'] );
-			$this->dieWithError( 'neowikibasebridge-property-unavailable', 'unavailable' );
+			$this->dieWithError( 'swsbasebridge-property-unavailable', 'unavailable' );
 		}
 	}
 
 	private function remote( array $params ): array {
 		$services = MediaWikiServices::getInstance();
 		$cache = $services->getMainWANObjectCache();
-		$agent = 'NeoWikiBaseBridge/0.4 (' . $services->getMainConfig()->get( 'Server' ) . ')';
+		$agent = 'SWSBaseBridge/0.4 (' . $services->getMainConfig()->get( 'Server' ) . ')';
 		return $cache->getWithSetCallback(
 			$cache->makeKey( 'SchemaBaseBridge', 'properties', hash( 'sha256', json_encode( $params ) ) ),
 			60,

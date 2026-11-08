@@ -7,7 +7,7 @@ Status: Accepted (2026-07-23), features using Neo4j for convenience superseded b
 
 ## Context
 
-NeoWiki currently uses Neo4j as its sole graph database ([ADR 3](003-neo4j-as-graph-database.md)). The graph is a
+SWS currently uses Neo4j as its sole graph database ([ADR 3](003-neo4j-as-graph-database.md)). The graph is a
 query-optimized projection of data whose source of truth lives in MediaWiki revision slots
 ([ADR 4](004-use-dedicated-slot.md)). This projection is kept in sync via MediaWiki hooks
 (`RevisionFromEditComplete`, `PageDeleteComplete`, etc.).
@@ -19,7 +19,7 @@ Data ecosystems. At the same time, the existing Neo4j/Cypher stack remains valua
 
 ### Multiple graph databases as plugins
 
-NeoWiki supports multiple graph database backends simultaneously. Each backend is a plugin that:
+SWS supports multiple graph database backends simultaneously. Each backend is a plugin that:
 
 1. **Receives domain events** (page saved, page deleted) and maintains its own projection of the data. A page
    save carries the page's subjects, so subject creations, updates and deletions arrive as a save of their page.
@@ -39,7 +39,7 @@ limited to deployment configuration and optional bulk-load optimizations.
 
 ### Each plugin owns its data model mapping
 
-The Neo4j plugin maps NeoWiki data to a property graph (as documented in [Graph Model](../api/graph-model.md)).
+The Neo4j plugin maps SWS data to a property graph (as documented in [Graph Model](../api/graph-model.md)).
 The SPARQL plugin maps the same data to RDF triples. These mappings are deliberately separate: attempting to
 force one abstraction over both property graphs and RDF would be artificial and constraining. The shared
 contract is at the domain event level, not the graph model level.
@@ -47,12 +47,12 @@ contract is at the domain event level, not the graph model level.
 ### User-facing query language is per-backend
 
 Users write queries in whatever language their wiki's configured backends support. `{{#cypher_raw:...}}` for Neo4j,
-`{{#sparql:...}}` for a triple store. NeoWiki does not provide a query abstraction language. This keeps things
+`{{#sparql:...}}` for a triple store. SWS does not provide a query abstraction language. This keeps things
 simple, avoids reinventing SMW's `#ask`, and lets users leverage the full power of each query language.
 
 ### Graph databases are optional
 
-NeoWiki works without any graph database configured. Features that require a graph backend (parser functions for
+SWS works without any graph database configured. Features that require a graph backend (parser functions for
 queries, query result visualizations) are gracefully unavailable when no backend is present. Features that
 currently use Neo4j for convenience (e.g., subject label autocomplete for Relation targets) should have fallback
 implementations or degrade gracefully.
@@ -61,7 +61,7 @@ This is not a near-term priority. The goal is to avoid architectural decisions t
 
 ## Consequences
 
-* NeoWiki gains support for QLever, SPARQL, and RDF.
+* SWS gains support for QLever, SPARQL, and RDF.
 * Extensions can register additional graph database plugins.
 * A new SPARQL plugin needs: an RDF mapping layer (Subject/Schema/Statement to RDF triples), a SPARQL Protocol
   HTTP client, a sync mechanism analogous to `Neo4jProjectionStore`, and a read-only query validator.
@@ -96,9 +96,9 @@ Switch entirely to RDF/SPARQL and drop Cypher support.
 
 Rejected because Neo4j/Cypher is already deeply integrated, has a larger user community for our enterprise use
 case, and offers a more intuitive query syntax for non-RDF users. The property-graph model is also a more natural
-fit for NeoWiki's data model (Subjects with properties and typed relationships).
+fit for SWS's data model (Subjects with properties and typed relationships).
 
-### Build a NeoWiki-specific query language
+### Build a SWS-specific query language
 
 Create an abstraction like SMW's `#ask` that works across backends.
 

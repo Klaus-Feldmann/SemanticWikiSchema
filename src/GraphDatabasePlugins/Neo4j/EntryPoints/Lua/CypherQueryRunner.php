@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\Lua;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
 
 class CypherQueryRunner {
 

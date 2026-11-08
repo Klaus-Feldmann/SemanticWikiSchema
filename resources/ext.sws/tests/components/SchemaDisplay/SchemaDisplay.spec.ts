@@ -1,0 +1,285 @@
+import { mount, VueWrapper, flushPromises } from '@vue/test-utils';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { createPinia, setActivePinia } from 'pinia';
+import { ref } from 'vue';
+import SchemaDisplay from '@/components/SchemaDisplay/SchemaDisplay.vue';
+import SchemaDisplayHeader from '@/components/SchemaDisplay/SchemaDisplayHeader.vue';
+import SchemaEditorDialog from '@/components/SchemaEditor/SchemaEditorDialog.vue';
+import SubjectCreatorDialog from '@/components/SubjectCreator/SubjectCreatorDialog.vue';
+import { useSubjectStore } from '@/stores/SubjectStore.ts';
+import { Schema } from '@/domain/Schema.ts';
+import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList.ts';
+import { createPropertyDefinitionFromJson } from '@/domain/PropertyDefinition.ts';
+import { TextType } from '@/domain/propertyTypes/Text.ts';
+import { NumberType } from '@/domain/propertyTypes/Number.ts';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { Service } from '@/SWSServices.ts';
+import { setupMwMock, createI18nMock } from '../../VueTestHelpers.ts';
+import { newSchema } from '@/TestHelpers.ts';
+
+const checkEditPermissionMock = vi.fn();
+const canEditSchemaRef = ref( false );
+
+vi.mock( '@/composables/useSchemaPermissions.ts', () => ( {
+	useSchemaPermissions: () => ( {
+		canEditSchema: canEditSchemaRef,
+		checkEditPermission: checkEditPermissionMock,
+	} ),
+} ) );
+
+let grantedRight = false;
+const canCreateSubjectPageRef = ref( false );
+const checkCreateSubjectPagePermissionMock = vi.fn( async (): Promise<void> => {
+	canCreateSubjectPageRef.value = grantedRight;
+} );
+
+vi.mock( '@/composables/useSubjectPermissions.ts', () => ( {
+	useSubjectPermissions: () => ( {
+		canCreateSubjectPage: canCreateSubjectPageRef,
+		checkCreateSubjectPagePermission: checkCreateSubjectPagePermissionMock,
+	} ),
+} ) );
+
+const getSchemaMock = vi.fn();
+
+let pinia: ReturnType<typeof createPinia>;
+
+function mountComponent( schema: Schema ): VueWrapper {
+	setupMwMock( { functions: [ 'msg', 'util' ] } );
+
+	return mount( SchemaDisplay, {
+		props: { schema },
+		global: {
+			plugins: [ pinia ],
+			mocks: { $i18n: createI18nMock() },
+			provide: {
+				[ Service.ComponentRegistry ]: SWSExtension.getInstance().getTypeSpecificComponentRegistry(),
+				[ Service.SchemaRepository ]: { getSchema: getSchemaMock },
+			},
+			stubs: {
+				CdxIcon: true,
+				CdxInfoChip: { template: '<span><slot /></span>', props: [ 'icon' ] },
+				SchemaDisplayHeader: true,
+				SchemaEditorDialog: true,
+				SubjectCreatorDialog: true,
+				SubjectsTable: true,
+			},
+		},
+	} );
+}
+
+describe( 'SchemaDisplay', () => {
+	beforeEach( () => {
+		pinia = createPinia();
+		setActivePinia( pinia );
+		canEditSchemaRef.value = false;
+		checkEditPermissionMock.mockClear();
+		grantedRight = false;
+		canCreateSubjectPageRef.value = false;
+		checkCreateSubjectPagePermissionMock.mockClear();
+		getSchemaMock.mockReset();
+	} );
+
+	it( 'lists the Schema\'s Subjects', () => {
+		const wrapper = mountComponent( newSchema( { title: 'Computer' } ) );
+
+		const table = wrapper.findComponent( { name: 'SubjectsTable' } );
+		expect( table.exists() ).toBe( true );
+		expect( table.props( 'fixedSchema' ) ).toBe( 'Computer' );
+	} );
+
+	it( 'passes schema and canEditSchema to header component', () => {
+		const schema = newSchema( { title: 'Test schema' } );
+
+		const wrapper = mountComponent( schema );
+		const header = wrapper.findComponent( SchemaDisplayHeader );
+
+		expect( header.props( 'schema' ) ).toStrictEqual( schema );
+		expect( header.props( 'canEditSchema' ) ).toBe( false );
+	} );
+
+	it( 'tells the header the user may create a subject page', async () => {
+		grantedRight = true;
+
+		const wrapper = mountComponent( newSchema() );
+		await flushPromises();
+
+		expect( wrapper.findComponent( SchemaDisplayHeader ).props( 'canCreateSubject' ) ).toBe( true );
+	} );
+
+	it( 'tells the header to offer no Subject creation for a Schema whose Subjects are dependent', async () => {
+		grantedRight = true;
+
+		const wrapper = mountComponent( newSchema( { subjectsAreDependent: true } ) );
+		await flushPromises();
+
+		expect( wrapper.findComponent( SchemaDisplayHeader ).props( 'canCreateSubject' ) ).toBe( false );
+	} );
+
+	it( 'opens the creator on this schema, page and all, when the header asks for it', async () => {
+		grantedRight = true;
+		const wrapper = mountComponent( newSchema( { title: 'Person' } ) );
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaDisplayHeader ).vm.$emit( 'create-subject' );
+
+		const dialog = wrapper.findComponent( SubjectCreatorDialog );
+		expect( dialog.props( 'hostPage' ) ).toBeNull();
+		expect( dialog.props( 'initialSchemaName' ) ).toBe( 'Person' );
+		expect( useSubjectStore( pinia ).subjectCreatorOpen ).toBe( true );
+	} );
+
+	it( 'keeps the creator closed until it is asked for', async () => {
+		grantedRight = true;
+
+		mountComponent( newSchema() );
+		await flushPromises();
+
+		expect( useSubjectStore( pinia ).subjectCreatorOpen ).toBe( false );
+	} );
+
+	it( 'renders no creator for a user who may not create subject pages', async () => {
+		const wrapper = mountComponent( newSchema() );
+		await flushPromises();
+
+		expect( wrapper.findComponent( SubjectCreatorDialog ).exists() ).toBe( false );
+	} );
+
+	it( 'renders property names, types, and required status', () => {
+		const schema = newSchema( {
+			properties: new PropertyDefinitionList( [
+				createPropertyDefinitionFromJson( 'Website', {
+					type: TextType.typeName,
+					required: true,
+				} ),
+				createPropertyDefinitionFromJson( 'Age', {
+					type: NumberType.typeName,
+					required: false,
+				} ),
+			] ),
+		} );
+
+		const wrapper = mountComponent( schema );
+		const rows = wrapper.findAll( 'tbody tr' );
+
+		expect( rows ).toHaveLength( 2 );
+		expect( rows[ 0 ].text() ).toContain( 'Website' );
+		expect( rows[ 0 ].text() ).toContain( 'sws-property-type-text' );
+		expect( rows[ 0 ].text() ).toContain( 'sws-schema-display-required-yes' );
+		expect( rows[ 1 ].text() ).toContain( 'Age' );
+		expect( rows[ 1 ].text() ).toContain( 'sws-property-type-number' );
+		expect( rows[ 1 ].text() ).toContain( 'sws-schema-display-required-no' );
+	} );
+
+	it( 'renders default values for properties that have them', () => {
+		const schema = newSchema( {
+			properties: new PropertyDefinitionList( [
+				createPropertyDefinitionFromJson( 'greeting', {
+					type: TextType.typeName,
+					default: [ 'Hello' ],
+				} ),
+			] ),
+		} );
+
+		const wrapper = mountComponent( schema );
+
+		expect( wrapper.find( 'tbody tr' ).text() ).toContain( 'Hello' );
+	} );
+
+	it( 'shows empty value indicators for missing default and description', () => {
+		const schema = newSchema( {
+			properties: new PropertyDefinitionList( [
+				createPropertyDefinitionFromJson( 'Website', {
+					type: TextType.typeName,
+				} ),
+			] ),
+		} );
+
+		const wrapper = mountComponent( schema );
+		const emptyValues = wrapper.findAll( '.ext-sws-schema-display__empty-value' );
+
+		expect( emptyValues ).toHaveLength( 2 );
+		expect( emptyValues[ 0 ].text() ).toBe( '-' );
+	} );
+
+	it( 'does not show empty value indicator when description is present', () => {
+		const schema = newSchema( {
+			properties: new PropertyDefinitionList( [
+				createPropertyDefinitionFromJson( 'Website', {
+					type: TextType.typeName,
+					description: 'The main website URL',
+					default: [ 'https://example.com' ],
+				} ),
+			] ),
+		} );
+
+		const wrapper = mountComponent( schema );
+
+		expect( wrapper.find( '.ext-sws-schema-display__empty-value' ).exists() ).toBe( false );
+		expect( wrapper.text() ).toContain( 'The main website URL' );
+	} );
+
+	it( 'shows empty message when schema has no properties', () => {
+		const wrapper = mountComponent( newSchema( { properties: new PropertyDefinitionList( [] ) } ) );
+
+		expect( wrapper.text() ).toContain( 'sws-schema-display-no-properties' );
+		expect( wrapper.find( '.cdx-table__table__empty-state' ).exists() ).toBe( true );
+	} );
+
+	it( 'renders SchemaEditorDialog when user has edit permission', () => {
+		canEditSchemaRef.value = true;
+
+		const wrapper = mountComponent( newSchema() );
+
+		expect( wrapper.findComponent( SchemaEditorDialog ).exists() ).toBe( true );
+	} );
+
+	it( 'does not render SchemaEditorDialog when user lacks permission', () => {
+		canEditSchemaRef.value = false;
+
+		const wrapper = mountComponent( newSchema() );
+
+		expect( wrapper.findComponent( SchemaEditorDialog ).exists() ).toBe( false );
+	} );
+
+	it( 'opens the dialog on the schema fetched from the repository when the header emits edit', async () => {
+		canEditSchemaRef.value = true;
+		setupMwMock( { functions: [ 'msg', 'notify' ] } );
+
+		const schema = newSchema( { title: 'Person', description: 'stale' } );
+		const fetched = newSchema( { title: 'Person', description: 'from the repository' } );
+		getSchemaMock.mockResolvedValue( fetched );
+
+		const wrapper = mountComponent( schema );
+		expect( wrapper.findComponent( SchemaEditorDialog ).props( 'open' ) ).toBe( false );
+
+		await wrapper.findComponent( SchemaDisplayHeader ).vm.$emit( 'edit' );
+		await flushPromises();
+
+		expect( getSchemaMock ).toHaveBeenCalledWith( 'Person' );
+		const dialog = wrapper.findComponent( SchemaEditorDialog );
+		expect( dialog.props( 'open' ) ).toBe( true );
+		expect( dialog.props( 'initialSchema' ) ).toStrictEqual( fetched );
+	} );
+
+	it( 'shows the creator open once it is asked for', async () => {
+		grantedRight = true;
+		const wrapper = mountComponent( newSchema() );
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaDisplayHeader ).vm.$emit( 'create-subject' );
+
+		expect( wrapper.findComponent( SubjectCreatorDialog ).props( 'open' ) ).toBe( true );
+	} );
+
+	it( 'closes the creator in the store when the dialog closes', async () => {
+		grantedRight = true;
+		const wrapper = mountComponent( newSchema() );
+		await flushPromises();
+		useSubjectStore( pinia ).openSubjectCreator();
+
+		wrapper.findComponent( SubjectCreatorDialog ).vm.$emit( 'update:open', false );
+
+		expect( useSubjectStore( pinia ).subjectCreatorOpen ).toBe( false );
+	} );
+} );

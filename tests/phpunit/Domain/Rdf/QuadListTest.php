@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList
- * @covers \ProfessionalWiki\NeoWiki\Domain\Rdf\Quad
+ * @covers \ProfessionalWiki\SWS\Domain\Rdf\QuadList
+ * @covers \ProfessionalWiki\SWS\Domain\Rdf\Quad
  */
 class QuadListTest extends TestCase {
 

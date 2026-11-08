@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Validation;
+namespace ProfessionalWiki\SWS\Application\Validation;
 
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 readonly class DependentSubjectViolations {
 

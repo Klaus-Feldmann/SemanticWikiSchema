@@ -6,7 +6,7 @@ Status: Accepted
 
 ## Context
 
-NeoWiki started off with GUIDs for Subject IDs (ADR 5) and for Relations (ADR 10).
+SWS started off with GUIDs for Subject IDs (ADR 5) and for Relations (ADR 10).
 
 We have since realized that according to some, GUIDs are not a good format. In particular, the blog post
 at https://www.unkey.com/blog/uuid-ux, plus seeing nanoid style IDs in various popular modern products.

@@ -11,7 +11,7 @@ $move=$services->getMovePageFactory()->newMovePage($title,$new);
 $status=$move->moveIfAllowed($admin,'isolated move test',true);
 if (!$status->isOK()) {throw new RuntimeException('Move failed: '.json_encode($status->getErrors()));}
 MediaWiki\Deferred\DeferredUpdates::doUpdates();
-(new ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor())->refresh($new,$title);
+(new ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor())->refresh($new,$title);
 MediaWiki\Deferred\DeferredUpdates::doUpdates();
 $data=SMW\Services\ServicesFactory::getInstance()->getStore()->getSemanticData(SMW\DataItems\WikiPage::newFromTitle($new));
 checkTest(isset($data->getProperties()['Name']),'moved page receives complete derived annotations');

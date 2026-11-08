@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 /**
  * One intermediate node a {@see SchemaMapping} synthesizes: the event-style node that event-centric
- * ontologies mediate a relationship through and that has no counterpart in NeoWiki's data
+ * ontologies mediate a relationship through and that has no counterpart in SWS's data
  * (OntologyMapping.md § What makes this hard). The node key it is declared under names it from the
  * property entries that attach to it and from another node's `$parent`, so it is not repeated here.
  *

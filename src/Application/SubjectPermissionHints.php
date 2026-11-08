@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * Side-effect-free permission queries, for showing or hiding UI affordances and for cheap early

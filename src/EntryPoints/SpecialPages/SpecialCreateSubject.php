@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
 use PermissionsError;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 
 class SpecialCreateSubject extends SpecialPage {
 
@@ -33,23 +33,23 @@ class SpecialCreateSubject extends SpecialPage {
 		}
 
 		$schemaTitle = MediaWikiServices::getInstance()->getTitleFactory()
-			->newFromText( $subPage ?? '', NeoWikiExtension::NS_SCHEMA );
+			->newFromText( $subPage ?? '', SWSExtension::NS_SCHEMA );
 
 		if ( $schemaTitle !== null
-			&& NeoWikiExtension::getInstance()->newDependentSubjectRules()->localSchemaDeclaresDependentSubjects( $schemaTitle->getText() )
+			&& SWSExtension::getInstance()->newDependentSubjectRules()->localSchemaDeclaresDependentSubjects( $schemaTitle->getText() )
 		) {
 			$this->getOutput()->addHTML( Html::errorBox(
-				$this->msg( 'neowiki-create-subject-error-dependent-subjects', $schemaTitle->getText() )->escaped()
+				$this->msg( 'sws-create-subject-error-dependent-subjects', $schemaTitle->getText() )->escaped()
 			) );
 			return;
 		}
 
-		NeoWikiExtension::getInstance()->newFrontendModuleLoader()->load( $this->getOutput(), $this->getSkin() );
+		SWSExtension::getInstance()->newFrontendModuleLoader()->load( $this->getOutput(), $this->getSkin() );
 
-		$attributes = [ 'id' => 'ext-neowiki-create-subject' ];
+		$attributes = [ 'id' => 'ext-sws-create-subject' ];
 
 		if ( $schemaTitle !== null ) {
-			$attributes['data-mw-neowiki-schema'] = $schemaTitle->getText();
+			$attributes['data-mw-sws-schema'] = $schemaTitle->getText();
 		}
 
 		$this->getOutput()->addHTML( Html::element( 'div', $attributes ) );
@@ -60,11 +60,11 @@ class SpecialCreateSubject extends SpecialPage {
 	}
 
 	public function getGroupName(): string {
-		return 'neowiki';
+		return 'sws';
 	}
 
 	public function getDescription(): Message {
-		return $this->msg( 'neowiki-special-createsubject' );
+		return $this->msg( 'sws-special-createsubject' );
 	}
 
 }

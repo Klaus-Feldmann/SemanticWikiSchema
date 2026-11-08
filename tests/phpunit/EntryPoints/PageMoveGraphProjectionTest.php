@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Moving a page keeps its graph node in sync with its new title. This needs no dedicated move hook:
@@ -18,10 +18,10 @@ use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * is created. The write-count tests pin that, so a move cannot start projecting a page twice or
  * deleting nodes.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onRevisionFromEditComplete
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
  * @group Database
  */
-class PageMoveGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class PageMoveGraphProjectionTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -33,7 +33,7 @@ class PageMoveGraphProjectionTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// The write-count tests rebuild the singleton with a spy plugin registered; reset it so later
 		// tests get a clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testMovingPageUpdatesGraphNodeName(): void {

@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MockHttpTrait;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NullRebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Source\Source;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Source\Source;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
 
 /**
  * Proves that a configured SPARQL store participates in the real write paths: a page edit that stores
@@ -33,12 +33,12 @@ use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
  * Neo4j is switched off for these tests (runWithoutGraphBackend), so the SPARQL plugin is exercised on
  * its own and the assertions do not depend on a live Neo4j.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
-class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class SparqlGraphProjectionTest extends SWSIntegrationTestCase {
 
 	use MockHttpTrait;
 
@@ -58,7 +58,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testConfiguredSparqlStoreReceivesPageEditAsGraphUpdate(): void {
 		$this->installMockHttp( $this->capturingHttp() );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 
 		$pageId = $this->runWithoutGraphBackend(
 			fn (): int => $this->createPageWithSubjects( 'Sparql projection page', TestSubject::build() )->getPageId()
@@ -74,7 +74,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 		$this->installMockHttp( $this->capturingHttp() );
 		// Both stores hold the same projection, so neither can take the default name and each names
 		// itself. A store name identifies one store, which is what a scoped rebuild is addressed by.
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [
+		$this->overrideConfigValue( 'SWSSparqlStores', [
 			[ 'updateUrl' => self::ENDPOINT, 'name' => 'primary' ],
 			[ 'updateUrl' => self::SECOND_ENDPOINT, 'name' => 'mirror' ],
 		] );
@@ -89,7 +89,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testTheStoreReceivesTheSubjectsOfAnEditOnAWikiOnlyMembersMayRead(): void {
 		$this->installMockHttp( $this->capturingHttp() );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 
 		$this->editAPageOnAWikiOnlyMembersMayRead();
 
@@ -98,7 +98,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testAStoreHoldingAMappingReceivesTheSubjectsOfAnEditOnAWikiOnlyMembersMayRead(): void {
 		$this->installMockHttp( $this->capturingHttp() );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT, 'projection' => 'EDM' ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT, 'projection' => 'EDM' ] ] );
 		$this->createMapping( 'EDM', '{"version":1,"prefixes":{"edm":"http://www.europeana.eu/schemas/edm/"},'
 			. '"schemas":{"' . TestSubject::DEFAULT_SCHEMA_ID . '":{"subject":{"class":"edm:Place"}}}}' );
 
@@ -124,7 +124,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testTheStoreBuildsASourceRegisteredAsAFactoryOnceForAllThePagesItSaves(): void {
 		$this->installMockHttp( $this->capturingHttp() );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 		$builds = 0;
 		$this->registerSources( [
 			'catalog' => function () use ( &$builds ): Source {
@@ -134,7 +134,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 		] );
 
 		$this->runWithoutGraphBackend( function (): void {
-			$store = NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins()['native'];
+			$store = SWSExtension::getInstance()->getNamedGraphDatabasePlugins()['native'];
 			$store->savePage( $this->pageWithASubjectOfACatalogSchema( 1 ) );
 			$store->savePage( $this->pageWithASubjectOfACatalogSchema( 2 ) );
 		} );
@@ -151,7 +151,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testDeletingPageSendsDropToSparqlStore(): void {
 		$this->installMockHttp( $this->capturingHttp() );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 
 		$pageId = $this->runWithoutGraphBackend( function (): int {
 			$pageId = $this->createPageWithSubjects( 'Sparql delete page', TestSubject::build() )->getPageId();
@@ -168,7 +168,7 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testFailingSparqlEndpointDoesNotAbortTheEdit(): void {
 		$this->installMockHttp( $this->makeFakeHttpRequest( 'server error', 500 ) );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 
 		$revision = $this->runWithoutGraphBackend(
 			fn () => $this->createPageWithSubjects( 'Sparql failing endpoint page', TestSubject::build() )
@@ -180,12 +180,12 @@ class SparqlGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testRebuildingAnUnreachableSparqlStoreEndsBeforeWalkingTheWiki(): void {
 		$this->installMockHttp( $this->makeFakeHttpRequest( 'connection refused', 0 ) );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => self::ENDPOINT ] ] );
 
 		$run = $this->runWithoutGraphBackend( function (): RebuildRun {
 			$this->createPageWithSubjects( 'Page the rebuild must not walk', TestSubject::build() );
 
-			return NeoWikiExtension::getInstance()
+			return SWSExtension::getInstance()
 				->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE )
 				->rebuild( 'native', RebuildTrigger::Cli, 200, new NullRebuildBatchObserver() );
 		} );

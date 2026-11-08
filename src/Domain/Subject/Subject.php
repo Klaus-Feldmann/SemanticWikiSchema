@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Subject;
+namespace ProfessionalWiki\SWS\Domain\Subject;
 
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 
 class Subject {
 

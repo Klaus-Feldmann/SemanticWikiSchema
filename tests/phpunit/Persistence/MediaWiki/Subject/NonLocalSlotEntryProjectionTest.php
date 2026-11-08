@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\TextContent;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * A local slot holds local Subjects only (ADR 23). Imported or hand-edited content can still carry an
@@ -20,10 +20,10 @@ use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
  * the subject-to-page index reads those keys as bare local ids (ADR 32) and drops such an entry, so
  * the projectors must drop it too rather than write a node nothing can find a page for.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
  * @group Database
  */
-class NonLocalSlotEntryProjectionTest extends NeoWikiIntegrationTestCase {
+class NonLocalSlotEntryProjectionTest extends SWSIntegrationTestCase {
 
 	private const string PAGE_NAME = 'NonLocalSlotEntryTest';
 	private const string LOCAL_ID = 'sTestNLS1111111';
@@ -47,7 +47,7 @@ class NonLocalSlotEntryProjectionTest extends NeoWikiIntegrationTestCase {
 	public function testThePageServesOnlyItsLocalSubject(): void {
 		$pageId = Title::newFromText( self::PAGE_NAME )->getId();
 
-		$subjects = NeoWikiExtension::getInstance()
+		$subjects = SWSExtension::getInstance()
 			->getSubjectRepository()
 			->getSubjectsByPageId( new PageId( $pageId ) );
 

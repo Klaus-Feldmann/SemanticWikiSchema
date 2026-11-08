@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\EntryPoints\Content;
 
 use MediaWiki\Json\FormatJson;
 use MediaWiki\Content\JsonContent;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 
 class SubjectContent extends JsonContent {
 
-	public const string CONTENT_MODEL_ID = 'NeoWikiSubject';
+	public const string CONTENT_MODEL_ID = 'SWSSubject';
 
 	public function __construct( string $text, string $modelId = self::CONTENT_MODEL_ID ) {
 		parent::__construct(
@@ -50,7 +50,7 @@ class SubjectContent extends JsonContent {
 	 * Returns a fresh instance of PageSubjects that does not have a reference to this content object.
 	 */
 	public function getPageSubjects(): PageSubjects {
-		return NeoWikiExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize( $this->getText() );
+		return SWSExtension::getInstance()->newSubjectContentDataDeserializer()->deserialize( $this->getText() );
 	}
 
 	/**

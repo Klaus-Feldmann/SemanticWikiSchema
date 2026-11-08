@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Source;
+namespace ProfessionalWiki\SWS\Tests\Application\Source;
 
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Application\Source\SourceRoutingSubjectLookup;
-use ProfessionalWiki\NeoWiki\Domain\Source\SourceRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
+use ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Source\SourceRoutingSubjectLookup
+ * @covers \ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup
  */
 class SourceRoutingSubjectLookupTest extends TestCase {
 

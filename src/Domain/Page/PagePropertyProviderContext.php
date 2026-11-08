@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Page;
+namespace ProfessionalWiki\SWS\Domain\Page;
 
 readonly class PagePropertyProviderContext {
 
@@ -20,7 +20,7 @@ readonly class PagePropertyProviderContext {
 	 *   Empty string if the content is unavailable.
 	 * @param array<string, int|float|string|bool|null> $parserProperties Properties recorded during parsing of the
 	 *   content (MediaWiki page properties, e.g. "defaultsort" or values set by parser hooks via
-	 *   ParserOutput::setPageProperty). These are inputs from the parse, not to be confused with the NeoWiki
+	 *   ParserOutput::setPageProperty). These are inputs from the parse, not to be confused with the SWS
 	 *   Page Properties that providers return.
 	 */
 	public function __construct(

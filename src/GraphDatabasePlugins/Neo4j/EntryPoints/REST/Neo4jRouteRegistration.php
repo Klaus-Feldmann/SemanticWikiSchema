@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
-use ProfessionalWiki\NeoWiki\NeoWikiConfig;
+use ProfessionalWiki\SWS\SWSConfig;
 
 class Neo4jRouteRegistration {
 
@@ -14,7 +14,7 @@ class Neo4jRouteRegistration {
 	 * @return string[]
 	 */
 	public static function routeFiles( ?string $readUrl, ?string $writeUrl ): array {
-		if ( !NeoWikiConfig::neo4jConfigured( $readUrl, $writeUrl ) ) {
+		if ( !SWSConfig::neo4jConfigured( $readUrl, $writeUrl ) ) {
 			return [];
 		}
 

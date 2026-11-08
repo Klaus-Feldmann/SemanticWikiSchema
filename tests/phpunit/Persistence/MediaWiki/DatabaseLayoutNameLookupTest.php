@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseLayoutNameLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLayoutNameLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseLayoutNameLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLayoutNameLookup
  * @group Database
  */
-class DatabaseLayoutNameLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseLayoutNameLookupTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	/**
 	 * @var array<string, int>
@@ -101,7 +101,7 @@ class DatabaseLayoutNameLookupTest extends NeoWikiIntegrationTestCase {
 		// it must keep querying past the first batch and yield every Layout exactly once, in strictly
 		// ascending page-ID order — a single truncated batch would drop the tail.
 		$bulk = $this->createBarePages(
-			NeoWikiExtension::NS_LAYOUT,
+			SWSExtension::NS_LAYOUT,
 			'BulkLayout',
 			DatabaseLayoutNameLookup::READABLE_NAMES_BATCH_SIZE + 20
 		);

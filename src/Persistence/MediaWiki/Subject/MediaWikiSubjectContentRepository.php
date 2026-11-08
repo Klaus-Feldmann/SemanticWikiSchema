@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Page\PageIdentity;
@@ -11,10 +11,10 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Application\SubjectContentRepository;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Application\SubjectContentRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
 use RuntimeException;
 use WikiPage;
 

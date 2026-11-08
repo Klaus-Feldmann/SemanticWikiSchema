@@ -1,12 +1,12 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use ApiBase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 
 final class ApiIdentity extends ApiBase {
 	public function execute(): void {
@@ -15,9 +15,9 @@ final class ApiIdentity extends ApiBase {
 		$title = Title::newFromID( $params['pageid'] );
 		if ( $title === null || !$this->getAuthority()->authorizeRead( 'read', $title ) ||
 			( $params['descriptions'] && preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $params['language'] ) !== 1 ) ) {
-			$this->dieWithError( 'neowikibasebridge-unavailable', 'unavailable' );
+			$this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' );
 		}
-		$pageSubjects = NeoWikiExtension::getInstance()->newPageSubjectsLookup()
+		$pageSubjects = SWSExtension::getInstance()->newPageSubjectsLookup()
 			->getPageSubjects( new PageId( $title->getArticleID() ) );
 		$mainId = $pageSubjects->getMainSubject()?->id->text;
 		$descriptionIdentities = $params['descriptions'] && $mainId !== null

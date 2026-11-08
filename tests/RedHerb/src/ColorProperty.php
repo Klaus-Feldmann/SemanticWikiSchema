@@ -5,8 +5,8 @@ declare( strict_types = 1 );
 namespace ProfessionalWiki\RedHerb;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
 
 class ColorProperty extends PropertyDefinition {
 

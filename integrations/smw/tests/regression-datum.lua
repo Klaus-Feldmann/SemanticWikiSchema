@@ -21,15 +21,15 @@ mw={language={getContentLanguage=function()return {code='de'}end},text={
  trim=function(s)return s:match('^%s*(.-)%s*$')end,
  nowiki=function(s)return s:gsub('&','&amp;'):gsub('<','&lt;'):gsub('>','&gt;'):gsub('%[','&#91;'):gsub('%]','&#93;'):gsub('|','&#124;')end
 }}
-package.preload['mw.neowiki']=function()return {
+package.preload['mw.sws']=function()return {
  getMainSubject=function()return subject end,getSubject=function()return subject end,
  getSchema=function()return {properties=definitions}end,
  getAll=function(name)return own[name] or {}end
 }end
-package.preload['mw.neowikibase']=function()return {getFields=function()return bridge end}end
+package.preload['mw.swsbase']=function()return {getFields=function()return bridge end}end
 mw.loadData = function(name) return require(name) end
-local api=require('Modul:NeoWiki/API')
-local module=require('Modul:NeoWiki')
+local api=require('Modul:SWS/API')
+local module=require('Modul:SWS')
 local frame={args={},callParserFunction=function(self,options)check(options.name=='#set','Uses #set');writes[#writes+1]=options.args[1];return ''end}
 reset(date());module.annotieren(frame)
 check(writes[1]=='Klassenzuordnung=Mensch','Existing classification retained')

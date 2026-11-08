@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\ParserOptions;
@@ -11,7 +11,7 @@ use MediaWiki\Title\Title;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 final class ProcessingResult {
-    public const STAMP = 'semantic-neowiki-complete-processing-v1';
+    public const STAMP = 'semantic-sws-complete-processing-v1';
 
     public function __construct(
         public readonly Title $title,

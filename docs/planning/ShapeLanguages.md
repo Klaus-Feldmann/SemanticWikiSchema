@@ -11,14 +11,14 @@ Discussion: [#997](https://github.com/ProfessionalWiki/NeoWiki/discussions/997).
 
 [SHACL](https://www.w3.org/TR/shacl/) (a W3C Recommendation) and [ShEx](https://shex.io/) (used by Wikidata for its
 EntitySchemas) describe and validate the shape of RDF graphs. This document answers what role they should play in
-NeoWiki — up to and including replacing NeoWiki's own Schema format.
+SWS — up to and including replacing SWS's own Schema format.
 
 In one line: **native Schemas stay the source of truth; shape languages are adopted at the RDF boundaries.**
 
-1. NeoWiki keeps its own Schema format ([ADR 6](../adr/006-schemas.md), [ADR 9](../adr/009-move-away-from-json-schema.md),
+1. SWS keeps its own Schema format ([ADR 6](../adr/006-schemas.md), [ADR 9](../adr/009-move-away-from-json-schema.md),
    [format reference](../api/schema-format.md)) and its own validator. We do not adopt ShEx or SHACL as the
    internal schema format, nor as the engine behind Subject validation.
-2. NeoWiki embraces shape languages where RDF crosses its boundary:
+2. SWS embraces shape languages where RDF crosses its boundary:
    - **Emitting shapes** generated from native Schemas, as machine-readable contracts for consumers of our RDF.
    - **Conformance-validating ontology projections** (CIDOC-CRM, EDM, …) against target-ontology shapes, in
      cooperation with the T4.5 quality-check component.
@@ -30,7 +30,7 @@ small subset of what shape languages express. The reverse direction is lossy, wh
 
 ## Background
 
-For NeoWiki terminology, see the [glossary](../glossary.md). The short version: Subjects hold Statements
+For SWS terminology, see the [glossary](../glossary.md). The short version: Subjects hold Statements
 whose Values can have multiple ordered parts; Relations between Subjects carry persistent IDs and their own
 properties. Schemas define Subject types via Property Definitions. Subject validation is backend-only: a single PHP
 validator behind REST endpoints returns structured violations ([ADR 21](../adr/021-add-backend-validation.md),
@@ -46,7 +46,7 @@ has changed around it — validation moved to the backend, RDF projections and o
 we revisited it. The conclusion stands, for these reasons:
 
 1. **Our data model is not an RDF graph.** Shape engines validate RDF. Using one internally would put a
-   Subject-to-RDF projection inside the editing path, and require translating engine reports back into NeoWiki terms.
+   Subject-to-RDF projection inside the editing path, and require translating engine reports back into SWS terms.
 2. **Violation reporting is a UI contract, not a boolean.** Our validator returns stable codes with message arguments
    and a `valuePartIndex` pointing into a Value's *ordered* parts, distinguishes writer's-schema type drift
    ([ADR 11](../adr/011-include-writers-schema.md)), and separates pre-existing violations from newly introduced ones
@@ -78,7 +78,7 @@ where they fit:
 ### Generated shape exports
 
 Generate SHACL (and, given demand, ShEx) from native Schemas, expressed over the projection vocabularies. Consumers
-of NeoWiki RDF get a machine-readable contract for the data's structure; the Wikibase-adjacent community gets
+of SWS RDF get a machine-readable contract for the data's structure; the Wikibase-adjacent community gets
 artifacts in a familiar form. This complements the self-description question in [NativeRdfProjection](NativeRdfProjection.md) (Q10) and
 the possible JSON Schema output mentioned in [ADR 9](../adr/009-move-away-from-json-schema.md) — one
 schema-translation surface with several output formats. Cheap to build: a serializer, no engine.
@@ -88,7 +88,7 @@ schema-translation surface with several output formats. Cheap to build: a serial
 The one thing shapes do that native validation never can: check that a projection into a target ontology conforms to
 that ontology's expectations — both that the mapping produces correct structure (checked over sample Subjects at
 mapping-authoring time) and that the data meets the target's requirements (e.g. a mandatory rights statement is
-missing). Engines run in external quality tooling (T4.5), not in the wiki's editing path; NeoWiki provides projected
+missing). Engines run in external quality tooling (T4.5), not in the wiki's editing path; SWS provides projected
 RDF, incremental re-validation via per-page named graphs, and traceability of findings back to page, Subject, and
 property. Detailed in [OntologyMapping](OntologyMapping.md) ("Validating projections"). A candidate engine
 (suggested 2026-07-03): [rudof](https://github.com/rudof-project/rudof) — Rust, SHACL + ShEx, MCP interface, can
@@ -107,7 +107,7 @@ Two uses. First, validate incoming RDF against shapes inside the import pipeline
 import preview and job reports where someone is already triaging records. Second, **bootstrap native Schemas from a
 shape document**: map the supported subset to Property Definitions, and report what was not mapped. Lossy-with-report
 is acceptable here because authority transfers to the native Schema after import. This supports shipping standard
-Schema bundles and migrating existing shape-described models (e.g. Wikibase EntitySchemas) into NeoWiki.
+Schema bundles and migrating existing shape-described models (e.g. Wikibase EntitySchemas) into SWS.
 
 ## SHACL first, ShEx optional
 
@@ -119,7 +119,7 @@ would rather add ShEx output in response to a concrete consumer than speculative
 ## Open questions for partners
 
 **Q1: Shape consumers.** Which tools or workflows on the partner side would consume SHACL (or ShEx) generated from
-NeoWiki Schemas? This determines how much the export capability matters and in which profile.
+SWS Schemas? This determines how much the export capability matters and in which profile.
 
 **Q2: Existing target-ontology shapes.** Which shapes exist today that ontology projections should be checked
 against? Platka-derived SHACL for CIDOC-CRM? EDM validation appears to live in XML Schema/Schematron (Metis) rather
@@ -128,7 +128,7 @@ than SHACL — what should an RDF-side EDM check use?
 **Q3: ShEx demand.** Is there an actual consumer for ShEx output or input (EntitySchema interoperability), or is
 SHACL sufficient for ECHOLOT?
 
-**Q4: Bootstrap sources.** Which existing shape-described models would partners want turned into starter NeoWiki
+**Q4: Bootstrap sources.** Which existing shape-described models would partners want turned into starter SWS
 Schemas, as a test of the import-bootstrap direction?
 
 **Q5: The position itself.** Does anyone see a use case that requires shapes as the *internal* format or engine —

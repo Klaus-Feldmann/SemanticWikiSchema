@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Domain\Schema\Property;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\PageType;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
 
 /** Text constraints and storage, with a local-page meaning and namespace preference. */
 class PageProperty extends TextProperty {

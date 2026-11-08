@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Data;
+namespace ProfessionalWiki\SWS\Tests\Data;
 
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Application\Source\LocalSource;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceNormalizer;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\NeoWiki\Domain\Source\SourceRegistry;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Application\Source\LocalSource;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceNormalizer;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 class TestSources {
 
@@ -34,7 +34,7 @@ class TestSources {
 
 	/**
 	 * Reads Schema references the way this wiki does: local to it, and renamed per $schemaNames in place
-	 * of MediaWiki's page-name normalization, which {@see \ProfessionalWiki\NeoWiki\Tests\Infrastructure\TitleBasedSchemaReferenceNormalizerTest}
+	 * of MediaWiki's page-name normalization, which {@see \ProfessionalWiki\SWS\Tests\Infrastructure\TitleBasedSchemaReferenceNormalizerTest}
 	 * covers. A name outside the map is left alone.
 	 *
 	 * @param array<string, string> $schemaNames Name as written => the name of the Schema it names.

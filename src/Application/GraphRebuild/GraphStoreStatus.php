@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
 
 /**
  * Where one graph store stands: how far its contents are from the wiki, and what rebuilding it has done

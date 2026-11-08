@@ -267,10 +267,10 @@ and any `default` use the same format.
 
 ## REST API
 
-`GET /neowiki/v0/schema/{schemaName}` wraps this format as `{ "schema": ... }`, or `{ "schema": null }` when the Schema
+`GET /sws/v0/schema/{schemaName}` wraps this format as `{ "schema": ... }`, or `{ "schema": null }` when the Schema
 does not exist or you may not [read](rest-api.md#permissions) it.
 
-`PUT /neowiki/v0/schema/{schemaName}` replaces the whole Schema without checking for changes made since you read it.
+`PUT /sws/v0/schema/{schemaName}` replaces the whole Schema without checking for changes made since you read it.
 It takes the Schema and an optional `comment`, used as the edit summary:
 
 ```json

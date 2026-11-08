@@ -1,7 +1,7 @@
 ( function () {
 	'use strict';
 
-	const nw = require( 'ext.neowiki' );
+	const nw = require( 'ext.sws' );
 	const icons = require( './icons.json' );
 	const ColorDisplay = require( './ColorDisplay.vue' );
 	const ColorInput = require( './ColorInput.vue' );
@@ -10,7 +10,7 @@
 
 	const COLOR_TYPE_NAME = 'color';
 
-	mw.hook( 'neowiki.registration' ).add( ( registrar ) => {
+	mw.hook( 'sws.registration' ).add( ( registrar ) => {
 		registrar.registerPropertyType( {
 			typeName: COLOR_TYPE_NAME,
 			valueType: nw.ValueType.String,

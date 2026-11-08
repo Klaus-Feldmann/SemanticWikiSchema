@@ -2,41 +2,41 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\Content\TextContent;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use Wikimedia\Rdbms\IDBAccessObject;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**
  * Needs the database, which holds the index, and the integration base class, whose hooks write it.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndex
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\OnRevisionCreatedHandler
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex
+ * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
+ * @covers \ProfessionalWiki\SWS\SWSExtension
  * @group Database
  */
-class PublishedSubjectIndexTest extends NeoWikiIntegrationTestCase {
+class PublishedSubjectIndexTest extends SWSIntegrationTestCase {
 
 	use ReadsPublishedSubjectIndex;
 
@@ -355,7 +355,7 @@ class PublishedSubjectIndexTest extends NeoWikiIntegrationTestCase {
 		$this->savePage( $this->subject( self::ADA, label: 'Draft name' ) );
 		$this->registerRevisionPolicy( FixedRevisionPolicy::publishing( $approved ) );
 
-		NeoWikiExtension::getInstance()->newPageRebuilder()->rebuild( Title::newFromText( self::PAGE ) );
+		SWSExtension::getInstance()->newPageRebuilder()->rebuild( Title::newFromText( self::PAGE ) );
 
 		$this->assertSame( [ self::ADA => 'Approved name' ], $this->displayNamesOf( $approved->getPageId() ) );
 	}
@@ -365,7 +365,7 @@ class PublishedSubjectIndexTest extends NeoWikiIntegrationTestCase {
 		$this->savePage( $this->subject( self::ADA, label: 'Draft name' ) );
 		$this->registerRevisionPolicy( FixedRevisionPolicy::publishing( $approved ) );
 
-		NeoWikiExtension::getInstance()
+		SWSExtension::getInstance()
 			->newPageRebuilderFor( new SpyGraphDatabasePlugin() )
 			->rebuild( Title::newFromText( self::PAGE ) );
 
@@ -424,7 +424,7 @@ class PublishedSubjectIndexTest extends NeoWikiIntegrationTestCase {
 	private function newIndexThatCannotWrite(): DatabasePublishedSubjectIndex {
 		return new DatabasePublishedSubjectIndex(
 			$this->getServiceContainer()->getConnectionProvider()->getReplicaDatabase(),
-			NeoWikiExtension::getInstance()->newUnrestrictedDependentSubjectRules()
+			SWSExtension::getInstance()->newUnrestrictedDependentSubjectRules()
 		);
 	}
 
@@ -449,7 +449,7 @@ class PublishedSubjectIndexTest extends NeoWikiIntegrationTestCase {
 		$keys = [];
 
 		foreach ( $this->selectSubjectRows( $pageId ) as $row ) {
-			$keys[$row->nws_subject_id] = $row->nws_page_key;
+			$keys[$row->swss_subject_id] = $row->swss_page_key;
 		}
 
 		return $keys;

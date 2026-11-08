@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
 use Throwable;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -32,7 +32,7 @@ class CypherQueryApi extends SimpleHandler {
 	public function run(): Response {
 		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromAuthority( $this->getAuthority() );
 
-		if ( $user->pingLimiter( 'neowiki-query' ) ) {
+		if ( $user->pingLimiter( 'sws-query' ) ) {
 			return $this->errorResponse( 429, 'rateLimitExceeded', 'Query rate limit exceeded.' );
 		}
 

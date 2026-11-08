@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
  * @group Database
  */
-class CompositeCypherQueryValidatorIntegrationTest extends NeoWikiIntegrationTestCase {
+class CompositeCypherQueryValidatorIntegrationTest extends SWSIntegrationTestCase {
 
 	public function setUp(): void {
 		$this->setUpNeo4j();
@@ -45,7 +45,7 @@ class CompositeCypherQueryValidatorIntegrationTest extends NeoWikiIntegrationTes
 		$this->assertTrue( $keywordValidator->queryIsAllowed( $query ) );
 
 		$explainValidator = new ExplainCypherQueryValidator(
-			NeoWikiExtension::getInstance()->getReadOnlyNeo4jClient()
+			SWSExtension::getInstance()->getReadOnlyNeo4jClient()
 		);
 		$this->assertFalse( $explainValidator->queryIsAllowed( $query ) );
 
@@ -57,7 +57,7 @@ class CompositeCypherQueryValidatorIntegrationTest extends NeoWikiIntegrationTes
 		return new CompositeCypherQueryValidator( [
 			new KeywordCypherQueryValidator(),
 			new ExplainCypherQueryValidator(
-				NeoWikiExtension::getInstance()->getReadOnlyNeo4jClient()
+				SWSExtension::getInstance()->getReadOnlyNeo4jClient()
 			),
 		] );
 	}

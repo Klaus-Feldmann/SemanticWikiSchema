@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\ViewParserFunction
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\CreateSubjectParserFunction
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\MainSubjectParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\ViewParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\CreateSubjectParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
  */
 class ParserFunctionErrorI18nTest extends TestCase {
 
-	private const array ERROR_PREFIXES = [ 'neowiki-view-error-', 'neowiki-create-subject-error-', 'neowiki-main-subject-error-' ];
+	private const array ERROR_PREFIXES = [ 'sws-view-error-', 'sws-create-subject-error-', 'sws-main-subject-error-' ];
 
 	/**
 	 * Error messages are rendered via Message::escaped(), which HTML-escapes

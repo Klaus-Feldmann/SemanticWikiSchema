@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\ValidateSubject;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\ValidateSubject;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Application\Queries\ValidateSubject\ValidateSubjectQuery;
-use ProfessionalWiki\NeoWiki\Application\Schema\Exception\SchemaNotFoundException;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Application\Validation\SubjectValidator;
-use ProfessionalWiki\NeoWiki\Infrastructure\ProductionIdGenerator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
+use ProfessionalWiki\SWS\Application\Schema\Exception\SchemaNotFoundException;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
+use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\ValidateSubject\ValidateSubjectQuery
+ * @covers \ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery
  */
 class ValidateSubjectQueryTest extends TestCase {
 

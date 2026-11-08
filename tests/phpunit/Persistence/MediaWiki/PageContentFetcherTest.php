@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Permissions\Authority;
@@ -12,13 +12,13 @@ use MediaWiki\Title\MalformedTitleException;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleParser;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher
  */
 class PageContentFetcherTest extends TestCase {
 

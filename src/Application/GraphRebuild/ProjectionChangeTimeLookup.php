@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
 /**
  * When the definition of an RDF projection last changed, which is what tells a rebuilt store from a

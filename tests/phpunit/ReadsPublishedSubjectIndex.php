@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
 use Wikimedia\Rdbms\IResultWrapper;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
@@ -17,10 +17,10 @@ trait ReadsPublishedSubjectIndex {
 		$rows = [];
 
 		foreach ( $this->selectSubjectRows( $pageId ) as $row ) {
-			$rows[$row->nws_subject_id] = [
-				'schema' => $row->nws_schema,
-				'displayName' => $row->nws_display_name,
-				'isMain' => (bool)$row->nws_is_main,
+			$rows[$row->swss_subject_id] = [
+				'schema' => $row->swss_schema,
+				'displayName' => $row->swss_display_name,
+				'isMain' => (bool)$row->swss_is_main,
 			];
 		}
 
@@ -44,7 +44,7 @@ trait ReadsPublishedSubjectIndex {
 		$flags = [];
 
 		foreach ( $this->selectSubjectRows( $pageId ) as $row ) {
-			$flags[$row->nws_subject_id] = (bool)$row->nws_dependent;
+			$flags[$row->swss_subject_id] = (bool)$row->swss_dependent;
 		}
 
 		return $flags;
@@ -57,7 +57,7 @@ trait ReadsPublishedSubjectIndex {
 		$editTimes = [];
 
 		foreach ( $this->selectSubjectRows( $pageId ) as $row ) {
-			$editTimes[$row->nws_subject_id] = (string)ConvertibleTimestamp::convert( TS_MW, $row->nws_edited );
+			$editTimes[$row->swss_subject_id] = (string)ConvertibleTimestamp::convert( TS_MW, $row->swss_edited );
 		}
 
 		return $editTimes;
@@ -67,8 +67,8 @@ trait ReadsPublishedSubjectIndex {
 		return $this->getDb()->newSelectQueryBuilder()
 			->select( '*' )
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE )
-			->where( [ 'nws_page_id' => $pageId ] )
-			->orderBy( 'nws_subject_id' )
+			->where( [ 'swss_page_id' => $pageId ] )
+			->orderBy( 'swss_subject_id' )
 			->caller( __METHOD__ )
 			->fetchResultSet();
 	}
@@ -80,14 +80,14 @@ trait ReadsPublishedSubjectIndex {
 		$relations = [];
 
 		$result = $this->getDb()->newSelectQueryBuilder()
-			->select( [ 'nwr_subject_id', 'nwr_property', 'nwr_target_id' ] )
+			->select( [ 'swsr_subject_id', 'swsr_property', 'swsr_target_id' ] )
 			->from( DatabasePublishedSubjectIndex::RELATION_TABLE )
-			->where( [ 'nwr_page_id' => $pageId ] )
+			->where( [ 'swsr_page_id' => $pageId ] )
 			->caller( __METHOD__ )
 			->fetchResultSet();
 
 		foreach ( $result as $row ) {
-			$relations[] = [ $row->nwr_subject_id, $row->nwr_property, $row->nwr_target_id ];
+			$relations[] = [ $row->swsr_subject_id, $row->swsr_property, $row->swsr_target_id ];
 		}
 
 		sort( $relations );

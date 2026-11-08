@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\MainConfigNames;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use Wikimedia\Rdbms\DatabaseSqlite;
 
 /**
  * For the tests that need a real full-text index, which is MySQL, and SQLite when PHP's SQLite was
  * built with FTS3.
  */
-abstract class FullTextSearchTestCase extends NeoWikiIntegrationTestCase {
+abstract class FullTextSearchTestCase extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -20,7 +20,7 @@ abstract class FullTextSearchTestCase extends NeoWikiIntegrationTestCase {
 		$this->skipWithoutAFullTextIndex();
 
 		// The test framework configures SearchEngineDummy. Without a configured engine, MediaWiki picks
-		// one from the database type, which NeoWiki's SearchMappings entries answer with its own.
+		// one from the database type, which SWS's SearchMappings entries answer with its own.
 		$this->overrideConfigValue( MainConfigNames::SearchType, null );
 
 		// The test framework turns the Pig Latin variant of English on, which no wiki does by default.

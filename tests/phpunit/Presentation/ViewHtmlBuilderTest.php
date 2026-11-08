@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Presentation\ViewHtmlBuilder;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectContentRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectContentRepository;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\ViewHtmlBuilder
+ * @covers \ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder
  */
 class ViewHtmlBuilderTest extends TestCase {
 
@@ -49,8 +49,8 @@ class ViewHtmlBuilderTest extends TestCase {
 
 		$html = $builder->mainSubjectHtml( Title::newFromText( 'HasSubject' ), null );
 
-		$this->assertStringContainsString( 'class="ext-neowiki-view"', $html );
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="s1zz1111111azz1"', $html );
+		$this->assertStringContainsString( 'class="ext-sws-view"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="s1zz1111111azz1"', $html );
 	}
 
 	public function testDoesNotIncludeRevisionIdInHtml(): void {
@@ -76,7 +76,7 @@ class ViewHtmlBuilderTest extends TestCase {
 
 		$html = $builder->mainSubjectHtml( Title::newFromText( 'RevisionLookup' ), 42 );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="s1zz1111111azz3"', $html );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="s1zz1111111azz3"', $html );
 	}
 
 	public function testShowsNoMainSubjectInFullForAPageWithoutOne(): void {
@@ -211,12 +211,12 @@ class ViewHtmlBuilderTest extends TestCase {
 	}
 
 	public static function wikitextMarkupProvider(): iterable {
-		yield 'the id alone' => [ '<div id="ext-neowiki-main-subject"></div>' ];
+		yield 'the id alone' => [ '<div id="ext-sws-main-subject"></div>' ];
 		yield 'an attribute ending in the data attribute' => [
-			'<div id="ext-neowiki-main-subject" data-x-data-mw-neowiki-subject-id="1"></div>'
+			'<div id="ext-sws-main-subject" data-x-data-mw-sws-subject-id="1"></div>'
 		];
 		yield 'the data attribute inside a value' => [
-			'<div id="ext-neowiki-main-subject" title="a data-mw-neowiki-subject-id="></div>'
+			'<div id="ext-sws-main-subject" title="a data-mw-sws-subject-id="></div>'
 		];
 	}
 

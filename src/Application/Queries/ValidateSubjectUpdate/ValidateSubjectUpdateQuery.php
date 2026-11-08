@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\ValidateSubjectUpdate;
+namespace ProfessionalWiki\SWS\Application\Queries\ValidateSubjectUpdate;
 
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 readonly class ValidateSubjectUpdateQuery {
 

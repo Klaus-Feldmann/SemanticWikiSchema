@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
-use ProfessionalWiki\NeoWiki\Presentation\RestReplaceSubjectPresenter;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Presentation\RestReplaceSubjectPresenter;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestReplaceSubjectPresenter
+ * @covers \ProfessionalWiki\SWS\Presentation\RestReplaceSubjectPresenter
  */
 class RestReplaceSubjectPresenterTest extends TestCase {
 

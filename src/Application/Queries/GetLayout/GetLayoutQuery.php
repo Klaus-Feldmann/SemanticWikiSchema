@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetLayout;
+namespace ProfessionalWiki\SWS\Application\Queries\GetLayout;
 
-use ProfessionalWiki\NeoWiki\Application\LayoutLookup;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\Presentation\LayoutPresentationSerializer;
+use ProfessionalWiki\SWS\Application\LayoutLookup;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
 
 readonly class GetLayoutQuery {
 

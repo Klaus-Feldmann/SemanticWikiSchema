@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki;
+namespace ProfessionalWiki\SWS;
 
 /**
  * Configuration for a single SPARQL 1.1 graph store the SPARQL plugin (#586) projects into and queries.
- * One is parsed from each `NeoWikiSparqlStores` entry (see {@see NeoWikiConfigFactory}).
+ * One is parsed from each `SWSSparqlStores` entry (see {@see SWSConfigFactory}).
  *
  * `updateUrl` is the SPARQL 1.1 Update endpoint the write path posts to; `queryUrl` is the SPARQL 1.1
  * Query endpoint the read surfaces post to, defaulting to `updateUrl` (for QLever the two are the same

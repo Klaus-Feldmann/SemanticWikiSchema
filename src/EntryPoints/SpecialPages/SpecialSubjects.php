@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 
 /**
  * Every Subject on the wiki, newest first, to filter by Schema and search. Special:Subjects/<Schema> opens on one
@@ -29,27 +29,27 @@ class SpecialSubjects extends SpecialPage {
 		$this->addHelpLink( DocumentationUrl::Subjects->value, true );
 
 		$out = $this->getOutput();
-		NeoWikiExtension::getInstance()->newFrontendModuleLoader()->load( $out, $this->getSkin() );
+		SWSExtension::getInstance()->newFrontendModuleLoader()->load( $out, $this->getSkin() );
 
-		$attributes = [ 'id' => 'ext-neowiki-subjects' ];
+		$attributes = [ 'id' => 'ext-sws-subjects' ];
 
 		// As Schema names are read everywhere: "Help:Person" names the Schema page Schema:Help:Person.
 		$schemaTitle = MediaWikiServices::getInstance()->getTitleFactory()
-			->makeTitleSafe( NeoWikiExtension::NS_SCHEMA, $subPage ?? '' );
+			->makeTitleSafe( SWSExtension::NS_SCHEMA, $subPage ?? '' );
 
 		if ( $schemaTitle !== null ) {
-			$attributes['data-mw-neowiki-schema'] = $schemaTitle->getText();
+			$attributes['data-mw-sws-schema'] = $schemaTitle->getText();
 		}
 
 		$out->addHTML( Html::element( 'div', $attributes ) );
 	}
 
 	public function getGroupName(): string {
-		return 'neowiki';
+		return 'sws';
 	}
 
 	public function getDescription(): Message {
-		return $this->msg( 'neowiki-special-subjects' );
+		return $this->msg( 'sws-special-subjects' );
 	}
 
 }

@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\MainConfigNames;
-use ProfessionalWiki\NeoWiki\EntryPoints\Search\SearchMySQLWithSubjects;
-use ProfessionalWiki\NeoWiki\EntryPoints\Search\SearchSqliteWithSubjects;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\Search\SearchMySQLWithSubjects;
+use ProfessionalWiki\SWS\EntryPoints\Search\SearchSqliteWithSubjects;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use SearchEngine;
 use SearchEngineDummy;
 
 /**
- * Which search engine a wiki with NeoWiki installed ends up with. MediaWiki resolves the configured
+ * Which search engine a wiki with SWS installed ends up with. MediaWiki resolves the configured
  * engine, or the one it picks from the database when none is configured, through the SearchMappings
- * entries in extension.json, which is where NeoWiki puts its own engines in place of core's.
+ * entries in extension.json, which is where SWS puts its own engines in place of core's.
  *
  * The test framework configures SearchEngineDummy, so every case states the configuration it is about.
  *
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Search\SearchMySQLWithSubjects
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Search\SearchSqliteWithSubjects
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchMySQLWithSubjects
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchSqliteWithSubjects
  */
-class SearchEngineMappingTest extends NeoWikiIntegrationTestCase {
+class SearchEngineMappingTest extends SWSIntegrationTestCase {
 
 	/**
-	 * Per database type: the name an administrator writes core's engine down as, and NeoWiki's
+	 * Per database type: the name an administrator writes core's engine down as, and SWS's
 	 * stand-in for it.
 	 */
 	private const ENGINES = [
@@ -37,7 +37,7 @@ class SearchEngineMappingTest extends NeoWikiIntegrationTestCase {
 		parent::setUp();
 
 		if ( !array_key_exists( $this->getDb()->getType(), self::ENGINES ) ) {
-			$this->markTestSkipped( 'NeoWiki stands in for the MySQL and SQLite search engines only' );
+			$this->markTestSkipped( 'SWS stands in for the MySQL and SQLite search engines only' );
 		}
 	}
 

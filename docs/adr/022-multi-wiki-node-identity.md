@@ -6,7 +6,7 @@ Status: Accepted (2026-07-19)
 
 ## Context
 
-NeoWiki projects its data into a graph ([ADR 3](003-neo4j-as-graph-database.md),
+SWS projects its data into a graph ([ADR 3](003-neo4j-as-graph-database.md),
 [ADR 19](019-graph-database-architecture.md)). In a **wiki farm** (i.e., BlueSpice Galaxy), several wikis share **one** graph
 so that metadata can be queried across them.
 
@@ -23,7 +23,7 @@ still being designed; this ADR records the first increment and makes it forward-
 
 In the shared graph, node identity is **scoped per wiki**:
 
-- Every node NeoWiki writes (page and subject nodes) carries a **`wiki_id`** property: the **MediaWiki Wiki ID**
+- Every node SWS writes (page and subject nodes) carries a **`wiki_id`** property: the **MediaWiki Wiki ID**
   (wiki name + table prefix, per [Manual:Wiki ID](https://www.mediawiki.org/wiki/Manual:Wiki_ID)).
 - **Page-node identity becomes wiki-scoped**: the `MERGE` key and uniqueness constraint change from `id` to
   `(wiki_id, id)`. Page-node lookups in existing queries are updated to match.

@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
 
 class SpyCypherQueryValidator implements CypherQueryValidator {
 

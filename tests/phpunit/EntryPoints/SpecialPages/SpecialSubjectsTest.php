@@ -2,54 +2,54 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSubjects;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubjects;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSubjects
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubjects
  * @group Database
  */
-class SpecialSubjectsTest extends NeoWikiIntegrationTestCase {
+class SpecialSubjectsTest extends SWSIntegrationTestCase {
 
 	use HelpLinkAssertions;
 
 	public function testMountsTheList(): void {
-		$this->assertStringContainsString( 'id="ext-neowiki-subjects"', $this->outputFor( null ) );
+		$this->assertStringContainsString( 'id="ext-sws-subjects"', $this->outputFor( null ) );
 	}
 
 	public function testPassesTheSubpageOnAsTheInitialSchemaInItsCanonicalForm(): void {
 		$this->assertStringContainsString(
-			'data-mw-neowiki-schema="Computer model"',
+			'data-mw-sws-schema="Computer model"',
 			$this->outputFor( 'computer_model' )
 		);
 	}
 
 	public function testKeepsANamespacePrefixAsPartOfTheSchemaName(): void {
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="Help:Person"', $this->outputFor( 'Help:Person' ) );
+		$this->assertStringContainsString( 'data-mw-sws-schema="Help:Person"', $this->outputFor( 'Help:Person' ) );
 	}
 
 	public function testStartsOnEverySchemaWithoutASubpage(): void {
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $this->outputFor( null ) );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $this->outputFor( null ) );
 	}
 
 	public function testStartsOnEverySchemaWithAnUnparseableSubpage(): void {
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $this->outputFor( '<' ) );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $this->outputFor( '<' ) );
 	}
 
 	public function testMountsTheListWithoutAGraphBackend(): void {
 		$this->assertStringContainsString(
-			'id="ext-neowiki-subjects"',
+			'id="ext-sws-subjects"',
 			$this->runWithoutGraphBackend( fn (): string => $this->outputFor( null ) )
 		);
 	}
 
 	public function testLoadsTheFrontendModule(): void {
-		$this->assertContains( 'ext.neowiki', $this->outputPageFor( null )->getModules() );
+		$this->assertContains( 'ext.sws', $this->outputPageFor( null )->getModules() );
 	}
 
 	public function testTheHelpLinkLeadsToTheDocs(): void {

@@ -6,7 +6,7 @@ Status: Accepted
 
 ## Context
 
-Historically, the NeoWiki frontend interacted directly with Neo4j through Cypher queries.
+Historically, the SWS frontend interacted directly with Neo4j through Cypher queries.
 
 We discovered that Neo4j does not support restricting write permissions outside of the Enterprise
 Edition. We did not know this when choosing Neo4j (ADR 3). Users should not be able to do arbitrary

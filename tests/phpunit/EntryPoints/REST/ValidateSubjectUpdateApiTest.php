@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ValidateSubjectUpdateApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectUpdateApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ValidateSubjectUpdateApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectUpdateApi
  * @group Database
  */
-class ValidateSubjectUpdateApiTest extends NeoWikiIntegrationTestCase {
+class ValidateSubjectUpdateApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	public function testHappyPathReturns200WithEmptyViolations(): void {
 		$this->createPages();
@@ -253,7 +253,7 @@ class ValidateSubjectUpdateApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function getSubjectFromRepository( string $subjectId ): Subject {
-		$subject = NeoWikiExtension::getInstance()
+		$subject = SWSExtension::getInstance()
 			->newSubjectRepository()
 			->getSubject( new SubjectId( $subjectId ) );
 

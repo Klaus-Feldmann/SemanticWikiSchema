@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Rdf;
+namespace ProfessionalWiki\SWS\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /**
  * The synthesized intermediate-node instances of one Subject's projection: it mints their IRIs and, for

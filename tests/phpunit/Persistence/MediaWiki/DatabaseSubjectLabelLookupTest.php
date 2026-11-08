@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectLabelLookupResult;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectLabelLookupResult;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectLabelLookup
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\LowestPageRows
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
-class DatabaseSubjectLabelLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseSubjectLabelLookupTest extends SWSIntegrationTestCase {
 
 	public function testFindsTheSubjectsWhoseNameStartsWithTheSearchInNameOrder(): void {
 		$this->createPageWithoutMainSubject(

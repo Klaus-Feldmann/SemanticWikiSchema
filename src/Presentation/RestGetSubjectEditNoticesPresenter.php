@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
 
 class RestGetSubjectEditNoticesPresenter implements GetSubjectEditNoticesPresenter {
 

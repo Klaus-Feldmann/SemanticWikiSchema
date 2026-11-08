@@ -50,6 +50,6 @@ Reloading the page stays legitimate where server-rendered output must reflect a 
 * Routing editing reads through the stores as the single data-access façade: puts values one component needs into
   shared state, where every fetch needs an epoch guard and a caller must handle a fetch that resolved but wrote
   nothing; ADR 16 already keeps editing UIs off store reads.
-* A query library such as TanStack Query or Pinia Colada: one more shared singleton NeoWiki must provide to frontend
+* A query library such as TanStack Query or Pinia Colada: one more shared singleton SWS must provide to frontend
   extensions, for request volumes the targets in [ADR 29](029-scalability-targets.md) do not justify. Should
   measured volume outgrow them, adopt the library rather than more cache machinery.

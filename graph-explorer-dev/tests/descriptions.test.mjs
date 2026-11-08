@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {readDescriptionGroups,createNeoWikiDescriptionRow} from '../source/neoWikiQIds.js';
+import {readDescriptionGroups,createSWSDescriptionRow} from '../source/swsQIds.js';
 const source={source:'wikidata',id:'Q5',url:'https://www.wikidata.org/wiki/Q5'};
 const group={text:'Mensch',language:'de',sources:[source]};
 const identities={wikidata:{status:'resolved',id:'Q5',url:source.url},descriptionGroups:[group]};
@@ -12,9 +12,9 @@ test('valid description sources remain attached; malicious targets rejected',()=
 test('description renders plain text with source labels and does not replace IDs',()=>{
  class Component{constructor(props){this.props=props;this.state={};}setState(v){this.state={...this.state,...v};}}
  const React={Component,createElement:(type,props,...children)=>({type,props,children})};
- const Row=createNeoWikiDescriptionRow(React,{origin:'https://aufeinwort.info',load:async()=>identities});
+ const Row=createSWSDescriptionRow(React,{origin:'https://aufeinwort.info',load:async()=>identities});
  const row=new Row({iri:'https://aufeinwort.info/entity/sF16iHXBMTQdHDY'});assert.equal(row.render(),null);
- row.state.identities=identities;const rendered=row.render();assert.equal(rendered.props.className,'ge-neowiki-descriptions');
+ row.state.identities=identities;const rendered=row.render();assert.equal(rendered.props.className,'ge-sws-descriptions');
  assert.match(JSON.stringify(rendered),/Mensch/);assert.match(JSON.stringify(rendered),/Wikidata/);
  row.state.identities={...identities,descriptionGroups:[]};assert.equal(row.render(),null);
 });
@@ -26,7 +26,7 @@ test('page descriptions are limited to the same-origin hosting page',()=>{
  assert.deepEqual(readDescriptionGroups([own],identities,{...page,id:43}),[]);
 });
 test('identity envelope carries only the selected display description into the graph',async()=>{
- const {readIdentities}=await import('../source/neoWikiQIds.js');
+ const {readIdentities}=await import('../source/swsQIds.js');
  const sid='sF16iHXBMTQdHDY';
  const local={source:'wikibase-local',id:'Q56',url:'https://aufeinwort.info/wiki/Qwasi:Q56'};
  const selected={text:'Eigene lokale Beschreibung',language:'de',sources:[local]};

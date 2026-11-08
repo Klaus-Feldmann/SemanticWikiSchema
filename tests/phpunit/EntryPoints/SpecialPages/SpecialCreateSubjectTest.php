@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Title\Title;
 use PermissionsError;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialCreateSubject;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialCreateSubject;
+use ProfessionalWiki\SWS\SWSExtension;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialCreateSubject
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\EnforcesRestriction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialCreateSubject
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\EnforcesRestriction
  * @group Database
  */
 class SpecialCreateSubjectTest extends SpecialPageTestBase {
@@ -28,8 +28,8 @@ class SpecialCreateSubjectTest extends SpecialPageTestBase {
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage( '', null, null, $this->getTestUser()->getUser() );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-create-subject"', $output );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $output );
+		$this->assertStringContainsString( 'id="ext-sws-create-subject"', $output );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $output );
 	}
 
 	public function testTheHelpLinkLeadsToTheDocs(): void {
@@ -42,36 +42,36 @@ class SpecialCreateSubjectTest extends SpecialPageTestBase {
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage( 'Person', null, null, $this->getTestUser()->getUser() );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="Person"', $output );
+		$this->assertStringContainsString( 'data-mw-sws-schema="Person"', $output );
 	}
 
 	public function testSubpageUnderscoresBecomeSpacesInTheSchemaName(): void {
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage( 'Legal_Entity', null, null, $this->getTestUser()->getUser() );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-schema="Legal Entity"', $output );
+		$this->assertStringContainsString( 'data-mw-sws-schema="Legal Entity"', $output );
 	}
 
 	public function testASchemaWhoseSubjectsAreDependentIsRefused(): void {
 		// The singleton caches Schemas by page and revision id, which repeat across tests' tables.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		$this->editPage(
-			Title::makeTitle( NeoWikiExtension::NS_SCHEMA, 'Birth' ),
+			Title::makeTitle( SWSExtension::NS_SCHEMA, 'Birth' ),
 			new SchemaContent( '{"subjectsAreDependent":true,"propertyDefinitions":{}}' )
 		);
 
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage( 'Birth', null, 'qqx', $this->getTestUser()->getUser() );
 
-		$this->assertStringContainsString( 'neowiki-create-subject-error-dependent-subjects', $output );
-		$this->assertStringNotContainsString( 'id="ext-neowiki-create-subject"', $output );
+		$this->assertStringContainsString( 'sws-create-subject-error-dependent-subjects', $output );
+		$this->assertStringNotContainsString( 'id="ext-sws-create-subject"', $output );
 	}
 
 	public function testAnUnparseableSubpagePinsNoSchema(): void {
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage( '<', null, null, $this->getTestUser()->getUser() );
 
-		$this->assertStringNotContainsString( 'data-mw-neowiki-schema', $output );
+		$this->assertStringNotContainsString( 'data-mw-sws-schema', $output );
 	}
 
 	public function testAUserWithoutTheEditRightIsRefused(): void {

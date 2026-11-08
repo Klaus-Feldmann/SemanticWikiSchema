@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
 
 /**
  * Maps a QueryException to the localized message that wikitext-facing surfaces
@@ -25,14 +25,14 @@ readonly class CypherErrorMessage {
 
 	public static function for( QueryException $error ): self {
 		return match ( $error->errorType() ) {
-			'permissionDenied' => new self( 'neowiki-cypher-error-permission-denied', [] ),
-			'emptyQuery' => new self( 'neowiki-cypher-error-empty-query', [] ),
-			'writeQueryRejected' => new self( 'neowiki-cypher-error-write-query', [] ),
-			'backendUnavailable' => new self( 'neowiki-cypher-error-backend-unavailable', [] ),
-			'cypherSyntaxError' => new self( 'neowiki-cypher-error-syntax', [ $error->getMessage() ] ),
-			'parameterMissing' => new self( 'neowiki-cypher-error-parameter-missing', [ $error->getMessage() ] ),
-			'queryTimeout' => new self( 'neowiki-cypher-error-timeout', [ $error->getMessage() ] ),
-			default => new self( 'neowiki-cypher-error-internal', [ $error->getMessage() ] ),
+			'permissionDenied' => new self( 'sws-cypher-error-permission-denied', [] ),
+			'emptyQuery' => new self( 'sws-cypher-error-empty-query', [] ),
+			'writeQueryRejected' => new self( 'sws-cypher-error-write-query', [] ),
+			'backendUnavailable' => new self( 'sws-cypher-error-backend-unavailable', [] ),
+			'cypherSyntaxError' => new self( 'sws-cypher-error-syntax', [ $error->getMessage() ] ),
+			'parameterMissing' => new self( 'sws-cypher-error-parameter-missing', [ $error->getMessage() ] ),
+			'queryTimeout' => new self( 'sws-cypher-error-timeout', [ $error->getMessage() ] ),
+			default => new self( 'sws-cypher-error-internal', [ $error->getMessage() ] ),
 		};
 	}
 

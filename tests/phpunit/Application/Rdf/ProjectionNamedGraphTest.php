@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
@@ -35,9 +35,9 @@ use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
  * projections can share one triple store without the per-page replace sync of one wiping the other's
  * triples. The page RESOURCE IRI that appears inside the triples is unaffected — only the graph moves.
  *
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector
- * @covers \ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector
+ * @covers \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces
  */
 class ProjectionNamedGraphTest extends TestCase {
 

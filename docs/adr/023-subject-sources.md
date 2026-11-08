@@ -9,11 +9,11 @@ Feedback remains welcome on the **Open questions** section below.
 
 ## Context
 
-Prior to this ADR, NeoWiki assumed every Subject is local, editable, versioned, stored in a MediaWiki revision slot
+Prior to this ADR, SWS assumed every Subject is local, editable, versioned, stored in a MediaWiki revision slot
 ([ADR 4](004-use-dedicated-slot.md)), and projected into the graph ([ADR 19](019-graph-database-architecture.md)).
 
 Several needed capabilities do not fit that assumption: cross-wiki metadata in a wiki farm, page and approval metadata, free-form (Confluence-style)
-tables, and structured data drawn from other systems (another NeoWiki, an on-wiki SMW or Wikibase store, external services).
+tables, and structured data drawn from other systems (another SWS, an on-wiki SMW or Wikibase store, external services).
 
 The detailed exploration is in [planning/SubjectSources.md](https://github.com/ProfessionalWiki/NeoWiki/blob/36998d0039ae62f248f1ac87d00058ea027408aa/docs/planning/SubjectSources.md).
 
@@ -22,7 +22,7 @@ The detailed exploration is in [planning/SubjectSources.md](https://github.com/P
 ### Subjects come from pluggable Sources
 
 A Subject is produced by a **Source**. The local revision slot is the default Source; others, like an on-wiki SMW/Wikibase
-store, another NeoWiki, or an external system, can also supply Subjects. A **Source registry** maps a source key to its
+store, another SWS, or an external system, can also supply Subjects. A **Source registry** maps a source key to its
 Source, which is the authority for its Subjects' capabilities, identity, and schema resolution. A wiki farm is simply
 more registered Sources.
 
@@ -39,7 +39,7 @@ A Source answers for five things and no more:
 
 On top of those five it carries one obligation rather than a capability: **a Source vouches for what it returns**.
 Everything it hands back is readable by every reader of this wiki, because a sourced Subject has no page here to
-authorize against and NeoWiki performs no per-user authorization on it. A Source over data with restrictions of
+authorize against and SWS performs no per-user authorization on it. A Source over data with restrictions of
 its own must serve only the unrestricted part — a question it answers without knowing who is asking. The accepted
 limitation: sourced data has no per-user granularity — [ADR 27](027-access-control.md) records this as its
 source-attested read class; lifting it would be an additive context on this contract, not a redesign.
@@ -126,7 +126,7 @@ Deferred and/or still being designed; consortium feedback is expected here.
 - **RDF / IRI export and ontology mapping** — see [planning/NativeRdfProjection.md](../planning/NativeRdfProjection.md)
   and [planning/OntologyMapping.md](../planning/OntologyMapping.md).
 - **Editing sourced Subjects (write-back)** — end-of-roadmap. How useful? Things like editing Wikibase Items
-  via NeoWiki UI, or editing data from a remote NeoWiki
+  via SWS UI, or editing data from a remote SWS
 
 ## Alternatives Considered
 

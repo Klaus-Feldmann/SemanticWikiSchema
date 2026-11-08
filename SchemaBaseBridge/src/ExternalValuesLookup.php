@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 use RuntimeException;
 use Throwable;
 
@@ -15,13 +15,13 @@ use Throwable;
 final class ExternalValuesLookup {
 	public function __construct( private readonly IContextSource $context ) {}
 
-	public function read( Title $title, array $p, ?PageDependencyRecorder $dependencies = null, ?\ProfessionalWiki\NeoWiki\Domain\Subject\Subject $selectedSubject = null ): array {
+	public function read( Title $title, array $p, ?PageDependencyRecorder $dependencies = null, ?\ProfessionalWiki\SWS\Domain\Subject\Subject $selectedSubject = null ): array {
 		if ( !$this->context->getAuthority()->authorizeRead( 'read', $title ) ||
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $p['language'] ) !== 1 ) {
-			throw new RuntimeException( 'NeoWikiBaseBridge: page or language unavailable' );
+			throw new RuntimeException( 'SWSBaseBridge: page or language unavailable' );
 		}
 		$dependencies?->recordDependencyOn( $title );
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$subject = $selectedSubject ?? $extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $p['pageid'] ) )->getMainSubject();
 		$fields = [];
 		$presentation = null;
@@ -32,7 +32,7 @@ final class ExternalValuesLookup {
 			$fieldTypes = [];
 			if ( ( $p['presentation'] ?? false ) && $schema !== null ) {
 				$presentation = GraphFieldPresentation::fromSchema( $schema,
-					Title::newFromText( 'NEOWIKIGRAPHTITLETOKEN' )?->getFullURL(), $subject, $p['language'] );
+					Title::newFromText( 'SWSGRAPHTITLETOKEN' )?->getFullURL(), $subject, $p['language'] );
 			}
 			foreach ( $schema?->getAllProperties()->asMap() ?? [] as $name => $property ) {
 				if ( $property->getPropertyType() === 'wikitext' ) { continue; }
@@ -78,7 +78,7 @@ final class ExternalValuesLookup {
 						if ( $status === 'resolved' && !$isTime && $values === [] ) { $status = 'unavailable'; }
 						$timeResult = null;
 						if ( $isTime && $supported && isset( $entities[$entityId] ) ) {
-							$options = $schema->getProperty( new \ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName( $name ) )->getWikiLink() ?? [];
+							$options = $schema->getProperty( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( $name ) )->getWikiLink() ?? [];
 							$timeResult = TimeClaimView::result( $claims, $source, $p['language'], (string)( $GLOBALS['wgLanguageCode'] ?? 'de' ), $options );
 							$status = $timeResult['status'];
 							$values = $timeResult['values'];

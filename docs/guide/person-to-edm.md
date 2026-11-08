@@ -4,12 +4,12 @@ order: 3
 ---
 # Worked example: projecting a Person to EDM
 
-End-to-end walkthrough of an [ontology mapping](../authoring/mapping-format.md) projection: a NeoWiki-native `Person`
+End-to-end walkthrough of an [ontology mapping](../authoring/mapping-format.md) projection: a SWS-native `Person`
 Schema, an EDM Mapping, and a demo page projected into
 [Europeana Data Model](https://pro.europeana.eu/page/edm-documentation) (EDM) RDF, shown against the native projection.
 
 It projects the EDM column of a small "person to many standards" toy model. Everything here ships as
-[demo data](../../DemoData/), so a wiki with the demo data imported (`php maintenance/run.php NeoWiki:ImportDemoData`)
+[demo data](../../DemoData/), so a wiki with the demo data imported (`php maintenance/run.php SemanticWikiSchema:ImportDemoData`)
 reproduces it — up to instance-specific page IDs and base URI (and, in the page metadata, timestamps and last editor).
 
 > **Scope: the near-1:1 tier.** This Person mapping is flat, so the walkthrough is term substitution. For the
@@ -96,29 +96,29 @@ vocabulary:
 
 ```sh
 # native (default):
-curl '.../rest.php/neowiki/v0/page/<id>/rdf?format=turtle'
+curl '.../rest.php/sws/v0/page/<id>/rdf?format=turtle'
 # EDM:
-curl '.../rest.php/neowiki/v0/page/<id>/rdf?projection=EDM&format=turtle'
+curl '.../rest.php/sws/v0/page/<id>/rdf?projection=EDM&format=turtle'
 ```
 
 In bulk, via the dump script (one named graph per page):
 
 ```sh
-php maintenance/run.php NeoWiki:DumpRdf --projection=EDM > dump-edm.trig
+php maintenance/run.php SemanticWikiSchema:DumpRdf --projection=EDM > dump-edm.trig
 ```
 
 ## 5. Native vs EDM output
 
 Real output from the demo wiki (Turtle; shared prefix header trimmed — the `neo*` CURIEs are the
 [IRI scheme](../api/rdf-export.md#iri-scheme)). The **native** projection of `Pablo_Picasso` —
-NeoWiki's own vocabulary, lossless, with page metadata and the two-layer relation:
+SWS's own vocabulary, lossless, with page metadata and the two-layer relation:
 
 ```turtle
 <.../page/115> a neo:Page;
     neo:pageName "Pablo Picasso";
     dcterms:created "2026-07-11T23:22:20Z"^^xsd:dateTime;
     dcterms:modified "2026-07-11T23:22:20Z"^^xsd:dateTime;
-    neo:lastEditor "NeoWiki";
+    neo:lastEditor "SWS";
     neo:mainSubject neo-subj:s2picasso2aaaa2;
     neo:hasSubject neo-subj:s2picasso2aaaa2.
 neo-subj:s2picasso2aaaa2 a neo-schema:Person;
@@ -226,7 +226,7 @@ For an ad-hoc load instead, feed the `DumpRdf --projection=EDM` output into any 
 ## The same data in CIDOC-CRM
 
 The toy model's CIDOC-CRM column mediates birth through an `E67_Birth` event node and an `E52_Time-Span`, neither of
-which exists in NeoWiki's flat data. `Mapping:CIDOC-CRM`, also shipped as demo data, declares both as
+which exists in SWS's flat data. `Mapping:CIDOC-CRM`, also shipped as demo data, declares both as
 [synthesized nodes](../authoring/mapping-format.md#synthesized-node-iris) and attaches `Birth place` and `Birth date` to them, so
 the same `Pablo_Picasso` page exports as an `E21_Person` whose birth hangs off minted event nodes. Which formalism
 authors should ultimately write such mappings in stays open

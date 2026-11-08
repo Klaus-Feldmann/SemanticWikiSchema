@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\EditNotice;
+namespace ProfessionalWiki\SWS\Application\EditNotice;
 
 interface EditNoticeMessageRenderer {
 

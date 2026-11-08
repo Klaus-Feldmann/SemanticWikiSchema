@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
@@ -10,15 +10,15 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use User;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup
  * @group Database
  */
-class FirstRevisionAuthorPageTitlesLookupTest extends NeoWikiIntegrationTestCase {
+class FirstRevisionAuthorPageTitlesLookupTest extends SWSIntegrationTestCase {
 
 	public function testReturnsAPageTheImporterCreated(): void {
 		$this->editAs( $this->importer(), 'Importer page', 'created by the importer' );
@@ -80,7 +80,7 @@ class FirstRevisionAuthorPageTitlesLookupTest extends NeoWikiIntegrationTestCase
 	}
 
 	private function importer(): User {
-		return User::newSystemUser( 'NeoWikiImportTest', [ 'steal' => true ] );
+		return User::newSystemUser( 'SWSImportTest', [ 'steal' => true ] );
 	}
 
 	private function otherUser(): User {

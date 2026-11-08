@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use NeoWikiBaseBridge\DescriptionPresentation;
+use SWSBaseBridge\DescriptionPresentation;
 final class DescriptionPresentationTest extends TestCase {
  private function item(string $text,string $language='de'):array {return ['status'=>'resolved','id'=>'Q5','url'=>'https://example.org/Q5','description'=>['language'=>$language,'value'=>$text]];}
  public function testDifferentDescriptionsPreserveSourceOrder():void {

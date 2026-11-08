@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration
  */
 class SparqlRouteRegistrationTest extends TestCase {
 
@@ -32,10 +32,10 @@ class SparqlRouteRegistrationTest extends TestCase {
 	public function testRouteFileDeclaresSparqlRoute(): void {
 		$routes = json_decode( file_get_contents( SparqlRouteRegistration::routeFiles( [ [ 'updateUrl' => 'u' ] ] )[0] ), true );
 
-		$this->assertSame( '/neowiki/v0/query/sparql', $routes[0]['path'] );
+		$this->assertSame( '/sws/v0/query/sparql', $routes[0]['path'] );
 		$this->assertSame( [ 'POST' ], $routes[0]['method'] );
 		$this->assertSame(
-			'ProfessionalWiki\\NeoWiki\\NeoWikiExtension::newSparqlQueryApi',
+			'ProfessionalWiki\\SWS\\SWSExtension::newSparqlQueryApi',
 			$routes[0]['factory']
 		);
 	}

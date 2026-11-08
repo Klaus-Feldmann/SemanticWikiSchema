@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application;
 
 readonly class Neo4jQueryRequest {
 

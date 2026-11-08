@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Persistence\SubjectPageIndex;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
 use Wikimedia\Rdbms\IDatabase;
 
 /**
- * Maintains `neowiki_subject_page` on the wiki's primary database (ADR 32).
+ * Maintains `sws_subject_page` on the wiki's primary database (ADR 32).
  *
  * Writes go through the connection the surrounding operation is already using, so indexing an edit joins
  * the transaction that writes its revision: the index commits with that revision or not at all, and can
@@ -20,7 +20,7 @@ use Wikimedia\Rdbms\IDatabase;
  */
 class DatabaseSubjectPageIndex implements SubjectPageIndex {
 
-	public const string TABLE = 'neowiki_subject_page';
+	public const string TABLE = 'sws_subject_page';
 
 	public function __construct(
 		private readonly IDatabase $db,
@@ -67,7 +67,7 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 
 	/**
 	 * Deletes by primary key rather than by page id, which is what {@see removePage} does. Deleting by
-	 * page id alone walks the `nwsp_page_id` index and gap-locks the range around it, so two pages saved
+	 * page id alone walks the `swssp_page_id` index and gap-locks the range around it, so two pages saved
 	 * at once whose ids sit next to each other in that index block one another, and can deadlock. Naming
 	 * both key columns turns each row into its own lookup, and Subject ids are random, so the rows a page
 	 * holds are scattered rather than adjacent. MediaWiki core does the same for `page_restrictions`
@@ -78,7 +78,7 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 	private function removeSubjectsOfPage( PageId $pageId, array $subjectIds ): void {
 		$this->db->newDeleteQueryBuilder()
 			->deleteFrom( self::TABLE )
-			->where( [ 'nwsp_subject_id' => $subjectIds, 'nwsp_page_id' => $pageId->id ] )
+			->where( [ 'swssp_subject_id' => $subjectIds, 'swssp_page_id' => $pageId->id ] )
 			->caller( __METHOD__ )
 			->execute();
 	}
@@ -91,8 +91,8 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 			->insertInto( self::TABLE )
 			->rows( array_map(
 				static fn ( string $subjectId ): array => [
-					'nwsp_subject_id' => $subjectId,
-					'nwsp_page_id' => $pageId->id,
+					'swssp_subject_id' => $subjectId,
+					'swssp_page_id' => $pageId->id,
 				],
 				$subjectIds
 			) )
@@ -106,9 +106,9 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 	 */
 	private function subjectsOfPage( PageId $pageId ): array {
 		$stored = $this->db->newSelectQueryBuilder()
-			->select( 'nwsp_subject_id' )
+			->select( 'swssp_subject_id' )
 			->from( self::TABLE )
-			->where( [ 'nwsp_page_id' => $pageId->id ] )
+			->where( [ 'swssp_page_id' => $pageId->id ] )
 			->caller( __METHOD__ )
 			->fetchFieldValues();
 
@@ -120,7 +120,7 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 	public function removePage( PageId $pageId ): void {
 		$this->db->newDeleteQueryBuilder()
 			->deleteFrom( self::TABLE )
-			->where( [ 'nwsp_page_id' => $pageId->id ] )
+			->where( [ 'swssp_page_id' => $pageId->id ] )
 			->caller( __METHOD__ )
 			->execute();
 	}

@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectResponse;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
 
 class RestGetMainSubjectPresenter implements GetMainSubjectPresenter {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -10,21 +10,21 @@ use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the page linked to, whose label is read from its Subject slot.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onHtmlPageLinkRendererBegin
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onChangesListInitRows
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onChangesListSpecialPageStructuredFilters
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onHtmlPageLinkRendererBegin
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onChangesListInitRows
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onChangesListSpecialPageStructuredFilters
  * @group Database
  */
-class SubjectIdTitledPageLinkTest extends NeoWikiIntegrationTestCase {
+class SubjectIdTitledPageLinkTest extends SWSIntegrationTestCase {
 
 	private const string SUBJECT_ID = 's1zz1111111azz8';
 	private const string SUBJECT_NAMESPACE_ID = 's1zz1111111azz9';
@@ -96,7 +96,7 @@ class SubjectIdTitledPageLinkTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testAChangeListLinksToAMainNamespacePageByItsLabelAndIdOnASubjectFirstWiki(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 
 		$this->assertStringContainsString( 'Ada Lovelace', $this->linkFromChangeList() );
 	}
@@ -131,7 +131,7 @@ class SubjectIdTitledPageLinkTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testRecentChangesLinksToAPageInTheSubjectNamespaceByItsLabelAndIdOnASubjectFirstWiki(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createSubjectNamespacePage();
 
 		$html = $this->renderRecentChanges()->getHTML();
@@ -174,7 +174,7 @@ class SubjectIdTitledPageLinkTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function listRow( int $pageId, int $namespace, string $title, ?DerivativeContext $listContext ): void {
-		NeoWikiHooks::onChangesListInitRows(
+		SWSHooks::onChangesListInitRows(
 			$listContext ?? new DerivativeContext( RequestContext::getMain() ),
 			[ (object)[ 'rc_cur_id' => $pageId, 'rc_namespace' => $namespace, 'rc_title' => $title ] ]
 		);
@@ -196,7 +196,7 @@ class SubjectIdTitledPageLinkTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function subjectNamespacePageTitle(): Title {
-		return Title::makeTitle( NeoWikiExtension::NS_SUBJECT, ucfirst( self::SUBJECT_NAMESPACE_ID ) );
+		return Title::makeTitle( SWSExtension::NS_SUBJECT, ucfirst( self::SUBJECT_NAMESPACE_ID ) );
 	}
 
 }

@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use LogicException;
-use ProfessionalWiki\NeoWiki\Infrastructure\IdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
 
 /**
  * Returns a scripted sequence of ids, one per generate() call. Lets a test force a collision by

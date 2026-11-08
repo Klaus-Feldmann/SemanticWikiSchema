@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception;
 
 use RuntimeException;
 
 /**
  * Thrown by the HTTP query endpoint when a SPARQL query request fails: a non-2xx HTTP response, or a
  * transport error (which surfaces as HTTP status 0). Carries the HTTP status and a bounded snippet of
- * the response body so {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService}
+ * the response body so {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService}
  * can classify it (4xx client error vs 5xx/transport unavailability) and, for a client error, relay the
  * store's own detail to the author.
  *

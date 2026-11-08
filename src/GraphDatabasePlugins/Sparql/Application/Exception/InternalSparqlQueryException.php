@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception;
 
 /**
  * A failure not covered by the more specific cases: most notably a 2xx response whose body is not a

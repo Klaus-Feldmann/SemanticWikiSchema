@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Parser\Sanitizer;
 use MessageLocalizer;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSetting;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting;
 
 /**
  * Renders the on-page reference for the on-wiki configuration page from the config schema, so it can
@@ -19,7 +19,7 @@ use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSetting;
  */
 class ConfigDocumentationBuilder {
 
-	public const string ANCHOR = 'neowiki-config-reference';
+	public const string ANCHOR = 'sws-config-reference';
 
 	public function __construct(
 		private ConfigSchema $schema,
@@ -34,19 +34,19 @@ class ConfigDocumentationBuilder {
 	public function buildPointer(): string {
 		return Html::rawElement(
 			'div',
-			[ 'class' => 'neowiki-config-docs-pointer' ],
-			$this->messageLocalizer->msg( 'neowiki-config-docs-pointer', self::ANCHOR, DocumentationUrl::OnWikiSettings->value )->parse()
+			[ 'class' => 'sws-config-docs-pointer' ],
+			$this->messageLocalizer->msg( 'sws-config-docs-pointer', self::ANCHOR, DocumentationUrl::OnWikiSettings->value )->parse()
 		);
 	}
 
 	public function buildReference(): string {
 		return Html::rawElement(
 			'div',
-			[ 'class' => 'neowiki-config-docs' ],
+			[ 'class' => 'sws-config-docs' ],
 			Html::element(
 				'h2',
 				[ 'id' => self::ANCHOR ],
-				$this->messageLocalizer->msg( 'neowiki-config-docs-heading' )->text()
+				$this->messageLocalizer->msg( 'sws-config-docs-heading' )->text()
 			) . $this->renderTable()
 		);
 	}
@@ -65,9 +65,9 @@ class ConfigDocumentationBuilder {
 		return Html::rawElement(
 			'tr',
 			[],
-			Html::element( 'th', [], $this->messageLocalizer->msg( 'neowiki-config-docs-column-key' )->text() )
-			. Html::element( 'th', [], $this->messageLocalizer->msg( 'neowiki-config-docs-column-value' )->text() )
-			. Html::element( 'th', [], $this->messageLocalizer->msg( 'neowiki-config-docs-column-setting' )->text() )
+			Html::element( 'th', [], $this->messageLocalizer->msg( 'sws-config-docs-column-key' )->text() )
+			. Html::element( 'th', [], $this->messageLocalizer->msg( 'sws-config-docs-column-value' )->text() )
+			. Html::element( 'th', [], $this->messageLocalizer->msg( 'sws-config-docs-column-setting' )->text() )
 		);
 	}
 

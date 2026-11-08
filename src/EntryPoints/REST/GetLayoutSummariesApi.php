@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\Domain\Layout\Layout;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class GetLayoutSummariesApi extends SimpleHandler {
 
@@ -19,7 +19,7 @@ class GetLayoutSummariesApi extends SimpleHandler {
 
 	public function run(): Response {
 		$params = $this->getValidatedParams();
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$layoutLookup = $extension->getLayoutLookup();
 
 		$page = $this->buildPage(

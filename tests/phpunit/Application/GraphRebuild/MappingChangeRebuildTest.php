@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\MappingChangeRebuilder;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyRebuildJobQueue;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
 use Psr\Log\NullLogger;
 use TestLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\MappingChangeRebuilder
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks
  * @group Database
  */
-class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
+class MappingChangeRebuildTest extends SWSIntegrationTestCase {
 
 	private const MAPPED_STORE = 'EDM';
 	private const PROJECTION = 'EDM';
@@ -41,18 +41,18 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->overrideConfigValues( [
-			'NeoWikiAutoRebuildOnMappingChange' => true,
-			'NeoWikiSparqlStores' => [
+			'SWSAutoRebuildOnMappingChange' => true,
+			'SWSSparqlStores' => [
 				[ 'updateUrl' => 'http://sparql.invalid/edm', 'projection' => self::PROJECTION, 'name' => self::MAPPED_STORE ],
 				[ 'updateUrl' => 'http://sparql.invalid/cidoc', 'projection' => 'CIDOC', 'name' => self::OTHER_STORE ],
 			],
 		] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testSavingAMappingQueuesARebuildOfTheStoreHoldingItsProjection(): void {
@@ -69,10 +69,10 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	 * naming it in lower case still matches an edit to that page.
 	 */
 	public function testAProjectionConfiguredInLowerCaseMatchesItsMappingPage(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [
+		$this->overrideConfigValue( 'SWSSparqlStores', [
 			[ 'updateUrl' => 'http://sparql.invalid/edm', 'projection' => 'edm', 'name' => self::MAPPED_STORE ],
 		] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		$this->createMapping( 'Edm', self::MAPPING_JSON );
 
@@ -115,11 +115,11 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	 * after the first threw, so a mirrored projection left all but one store on the old vocabulary.
 	 */
 	public function testEveryStoreSharingAProjectionIsQueued(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [
+		$this->overrideConfigValue( 'SWSSparqlStores', [
 			[ 'updateUrl' => 'http://sparql.invalid/edm-a', 'projection' => self::PROJECTION, 'name' => 'edm-a' ],
 			[ 'updateUrl' => 'http://sparql.invalid/edm-b', 'projection' => self::PROJECTION, 'name' => 'edm-b' ],
 		] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		$this->createMapping( self::PROJECTION, self::MAPPING_JSON );
 
@@ -152,14 +152,14 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * NeoWiki's own code defines the native projection, so creating a page that happens to be called
+	 * SWS's own code defines the native projection, so creating a page that happens to be called
 	 * Mapping:Native changes nothing about what a store holding it should contain.
 	 */
 	public function testAMappingNamedAfterTheNativeProjectionRebuildsNothing(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [
+		$this->overrideConfigValue( 'SWSSparqlStores', [
 			[ 'updateUrl' => 'http://sparql.invalid/native', 'projection' => 'native', 'name' => self::NATIVE_STORE ],
 		] );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		$this->createMapping( 'Native', self::MAPPING_JSON );
 
@@ -174,7 +174,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testNothingIsRebuiltWhenTheWikiHasNotAskedForIt(): void {
-		$this->overrideConfigValue( 'NeoWikiAutoRebuildOnMappingChange', false );
+		$this->overrideConfigValue( 'SWSAutoRebuildOnMappingChange', false );
 
 		$this->createMapping( self::PROJECTION, self::MAPPING_JSON );
 
@@ -182,7 +182,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testDeletingAMappingRebuildsNothingWhenTheWikiHasNotAskedForIt(): void {
-		$this->overrideConfigValue( 'NeoWikiAutoRebuildOnMappingChange', false );
+		$this->overrideConfigValue( 'SWSAutoRebuildOnMappingChange', false );
 		$this->createMapping( self::PROJECTION, self::MAPPING_JSON );
 
 		$this->deleteMapping( self::PROJECTION );
@@ -207,7 +207,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 
 	public function testARebuildLeftToFinishIsSaidSoRatherThanReportedAsAFailure(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->newRunRepository()->startRun( self::MAPPED_STORE, RebuildTrigger::Ui, RebuildStatus::Running );
 
 		$this->createMapping( self::PROJECTION, self::MAPPING_JSON );
@@ -241,7 +241,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testAStoreThatCannotBeRebuiltIsReportedRatherThanThrownAt(): void {
 		$logger = new TestLogger( true );
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$rebuilder = new MappingChangeRebuilder(
 			projectionsByStore: [ self::MAPPED_STORE => self::PROJECTION ],
 			coordinator: new GraphRebuildCoordinator(
@@ -275,13 +275,13 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newRunRepository(): RebuildRunRepository {
-		return NeoWikiExtension::getInstance()->newRebuildRunRepository();
+		return SWSExtension::getInstance()->newRebuildRunRepository();
 	}
 
 	private function restoreMapping( string $name ): void {
 		$status = MediaWikiServices::getInstance()->getUndeletePageFactory()->newUndeletePage(
 			MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle(
-				Title::newFromText( $name, NeoWikiExtension::NS_MAPPING )
+				Title::newFromText( $name, SWSExtension::NS_MAPPING )
 			),
 			$this->getTestSysop()->getAuthority()
 		)->undeleteUnsafe( 'test restoration' );
@@ -291,7 +291,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 
 	private function protectMapping( string $name ): void {
 		$page = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle(
-			Title::newFromText( $name, NeoWikiExtension::NS_MAPPING )
+			Title::newFromText( $name, SWSExtension::NS_MAPPING )
 		);
 		$status = $page->doUpdateRestrictions(
 			[ 'edit' => 'sysop' ],
@@ -306,7 +306,7 @@ class MappingChangeRebuildTest extends NeoWikiIntegrationTestCase {
 
 	private function deleteMapping( string $name ): void {
 		$page = MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle(
-			Title::newFromText( $name, NeoWikiExtension::NS_MAPPING )
+			Title::newFromText( $name, SWSExtension::NS_MAPPING )
 		);
 		$deletePage = MediaWikiServices::getInstance()->getDeletePageFactory()->newDeletePage(
 			$page,

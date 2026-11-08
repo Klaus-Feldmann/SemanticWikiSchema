@@ -6,11 +6,11 @@ order: 1
 # Getting started
 
 Turn a wiki page into structured, queryable data in a few minutes. Try it on the public sandbox at
-[neowiki.dev](https://neowiki.dev) (create an account, then experiment freely: it is a sandbox and resets
+[sws.dev](https://neowiki.dev) (create an account, then experiment freely: it is a sandbox and resets
 periodically) or on [your own wiki](../operations/installation.md).
 
-The place to start is **Overview** in the sidebar's **NeoWiki** section: **Special:NeoWiki** leads to the wiki's Schemas
-and the other NeoWiki pages, and lets you create a Subject.
+The place to start is **Overview** in the sidebar's **SWS** section: **Special:SWS** leads to the wiki's Schemas
+and the other SWS pages, and lets you create a Subject.
 
 ## 1. Create a Schema
 

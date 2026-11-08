@@ -8,7 +8,13 @@ The main purpose of this fork is to automatically generate Semantic MediaWiki (S
 
 **This fork is not maintained or supported by Jeroen De Dauw or Professional Wiki.** Please report fork-specific issues in [this repository](https://github.com/Klaus-Feldmann/SemanticWikiSchema/issues), not to the original NeoWiki project. Original authorship and licenses are retained.
 
-Semantic WikiSchema was previously published as Semantic NeoWiki. Existing configuration keys and API names retain their technical identifiers.
+Semantic WikiSchema was previously published as Semantic NeoWiki.
+
+## Independent development and migration from NeoWiki
+
+Semantic WikiSchema is developed independently from its NeoWiki foundation to provide its extended schema, Wikidata/Wikibase and optional SMW workflow. From **0.1.22**, it uses its own SWS database tables and columns, content-model names, subject slot, configuration names, Lua bindings, API routes and MCP tools. **NeoWiki and Semantic WikiSchema 0.1.22 are not interchangeable installations:** switching between them requires a coordinated migration rather than replacing extension files or sharing the same database structures.
+
+A report-first migration tool supports moving existing legacy NeoWiki/Semantic WikiSchema identifiers to SWS while preserving data, subject IDs, pages and revision references. The migration from the adapted **Semantic WikiSchema 0.1.20** installation to **0.1.22** has been completed and tested on AufEinWort. Migration from other NeoWiki versions requires checking the actual source schema and migration report; it is not yet verified for every upstream release. Follow the [migration guide](publication/MIGRATION-0.1.22.md) before replacing an existing installation. Original NeoWiki authorship, provenance and licensing remain acknowledged.
 
 ## Dynamic, schema-driven metadata from WikiData
 
@@ -20,9 +26,9 @@ For Wikipedia, this offers a potential way to consolidate metadata tasks current
 
 ## Version and supported environment
 
-Semantic WikiSchema 0.1.19 adds guided schema field-type changes and retains NeoWiki 0.1.0 as its upstream base.
+Semantic WikiSchema **0.1.22** has been installed on AufEinWort after migrating the existing 0.1.20 data. The user confirmed the browser workflow, and authenticated MCP reads verified schema definitions, stored subjects, dependent-subject relations and complete source-aware Data views through the new SWS APIs. NeoWiki 0.1.0 remains the original upstream base.
 
-The 0.1.19 runtime was installed and tested on AufEinWort using the complete local package. See [verification](publication/VERIFICATION.md) for the distinction between runtime and Composer-distribution checks.
+See [verification](publication/VERIFICATION-0.1.22.md) for the exact checks and remaining limits. A fresh Composer installation of 0.1.22 and fresh JSON/Turtle/TriG export downloads have not yet been verified; earlier-version checks are identified separately.
 
 Support is limited to the tested setup: **MediaWiki 1.47.0-wmf.24, PHP 8.3.36, the legacy parser, UnlinkedWikibase 3.0.0, Semantic MediaWiki 7.4.0, Semantic Scribunto 3.0.0, local Wikibase, Scribunto and a Fuseki/SPARQL-backed Graph Explorer.** Earlier MediaWiki versions and other parser/backend combinations are not supported or tested by this fork. Later versions require their own verification. Details are in [the environment snapshot](publication/TESTED-ENVIRONMENT.json).
 
@@ -46,6 +52,8 @@ External source changes alone do not guarantee immediate propagation to stored S
 
 ## Installation: Composer only
 
+**Existing installations must follow the [data migration guide](publication/MIGRATION-0.1.22.md) before switching code. Copying the new extension over an old installation does not migrate its data.**
+
 This version is for an existing MediaWiki server. **No Docker image, Docker demo or alternate application installer is supplied or supported.** Built Data UI/Graph assets are included; npm is not an installation requirement. Inherited demo data and Docker reference files remain in Git history/source browsing but are excluded from GitHub/Composer distribution archives.
 
 In the MediaWiki root, merge the following into your existing `composer.local.json` without replacing other settings:
@@ -56,7 +64,7 @@ In the MediaWiki root, merge the following into your existing `composer.local.js
     { "type": "vcs", "url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema" }
   ],
   "require": {
-    "aufeinwort/semantic-wikischema": "dev-semantic-0.1.19"
+    "aufeinwort/semantic-wikischema": "dev-semantic-0.1.22"
   },
   "config": {
     "allow-plugins": { "composer/installers": true }
@@ -64,7 +72,7 @@ In the MediaWiki root, merge the following into your existing `composer.local.js
 }
 ```
 
-Use the MediaWiki root Composer workflow, which merges `composer.local.json`; do not run this local configuration file as a separate Composer project. For an existing installation, replace the previous package requirement (`aufeinwort/semantic-neowiki` or `neowiki/neowiki`) with the new one. See the migration guide for the corresponding Composer update command. Remove an obsolete merge include of `extensions/NeoWiki/composer.json`, if present. Preserve existing compatibility work for Wikibase/DataTransfer; the fork does not automatically modify those packages.
+Use the MediaWiki root Composer workflow, which merges `composer.local.json`; do not run this local configuration file as a separate Composer project. For an existing installation, replace the previous package requirement (`aufeinwort/semantic-neowiki` or `neowiki/neowiki`) with the new one. See the migration guide for the corresponding Composer update command. Remove an obsolete merge include of `extensions/NeoWiki/composer.json` or a duplicate `extensions/SemanticWikiSchema/composer.json` include, if present. Preserve existing compatibility work for Wikibase/DataTransfer; the fork does not automatically modify those packages.
 
 Then, from the MediaWiki root:
 
@@ -84,8 +92,8 @@ wfLoadExtension( 'SchemaBaseBridge', "$IP/extensions/SemanticWikiSchema/SchemaBa
 
 $wgUseParsoidParser = false;
 $wgUseParsoidLinksUpdate = false;
-$wgNeoWikiAutoRenderMainSubject = false;
-$wgNeoWikiSubjectFirst = false;
+$wgSWSAutoRenderMainSubject = false;
+$wgSWSSubjectFirst = false;
 
 // Optional AufEinWort registration helper; replace the old include, do not duplicate it:
 $wgAewiWikidataAutoNamespaces = [ 0 ];
@@ -93,16 +101,16 @@ $wgAewiWikidataSmwProperty = 'Wikidata';
 require_once "$IP/extensions/SemanticWikiSchema/integrations/registration/AewiWikidataRegistrierung.php";
 ```
 
-Remove the former `wfLoadExtension( 'NeoWiki' )` and old Bridge include for the switch; never load both implementations. Existing schema/subject content models, namespace IDs, `mw.neowiki`, `neowiki*` APIs, `NeoWiki*` settings, custom hooks and `MediaWiki:NeoWiki` are deliberately retained. **Do not rename stored data or these settings just because the extension folder changed.**
+Remove the former `wfLoadExtension( 'SWS' )` and old Bridge include for the switch; never load both implementations. Existing schema/subject content models, namespace IDs, `mw.sws`, `sws*` APIs, `SWS*` settings, custom hooks and `MediaWiki:SWS` are deliberately retained. **Do not rename stored data or these settings just because the extension folder changed.**
 
-See the commented [LocalSettings example](publication/LocalSettings.SemanticWikiSchema.example.php), [graph configuration](graph-explorer/config.js), and [integration guide](publication/INSTALLATION.md). Keep the existing RDF base IRI and graph-store endpoints. The new graph page is under `/w/extensions/SemanticWikiSchema/graph-explorer/envendpoint.html` on a `/w` deployment; update old links/redirects deliberately. The SPARQL service remains external. The tested NeoWiki graph dataset (port 3331) and SMW SPARQLStore dataset (port 3030) are distinct; the example preserves that separation.
+See the commented [LocalSettings example](publication/LocalSettings.SemanticWikiSchema.example.php), [graph configuration](graph-explorer/config.js), and [integration guide](publication/INSTALLATION.md). Keep the existing RDF base IRI and graph-store endpoints. The new graph page is under `/w/extensions/SemanticWikiSchema/graph-explorer/envendpoint.html` on a `/w` deployment; update old links/redirects deliberately. The SPARQL service remains external. The tested SWS graph dataset (port 3331) and SMW SPARQLStore dataset (port 3030) are distinct; the example preserves that separation.
 
 ## Included integration material
 
-- [SMW modules and templates](integrations/smw/README.md), with current wiki revision provenance. Their existing names remain NeoWiki. Import the two current query modules; preserve existing local configuration. An annotation template call is no longer needed.
+- [SMW modules and templates](integrations/smw/README.md), with current wiki revision provenance. Their existing names remain SWS. Import Modul:WikiSchema for queries and optional WikiSchema templates. Optional SMW mappings use $wgWikiSchemaSmwMapping in LocalSettings.php. An annotation template call is no longer needed.
 - [Wikidata registration helper](integrations/registration/README.md): AewiWikidataRegistrierung.php and its Magic Words file. Existing Q-registration templates can stay; the example helper's automatic title search uses German Wikipedia and is namespace-controlled.
 - [Historical optional SMW 7.3.1 statistics correction](integrations/smw/compatibility/README.md): exact-source patch for SPARQLStore, with a checked backup/apply script. It is not applied by Composer and must not be applied to SMW 7.4.0 on the basis of its older version alone.
-- [MCP source/runtime patch](integrations/mcp/README.md): complete Data-view tool and recognition of the SemanticWikiSchema extension name. Apply before changing extension identity if MCP must retain the existing NeoWiki tools. It targets MCP 0.20.1, with checked compatible 0.20.0 runtime files; it contains no authentication data.
+- [MCP source/runtime patch](integrations/mcp/README.md): complete Data-view tool and recognition of the SemanticWikiSchema extension name. Apply before changing extension identity if MCP must retain the existing SWS tools. It targets MCP 0.20.1, with checked compatible 0.20.0 runtime files; it contains no authentication data.
 
 ## Credits, license and verification
 
@@ -114,4 +122,4 @@ Original copyright notices and the GPL-2.0-or-later license remain unchanged; se
 
 Zazuko Graph Explorer retains its LGPL notice, original sources and dependency notices; the separate MCP patch retains the MCP project's license. See [third-party provenance](publication/THIRD-PARTY.md).
 
-[Verification and limits](publication/VERIFICATION.md) · [German overview](publication/LESEMICH.md) · [Contributing](CONTRIBUTING.md) · [Original NeoWiki documentation](README-UPSTREAM.md)
+[Verification and limits](publication/VERIFICATION.md) · [German overview](publication/LESEMICH.md) · [Contributing](CONTRIBUTING.md) · [Original SWS documentation](README-UPSTREAM.md)

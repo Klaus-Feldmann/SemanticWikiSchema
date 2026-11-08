@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Hook;
+namespace ProfessionalWiki\SWS\EntryPoints\Hook;
 
 final class ImageConfigHook {
 	public static function onMakeGlobalVariablesScript( array &$vars, $out ): void {
-		$vars['wgNeoWikiProjectName'] = (string)$out->getConfig()->get( 'Sitename' );
+		$vars['wgSWSProjectName'] = (string)$out->getConfig()->get( 'Sitename' );
 	}
 }

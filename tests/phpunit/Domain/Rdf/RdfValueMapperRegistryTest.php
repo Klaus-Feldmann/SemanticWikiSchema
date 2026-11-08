@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Value\BooleanValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualText;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry
+ * @covers \ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry
  */
 class RdfValueMapperRegistryTest extends TestCase {
 

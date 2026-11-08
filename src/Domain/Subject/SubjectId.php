@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Subject;
+namespace ProfessionalWiki\SWS\Domain\Subject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Infrastructure\IdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
 use Stringable;
 
 /**
@@ -35,7 +35,7 @@ readonly class SubjectId implements Stringable {
 	public const string SOURCE_KEY_PATTERN = '/^[A-Za-z][A-Za-z0-9_-]{0,63}\z/';
 
 	/**
-	 * A non-local localId is opaque to NeoWiki, so only its serialization is constrained: RFC 3986
+	 * A non-local localId is opaque to SWS, so only its serialization is constrained: RFC 3986
 	 * pchar, minus percent-encoding and minus the two sub-delimiters an HTML attribute would have to
 	 * escape (`&` and `'`). That keeps a serialized id usable verbatim as a REST path segment, a JSON
 	 * object key, a Neo4j string property, a `data-` attribute value and a Lua table value. It admits
@@ -106,7 +106,7 @@ readonly class SubjectId implements Stringable {
 	 * Whether $text is a well-formed Subject id in either form. Syntax only, against the grammars here:
 	 * whether the Source exists is answered at resolution time by the Source registry, and whether that
 	 * Source recognizes the localId is answered by nothing today —
-	 * {@see \ProfessionalWiki\NeoWiki\Domain\Source\Source::isValidLocalId()} is the seam for it, and no
+	 * {@see \ProfessionalWiki\SWS\Domain\Source\Source::isValidLocalId()} is the seam for it, and no
 	 * caller consults it.
 	 */
 	public static function isValid( string $text ): bool {
@@ -114,7 +114,7 @@ readonly class SubjectId implements Stringable {
 	}
 
 	/**
-	 * The local Source's own grammar, which {@see \ProfessionalWiki\NeoWiki\Application\Source\LocalSource}
+	 * The local Source's own grammar, which {@see \ProfessionalWiki\SWS\Application\Source\LocalSource}
 	 * exposes as its localId rule.
 	 */
 	public static function isValidLocalId( string $text ): bool {

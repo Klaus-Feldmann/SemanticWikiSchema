@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Context\RequestContext;
@@ -11,19 +11,19 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Permissions\UltimateAuthority;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
 use SkinTemplate;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onContentHandlerDefaultModelFor
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onEditFilter
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onSkinTemplateNavigationUniversal
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onContentHandlerDefaultModelFor
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onEditFilter
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSkinTemplateNavigationUniversal
  * @group Database
  */
 class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 
 	private function configTitle(): Title {
-		return Title::makeTitle( NS_MEDIAWIKI, 'NeoWiki' );
+		return Title::makeTitle( NS_MEDIAWIKI, 'SWS' );
 	}
 
 	private function newEditPage( Title $title ): EditPage {
@@ -36,7 +36,7 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 
 	private function editFilterError( Title $title, string $text ): string {
 		$error = '';
-		NeoWikiHooks::onEditFilter( $this->newEditPage( $title ), $text, '', $error, '' );
+		SWSHooks::onEditFilter( $this->newEditPage( $title ), $text, '', $error, '' );
 
 		return $error;
 	}
@@ -44,7 +44,7 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 	public function testConfigPageGetsTheJsonContentModel(): void {
 		$model = CONTENT_MODEL_WIKITEXT;
 
-		NeoWikiHooks::onContentHandlerDefaultModelFor( $this->configTitle(), $model );
+		SWSHooks::onContentHandlerDefaultModelFor( $this->configTitle(), $model );
 
 		$this->assertSame( CONTENT_MODEL_JSON, $model );
 	}
@@ -52,16 +52,16 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 	public function testOtherMediaWikiPageKeepsItsContentModel(): void {
 		$model = CONTENT_MODEL_WIKITEXT;
 
-		NeoWikiHooks::onContentHandlerDefaultModelFor( Title::makeTitle( NS_MEDIAWIKI, 'NotNeoWiki' ), $model );
+		SWSHooks::onContentHandlerDefaultModelFor( Title::makeTitle( NS_MEDIAWIKI, 'NotSWS' ), $model );
 
 		$this->assertSame( CONTENT_MODEL_WIKITEXT, $model );
 	}
 
 	public function testContentModelIsNotForcedWhenInWikiConfigDisabled(): void {
-		$this->overrideConfigValue( 'NeoWikiEnableInWikiConfig', false );
+		$this->overrideConfigValue( 'SWSEnableInWikiConfig', false );
 
 		$model = CONTENT_MODEL_WIKITEXT;
-		NeoWikiHooks::onContentHandlerDefaultModelFor( $this->configTitle(), $model );
+		SWSHooks::onContentHandlerDefaultModelFor( $this->configTitle(), $model );
 
 		$this->assertSame( CONTENT_MODEL_WIKITEXT, $model );
 	}
@@ -81,9 +81,9 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function testUnknownKeyIsRejectedWithItsMessage(): void {
-		$error = $this->editFilterError( $this->configTitle(), '{ "NeoWikiSparqlStores": [] }' );
+		$error = $this->editFilterError( $this->configTitle(), '{ "SWSSparqlStores": [] }' );
 
-		$this->assertStringContainsString( 'NeoWikiSparqlStores', $error );
+		$this->assertStringContainsString( 'SWSSparqlStores', $error );
 	}
 
 	public function testWrongTypeIsRejected(): void {
@@ -120,13 +120,13 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function testOtherMediaWikiPageKeepsItsNamespaceTab(): void {
-		$links = $this->navigationOf( Title::makeTitle( NS_MEDIAWIKI, 'NotNeoWiki' ) );
+		$links = $this->navigationOf( Title::makeTitle( NS_MEDIAWIKI, 'NotSWS' ) );
 
 		$this->assertArrayHasKey( 'mediawiki', $links['associated-pages'] );
 	}
 
 	/**
-	 * The tabs MediaWiki gives a MediaWiki: page, as NeoWiki leaves them. Skins draw them from
+	 * The tabs MediaWiki gives a MediaWiki: page, as SWS leaves them. Skins draw them from
 	 * associated-pages, or from namespaces, its older copy.
 	 */
 	private function navigationOf( Title $title, ?Authority $authority = null ): array {
@@ -147,13 +147,13 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 			'views' => [ 'view' => [ 'text' => 'Read' ], 'edit' => [ 'text' => 'Edit' ] ],
 		];
 
-		NeoWikiHooks::onSkinTemplateNavigationUniversal( $skin, $links );
+		SWSHooks::onSkinTemplateNavigationUniversal( $skin, $links );
 
 		return $links;
 	}
 
 	public function testConfigPageIsNotValidatedWhenInWikiConfigDisabled(): void {
-		$this->overrideConfigValue( 'NeoWikiEnableInWikiConfig', false );
+		$this->overrideConfigValue( 'SWSEnableInWikiConfig', false );
 
 		$this->assertSame(
 			'',

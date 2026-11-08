@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildBatchObserver;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildBatchObserver;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
 
 /**
  * Cancels the store's rebuild after its first batch, standing in for someone pressing cancel while a

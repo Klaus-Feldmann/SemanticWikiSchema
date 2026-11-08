@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\RemoveStatementApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\RemoveStatementApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\RemoveStatementApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\RemoveStatementApi
  * @group Database
  */
-class RemoveStatementApiTest extends NeoWikiIntegrationTestCase {
+class RemoveStatementApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SUBJECT_ID = 'sTestRS11111111';
 
@@ -75,7 +75,7 @@ class RemoveStatementApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function getSubjectFromRepository(): Subject {
-		$subject = NeoWikiExtension::getInstance()
+		$subject = SWSExtension::getInstance()
 			->newSubjectRepository()
 			->getSubject( new SubjectId( self::SUBJECT_ID ) );
 
@@ -232,7 +232,7 @@ class RemoveStatementApiTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectPage();
 		$this->deletePage(
 			$this->getServiceContainer()->getWikiPageFactory()->newFromTitle(
-				Title::newFromText( 'RemoveStatementSchema', NeoWikiExtension::NS_SCHEMA )
+				Title::newFromText( 'RemoveStatementSchema', SWSExtension::NS_SCHEMA )
 			)
 		);
 
@@ -250,7 +250,7 @@ class RemoveStatementApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testEnforcementBlocksRemovingARequiredStatement(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 		$this->createSubjectPage(
 			'{"title":"RemoveStatementSchema","propertyDefinitions":'
 				. '{"Website":{"type":"url","required":{"severity":"error"}}}}'

@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\MutablePagePropertyProvider;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\MutablePagePropertyProvider;
 
 /**
  * The refresh a Page Property Provider triggers when the state it contributes changes outside an edit
  * (#889): an approval extension marking a revision approved, say. A page holding no Subjects is the
  * case this has to cover, since approval is tracked for ordinary content pages.
  *
- * @covers \ProfessionalWiki\NeoWiki\Application\PageRebuilder
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\OnRevisionCreatedHandler
+ * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
  * @group Database
  */
-class PageRefreshWithoutEditTest extends NeoWikiIntegrationTestCase {
+class PageRefreshWithoutEditTest extends SWSIntegrationTestCase {
 
 	private const string PAGE_NAME = 'Page refreshed without an edit';
 
@@ -40,7 +40,7 @@ class PageRefreshWithoutEditTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// The test rebuilds the singleton with a provider registered; reset it so later tests get a
 		// clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testRefreshUpdatesThePagePropertiesOfAPageWithoutSubjects(): void {
@@ -55,7 +55,7 @@ class PageRefreshWithoutEditTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * Through NeoWikiExtension's own wiring, not a hand-built handler: the registered policy has to reach
+	 * Through SWSExtension's own wiring, not a hand-built handler: the registered policy has to reach
 	 * both PageRebuilder and the handler behind it, or a rebuild after approval would project the draft.
 	 */
 	public function testRefreshProjectsTheRevisionTheRegisteredPolicyPublishes(): void {
@@ -90,7 +90,7 @@ class PageRefreshWithoutEditTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function refreshPage(): PageRefreshOutcome {
-		return NeoWikiExtension::getInstance()
+		return SWSExtension::getInstance()
 			->newPageRebuilder()
 			->rebuild( Title::newFromText( self::PAGE_NAME ) );
 	}

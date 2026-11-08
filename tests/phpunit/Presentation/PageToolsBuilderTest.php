@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Skin\SkinComponentUtils;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Presentation\PageToolsBuilder;
+use ProfessionalWiki\SWS\Presentation\PageToolsBuilder;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\PageToolsBuilder
+ * @covers \ProfessionalWiki\SWS\Presentation\PageToolsBuilder
  */
 class PageToolsBuilderTest extends MediaWikiIntegrationTestCase {
 
@@ -77,7 +77,7 @@ class PageToolsBuilderTest extends MediaWikiIntegrationTestCase {
 		$this->assertEquals(
 			[
 				$this->rdfItem(),
-				$this->editJsonItem( 'neowiki-page-tools-view-json' ),
+				$this->editJsonItem( 'sws-page-tools-view-json' ),
 			],
 			$this->build(
 				canCreateMainSubject: false,
@@ -111,11 +111,11 @@ class PageToolsBuilderTest extends MediaWikiIntegrationTestCase {
 	 */
 	private function createSubjectItem(): array {
 		return [
-			'text' => wfMessage( 'neowiki-page-tools-create-subject' )->text(),
+			'text' => wfMessage( 'sws-page-tools-create-subject' )->text(),
 			'href' => '#',
-			'id' => 't-neowiki-create-subject',
+			'id' => 't-sws-create-subject',
 			'data' => [
-				'mw-neowiki-action' => 'open-subject-creator',
+				'mw-sws-action' => 'open-subject-creator',
 			],
 		];
 	}
@@ -125,21 +125,21 @@ class PageToolsBuilderTest extends MediaWikiIntegrationTestCase {
 	 */
 	private function rdfItem(): array {
 		return [
-			'text' => wfMessage( 'neowiki-page-tools-rdf' )->text(),
-			'href' => wfScript( 'rest' ) . '/neowiki/v0/page/'
+			'text' => wfMessage( 'sws-page-tools-rdf' )->text(),
+			'href' => wfScript( 'rest' ) . '/sws/v0/page/'
 				. self::PAGE_ID . '/rdf?format=turtle',
-			'id' => 't-neowiki-rdf',
+			'id' => 't-sws-rdf',
 		];
 	}
 
 	/**
 	 * @return array<string, mixed>
 	 */
-	private function editJsonItem( string $messageKey = 'neowiki-page-tools-edit-json' ): array {
+	private function editJsonItem( string $messageKey = 'sws-page-tools-edit-json' ): array {
 		return [
 			'text' => wfMessage( $messageKey )->text(),
 			'href' => SkinComponentUtils::makeSpecialUrlSubpage( 'NeoJson', self::PAGE_NAME ),
-			'id' => 't-neowiki-edit-json',
+			'id' => 't-sws-edit-json',
 		];
 	}
 

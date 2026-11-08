@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\SubjectSummaries;
+namespace ProfessionalWiki\SWS\Tests\Application\SubjectSummaries;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryHostSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestNaming;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Tests\Data\TestNaming;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryHostSubjects
+ * @covers \ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects
  */
 class SubjectSummaryHostSubjectsTest extends TestCase {
 

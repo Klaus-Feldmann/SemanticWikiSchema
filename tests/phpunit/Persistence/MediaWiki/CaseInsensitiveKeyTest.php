@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CaseInsensitiveKey;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\CaseInsensitiveKey;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CaseInsensitiveKey
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CaseInsensitiveKey
  */
 class CaseInsensitiveKeyTest extends TestCase {
 

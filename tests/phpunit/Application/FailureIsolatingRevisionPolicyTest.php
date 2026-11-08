@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\FailureIsolatingRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Application\FailureIsolatingRevisionPolicy;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\FailureIsolatingRevisionPolicy
+ * @covers \ProfessionalWiki\SWS\Application\FailureIsolatingRevisionPolicy
  */
 class FailureIsolatingRevisionPolicyTest extends TestCase {
 

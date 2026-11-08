@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki;
+namespace ProfessionalWiki\SWS;
 
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
+use ProfessionalWiki\SWS\Domain\Page\PageProperties;
 
 /**
  * The Page Properties to project for a revision.
@@ -15,7 +15,7 @@ use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
  * propagates is the caller's choice, made by which implementation it is given: the hook-facing write
  * path isolates it so a projection failure never aborts the user's edit, and the maintenance rebuild
  * path lets it through so the script can report which pages failed to reconcile, and why. This mirrors
- * the same split on the graph plugins (see FailureIsolatingGraphDatabasePlugin and NeoWikiExtension).
+ * the same split on the graph plugins (see FailureIsolatingGraphDatabasePlugin and SWSExtension).
  *
  * Null means the properties could not be built and the page must not be projected. Only the isolating
  * implementation returns it; PagePropertiesBuilder always either answers or throws.

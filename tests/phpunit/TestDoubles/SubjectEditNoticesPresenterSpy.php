@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
 
 class SubjectEditNoticesPresenterSpy implements GetSubjectEditNoticesPresenter {
 

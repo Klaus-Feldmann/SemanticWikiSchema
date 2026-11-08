@@ -2,32 +2,32 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestGetPageSubjectsPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetPageSubjects\GetPageSubjectsQuery
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestGetPageSubjectsPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery
  * @group Database
  */
-class GetPageSubjectsApiTest extends NeoWikiIntegrationTestCase {
+class GetPageSubjectsApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	public function setUp(): void {
 		$this->setUpNeo4j();
@@ -312,7 +312,7 @@ JSON
 
 		$emptyPageId = $this->insertPage(
 			'GetPageSubjectsApiTest_NoSubjects',
-			'Just wikitext, no NeoWiki subjects.'
+			'Just wikitext, no SWS subjects.'
 		)['id'];
 
 		$denied = json_decode( $this->executeHandler(

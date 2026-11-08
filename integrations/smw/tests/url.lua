@@ -2,13 +2,13 @@ local n=0
 local function check(ok,msg)n=n+1;if not ok then error(msg)end end
 local records,other,allCalls,bridgeCalls,fail={{url='https://de.wikipedia.org/wiki/Regiomontanus?oldid=123&x=2',label='Regiomontanus',caption='Wikipedia (de)',captionPage='Vermerk:Wikipedia'}},{},{},0,false
 mw={loadData=function(name)return require(name)end,text={trim=function(s)return s:match('^%s*(.-)%s*$')end,nowiki=function(s)return s end},language={getContentLanguage=function()return {code='de'}end},hash={hashValue=function(_,s)return 'id'..s:gsub('%z','_')end}}
-package.preload['mw.neowiki']=function()return {
+package.preload['mw.sws']=function()return {
 getMainSubject=function()return {id='sTest',schema='Person',statements={Quellenangabe={values=records}}}end,
 getSchema=function()return {name='Person',properties={{name='Quellenangabe',type='url'},{name='Zahl',type='number'}}}end,
 getAll=function(name)if name=='Zahl'then return other end;local t={};for _,v in ipairs(records)do t[#t+1]=v.url end;return t end
 }end
-package.preload['mw.neowikibase']=function()bridgeCalls=bridgeCalls+1;error('Not needed')end
-local api=require('Modul:NeoWiki/API');local m=require('Modul:NeoWiki');local config=require('Modul:NeoWiki/config')
+package.preload['mw.swsbase']=function()bridgeCalls=bridgeCalls+1;error('Not needed')end
+local api=require('Modul:SWS/API');local m=require('Modul:SWS');local config=require('Modul:SWS/config')
 local frame={callParserFunction=function(self,o)allCalls[#allCalls+1]=o;return ''end}
 local values=api.collect().fields[1].values
 check(values[1].value==records[1].url,'Scalar URL preserved')

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\GetSubjectEditNotices;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSubjectEditNotices;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeProvider;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\NullSubjectEditNoticeEnvironment;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\RecordingSchemaNoticeProvider;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubSubjectEditNoticeContextFactory;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubSubjectEditNoticeProvider;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SubjectEditNoticesPresenterSpy;
+use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use ProfessionalWiki\SWS\Tests\TestDoubles\NullSubjectEditNoticeEnvironment;
+use ProfessionalWiki\SWS\Tests\TestDoubles\RecordingSchemaNoticeProvider;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeContextFactory;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SubjectEditNoticesPresenterSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
  */
 class GetSubjectEditNoticesQueryTest extends TestCase {
 

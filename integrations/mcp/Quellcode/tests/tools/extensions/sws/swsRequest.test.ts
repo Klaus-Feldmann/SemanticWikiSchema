@@ -1,0 +1,267 @@
+import { describe, it, expect, vi } from 'vitest';
+import { createMockMwn } from '../../../helpers/mock-mwn.ts';
+import { swsRequest } from '../../../../src/tools/extensions/sws/swsRequest.ts';
+import { ClassifiedError } from '../../../../src/errors/classifyError.ts';
+import { WikiTimeoutError } from '../../../../src/errors/wikiTimeoutError.ts';
+import { rejectionOf } from '../../../helpers/rejectionOf.ts';
+import { httpError } from '../../../helpers/httpError.ts';
+
+describe('swsRequest', () => {
+	it('derives the REST base from apiUrl and sends a GET with query string', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockResolvedValue({ data: { schemas: [], totalRows: 0 } }),
+		});
+		await swsRequest(mock as never, {
+			method: 'GET',
+			path: '/schemas',
+			query: { limit: '500', offset: '0' },
+		});
+		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
+		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/schemas?limit=500&offset=0');
+		expect(call.method).toBe('GET');
+	});
+
+	it('lets an expired call budget through instead of relabelling it', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(new WikiTimeoutError(150_000, 'calling')),
+		});
+
+		const err = await rejectionOf(
+			swsRequest(mock as never, { method: 'GET', path: '/schemas' }),
+		);
+
+		// Converted, the tool returns it as a RESULT the dispatcher never sees,
+		// losing the code and the write caveat.
+		expect(err).toBeInstanceOf(WikiTimeoutError);
+		expect(err).not.toBeInstanceOf(ClassifiedError);
+	});
+
+	it('JSON-encodes a POST body and sets Content-Type', async () => {
+		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: { rows: [] } }) });
+		await swsRequest(mock as never, {
+			method: 'POST',
+			path: '/query/cypher',
+			body: { cypher: 'RETURN 1' },
+		});
+		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
+		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/query/cypher');
+		expect(call.method).toBe('POST');
+		expect(call.data).toBe(JSON.stringify({ cypher: 'RETURN 1' }));
+		expect((call.headers as Record<string, string>)['Content-Type']).toBe('application/json');
+	});
+
+	it('injects the bearer when using OAuth2, and omits it otherwise', async () => {
+		const withTok = createMockMwn({
+			usingOAuth2: true,
+			options: { apiUrl: 'https://test.wiki/w/api.php', OAuth2AccessToken: 'tok' },
+			rawRequest: vi.fn().mockResolvedValue({ data: {} }),
+		});
+		await swsRequest(withTok as never, { method: 'GET', path: '/schemas' });
+		const h1 = (withTok.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
+		expect(h1.Authorization).toBe('Bearer tok');
+
+		const noTok = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: {} }) });
+		await swsRequest(noTok as never, { method: 'GET', path: '/schemas' });
+		const h2 = (noTok.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
+		expect(h2.Authorization).toBeUndefined();
+	});
+
+	it('maps an errorType envelope to the right category', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi
+				.fn()
+				.mockRejectedValue(
+					httpError(422, { errorType: 'writeQueryRejected', message: 'Query is not read-only.' }),
+				),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
+		).rejects.toMatchObject({ category: 'invalid_input', message: 'Query is not read-only.' });
+	});
+
+	it('maps permission/rate/backend errorTypes', async () => {
+		const cases: Array<[string, string]> = [
+			['permissionDenied', 'permission_denied'],
+			['rateLimitExceeded', 'rate_limited'],
+			['backendUnavailable', 'upstream_failure'],
+		];
+		for (const [errorType, category] of cases) {
+			const mock = createMockMwn({
+				rawRequest: vi.fn().mockRejectedValue(httpError(500, { errorType, message: 'x' })),
+			});
+			await expect(
+				swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
+			).rejects.toMatchObject({ category });
+		}
+	});
+
+	it('maps a REST param-validation envelope to invalid_input with the English message', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(
+				httpError(400, {
+					error: 'parameter-validation-failed',
+					messageTranslations: { en: 'The "schema" parameter must be set.' },
+				}),
+			),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'GET', path: '/subject-labels' }),
+		).rejects.toMatchObject({
+			category: 'invalid_input',
+			message: 'The "schema" parameter must be set.',
+		});
+	});
+
+	it('maps a read-denied envelope to permission_denied', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi
+				.fn()
+				.mockRejectedValue(
+					httpError(403, { error: 'rest-read-denied', httpCode: 403, httpReason: 'Forbidden' }),
+				),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'GET', path: '/schemas' }),
+		).rejects.toMatchObject({ category: 'permission_denied' });
+	});
+
+	it('records the HTTP status the wiki answered with', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(httpError(409, { status: 'error', message: 'taken' })),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'POST', path: '/subject', body: {} }),
+		).rejects.toMatchObject({ upstreamStatus: 409 });
+	});
+
+	it('maps a refused write to invalid_input and carries its violations', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(
+				httpError(422, {
+					status: 'error',
+					message: 'Validation failed',
+					violations: [
+						{
+							propertyName: null,
+							code: 'dependent-subject-without-host',
+							args: [],
+							severity: 'error',
+							subjectId: 's1demo6sssssss1',
+						},
+					],
+				}),
+			),
+		});
+		const err = await rejectionOf(
+			swsRequest(mock as never, { method: 'PUT', path: '/subject/s1', body: {}, csrf: true }),
+		);
+		expect(err).toMatchObject({ category: 'invalid_input' });
+		expect((err as Error).message).toContain('dependent-subject-without-host');
+		expect((err as Error).message).toContain('s1demo6sssssss1');
+	});
+
+	it('maps a 404 to not_found', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(httpError(404, { error: 'not-found' })),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'GET', path: '/schema/Nope' }),
+		).rejects.toMatchObject({ category: 'not_found' });
+	});
+
+	it('sanitizes an internal-exception body to message only', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockRejectedValue(
+				httpError(500, {
+					message: 'Error: Unsupported Cypher value type: DateTime',
+					exception: { backtrace: ['secret/path.php:67'] },
+				}),
+			),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
+		).rejects.toMatchObject({
+			category: 'upstream_failure',
+			message: 'Error: Unsupported Cypher value type: DateTime',
+		});
+	});
+
+	it('throws upstream_failure when apiUrl is not set', async () => {
+		const mock = createMockMwn({ options: { apiUrl: '' } });
+		await expect(
+			swsRequest(mock as never, { method: 'GET', path: '/schemas' }),
+		).rejects.toMatchObject({ category: 'upstream_failure' });
+	});
+
+	it('falls back to upstream_failure for an unknown errorType', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi
+				.fn()
+				.mockRejectedValue(httpError(500, { errorType: 'someFutureType', message: 'x' })),
+		});
+		await expect(
+			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
+		).rejects.toMatchObject({ category: 'upstream_failure' });
+	});
+
+	it('sends a PUT to the right URL', async () => {
+		const mock = createMockMwn({
+			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'updated', subjectId: 's1' } }),
+		});
+		await swsRequest(mock as never, {
+			method: 'PUT',
+			path: '/subject/s1',
+			body: { label: 'X', statements: {} },
+		});
+		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
+		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/s1');
+		expect(call.method).toBe('PUT');
+	});
+
+	it('sends a DELETE and tolerates an empty body', async () => {
+		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: '' }) });
+		const out = await swsRequest(mock as never, { method: 'DELETE', path: '/subject/s1' });
+		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
+		expect(call.method).toBe('DELETE');
+		expect(out).toBe('');
+	});
+
+	it('injects X-CSRF-TOKEN when csrf is set, and omits it otherwise', async () => {
+		const withCsrf = createMockMwn({
+			getCsrfToken: vi.fn().mockResolvedValue('csrf-tok'),
+			rawRequest: vi.fn().mockResolvedValue({ data: {} }),
+		});
+		await swsRequest(withCsrf as never, { method: 'DELETE', path: '/subject/s1', csrf: true });
+		const h1 = (withCsrf.rawRequest.mock.calls[0][0] as { headers: Record<string, string> })
+			.headers;
+		expect(h1['X-CSRF-TOKEN']).toBe('csrf-tok');
+		expect(withCsrf.getCsrfToken).toHaveBeenCalledTimes(1);
+
+		const noCsrf = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: {} }) });
+		await swsRequest(noCsrf as never, { method: 'GET', path: '/schemas' });
+		const h2 = (noCsrf.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
+		expect(h2['X-CSRF-TOKEN']).toBeUndefined();
+		expect(noCsrf.getCsrfToken).not.toHaveBeenCalled();
+	});
+
+	it('maps the write {status:error,message} envelope by HTTP status', async () => {
+		const cases: Array<[number, string]> = [
+			[400, 'invalid_input'],
+			[403, 'permission_denied'],
+			[404, 'not_found'],
+			[409, 'conflict'],
+			[429, 'rate_limited'],
+			[500, 'upstream_failure'],
+		];
+		for (const [status, category] of cases) {
+			const mock = createMockMwn({
+				rawRequest: vi
+					.fn()
+					.mockRejectedValue(httpError(status, { status: 'error', message: 'bad' })),
+			});
+			await expect(
+				swsRequest(mock as never, { method: 'PUT', path: '/subject/s1', body: {}, csrf: true }),
+			).rejects.toMatchObject({ category, message: 'bad' });
+		}
+	});
+});

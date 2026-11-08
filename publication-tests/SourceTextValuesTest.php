@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use NeoWikiBaseBridge\{TextClaimView,PropertyDatatypePolicy,PropertyResults,SchemaPropertyBindings};
-use ProfessionalWiki\NeoWiki\Application\Semantic\{FieldValues,AnnotationPlanner};
+use SWSBaseBridge\{TextClaimView,PropertyDatatypePolicy,PropertyResults,SchemaPropertyBindings};
+use ProfessionalWiki\SWS\Application\Semantic\{FieldValues,AnnotationPlanner};
 final class SourceTextValuesTest extends TestCase {
     private function reader(array $values,string $status='resolved',array $own=[]): FieldValues {
         return new FieldValues(['name'=>'Person','properties'=>[

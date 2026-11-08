@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 
 /**
- * Which revision of a page NeoWiki publishes: projects to the graph stores, exports as RDF, and reads
+ * Which revision of a page SWS publishes: projects to the graph stores, exports as RDF, and reads
  * Schemas, Layouts, Mappings and the on-wiki configuration from. Registered by an approval extension
  * such as ContentStabilization, which shows readers an approved revision rather than the newest one.
  * With no policy registered every page publishes its latest revision.

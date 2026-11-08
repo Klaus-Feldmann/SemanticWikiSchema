@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MockMessageLocalizer;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml;
+use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectLabelHtml
  */
 class SubjectLabelHtmlTest extends TestCase {
 
@@ -45,19 +45,19 @@ class SubjectLabelHtmlTest extends TestCase {
 	}
 
 	public function testTheIdCarriesTheClassItIsStyledBy(): void {
-		$this->assertStringContainsString( 'class="ext-neowiki-subject-label-id"', $this->withId( 'Ada Lovelace' ) );
+		$this->assertStringContainsString( 'class="ext-sws-subject-label-id"', $this->withId( 'Ada Lovelace' ) );
 	}
 
 	public function testASubjectWithoutALabelReadsAsNoLabelDefinedWithTheId(): void {
 		$html = SubjectLabelHtml::withId( new MockMessageLocalizer( 'qqx' ), null, 's1zz1111111azz4' );
 
-		$this->assertSame( '(neowiki-subject-no-label)(word-separator)(parentheses: s1zz1111111azz4)', strip_tags( $html ) );
+		$this->assertSame( '(sws-subject-no-label)(word-separator)(parentheses: s1zz1111111azz4)', strip_tags( $html ) );
 	}
 
 	public function testNoLabelDefinedCarriesTheClassItIsStyledBy(): void {
 		$html = SubjectLabelHtml::withId( new MockMessageLocalizer( 'qqx' ), null, 's1zz1111111azz4' );
 
-		$this->assertStringContainsString( '<span class="ext-neowiki-subject-label-none">(neowiki-subject-no-label)</span>', $html );
+		$this->assertStringContainsString( '<span class="ext-sws-subject-label-none">(sws-subject-no-label)</span>', $html );
 	}
 
 }

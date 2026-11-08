@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\JsonContent;
@@ -12,12 +12,12 @@ use MediaWiki\Rest\Response;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ResolveSubjectIriApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use TestLogger;
 
 /**
@@ -25,12 +25,12 @@ use TestLogger;
  * dereference reads its target through the combining lookup, so a valid page value wins over the PHP
  * config, an invalid one falls back with a warning, and the kill switch stops the page from applying.
  *
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigLookup
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::isSubjectFirst
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MediaWikiWikiConfigSource
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup
+ * @covers \ProfessionalWiki\SWS\SWSExtension::isSubjectFirst
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
  * @group Database
  */
-class InWikiConfigSubjectFirstTest extends NeoWikiIntegrationTestCase {
+class InWikiConfigSubjectFirstTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private const string SCHEMA = 'InWikiConfigSubjectFirstSchema';
@@ -43,7 +43,7 @@ class InWikiConfigSubjectFirstTest extends NeoWikiIntegrationTestCase {
 
 		// Pin the PHP config to false (the win case's page value is true) so a passing test proves the page
 		// value, not an ambient override; the fallback cases then land on the hosting page.
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', false );
+		$this->overrideConfigValue( 'SWSSubjectFirst', false );
 
 		$this->createSchema( self::SCHEMA );
 
@@ -59,21 +59,21 @@ class InWikiConfigSubjectFirstTest extends NeoWikiIntegrationTestCase {
 
 	protected function tearDown(): void {
 		// Drop the memoized config-page source so a later test does not inherit it.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		parent::tearDown();
 	}
 
 	private function saveConfigPage( string $json ): void {
 		$wikiPage = MediaWikiServices::getInstance()->getWikiPageFactory()
-			->newFromTitle( Title::makeTitle( NS_MEDIAWIKI, NeoWikiExtension::CONFIG_PAGE_TITLE ) );
+			->newFromTitle( Title::makeTitle( NS_MEDIAWIKI, SWSExtension::CONFIG_PAGE_TITLE ) );
 
 		$updater = $wikiPage->newPageUpdater( $this->getTestSysop()->getUser() );
 		$updater->setContent( SlotRecord::MAIN, new JsonContent( $json ) );
 		$updater->saveRevision( CommentStoreComment::newUnsavedComment( 'config' ) );
 
 		// The source memoizes the page per request, so drop the singleton to read the just-saved page.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	private function htmlDereferenceLocation(): string {
@@ -111,7 +111,7 @@ class InWikiConfigSubjectFirstTest extends NeoWikiIntegrationTestCase {
 
 	public function testAnInvalidPageSettingFallsBackToThePhpConfigAndWarns(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 
 		$this->saveConfigPage( '{ "subjectFirst": "yes" }' );
 
@@ -124,7 +124,7 @@ class InWikiConfigSubjectFirstTest extends NeoWikiIntegrationTestCase {
 
 	public function testThePageSettingIsIgnoredWhenInWikiConfigIsDisabled(): void {
 		$this->saveConfigPage( '{ "subjectFirst": true }' );
-		$this->overrideConfigValue( 'NeoWikiEnableInWikiConfig', false );
+		$this->overrideConfigValue( 'SWSEnableInWikiConfig', false );
 
 		$this->assertLandsOnHostingPage(
 			$this->htmlDereferenceLocation(),

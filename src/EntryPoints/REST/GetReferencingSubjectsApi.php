@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\RestGetReferencingSubjectsPresenter;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\RestGetReferencingSubjectsPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -17,7 +17,7 @@ class GetReferencingSubjectsApi extends SimpleHandler {
 
 	public function run( string $subjectId ): Response {
 		// Validate the ID shape first, so a malformed value is a clean 400 rather than becoming a 500.
-		if ( NeoWikiExtension::getInstance()->getSubjectIdParser()->parse( $subjectId ) === null ) {
+		if ( SWSExtension::getInstance()->getSubjectIdParser()->parse( $subjectId ) === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
 				'message' => 'Invalid Subject ID: ' . $subjectId,
 			] );
@@ -25,7 +25,7 @@ class GetReferencingSubjectsApi extends SimpleHandler {
 
 		$presenter = new RestGetReferencingSubjectsPresenter();
 
-		NeoWikiExtension::getInstance()
+		SWSExtension::getInstance()
 			->newGetReferencingSubjectsQuery( $presenter, $this->getAuthority() )
 			->execute( subjectId: $subjectId, limit: $this->getValidatedParams()['limit'] );
 

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NothingToCancelException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\GraphStoreStatusSerializer;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToCancelException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\GraphStoreStatusSerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -37,7 +37,7 @@ class CancelGraphStoreRebuildApi extends SimpleHandler {
 		$this->csrfValidator->verifyCsrfToken();
 
 		try {
-			$run = NeoWikiExtension::getInstance()
+			$run = SWSExtension::getInstance()
 				->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE )
 				->cancel( $name );
 		} catch ( UnknownGraphStoreException $e ) {

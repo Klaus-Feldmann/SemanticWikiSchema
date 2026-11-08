@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\NeoWiki\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchMatch;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectSearchHitHtmlBuilder;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
+use ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * A Subject's labels, values, property names and Schema names are whatever an editor typed, so this
  * covers what becomes of them on the way into a search result row.
  *
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectSearchHitHtmlBuilder
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder
  */
-class SubjectSearchHitHtmlBuilderTest extends NeoWikiIntegrationTestCase {
+class SubjectSearchHitHtmlBuilderTest extends SWSIntegrationTestCase {
 
 	private const string SCRIPT = '<script>alert("x")</script>';
 
@@ -49,7 +49,7 @@ class SubjectSearchHitHtmlBuilderTest extends NeoWikiIntegrationTestCase {
 		$html = $this->newBuilder()->buildExtract( $this->matchOn( 'City', [ '', 'Amsterdam', '' ] ) );
 
 		$this->assertStringContainsString( 'Museum', $html );
-		$this->assertStringNotContainsString( '(neowiki-search-hit-subject:', $html );
+		$this->assertStringNotContainsString( '(sws-search-hit-subject:', $html );
 	}
 
 	public function testTheHeadingNamesTheSubjectAndItsSchema(): void {
@@ -57,7 +57,7 @@ class SubjectSearchHitHtmlBuilderTest extends NeoWikiIntegrationTestCase {
 			new SubjectSearchMatch( 'Museum', 'Van Gogh Museum', [ new MatchedSearchLine( 'City', [ '', 'A', '' ], [] ) ] )
 		);
 
-		$this->assertStringContainsString( '(neowiki-search-hit-subject: Van Gogh Museum, Museum)', $html );
+		$this->assertStringContainsString( '(sws-search-hit-subject: Van Gogh Museum, Museum)', $html );
 	}
 
 	public function testAMatchedStretchIsMarkedTheWayMediaWikiMarksItsOwn(): void {
@@ -92,7 +92,7 @@ class SubjectSearchHitHtmlBuilderTest extends NeoWikiIntegrationTestCase {
 		] ) );
 
 		$this->assertStringContainsString(
-			'(neowiki-search-hit-property-path: Attendance, Year)(colon-separator)<span class="searchmatch">2019</span>',
+			'(sws-search-hit-property-path: Attendance, Year)(colon-separator)<span class="searchmatch">2019</span>',
 			$html
 		);
 	}
@@ -103,7 +103,7 @@ class SubjectSearchHitHtmlBuilderTest extends NeoWikiIntegrationTestCase {
 		] ) );
 
 		$this->assertStringContainsString(
-			'(neowiki-search-hit-property-path: (neowiki-search-hit-property-path: Attendance, Source), Publisher)',
+			'(sws-search-hit-property-path: (sws-search-hit-property-path: Attendance, Source), Publisher)',
 			$html
 		);
 	}

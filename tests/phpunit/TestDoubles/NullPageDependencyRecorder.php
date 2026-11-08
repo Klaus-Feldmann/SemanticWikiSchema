@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 
 class NullPageDependencyRecorder implements PageDependencyRecorder {
 

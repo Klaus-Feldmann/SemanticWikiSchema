@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence;
+namespace ProfessionalWiki\SWS\Persistence;
 
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
 
 interface MappingNameLookup {
 

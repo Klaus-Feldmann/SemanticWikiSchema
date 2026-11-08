@@ -1,0 +1,120 @@
+import { App, inject } from 'vue';
+import { TypeSpecificComponentRegistry } from '@/TypeSpecificComponentRegistry.ts';
+import { SchemaPermissionHints } from '@/application/SchemaPermissionHints.ts';
+import { SubjectPermissionHints } from '@/application/SubjectPermissionHints.ts';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { PropertyTypeRegistry } from '@/domain/PropertyType.ts';
+import { SchemaRepository } from '@/application/SchemaRepository.ts';
+import { SubjectRepository } from '@/domain/SubjectRepository.ts';
+import { SubjectLabelSearch } from '@/domain/SubjectLabelSearch.ts';
+import type { SubjectSummaryLookup } from '@/application/SubjectSummaryLookup.ts';
+import type { SubjectCountLookup } from '@/application/SubjectCountLookup.ts';
+import { PageTitleSearch } from '@/domain/PageTitleSearch.ts';
+import { ViewTypeRegistry } from '@/ViewTypeRegistry.ts';
+import { LayoutPermissionHints } from '@/application/LayoutPermissionHints.ts';
+import { LayoutRepository } from '@/application/LayoutRepository.ts';
+import { MappingPermissionHints } from '@/application/MappingPermissionHints.ts';
+
+export enum Service { // TODO: make private
+	ComponentRegistry = 'ComponentRegistry',
+	SchemaPermissionHints = 'SchemaPermissionHints',
+	SubjectPermissionHints = 'SubjectPermissionHints',
+	PropertyTypeRegistry = 'PropertyTypeRegistry',
+	SchemaRepository = 'SchemaRepository',
+	SubjectRepository = 'SubjectRepository',
+	SubjectLabelSearch = 'SubjectLabelSearch',
+	SubjectSummaryLookup = 'SubjectSummaryLookup',
+	SubjectCountLookup = 'SubjectCountLookup',
+	PageTitleSearch = 'PageTitleSearch',
+	ViewTypeRegistry = 'ViewTypeRegistry',
+	LayoutPermissionHints = 'LayoutPermissionHints',
+	LayoutRepository = 'LayoutRepository',
+	MappingPermissionHints = 'MappingPermissionHints'
+}
+
+export class SWSServices {
+
+	public static registerServices( app: App ): void {
+		Object.entries( SWSServices.getServices() ).forEach( ( [ key, service ] ) => {
+			app.provide( key, service );
+		} );
+	}
+
+	public static getServices(): Record<string, unknown> {
+		const sws = SWSExtension.getInstance();
+
+		return {
+			[ Service.ComponentRegistry ]: sws.getTypeSpecificComponentRegistry(),
+			[ Service.SchemaPermissionHints ]: sws.newSchemaPermissionHints(),
+			[ Service.SubjectPermissionHints ]: sws.newSubjectPermissionHints(),
+			[ Service.PropertyTypeRegistry ]: sws.getPropertyTypeRegistry(),
+			[ Service.SchemaRepository ]: sws.getSchemaRepository(),
+			[ Service.SubjectRepository ]: sws.getSubjectRepository(),
+			[ Service.SubjectLabelSearch ]: sws.getSubjectLabelSearch(),
+			[ Service.SubjectSummaryLookup ]: sws.getSubjectSummaryLookup(),
+			[ Service.SubjectCountLookup ]: sws.getSubjectCountLookup(),
+			[ Service.PageTitleSearch ]: sws.getPageTitleSearch(),
+			[ Service.ViewTypeRegistry ]: sws.getViewTypeRegistry(),
+			[ Service.LayoutPermissionHints ]: sws.newLayoutPermissionHints(),
+			[ Service.LayoutRepository ]: sws.getLayoutRepository(),
+			[ Service.MappingPermissionHints ]: sws.newMappingPermissionHints(),
+		};
+	}
+
+	public static getComponentRegistry(): TypeSpecificComponentRegistry {
+		return inject( Service.ComponentRegistry ) as TypeSpecificComponentRegistry;
+	}
+
+	public static getPropertyTypeRegistry(): PropertyTypeRegistry {
+		return inject( Service.PropertyTypeRegistry ) as PropertyTypeRegistry;
+	}
+
+	public static getSchemaPermissionHints(): SchemaPermissionHints {
+		return inject( Service.SchemaPermissionHints ) as SchemaPermissionHints;
+	}
+
+	public static getSubjectPermissionHints(): SubjectPermissionHints {
+		return inject( Service.SubjectPermissionHints ) as SubjectPermissionHints;
+	}
+
+	public static getSchemaRepository(): SchemaRepository {
+		return inject( Service.SchemaRepository ) as SchemaRepository;
+	}
+
+	public static getSubjectRepository(): SubjectRepository {
+		return inject( Service.SubjectRepository ) as SubjectRepository;
+	}
+
+	public static getSubjectLabelSearch(): SubjectLabelSearch {
+		return inject( Service.SubjectLabelSearch ) as SubjectLabelSearch;
+	}
+
+	public static getSubjectSummaryLookup(): SubjectSummaryLookup {
+		return inject( Service.SubjectSummaryLookup ) as SubjectSummaryLookup;
+	}
+
+	public static getSubjectCountLookup(): SubjectCountLookup {
+		return inject( Service.SubjectCountLookup ) as SubjectCountLookup;
+	}
+
+	public static getPageTitleSearch(): PageTitleSearch {
+		return inject( Service.PageTitleSearch ) as PageTitleSearch;
+	}
+
+	public static getViewTypeRegistry(): ViewTypeRegistry {
+		return inject( Service.ViewTypeRegistry ) as ViewTypeRegistry;
+	}
+
+	public static getLayoutPermissionHints(): LayoutPermissionHints {
+		return inject( Service.LayoutPermissionHints ) as LayoutPermissionHints;
+	}
+
+	public static getLayoutRepository(): LayoutRepository {
+		return inject( Service.LayoutRepository ) as LayoutRepository;
+	}
+
+	public static getMappingPermissionHints(): MappingPermissionHints {
+		return inject( Service.MappingPermissionHints ) as MappingPermissionHints;
+	}
+
+}

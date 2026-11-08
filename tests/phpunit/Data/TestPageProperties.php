@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Data;
+namespace ProfessionalWiki\SWS\Tests\Data;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageDateTime;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
+use ProfessionalWiki\SWS\Domain\Page\PageDateTime;
+use ProfessionalWiki\SWS\Domain\Page\PageProperties;
 
 class TestPageProperties {
 

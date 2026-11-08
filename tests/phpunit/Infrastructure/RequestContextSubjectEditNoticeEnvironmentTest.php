@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\RequestContextSubjectEditNoticeEnvironment
+ * @covers \ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment
  * @group Database
  */
-class RequestContextSubjectEditNoticeEnvironmentTest extends NeoWikiIntegrationTestCase {
+class RequestContextSubjectEditNoticeEnvironmentTest extends SWSIntegrationTestCase {
 
 	private function newEnvironment(): RequestContextSubjectEditNoticeEnvironment {
 		return new RequestContextSubjectEditNoticeEnvironment(

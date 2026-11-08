@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use Normalizer;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 
 /**
  * Resolves each link into the documentation site against the docs tree the site is built from, so a moved page
  * or a renamed heading fails here rather than leaving readers on a 404 or at the top of the wrong page. The links
  * in extension.json are checked too, as JSON cannot use the enum.
  *
- * @covers \ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl
+ * @covers \ProfessionalWiki\SWS\Presentation\DocumentationUrl
  */
 class DocumentationUrlTest extends TestCase {
 

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
 use RuntimeException;
 
 /**

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Tests\Domain\Mapping;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SchemaMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping
+ * @covers \ProfessionalWiki\SWS\Domain\Mapping\Mapping
  */
 class MappingTest extends TestCase {
 

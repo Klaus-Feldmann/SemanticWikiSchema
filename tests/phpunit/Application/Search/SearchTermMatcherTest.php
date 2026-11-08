@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Search;
+namespace ProfessionalWiki\SWS\Tests\Application\Search;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\NeoWiki\Tests\MarkedMatchesTrait;
+use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
+use ProfessionalWiki\SWS\Tests\MarkedMatchesTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Search\SearchTermMatcher
+ * @covers \ProfessionalWiki\SWS\Application\Search\SearchTermMatcher
  */
 class SearchTermMatcherTest extends TestCase {
 

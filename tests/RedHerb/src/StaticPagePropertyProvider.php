@@ -4,8 +4,8 @@ declare( strict_types = 1 );
 
 namespace ProfessionalWiki\RedHerb;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
 
 class StaticPagePropertyProvider implements PagePropertyProvider {
 

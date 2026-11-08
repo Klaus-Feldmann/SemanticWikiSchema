@@ -6,7 +6,7 @@ Status: Accepted (2026-09-29)
 
 ## Context
 
-To make good design and implementation decisions, we need to know how far NeoWiki should scale, so we avoid both
+To make good design and implementation decisions, we need to know how far SWS should scale, so we avoid both
 degraded performance at scale and accidental complexity via unnecessary optimization.
 
 Informed estimates of what real deployments look like:
@@ -26,7 +26,7 @@ The targets are lower bounds. Scaling beyond them is nice and should be done whe
 
 ### Scalability Targets
 
-NeoWiki needs to handle these sizes, counted per graph store (so for wiki farms we combine all wikis):
+SWS needs to handle these sizes, counted per graph store (so for wiki farms we combine all wikis):
 
 | Metric                 | Great up to                      | Acceptable up to |
 |------------------------|----------------------------------|------------------|
@@ -42,7 +42,7 @@ Definitions:
 
 ### Writing Speed Targets
 
-NeoWiki needs to meet these write speeds at any size within the scalability targets above, with all configured
+SWS needs to meet these write speeds at any size within the scalability targets above, with all configured
 projections included. The duration columns follow from the target rate:
 
 | Write path                                       | Subjects/second | 100 thousand Subjects | 1 million Subjects | 10 million Subjects |

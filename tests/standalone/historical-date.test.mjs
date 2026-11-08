@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseHistoricalDate, historicalDateBounds, historicalYearTitle } from '../../resources/ext.neowiki/src/domain/propertyTypes/historicalDate.ts';
-import { wikiPageUrl } from '../../resources/ext.neowiki/src/presentation/wikiLinks.ts';
+import { parseHistoricalDate, historicalDateBounds, historicalYearTitle } from '../../resources/ext.sws/src/domain/propertyTypes/historicalDate.ts';
+import { wikiPageUrl } from '../../resources/ext.sws/src/presentation/wikiLinks.ts';
 
 for (const [wire, expected] of [
  ['1458',{year:1458}], ['1458-10',{year:1458,month:10}], ['1458-10-01',{year:1458,month:10,day:1}],

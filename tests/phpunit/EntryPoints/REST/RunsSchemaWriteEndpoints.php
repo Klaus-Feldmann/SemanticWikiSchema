@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Request\FauxRequest;
@@ -13,9 +13,9 @@ use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SchemaPageWriteApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\EntryPoints\REST\SchemaPageWriteApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 trait RunsSchemaWriteEndpoints {
@@ -51,7 +51,7 @@ trait RunsSchemaWriteEndpoints {
 			'getUserPermissionsErrors',
 			static function ( $title, $user, $action, &$result ) use ( $schemaName ): bool {
 				if ( $action === 'read'
-					&& $title->getNamespace() === NeoWikiExtension::NS_SCHEMA
+					&& $title->getNamespace() === SWSExtension::NS_SCHEMA
 					&& $title->getDBkey() === $schemaName
 				) {
 					$result = [ 'badaccess-group0' ];
@@ -75,7 +75,7 @@ trait RunsSchemaWriteEndpoints {
 	}
 
 	private function schemaTitle( string $schemaName ): Title {
-		return Title::makeTitle( NeoWikiExtension::NS_SCHEMA, $schemaName );
+		return Title::makeTitle( SWSExtension::NS_SCHEMA, $schemaName );
 	}
 
 	private function schemaPageExists( string $schemaName ): bool {

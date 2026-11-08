@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * Holds each Schema parsed from PublishedPageJsonLookup's JSON for as long as the PHP process lasts,
  * keyed on the Schema page's latest revision id from the LinkCache, so a hit costs no I/O.
- * NeoWikiExtension pins its lookups in its singleton, so that is a single request under mod_php and an
+ * SWSExtension pins its lookups in its singleton, so that is a single request under mod_php and an
  * entire run under a maintenance script. Such a long-running process does not see an approval change,
  * which leaves the latest revision id as it was, and a maintenance script does not see another
  * process's edit either; a job runner clears the LinkCache before every job.
@@ -36,7 +36,7 @@ class CachingSchemaLookup implements SchemaLookup {
 	}
 
 	public function getSchema( SchemaName $schemaName ): ?Schema {
-		$title = $this->titleFactory->makeTitleSafe( NeoWikiExtension::NS_SCHEMA, $schemaName->getText() );
+		$title = $this->titleFactory->makeTitleSafe( SWSExtension::NS_SCHEMA, $schemaName->getText() );
 
 		if ( $title === null || !$title->exists() ) {
 			return null;

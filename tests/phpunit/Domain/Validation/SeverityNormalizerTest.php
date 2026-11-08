@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Validation;
+namespace ProfessionalWiki\SWS\Tests\Domain\Validation;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Severity;
-use ProfessionalWiki\NeoWiki\Domain\Validation\SeverityNormalizer;
+use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use ProfessionalWiki\SWS\Domain\Validation\SeverityNormalizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Validation\SeverityNormalizer
+ * @covers \ProfessionalWiki\SWS\Domain\Validation\SeverityNormalizer
  */
 class SeverityNormalizerTest extends TestCase {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 /**
- * Holds a registered policy to what NeoWiki can accept from one, and fails closed when it cannot.
+ * Holds a registered policy to what SWS can accept from one, and fails closed when it cannot.
  *
  * A policy that throws publishes nothing and hides everything: the edit hook it runs on sits inside
  * PageUpdater's atomic section, so a throw there would roll the contributor's save back, and a throw

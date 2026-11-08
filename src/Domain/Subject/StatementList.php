@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Subject;
+namespace ProfessionalWiki\SWS\Domain\Subject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\RelationType;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelation;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
 
 readonly class StatementList {
 

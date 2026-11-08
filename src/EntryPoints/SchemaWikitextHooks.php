@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Logger\LoggerFactory;
@@ -10,17 +10,17 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\SchemaWikitext;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\Infrastructure\ParserPageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use ProfessionalWiki\SWS\Application\SchemaWikitext;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 use Throwable;
 
 final class SchemaWikitextHooks {
-	private const MARKER = 'neowiki-schema-wikitext-visited';
+	private const MARKER = 'sws-schema-wikitext-visited';
 
 	public static function onParserBeforeInternalParse( Parser $parser, string &$text, $stripState ): void {
 		if ( $parser->getOutputType() !== Parser::OT_HTML || $parser->getOptions()->isMessage()
@@ -32,7 +32,7 @@ final class SchemaWikitextHooks {
 		$revisionId = $parser->getRevisionId();
 		if ( $revisionId && $revisionId < $title->getLatestRevID() ) { return; }
 		try {
-			$extension = NeoWikiExtension::getInstance();
+			$extension = SWSExtension::getInstance();
 			$subject = $extension->newSubjectResolver( $parser )->resolveMainByTitle( $title );
 			if ( $subject === null || !$subject->getSchemaReference()->isLocal() ) { return; }
 			$reference = $subject->getSchemaReference();
@@ -41,9 +41,9 @@ final class SchemaWikitextHooks {
 			if ( $schema === null ) { return; }
 			$text = SchemaWikitext::append( $text, SchemaWikitext::programs( $schema ) );
 		} catch ( Throwable $e ) {
-			if ( $context = \ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingContext::current() ) { $context->failure = $e->getMessage(); }
-			LoggerFactory::getInstance( 'NeoWiki' )->error( 'Schema wikitext preparation failed', [ 'exception' => $e ] );
-			$text .= "\n<strong class=\"error\">" . wfMessage( 'neowiki-wikitext-error' )->escaped() . '</strong>';
+			if ( $context = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $context->failure = $e->getMessage(); }
+			LoggerFactory::getInstance( 'SWS' )->error( 'Schema wikitext preparation failed', [ 'exception' => $e ] );
+			$text .= "\n<strong class=\"error\">" . wfMessage( 'sws-wikitext-error' )->escaped() . '</strong>';
 		}
 	}
 
@@ -72,19 +72,19 @@ final class SchemaWikitextHooks {
 					$ok = self::refreshPage( $title );
 					if ( !$ok ) { MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title, [ 'page' => true ] ) ); }
 				} catch ( Throwable $e ) {
-					LoggerFactory::getInstance( 'NeoWiki' )->error( 'Schema wikitext page refresh failed; queued retry', [ 'exception' => $e ] );
+					LoggerFactory::getInstance( 'SWS' )->error( 'Schema wikitext page refresh failed; queued retry', [ 'exception' => $e ] );
 					MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title, [ 'page' => true ] ) );
 				}
 			} );
 		} catch ( Throwable $e ) {
-			LoggerFactory::getInstance( 'NeoWiki' )->error( 'Schema wikitext refresh scheduling failed', [ 'exception' => $e ] );
+			LoggerFactory::getInstance( 'SWS' )->error( 'Schema wikitext refresh scheduling failed', [ 'exception' => $e ] );
 		}
 	}
 
 	private static function usesExecution( RevisionRecord $revision ): bool {
 		$subject = SubjectSlotReader::read( $revision )?->getPageSubjects()->getMainSubject();
 		if ( $subject === null || !$subject->getSchemaReference()->isLocal() ) { return false; }
-		$schema = NeoWikiExtension::getInstance()->getSchemaResolver()->getSchema( $subject->getSchemaReference() );
+		$schema = SWSExtension::getInstance()->getSchemaResolver()->getSchema( $subject->getSchemaReference() );
 		return $schema !== null && SchemaWikitext::programs( $schema ) !== [];
 	}
 
@@ -101,7 +101,7 @@ final class SchemaWikitextHooks {
 	}
 
 	public static function refreshPage( Title $title ): bool {
-        return ( new \ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor() )->refresh( $title );
+        return ( new \ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor() )->refresh( $title );
 	}
 
 	public static function refreshJob( Title $title ): object {
@@ -110,6 +110,6 @@ final class SchemaWikitextHooks {
 			? \MediaWiki\JobQueue\Jobs\RefreshLinksJob::class : \RefreshLinksJob::class;
 		// No root timestamp: the job must obtain a fresh parse rather than reuse an inherited main-slot output.
 		return new $class( $title, [ 'recursive' => false, 'useRecursiveLinksUpdate' => false,
-			'causeAction' => 'neowiki-schema-wikitext', 'causeAgent' => 'NeoWiki' ] );
+			'causeAction' => 'sws-schema-wikitext', 'causeAgent' => 'SWS' ] );
 	}
 }

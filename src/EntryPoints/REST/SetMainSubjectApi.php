@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Actions\SetMainSubject\SetMainSubjectRequest;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\RestSetMainSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectRequest;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\RestSetMainSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class SetMainSubjectApi extends SimpleHandler {
@@ -46,7 +46,7 @@ class SetMainSubjectApi extends SimpleHandler {
 		$presenter = new RestSetMainSubjectPresenter();
 
 		try {
-			NeoWikiExtension::getInstance()
+			SWSExtension::getInstance()
 				->newSetMainSubjectAction( $presenter, $this->getAuthority() )
 				->setMainSubject( new SetMainSubjectRequest(
 					pageId: $pageId,

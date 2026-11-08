@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\ImportPages;
+namespace ProfessionalWiki\SWS\Application\Actions\ImportPages;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Content;
@@ -10,18 +10,18 @@ use MediaWiki\Content\CssContent;
 use MediaWiki\Content\TextContent;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Persistence\PageDeleter;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\PageDeleter;
 use RuntimeException;
 
 class ImportPagesAction {
 
-	private const string DELETION_REASON = 'No longer part of the NeoWiki demo data';
+	private const string DELETION_REASON = 'No longer part of the SWS demo data';
 
 	/**
 	 * @var array<string, true> Prefixed DB keys of the pages this run imported, whether or not the
@@ -172,7 +172,7 @@ class ImportPagesAction {
 			page: $title,
 			contentBySlot: $contentBySlot,
 			comment: CommentStoreComment::newUnsavedComment(
-				'Importing NeoWiki demo data'
+				'Importing SWS demo data'
 			)
 		);
 

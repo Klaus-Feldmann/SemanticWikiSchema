@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Domain\Rdf;
 
 /**
  * Builds {@see Literal}s with the correct xsd datatype for the native projection. Centralizes the

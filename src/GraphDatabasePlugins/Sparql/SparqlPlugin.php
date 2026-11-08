@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql;
 
 use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\EntryPoints\ParserAuthority;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\NeoWiki\SparqlStoreConfig;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\SparqlStoreConfig;
 use Psr\Log\LoggerInterface;
 
 /**
  * Composition root for one SPARQL graph-database backend — one instance per configured store —
- * mirroring {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Neo4jPlugin}. Owns both the write
+ * mirroring {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin}. Owns both the write
  * path (the projection store) and the read path (the query service and its wikitext surfaces). A new
  * backend copies this shape.
  *
@@ -76,9 +76,9 @@ readonly class SparqlPlugin {
 	}
 
 	/**
-	 * The Lua library function names this plugin contributes to mw.neowiki. The handler lives on
+	 * The Lua library function names this plugin contributes to mw.sws. The handler lives on
 	 * ScribuntoLuaLibrary; the plugin's presence is the gate. Only the first configured store's plugin
-	 * contributes these (see NeoWikiExtension::getFirstSparqlPlugin).
+	 * contributes these (see SWSExtension::getFirstSparqlPlugin).
 	 *
 	 * @return string[]
 	 */

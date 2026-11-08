@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -12,13 +12,13 @@ use MediaWiki\Content\ValidationParams;
 use MediaWiki\Message\Message;
 use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\NeoWiki\Domain\Schema\DependentSubjectSchemaRules;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\NeoWiki\Presentation\PropertyNameProblemMessage;
+use ProfessionalWiki\SWS\Domain\Schema\DependentSubjectSchemaRules;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use ProfessionalWiki\SWS\Presentation\PropertyNameProblemMessage;
 use StatusValue;
 
 class SchemaContentHandler extends JsonContentHandler {
@@ -42,7 +42,7 @@ class SchemaContentHandler extends JsonContentHandler {
 			$schemaName = new SchemaName( $title->getText() );
 		} catch ( InvalidArgumentException $exception ) {
 			$schemaName = null;
-			$status->fatal( 'neowiki-schema-name-invalid', $exception->getMessage() );
+			$status->fatal( 'sws-schema-name-invalid', $exception->getMessage() );
 		}
 
 		$validator = SchemaContentValidator::newInstance();
@@ -50,8 +50,8 @@ class SchemaContentHandler extends JsonContentHandler {
 		if ( !$validator->validate( $content->getText() ) ) {
 			$this->reportValidationErrors(
 				$status,
-				'neowiki-schema-invalid',
-				'neowiki-schema-invalid-detail',
+				'sws-schema-invalid',
+				'sws-schema-invalid-detail',
 				$validator->getErrors()
 			);
 		}
@@ -63,18 +63,18 @@ class SchemaContentHandler extends JsonContentHandler {
 		if ( $schemaName !== null && $status->isOK() ) {
 			$this->checkDependentSubjectRules(
 				$status,
-				NeoWikiExtension::getInstance()->getPersistenceSchemaDeserializer()->deserialize( $schemaName, $content->getText() )
+				SWSExtension::getInstance()->getPersistenceSchemaDeserializer()->deserialize( $schemaName, $content->getText() )
 			);
 		}
 
-        if ($status->isOK() && class_exists(\NeoWikiBaseBridge\SchemaPropertyBindings::class)) {
+        if ($status->isOK() && class_exists(\SWSBaseBridge\SchemaPropertyBindings::class)) {
             try {
                 $old=\MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle($title);
                 $oldContent=$old?->getContent('main');
                 $previous=$oldContent instanceof SchemaContent ? json_decode($oldContent->getText(),true) : [];
-                \NeoWikiBaseBridge\SchemaPropertyBindings::validate(json_decode($content->getText(),true),$previous ?? [],\MediaWiki\Context\RequestContext::getMain());
+                \SWSBaseBridge\SchemaPropertyBindings::validate(json_decode($content->getText(),true),$previous ?? [],\MediaWiki\Context\RequestContext::getMain());
             } catch (\Throwable $e) {
-                $status->fatal('neowiki-property-datatype-invalid',$e->getMessage());
+                $status->fatal('sws-property-datatype-invalid',$e->getMessage());
             }
         }
         return $status;
@@ -93,17 +93,17 @@ class SchemaContentHandler extends JsonContentHandler {
 		if ( $problems !== [] ) {
 			$this->reportErrors(
 				$status,
-				'neowiki-schema-invalid',
+				'sws-schema-invalid',
 				array_map( PropertyNameProblemMessage::from( ... ), $problems )
 			);
 		}
 	}
 
 	private function checkDependentSubjectRules( StatusValue $status, Schema $schema ): void {
-		$rules = new DependentSubjectSchemaRules( NeoWikiExtension::getInstance()->getSchemaResolver() );
+		$rules = new DependentSubjectSchemaRules( SWSExtension::getInstance()->getSchemaResolver() );
 
 		if ( $rules->changesDeclaration( $schema ) ) {
-			$status->fatal( 'neowiki-schema-dependence-unchangeable' );
+			$status->fatal( 'sws-schema-dependence-unchangeable' );
 			return;
 		}
 
@@ -111,7 +111,7 @@ class SchemaContentHandler extends JsonContentHandler {
 
 		if ( $mixingProperties !== [] ) {
 			$status->fatal(
-				'neowiki-schema-relation-targets-mixed',
+				'sws-schema-relation-targets-mixed',
 				Message::listParam( $mixingProperties ),
 				count( $mixingProperties )
 			);
@@ -138,7 +138,7 @@ JSON
 	}
 
 	public function canBeUsedOn( Title $title ): bool {
-		return $title->getNamespace() === NeoWikiExtension::NS_SCHEMA;
+		return $title->getNamespace() === SWSExtension::NS_SCHEMA;
 	}
 
 }

@@ -1,7 +1,7 @@
 {
   "name": "SemanticWikiSchema",
-  "testedNeoWikiVersion": "0.1.19+2026-11-08",
-  "bridgeVersion": "0.19.1+2026-11-05",
+  "testedSWSVersion": "0.1.22+2026-11-08",
+  "bridgeVersion": "0.20.0+2026-11-08",
   "prepared": "2026-11-08",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
@@ -9,22 +9,20 @@
     "version": "0.1.0"
   },
   "forkMasterAtPreparation": "4cc3ed7fcb325f903632f4762f409de9d28edeed",
-  "branch": "semantic-0.1.19",
+  "branch": "local-sws-0.1.22-migration",
   "extensionName": "SemanticWikiSchema",
-  "extensionVersion": "0.1.19+2026-11-08",
+  "extensionVersion": "0.1.22+2026-11-08",
   "composerPackage": "aufeinwort/semantic-wikischema",
   "minimumMediaWiki": "1.47.0-wmf.24",
   "composerLiveInstallVerified": false,
   "contact": "info@aufeinwort.info",
-  "composerLocalInstallVerified": true,
-  "publicationBranches": [
-    "master",
-    "semantic-0.1.19"
-  ],
-  "runtimeLiveInstallVerified": true,
-  "runtimeInstallMethod": "Complete local package installed on M4; maintainer confirmed schema editing and Wikidata retrieval with job worker enabled",
+  "composerLocalInstallVerified": false,
+  "publicationBranches": [],
+  "runtimeLiveInstallVerified": false,
+  "runtimeInstallMethod": "Local rename candidate, not installed",
   "previousComposerLiveInstallVerified": {
     "version": "0.1.9-test+2026-11-03",
     "date": "2026-11-03"
-  }
+  },
+  "inputVersion": "0.1.20+2026-11-08"
 }

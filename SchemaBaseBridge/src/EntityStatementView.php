@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** P31-style entity values only in this increment; other datatypes are explicitly unsupported. */
 final class EntityStatementView {

@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 /**
  * {@see QuerySparqlEndToEndTestCase} against QLever — the `test_qlever` dev-stack service, and the
  * engine both Docker stacks point the wiki itself at.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
 class QueryQLeverEndToEndTest extends QuerySparqlEndToEndTestCase {

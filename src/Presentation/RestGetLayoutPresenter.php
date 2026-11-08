@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetLayout\GetLayoutPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
 
 class RestGetLayoutPresenter implements GetLayoutPresenter {
 

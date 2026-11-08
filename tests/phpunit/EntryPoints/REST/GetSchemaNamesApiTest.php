@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaNamesApi;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaNamesApi;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaNamesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaNamesApi
  * @group Database
  */
-class GetSchemaNamesApiTest extends NeoWikiIntegrationTestCase {
+class GetSchemaNamesApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	public function testRejectsRequestWithoutSearchParam(): void {

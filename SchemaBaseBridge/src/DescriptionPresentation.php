@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** Same readable descriptions for API, Data and Graph; never choose one source over another. */
 final class DescriptionPresentation {

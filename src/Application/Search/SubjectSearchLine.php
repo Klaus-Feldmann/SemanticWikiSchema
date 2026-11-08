@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Search;
+namespace ProfessionalWiki\SWS\Application\Search;
 
 /**
  * One searchable string of a Subject and the property it came from.

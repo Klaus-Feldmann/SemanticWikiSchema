@@ -2,47 +2,47 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\OnRevisionCreatedHandler;
-use ProfessionalWiki\NeoWiki\FailureIsolatingPagePropertiesSource;
-use ProfessionalWiki\NeoWiki\PagePropertiesBuilder;
-use ProfessionalWiki\NeoWiki\Persistence\CorePagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Persistence\PublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Persistence\SubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpySubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingPublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingSubjectPageIndex;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
+use ProfessionalWiki\SWS\FailureIsolatingPagePropertiesSource;
+use ProfessionalWiki\SWS\PagePropertiesBuilder;
+use ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider;
+use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPublishedSubjectIndex;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectPageIndex;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingPublishedSubjectIndex;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingSubjectPageIndex;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\OnRevisionCreatedHandler
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectsToPublish
+ * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
  * @group Database
  */
-class OnRevisionCreatedHandlerTest extends NeoWikiIntegrationTestCase {
+class OnRevisionCreatedHandlerTest extends SWSIntegrationTestCase {
 
 	private const int DELETED_PAGE_ID = 42;
 	private const int STUB_PAGE_ID = 43;

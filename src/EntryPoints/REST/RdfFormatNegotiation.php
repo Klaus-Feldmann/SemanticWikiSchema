@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
 
 /**
  * Shared RDF serialization negotiation for the RDF export handlers ({@see ExportPageRdfApi},

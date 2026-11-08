@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Session\CsrfTokenSet;

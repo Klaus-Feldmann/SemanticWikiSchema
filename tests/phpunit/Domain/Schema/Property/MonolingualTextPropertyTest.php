@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
-use ProfessionalWiki\NeoWiki\Domain\LanguageTag;
+use ProfessionalWiki\SWS\Domain\LanguageTag;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\MonolingualTextProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\MonolingualTextProperty
  */
 class MonolingualTextPropertyTest extends PropertyTestCase {
 

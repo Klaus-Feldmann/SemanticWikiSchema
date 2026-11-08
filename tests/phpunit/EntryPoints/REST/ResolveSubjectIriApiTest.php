@@ -2,28 +2,28 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ResolveSubjectIriApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ResolveSubjectIriApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi
  * @group Database
  */
-class ResolveSubjectIriApiTest extends NeoWikiIntegrationTestCase {
+class ResolveSubjectIriApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SCHEMA = 'ResolveSubjectIriApiTestSchema';
 	private const string SUBJECT_ID = 'sTestDeref11111';
@@ -62,11 +62,11 @@ class ResolveSubjectIriApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * NeoWiki ships as a page-first wiki (extension.json), so the hosting page is the shipped browser
+	 * SWS ships as a page-first wiki (extension.json), so the hosting page is the shipped browser
 	 * target and the tests of it leave the setting unset. The subject-first tests opt in explicitly.
 	 */
 	private function makeWikiSubjectFirst(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 	}
 
 	public function testAcceptTriGRedirectsToTheSubjectTriGExport(): void {
@@ -117,7 +117,7 @@ class ResolveSubjectIriApiTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testAnIdNamingThisWikiRedirectsToItsBareForm(): void {
 		$this->makeWikiSubjectFirst();
-		$localSourceKey = NeoWikiExtension::getInstance()->getSubjectIdParser()->getLocalSourceKey();
+		$localSourceKey = SWSExtension::getInstance()->getSubjectIdParser()->getLocalSourceKey();
 
 		$response = $this->deref(
 			headers: [ 'Accept' => 'text/html' ],
@@ -156,7 +156,7 @@ class ResolveSubjectIriApiTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertSame( 404, $response->getStatusCode() );
 		$this->assertStringContainsString(
-			'No NeoWiki data found for subject: ' . self::ABSENT_ID,
+			'No SWS data found for subject: ' . self::ABSENT_ID,
 			$response->getBody()->getContents()
 		);
 	}
@@ -205,7 +205,7 @@ class ResolveSubjectIriApiTest extends NeoWikiIntegrationTestCase {
 		$location = $response->getHeaderLine( 'Location' );
 
 		$this->assertMatchesRegularExpression( '#^https?://#', $location, 'The Location is an absolute URL.' );
-		$this->assertStringContainsString( '/neowiki/v0/subject/' . self::SUBJECT_ID . '/rdf', $location );
+		$this->assertStringContainsString( '/sws/v0/subject/' . self::SUBJECT_ID . '/rdf', $location );
 		$this->assertStringContainsString( 'format=' . $format, $location );
 		$this->assertStringNotContainsString(
 			'projection=',

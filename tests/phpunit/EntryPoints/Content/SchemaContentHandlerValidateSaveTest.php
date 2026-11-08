@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContentHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContentHandler;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContentHandler
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\DependentSubjectSchemaRules
- * @covers \ProfessionalWiki\NeoWiki\Presentation\PropertyNameProblemMessage
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContentHandler
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\DependentSubjectSchemaRules
+ * @covers \ProfessionalWiki\SWS\Presentation\PropertyNameProblemMessage
  * @group Database
  */
-class SchemaContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
+class SchemaContentHandlerValidateSaveTest extends SWSIntegrationTestCase {
 
 	private function validate( string $json, string $name = 'Person' ): StatusValue {
 		$handler = new SchemaContentHandler( SchemaContent::CONTENT_MODEL_ID );
-		$title = Title::makeTitle( NeoWikiExtension::NS_SCHEMA, $name );
+		$title = Title::makeTitle( SWSExtension::NS_SCHEMA, $name );
 		$params = new ValidationParams( $title->toPageIdentity(), 0 );
 
 		return $handler->validateSave( new SchemaContent( $json ), $params );
@@ -81,15 +81,15 @@ class SchemaContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 
 		$text = $this->firstMessageInQqx( $status );
 
-		$this->assertStringContainsString( '(neowiki-schema-invalid: 5,', $text );
-		$this->assertStringContainsString( '(neowiki-property-name-reserved: id)', $text );
-		$this->assertStringContainsString( '(neowiki-property-name-near-duplicate: birth date, Birth date)', $text );
-		$this->assertStringContainsString( '(neowiki-property-name-not-canonical: Birth  place, Birth place)', $text );
+		$this->assertStringContainsString( '(sws-schema-invalid: 5,', $text );
+		$this->assertStringContainsString( '(sws-property-name-reserved: id)', $text );
+		$this->assertStringContainsString( '(sws-property-name-near-duplicate: birth date, Birth date)', $text );
+		$this->assertStringContainsString( '(sws-property-name-not-canonical: Birth  place, Birth place)', $text );
 		$this->assertStringContainsString(
-			"(neowiki-property-name-not-canonical-invisible: Death\u{200B}place, Deathplace, U+200B)",
+			"(sws-property-name-not-canonical-invisible: Death\u{200B}place, Deathplace, U+200B)",
 			$text
 		);
-		$this->assertStringContainsString( '(neowiki-property-name-characters: Phone #, #)', $text );
+		$this->assertStringContainsString( '(sws-property-name-characters: Phone #, #)', $text );
 	}
 
 	/**
@@ -98,14 +98,14 @@ class SchemaContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 	public function testIntegerPropertyNameFailsValidation(): void {
 		$status = $this->validate( '{ "propertyDefinitions": { "2024": { "type": "text" } } }' );
 
-		$this->assertStringContainsString( '(neowiki-property-name-integer: 2024)', $this->firstMessageInQqx( $status ) );
+		$this->assertStringContainsString( '(sws-property-name-integer: 2024)', $this->firstMessageInQqx( $status ) );
 	}
 
 	public function testStructurallyInvalidSchemaReportsOnlyItsStructuralError(): void {
 		$status = $this->validate( '{ "propertyDefinitions": { "id": { "type": "" } } }' );
 
 		$this->assertCount( 1, $status->getMessages() );
-		$this->assertStringContainsString( '(neowiki-schema-invalid: 1,', $this->firstMessageInQqx( $status ) );
+		$this->assertStringContainsString( '(sws-schema-invalid: 1,', $this->firstMessageInQqx( $status ) );
 	}
 
 	private function firstMessageInQqx( StatusValue $status ): string {
@@ -117,7 +117,7 @@ class SchemaContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 
 		$status = $this->validate( '{ "propertyDefinitions": {} }', 'Birth' );
 
-		$this->assertStatusError( 'neowiki-schema-dependence-unchangeable', $status );
+		$this->assertStatusError( 'sws-schema-dependence-unchangeable', $status );
 	}
 
 	public function testEditingAStoredSchemaWithoutChangingItsDeclarationPassesValidation(): void {
@@ -136,7 +136,7 @@ class SchemaContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 			'{ "propertyDefinitions": { "Related": { "type": "relation", "targetSchemas": [ "Birth", "Place" ] } } }'
 		);
 
-		$this->assertStatusError( 'neowiki-schema-relation-targets-mixed', $status );
+		$this->assertStatusError( 'sws-schema-relation-targets-mixed', $status );
 	}
 
 }

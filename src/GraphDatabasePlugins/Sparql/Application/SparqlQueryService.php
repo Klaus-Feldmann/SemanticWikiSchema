@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
 
-use ProfessionalWiki\NeoWiki\Application\RawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\InternalSparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlSyntaxException;
+use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\InternalSparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlSyntaxException;
 
 /**
  * Runs a read-only SPARQL query against one store and returns the W3C results document. The read-side
- * counterpart to {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService}.
+ * counterpart to {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService}.
  *
  * Two deliberate differences from the Cypher service:
  *
  *  - No read-only validator. Cypher can express writes, so it needs one; the query is instead sent as a
  *    SPARQL 1.1 Protocol *query* operation, and the SPARQL Query grammar contains no update forms (see
- *    {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint}).
+ *    {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint}).
  *  - No normalizer and no envelope. Bolt records are not JSON, so the Cypher path assembles rows into an
  *    envelope; the SPARQL response already *is* the `application/sparql-results+json` document, returned
  *    unmodified. As a consequence the `maxRows` cap is not applied: truncating `results.bindings` would

@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Persistence;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Persistence;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfProjection;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageProperties;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
-use ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\CapturingSparqlUpdateEndpoint;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedPageProjector;
+use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageProperties;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Tests\TestDoubles\CapturingSparqlUpdateEndpoint;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedPageProjector;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
  */
 class SparqlProjectionStoreTest extends TestCase {
 

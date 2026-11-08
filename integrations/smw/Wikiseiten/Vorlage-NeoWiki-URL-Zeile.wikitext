@@ -1,1 +1,0 @@
-<includeonly>{{#invoke:NeoWiki|urlZeile|url={{{1|}}}|titel={{{2|}}}|bezeichnung={{{3|}}}|ziel={{{4|}}}}}</includeonly><noinclude>Ausgabevorlage für URL-Unterobjekte: URL, Anzeigename, Bezeichnung und lokales Linkziel. Setzt keine Annotationen.</noinclude>

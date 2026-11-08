@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeScope;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\PropertyMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\PropertyMappings;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
+use ProfessionalWiki\SWS\Domain\Mapping\PropertyMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\PropertyMappings;
+use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
 
 class MappingPersistenceDeserializer {
 

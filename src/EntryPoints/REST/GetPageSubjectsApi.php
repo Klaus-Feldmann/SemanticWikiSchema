@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\RestGetPageSubjectsPresenter;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\RestGetPageSubjectsPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetPageSubjectsApi extends SimpleHandler {
@@ -22,7 +22,7 @@ class GetPageSubjectsApi extends SimpleHandler {
 
 		$expandOptions = explode( '|', $this->getRequest()->getQueryParams()['expand'] ?? '' );
 
-		NeoWikiExtension::getInstance()->newGetPageSubjectsQuery( $presenter, $this->getAuthority() )->execute(
+		SWSExtension::getInstance()->newGetPageSubjectsQuery( $presenter, $this->getAuthority() )->execute(
 			pageId: $pageId,
 			includeSchemas: in_array( self::EXPAND_SCHEMAS, $expandOptions, true ),
 			includeReferencedSubjects: in_array( self::EXPAND_RELATIONS, $expandOptions, true ),

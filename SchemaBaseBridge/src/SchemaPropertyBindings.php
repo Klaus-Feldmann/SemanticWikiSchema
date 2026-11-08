@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use Closure;
 use MediaWiki\Context\IContextSource;

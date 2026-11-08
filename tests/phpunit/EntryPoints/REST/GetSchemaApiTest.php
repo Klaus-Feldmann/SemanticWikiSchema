@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaApi;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSchemaApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi
  * @group Database
  */
-class GetSchemaApiTest extends NeoWikiIntegrationTestCase {
+class GetSchemaApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private SchemaName $schemaName;

@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContentHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContentHandler
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler
  * @group Database
  */
-class MappingContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
+class MappingContentHandlerValidateSaveTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -25,7 +25,7 @@ class MappingContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 
 	private function validate( string $json, string $name = 'EDM' ): StatusValue {
 		$handler = new MappingContentHandler( MappingContent::CONTENT_MODEL_ID );
-		$params = new ValidationParams( Title::makeTitle( NeoWikiExtension::NS_MAPPING, $name )->toPageIdentity(), 0 );
+		$params = new ValidationParams( Title::makeTitle( SWSExtension::NS_MAPPING, $name )->toPageIdentity(), 0 );
 
 		return $handler->validateSave( new MappingContent( $json ), $params );
 	}
@@ -69,7 +69,7 @@ class MappingContentHandlerValidateSaveTest extends NeoWikiIntegrationTestCase {
 		$status = $this->validate( $this->edmMapping(), 'Native' );
 
 		$this->assertFalse( $status->isOK() );
-		$this->assertTrue( $status->hasMessage( 'neowiki-mapping-name-invalid' ) );
+		$this->assertTrue( $status->hasMessage( 'sws-mapping-name-invalid' ) );
 	}
 
 	private function edmMapping(): string {
