@@ -693,5 +693,6 @@
 	"neowiki-managesubjects-export-stored-projection": "$1 (stored values)",
 	"neowiki-derived-missing": "Not specified in the source.",
 	"neowiki-property-datatype": "Source datatype:",
-	"neowiki-property-datatype-invalid": "Property assignment cannot be saved: $1. The source datatype must be available and supported by the selected field type."
+	"neowiki-property-datatype-invalid": "Property assignment cannot be saved: $1. The source datatype must be available and supported by the selected field type.",
+	"neowiki-property-type-source-reset": "The property mapping was removed because the field type changed. For a supported field type, select a compatible property again."
 }

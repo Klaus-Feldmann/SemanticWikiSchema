@@ -20,11 +20,13 @@ For Wikipedia, this offers a potential way to consolidate metadata tasks current
 
 ## Version and supported environment
 
-Semantic WikiSchema 0.1.18 is based on the published 0.1.17 runtime and retains NeoWiki 0.1.0 as its upstream base.
+Semantic WikiSchema 0.1.19 adds guided schema field-type changes and retains NeoWiki 0.1.0 as its upstream base.
 
-The 0.1.17 runtime was tested on AufEinWort after guarded updates over the existing Composer installation. See [verification](publication/VERIFICATION.md) for the distinction between runtime and Composer-distribution checks.
+The 0.1.19 runtime was installed and tested on AufEinWort using the complete local package. See [verification](publication/VERIFICATION.md) for the distinction between runtime and Composer-distribution checks.
 
 Support is limited to the tested setup: **MediaWiki 1.47.0-wmf.24, PHP 8.3.36, the legacy parser, UnlinkedWikibase 3.0.0, Semantic MediaWiki 7.4.0, Semantic Scribunto 3.0.0, local Wikibase, Scribunto and a Fuseki/SPARQL-backed Graph Explorer.** Earlier MediaWiki versions and other parser/backend combinations are not supported or tested by this fork. Later versions require their own verification. Details are in [the environment snapshot](publication/TESTED-ENVIRONMENT.json).
+
+Schema fields can be adapted to a new type directly in the editor. The editor initializes the settings for the selected type, clears the previous external property mapping and guides contributors to select a compatible Wikidata or Wikibase property. Field names and descriptions are retained, and selecting the current type preserves its property mapping. Existing subject values retain their stored representation.
 
 ## Added capabilities
 
@@ -54,7 +56,7 @@ In the MediaWiki root, merge the following into your existing `composer.local.js
     { "type": "vcs", "url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema" }
   ],
   "require": {
-    "aufeinwort/semantic-wikischema": "dev-semantic-0.1.18"
+    "aufeinwort/semantic-wikischema": "dev-semantic-0.1.19"
   },
   "config": {
     "allow-plugins": { "composer/installers": true }

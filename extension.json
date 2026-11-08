@@ -1,7 +1,7 @@
 {
 	"name": "SemanticWikiSchema",
 	"namemsg": "neowiki-name",
-	"version": "0.1.18+2026-11-06",
+	"version": "0.1.19+2026-11-08",
 	"author": "Softwaredesign und Weiterentwicklung des Forks: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos. Basiert auf NeoWiki von [https://professional.wiki/ Professional Wiki], [https://www.entropywins.wtf/mediawiki Jeroen De Dauw], Morne Alberts, [https://www.mediawiki.org/wiki/User:Alistair3149 Alistair3149] und [https://github.com/ProfessionalWiki/NeoWiki/graphs/contributors?all=1 weiteren Mitwirkenden].",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"license-name": "GPL-2.0-or-later",
@@ -1246,7 +1246,8 @@
 				"neowiki-wikitext-remove",
 				"neowiki-auto-identity-page",
 				"neowiki-managesubjects-export-complete",
-				"neowiki-managesubjects-export-stored-projection"
+				"neowiki-managesubjects-export-stored-projection",
+				"neowiki-property-type-source-reset"
 			],
 			"@group:": "TODO: Load code separately while in development. Remove later.",
 			"group": "ext.neowiki"

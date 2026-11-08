@@ -1,5 +1,10 @@
 # Semantic WikiSchema releases
 
+## 0.1.19 — 2026-11-08
+
+Schema fields can be adapted to a new type directly in the editor. The editor initializes the settings for the selected type, clears the previous external property mapping and guides contributors to select a compatible Wikidata or Wikibase property. Field names and descriptions are retained, and selecting the current type preserves its property mapping. Existing subject values retain their stored representation.
+
+
 ## 0.1.18 — 2026-11-06
 
 Renames the extension and its companion to Semantic WikiSchema and SchemaBaseBridge. The package installs in `extensions/SemanticWikiSchema`. See the [migration guide](publication/INSTALLATION.md) for the Composer, LocalSettings, Graph Explorer and MCP changes.

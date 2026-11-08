@@ -693,5 +693,6 @@
 	"neowiki-managesubjects-export-stored-projection": "$1 (gespeicherte Angaben)",
 	"neowiki-derived-missing": "In der Quelle nicht angegeben.",
 	"neowiki-property-datatype": "Quelldatentyp:",
-	"neowiki-property-datatype-invalid": "Eigenschaftszuordnung kann nicht gespeichert werden: $1. Der Quelldatentyp muss abrufbar und für den gewählten Feldtyp unterstützt sein."
+	"neowiki-property-datatype-invalid": "Eigenschaftszuordnung kann nicht gespeichert werden: $1. Der Quelldatentyp muss abrufbar und für den gewählten Feldtyp unterstützt sein.",
+	"neowiki-property-type-source-reset": "Die P-Zuordnung wurde wegen des geänderten Feldtyps entfernt. Für einen unterstützten Feldtyp kannst du die passende Eigenschaft erneut auswählen."
 }

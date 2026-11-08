@@ -65,3 +65,7 @@ An isolated Composer path-repository install of the prepared 0.1.13 working tree
 ## Publication 0.1.17, 2026-11-06
 
 Runtime verified on the existing AufEinWort installation after guarded updates. Dependent subjects referenced by the main subject on the same page contribute to automatic SMW annotations. The bundled Graph Explorer accepts language-tagged Wikidata text values. Kurt Gödel’s dependent field `Einordnung` was verified in SMW by the maintainer. The prepared runtime files were compared with the tested baseline and update payload. The full Composer package for this version has yet to be deployed on the production server.
+
+## 0.1.19 guided field-type changes, 2026-11-08
+
+The candidate derives from the published 0.1.18 tree. Five added regression cases cover changes from a P31-bound text field to Wikitext, Number, Image and Page, and re-selection of the unchanged type. All 230 frontend test files passed, comprising 3747 tests. TypeScript checking and the production build passed. The new notice is registered in the ResourceLoader module and translated in English and German. The maintainer installed the complete local 0.1.19 package on the M4 production server and confirmed schema editing and Wikidata retrieval with the job worker enabled. Local Composer installation and the PHP contract checks passed. Installation of 0.1.19 through GitHub/Composer remains a separate check.
