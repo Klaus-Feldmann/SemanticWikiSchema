@@ -21,7 +21,7 @@ An edit to a Subject, Schema, Layout, or Mapping is an edit to its page and show
 | Create, edit, move, or delete a page | [`action=edit`](https://www.mediawiki.org/wiki/API:Edit), [`action=move`](https://www.mediawiki.org/wiki/API:Move), [`action=delete`](https://www.mediawiki.org/wiki/API:Delete) |
 
 Rendered page HTML from the Action API leaves out the Subjects that [Views](../glossary.md#view) and
-`{{#main_subject}}` show. Read and write Subjects through NeoWiki's [REST API](rest-api.md), not through a page's
+`{{#main_subject}}` show. Read and write Subjects through SWS's [REST API](rest-api.md), not through a page's
 revision slots.
 
 To see every module your wiki offers, open `Special:ApiSandbox` on it.

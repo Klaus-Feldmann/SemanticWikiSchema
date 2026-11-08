@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Request\WebResponse;
 use MediaWiki\Rest\LocalizedHttpException;
 use MediaWiki\Rest\Response;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 use UtfNormal\Validator as UtfNormalValidator;
 use Wikimedia\Message\MessageValue;
 use Wikimedia\ParamValidator\ParamValidator;
@@ -62,7 +62,7 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 	 * the new one is approved.
 	 */
 	private function presentSavedSchema(): array {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		return $extension->getSchemaPresentationSerializer()->toArray(
 			$extension->getPersistenceSchemaDeserializer()->deserialize(
@@ -90,7 +90,7 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'The whole Schema, in the shape GET /neowiki/v0/schema/{schemaName} returns under '
+				self::PARAM_DESCRIPTION => 'The whole Schema, in the shape GET /sws/v0/schema/{schemaName} returns under '
 					. '`schema`. Format documented at ' . DocumentationUrl::SchemaFormat->value . '.',
 			],
 		] + parent::getBodyParamSettings();

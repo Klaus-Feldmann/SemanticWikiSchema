@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Scribunto;
+namespace ProfessionalWiki\SWS\EntryPoints\Scribunto;
 
 use Exception;
 use InvalidArgumentException;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LibraryBase;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\EntryPoints\ParserAuthority;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class ScribuntoLuaLibrary extends LibraryBase {
 
@@ -29,7 +29,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	private function getSubjectDataLookup(): SubjectDataLookup {
 		if ( $this->subjectDataLookup === null ) {
 			$this->subjectDataLookup = new SubjectDataLookup(
-				NeoWikiExtension::getInstance()->newSubjectResolver( $this->getParser() ),
+				SWSExtension::getInstance()->newSubjectResolver( $this->getParser() ),
 			);
 		}
 
@@ -45,7 +45,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 
 	private function getCypherQueryRunner(): CypherQueryRunner {
 		if ( $this->cypherQueryRunner === null ) {
-			$this->cypherQueryRunner = NeoWikiExtension::getInstance()->newCypherQueryRunner( $this->getParser() );
+			$this->cypherQueryRunner = SWSExtension::getInstance()->newCypherQueryRunner( $this->getParser() );
 		}
 
 		return $this->cypherQueryRunner;
@@ -53,7 +53,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 
 	private function getSparqlQueryRunner(): SparqlQueryRunner {
 		if ( $this->sparqlQueryRunner === null ) {
-			$this->sparqlQueryRunner = NeoWikiExtension::getInstance()->newSparqlQueryRunner( $this->getParser() );
+			$this->sparqlQueryRunner = SWSExtension::getInstance()->newSparqlQueryRunner( $this->getParser() );
 		}
 
 		return $this->sparqlQueryRunner;
@@ -71,23 +71,23 @@ class ScribuntoLuaLibrary extends LibraryBase {
             'hasAutomaticAnnotations' => [ $this, 'hasAutomaticAnnotations' ],
 		];
 
-		$neo4jFunctions = NeoWikiExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? [];
+		$neo4jFunctions = SWSExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? [];
 		foreach ( $neo4jFunctions as $name ) {
 			$lib[$name] = [ $this, $name ];
 		}
 
-		$sparqlFunctions = NeoWikiExtension::getInstance()->getFirstSparqlPlugin()?->getLuaLibraryFunctionNames() ?? [];
+		$sparqlFunctions = SWSExtension::getInstance()->getFirstSparqlPlugin()?->getLuaLibraryFunctionNames() ?? [];
 		foreach ( $sparqlFunctions as $name ) {
 			$lib[$name] = [ $this, $name ];
 		}
 
 		return $this->getEngine()->registerInterface(
-			__DIR__ . '/mw.neowiki.lua', $lib, []
+			__DIR__ . '/mw.sws.lua', $lib, []
 		);
 	}
 
 	public function getValue( ?string $propertyName = null, ?array $options = null ): array {
-		$this->checkType( 'mw.neowiki.getValue', 1, $propertyName, 'string' );
+		$this->checkType( 'mw.sws.getValue', 1, $propertyName, 'string' );
 
 		if ( $options !== null && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
 			$this->incrementExpensiveFunctionCount();
@@ -97,7 +97,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	}
 
 	public function getAll( ?string $propertyName = null, ?array $options = null ): array {
-		$this->checkType( 'mw.neowiki.getAll', 1, $propertyName, 'string' );
+		$this->checkType( 'mw.sws.getAll', 1, $propertyName, 'string' );
 
 		if ( $options !== null && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
 			$this->incrementExpensiveFunctionCount();
@@ -107,7 +107,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	}
 
 	public function getMainSubject( ?string $pageName = null ): array {
-		$this->checkTypeOptional( 'mw.neowiki.getMainSubject', 1, $pageName, 'string', null );
+		$this->checkTypeOptional( 'mw.sws.getMainSubject', 1, $pageName, 'string', null );
 
 		if ( $pageName !== null ) {
 			$this->incrementExpensiveFunctionCount();
@@ -117,14 +117,14 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	}
 
 	public function getSubject( ?string $subjectId = null ): array {
-		$this->checkType( 'mw.neowiki.getSubject', 1, $subjectId, 'string' );
+		$this->checkType( 'mw.sws.getSubject', 1, $subjectId, 'string' );
 		$this->incrementExpensiveFunctionCount();
 
 		return $this->getSubjectDataLookup()->getSubjectData( $subjectId );
 	}
 
 	public function getSubjects( ?string $pageName = null ): array {
-		$this->checkTypeOptional( 'mw.neowiki.getSubjects', 1, $pageName, 'string', null );
+		$this->checkTypeOptional( 'mw.sws.getSubjects', 1, $pageName, 'string', null );
 
 		if ( $pageName !== null ) {
 			$this->incrementExpensiveFunctionCount();
@@ -134,8 +134,8 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	}
 
 	public function query( ?string $cypher = null, ?array $params = null ): array {
-		$this->checkType( 'mw.neowiki.query', 1, $cypher, 'string' );
-		$this->checkTypeOptional( 'mw.neowiki.query', 2, $params, 'table', null );
+		$this->checkType( 'mw.sws.query', 1, $cypher, 'string' );
+		$this->checkTypeOptional( 'mw.sws.query', 2, $params, 'table', null );
 		$this->incrementExpensiveFunctionCount();
 
 		try {
@@ -151,7 +151,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	}
 
 	public function sparqlQuery( ?string $sparql = null ): array {
-		$this->checkType( 'mw.neowiki.sparqlQuery', 1, $sparql, 'string' );
+		$this->checkType( 'mw.sws.sparqlQuery', 1, $sparql, 'string' );
 		$this->incrementExpensiveFunctionCount();
 
 		try {
@@ -173,12 +173,12 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	 */
 	public function getSchema( string|array|null $schemaReference = null ): array {
 		if ( !is_array( $schemaReference ) ) {
-			$this->checkType( 'mw.neowiki.getSchema', 1, $schemaReference, 'string' );
+			$this->checkType( 'mw.sws.getSchema', 1, $schemaReference, 'string' );
 		}
 
 		$this->incrementExpensiveFunctionCount();
 
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		try {
 			$reference = $extension->getSchemaReferenceParser()->fromJson( $schemaReference );
@@ -201,34 +201,34 @@ class ScribuntoLuaLibrary extends LibraryBase {
         $o=$options ?? [];
         foreach($o as $key=>$value) {
             if(!in_array($key,['page','subject','field','language','origin','includeImages'],true) || ($key==='includeImages' ? !is_bool($value) : !is_string($value))) {
-                throw new LuaError('NeoWiki: invalid field lookup option');
+                throw new LuaError('SWS: invalid field lookup option');
             }
         }
-        if(isset($o['page'],$o['subject'])) { throw new LuaError('NeoWiki: specify page or subject, not both'); }
+        if(isset($o['page'],$o['subject'])) { throw new LuaError('SWS: specify page or subject, not both'); }
         $title=isset($o['page']) ? \MediaWiki\Title\Title::newFromText($o['page']) : $this->getTitle();
-        if(!$title || $title->isExternal() || !$title->canExist()) { throw new LuaError('NeoWiki: invalid lookup page'); }
-        $extension=NeoWikiExtension::getInstance();
+        if(!$title || $title->isExternal() || !$title->canExist()) { throw new LuaError('SWS: invalid lookup page'); }
+        $extension=SWSExtension::getInstance();
         $resolver=$extension->newSubjectResolver($this->getParser());
         $subject=isset($o['subject']) ? $resolver->resolveById($o['subject']) : $resolver->resolveMainByTitle($title);
         if(!$subject) { return [ [ 'fields'=>[], 'missing'=>true ] ]; }
         $authority=ParserAuthority::of($this->getParser());
         $schema=$extension->getSchemaResolverFor($authority)->getSchema($subject->getSchemaReference());
-        if(!$schema) { throw new LuaError('NeoWiki: schema unavailable'); }
-        $dependencies=new \ProfessionalWiki\NeoWiki\Infrastructure\ParserPageDependencyRecorder($this->getParser());
+        if(!$schema) { throw new LuaError('SWS: schema unavailable'); }
+        $dependencies=new \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder($this->getParser());
         $dependencies->recordDependencyOnSchema($subject->getSchemaReference());
         $services=\MediaWiki\MediaWikiServices::getInstance();
         $language=$o['language'] ?? $services->getContentLanguage()->getCode();
-        if(!preg_match('/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/',$language)) { throw new LuaError('NeoWiki: invalid language'); }
+        if(!preg_match('/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/',$language)) { throw new LuaError('SWS: invalid language'); }
         $key=json_encode([$subject->id->text,$title->getPrefixedText(),$language]);
         try {
             if(!isset($this->effectiveReaders[$key])) {
                 $this->incrementExpensiveFunctionCount();
                 $context=new \MediaWiki\Context\DerivativeContext(\MediaWiki\Context\RequestContext::getMain());
                 $context->setUser($services->getUserFactory()->newFromUserIdentity($this->getParser()->getUserIdentity()));
-                $this->effectiveReaders[$key]=\ProfessionalWiki\NeoWiki\Application\Semantic\FieldSnapshot::reader($schema,$subject,
+                $this->effectiveReaders[$key]=\ProfessionalWiki\SWS\Application\Semantic\FieldSnapshot::reader($schema,$subject,
                     static function() use($context,$title,$subject,$language,$dependencies): array {
-                        if(!class_exists(\NeoWikiBaseBridge\ExternalValuesLookup::class)) { throw new \RuntimeException('NeoWiki source bridge unavailable'); }
-                        return (new \NeoWikiBaseBridge\ExternalValuesLookup($context))->read($title,[
+                        if(!class_exists(\SWSBaseBridge\ExternalValuesLookup::class)) { throw new \RuntimeException('SWS source bridge unavailable'); }
+                        return (new \SWSBaseBridge\ExternalValuesLookup($context))->read($title,[
                             'pageid'=>$title->getArticleID(),'subject'=>$subject->id->text,'language'=>$language,'presentation'=>false
                         ],$dependencies);
                     }, fn(string $name) => $this->getSubjectDataLookup()->getAll($title,$name,['subject'=>$subject->id->text])[0]);
@@ -237,7 +237,7 @@ class ScribuntoLuaLibrary extends LibraryBase {
             $result['subject']=isset($o['subject']) ? $this->getSubjectDataLookup()->getSubjectData($o['subject'])[0]
                 : $this->getSubjectDataLookup()->getMainSubjectData($title)[0];
             return [ self::fieldsToLua($result) ];
-        } catch (\Throwable $e) { throw new LuaError('NeoWiki: '.$e->getMessage()); }
+        } catch (\Throwable $e) { throw new LuaError('SWS: '.$e->getMessage()); }
     }
 
     private static function fieldsToLua(mixed $value): mixed {

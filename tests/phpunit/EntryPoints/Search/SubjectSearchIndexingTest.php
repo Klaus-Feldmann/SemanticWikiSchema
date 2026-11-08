@@ -2,36 +2,36 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpySubjectIndexingSearchEngine;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectIndexingSearchEngine;
 use RuntimeException;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
  * What an edit hands the wiki's search engine to index. Searching for it is
- * {@see \ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search\DatabaseSearchEndToEndTest}.
+ * {@see \ProfessionalWiki\SWS\Tests\EntryPoints\Search\DatabaseSearchEndToEndTest}.
  *
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Search\IndexesSubjectText
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onRevisionFromEditComplete
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onPageUndeleteComplete
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onAfterImportPage
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Search\IndexesSubjectText
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onPageUndeleteComplete
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAfterImportPage
  */
-class SubjectSearchIndexingTest extends NeoWikiIntegrationTestCase {
+class SubjectSearchIndexingTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -171,11 +171,11 @@ class SubjectSearchIndexingTest extends NeoWikiIntegrationTestCase {
 	public function testSubjectTextIsNormalizedForSearchLikePageText(): void {
 		$pageId = $this->createSubjectPage( $this->museumIn( "\u{FF2E}\u{FF45}\u{FF4F}" ) );
 
-		$this->assertStringContainsString( 'neo', $this->textIndexedFor( $pageId ) );
+		$this->assertStringContainsString( 'sws', $this->textIndexedFor( $pageId ) );
 	}
 
 	/**
-	 * A Subject slot MediaWiki accepts but NeoWiki cannot read must not cost the page its own text in
+	 * A Subject slot MediaWiki accepts but SWS cannot read must not cost the page its own text in
 	 * the index, nor abort a rebuild of the whole wiki's index part way through.
 	 */
 	public function testUnreadableSubjectSlotStillIndexesThePageText(): void {
@@ -250,8 +250,8 @@ class SubjectSearchIndexingTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * A Subject slot holding JSON that MediaWiki's content model accepts but NeoWiki cannot read as
-	 * Subjects, which no NeoWiki write path produces but an import or a hand-edit can leave behind.
+	 * A Subject slot holding JSON that MediaWiki's content model accepts but SWS cannot read as
+	 * Subjects, which no SWS write path produces but an import or a hand-edit can leave behind.
 	 */
 	private function writeRawSubjectSlot( string $pageName, string $json ): void {
 		$updater = MediaWikiServices::getInstance()->getWikiPageFactory()

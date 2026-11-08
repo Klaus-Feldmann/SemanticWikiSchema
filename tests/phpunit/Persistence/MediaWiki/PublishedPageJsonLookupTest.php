@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ObjectForgettingBagOStuff;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPageContentFetcher;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ObjectForgettingBagOStuff;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
 use Wikimedia\ObjectCache\HashBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup
  */
 class PublishedPageJsonLookupTest extends TestCase {
 

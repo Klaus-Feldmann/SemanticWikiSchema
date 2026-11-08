@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator
  * @group Database
  */
-class ExplainCypherQueryValidatorTest extends NeoWikiIntegrationTestCase {
+class ExplainCypherQueryValidatorTest extends SWSIntegrationTestCase {
 
 	private ExplainCypherQueryValidator $validator;
 
@@ -20,7 +20,7 @@ class ExplainCypherQueryValidatorTest extends NeoWikiIntegrationTestCase {
 		$this->setUpNeo4j();
 
 		$this->validator = new ExplainCypherQueryValidator(
-			NeoWikiExtension::getInstance()->getReadOnlyNeo4jClient()
+			SWSExtension::getInstance()->getReadOnlyNeo4jClient()
 		);
 	}
 

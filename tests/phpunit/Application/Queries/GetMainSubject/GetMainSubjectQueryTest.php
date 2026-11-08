@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\GetMainSubject;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetMainSubject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersResolver;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectQuery;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectResponse;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectQuery
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
  */
 class GetMainSubjectQueryTest extends TestCase {
 
@@ -127,7 +127,7 @@ class GetMainSubjectQueryTest extends TestCase {
 				new PageIdentifiers(
 					id: new PageId( self::PAGE_ID ),
 					title: 'Subject:' . ucfirst( self::MAIN_SUBJECT_ID ),
-					namespaceId: NeoWikiExtension::NS_SUBJECT
+					namespaceId: SWSExtension::NS_SUBJECT
 				),
 			] )
 		)->execute( self::PAGE_ID );

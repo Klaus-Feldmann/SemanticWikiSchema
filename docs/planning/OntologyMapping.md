@@ -16,7 +16,7 @@ Discussion: [#996](https://github.com/ProfessionalWiki/NeoWiki/discussions/996).
 > The near-1:1 term-substitution tier shipped first (2026-07); the **structural tier** followed as an optional
 > addition to the same format: node synthesis with deterministic IRIs, and contraction as source-side
 > contributions. See the [Ontology Mapping reference](../authoring/mapping-format.md) and the worked
-> [Person → EDM example](../guide/person-to-edm.md). The rule format is NeoWiki-native, so the
+> [Person → EDM example](../guide/person-to-edm.md). The rule format is SWS-native, so the
 > mapping-formalism question (Q1, [#995](https://github.com/ProfessionalWiki/NeoWiki/issues/995)) stays open
 > at the authoring level; the stored format is provisional. The questions it answered are listed under
 > [Decided](#decided).
@@ -29,7 +29,7 @@ Discussion: [#996](https://github.com/ProfessionalWiki/NeoWiki/discussions/996).
 - [Q4 — Import](#q4-import): how far to shape the format for the import direction.
 - [Q5 — Validation via SHACL](#q5-validation-via-shacl): which shapes, and where findings surface for curators.
 - [Q7 — Packaging and distribution](#q7-packaging-and-distribution): bundles across wikis and a farm.
-- [Q8 — Multilinguality](#q8-multilinguality): the cohesive pass across NeoWiki's surfaces.
+- [Q8 — Multilinguality](#q8-multilinguality): the cohesive pass across SWS's surfaces.
 - [Q10 — Flat vs nested native modelling](#q10-flat-vs-nested-native-modelling): the modelling fork, to be settled
   outside this document.
 
@@ -37,21 +37,21 @@ Everything else the document asked has been answered by the implementation — s
 
 ## Summary
 
-NeoWiki defines its own native Schemas ([ADR 6](../adr/006-schemas.md)). For RDF and SPARQL it projects that data into
-RDF; the native projection uses NeoWiki-native predicates ([NativeRdfProjection.md](NativeRdfProjection.md)). For
+SWS defines its own native Schemas ([ADR 6](../adr/006-schemas.md)). For RDF and SPARQL it projects that data into
+RDF; the native projection uses SWS-native predicates ([NativeRdfProjection.md](NativeRdfProjection.md)). For
 interoperability — the core of ECHOLOT (SO2, T3.1, T3.2) — the data must instead be available in established
 cultural-heritage ontologies such as CIDOC-CRM, EDM, HDTO, and BIBFRAME.
 
-An **ontology mapping** projects native NeoWiki data **directly into a target ontology**: that ontology RDF is what a
+An **ontology mapping** projects native SWS data **directly into a target ontology**: that ontology RDF is what a
 configured triple store holds and what SPARQL queries run against. The native projection stays the default — used
 when no mapping is configured — and the lossless-export target; ontology mappings define the others.
 
 Mappings are first-class, authorable, installable objects, kept separate from Schemas so the native data model is not
-deformed to fit an ontology. A mapping defines the **correspondence** between NeoWiki's model and an ontology, and is
+deformed to fit an ontology. A mapping defines the **correspondence** between SWS's model and an ontology, and is
 intended to drive both export (native → ontology) and, later, import (ontology → native).
 
 The central difficulty is that good ontology mapping is **not predicate renaming**: CIDOC-CRM and similar ontologies
-are event-centric and require *synthesizing intermediate nodes that do not exist in NeoWiki's data*. The mapping is a
+are event-centric and require *synthesizing intermediate nodes that do not exist in SWS's data*. The mapping is a
 graph-to-graph transformation governed by reusable patterns.
 
 > Terminology note: ECHOLOT partners often say "RDF mapping" for ontology alignment — that is *this* document. The
@@ -67,7 +67,7 @@ of whichever projection a query targets. Each projection writes its own family o
 overwrite one another.
 
 - The **native projection** ([NativeRdfProjection.md](NativeRdfProjection.md)) is the default target. A wiki with no
-  ontology mapping configured still gets RDF and SPARQL, in NeoWiki-native terms.
+  ontology mapping configured still gets RDF and SPARQL, in SWS-native terms.
 - An **ontology mapping** defines an alternative target (CIDOC-CRM, EDM, …). A store can hold that projection — on its
   own or alongside others — and SPARQL against it is written in that ontology.
 - Projections are **pluggable per store**, consistent with [ADR 19](../adr/019-graph-database-architecture.md) (each
@@ -107,7 +107,7 @@ Settled across our planning:
 
 Targets sit on a spectrum. Flat, property-centric ones (Dublin Core, much of EDM) mostly need term substitution:
 `Person.Name` → `foaf:name`. Event-centric ones do not: CIDOC-CRM mediates relationships through events, so a native
-`Creator` relation expands to a path through an `E12_Production` node that has **no counterpart in NeoWiki's data**
+`Creator` relation expands to a path through an `E12_Production` node that has **no counterpart in SWS's data**
 and must be minted. The mirror case is contraction — where the data carries structure a target does not want, the
 mapping collapses it, as a Birth event Subject collapses to `rdaGr2:dateOfBirth` on a flat EDM agent. Both directions
 are needed because a wiki serves several targets at once ([sibling projections](#projections-not-layers)) that
@@ -118,7 +118,7 @@ Expressing both in one declarative form is what the mapping format had to solve,
 
 ### Flat vs nested native modelling (open fork)
 
-Where the structure comes from is itself undecided (2026-06-24 data-modelling call with takin and OEAW). NeoWiki can
+Where the structure comes from is itself undecided (2026-06-24 data-modelling call with takin and OEAW). SWS can
 already express intermediate nodes as separate Subjects linked by Relations; the fork is about what the modelling norm
 should be and where the burden sits:
 
@@ -133,7 +133,7 @@ should be and where the burden sits:
 The fork is to be settled outside this document — it is a schema-model and editing-UX decision, exercised through the shared
 toy model ([Neutral Person to Many Standards](https://docs.google.com/spreadsheets/d/1j2_7j8RCUJrrMsfZaXtqHQOwp9cN9F8HIBtd3pfsToU/edit))
 that expresses one person model across several ontologies. The same toy model doubles as the first end-to-end
-exercise of this document's approach: implement its neutral person schema in NeoWiki, define a Mapping for it, and
+exercise of this document's approach: implement its neutral person schema in SWS, define a Mapping for it, and
 project to EDM first — the near-1:1 tier — proving or disproving the mechanism by doing (proposed at the 2026-07-03
 WP2/3/4 call). What matters here is that the formalism needs both directions under **either** route: not every wiki
 will model maximally nested (a mapping must handle whatever the native model is), and sibling targets decompose
@@ -146,14 +146,14 @@ remove the requirement (Q10).
 1. **Non-destructive.** A mapping never changes native Schemas or stored data; it only defines a projection. A wiki with
    no mapping still has the native projection.
 2. **Patterns are reusable and externally curated where possible.** Encoding CIDOC-CRM correctly is specialist work.
-   NeoWiki should *bind* local constructs to curated ontology patterns, not re-encode ontology knowledge in its own
+   SWS should *bind* local constructs to curated ontology patterns, not re-encode ontology knowledge in its own
    codebase.
 3. **Reuse a formalism; do not invent one casually.** Prefer an established mapping/transformation formalism (see open
-   questions) over a bespoke NeoWiki DSL, consistent with [ADR 19](../adr/019-graph-database-architecture.md)'s
+   questions) over a bespoke SWS DSL, consistent with [ADR 19](../adr/019-graph-database-architecture.md)'s
    "don't reinvent the query layer" stance.
 4. **Mappings are first-class wiki objects.** Authorable and versioned like other content (a wiki page and/or an
    API-writable object), not buried in server configuration. Distributable as bundles.
-5. **Bidirectional correspondence.** A mapping describes how NeoWiki's model and an ontology correspond, for both export
+5. **Bidirectional correspondence.** A mapping describes how SWS's model and an ontology correspond, for both export
    and import. Export ships first; import (below) reuses the correspondence but needs additional machinery.
 
 ## The shipped format
@@ -164,8 +164,8 @@ its properties, its synthesized nodes, and its contributions project. It is spec
 
 ## Import
 
-The mapping is the **correspondence** between NeoWiki's model and an ontology, so it is also the basis for importing
-ontology RDF into NeoWiki Subjects (T3.2 calls for native RDF/RDF\* import; T2.3 frames interoperability as
+The mapping is the **correspondence** between SWS's model and an ontology, so it is also the basis for importing
+ontology RDF into SWS Subjects (T3.2 calls for native RDF/RDF\* import; T2.3 frames interoperability as
 bidirectional model-model mappings). Export ships first, but the formalism should be chosen with import in mind.
 
 Import is not export run backwards. A structural mapping is generally **not trivially invertible**: importing CIDOC-CRM
@@ -196,7 +196,7 @@ and two distinct failure sources make that worthwhile:
   the target ontology mandates is missing). These are per-Subject curation findings.
 
 Proposed division of labour: shape engines run in external quality tooling (T4.5), not in the wiki's editing path.
-NeoWiki's job is to keep projections checkable and findings traceable:
+SWS's job is to keep projections checkable and findings traceable:
 
 - Export of projected RDF for a given mapping (per page and in bulk), so external validators have input.
 - Per-page named graphs ([RDF Export reference](../api/rdf-export.md#iri-scheme)) make re-validation incremental:
@@ -234,7 +234,7 @@ with deep CIDOC-CRM / EDM / RDF experience. Questions the implementation answere
 
 ### Q1: Authoring formalism
 
-The shipped format is a NeoWiki-native declarative JSON, and it is the executable substrate. What stays open is
+The shipped format is a SWS-native declarative JSON, and it is the executable substrate. What stays open is
 whether a higher-level formalism should sit in front of it: **LinkML**, whose class/slot mappings to external
 vocabularies are established and tooling-rich but of unproven expressiveness for CIDOC-CRM-style structural expansion
 ([#995](https://github.com/ProfessionalWiki/NeoWiki/issues/995)), or an export from the T2.3 pattern library that
@@ -244,9 +244,9 @@ ontology-mapping frameworks exist in this space, and reusing or aligning with on
 
 ### Q3: Platka boundary
 
-Platka is the T2.3 pattern library (takin). Open: the division of labour between it and NeoWiki, what NeoWiki would
+Platka is the T2.3 pattern library (takin). Open: the division of labour between it and SWS, what SWS would
 consume from it, in what format, and over what interface. The division we have assumed is that the library owns the
-*recipe* — the exact RDF a given alignment must produce — while NeoWiki owns the *binding* of local Schemas onto it
+*recipe* — the exact RDF a given alignment must produce — while SWS owns the *binding* of local Schemas onto it
 and the *execution* against actual Subjects; to be confirmed with takin
 ([#996](https://github.com/ProfessionalWiki/NeoWiki/discussions/996)).
 
@@ -259,9 +259,9 @@ reconciliation)?
 ### Q5: Validation via SHACL
 
 [Validating projections](#validating-projections) proposes consuming shapes emitted by the T2.3 library to check
-ontology projections, with the engines in the T4.5 tooling rather than in NeoWiki. Open: which shapes the library
+ontology projections, with the engines in the T4.5 tooling rather than in SWS. Open: which shapes the library
 actually emits and their coverage per ontology; and where findings surface for curators (report pages, a dashboard,
-an API the quality component writes back to) — in NeoWiki core or a plug-in. Candidate engine (suggested 2026-07-03):
+an API the quality component writes back to) — in SWS core or a plug-in. Candidate engine (suggested 2026-07-03):
 [rudof](https://github.com/rudof-project/rudof) — Rust, SHACL + ShEx, has an MCP interface, and can validate a QLever
 endpoint directly; endpoint-side validation still needs the traceability path above, since the store has no sync-back
 to the wiki.
@@ -274,7 +274,7 @@ packaged, versioned, installed, and shared across wikis and a farm.
 ### Q8: Multilinguality
 
 A mapping can language-tag the literals it projects, which leaves the harder half open: where multilinguality lives
-across NeoWiki as a whole — property labels ([#710](https://github.com/ProfessionalWiki/NeoWiki/issues/710)), select
+across SWS as a whole — property labels ([#710](https://github.com/ProfessionalWiki/NeoWiki/issues/710)), select
 options ([#726](https://github.com/ProfessionalWiki/NeoWiki/issues/726)), the native projection, and Views. CH data is
 heavily multilingual (Basque, the ELB languages), while canonical values used in queries stay language-neutral. A
 cohesive pass across surfaces is wanted rather than per-surface answers.
@@ -305,7 +305,7 @@ Answered by the shipped implementation. Numbers are the original question number
   two Mapping pages can both use CIDOC-CRM terms, each defining its own shape
   ([#996 comment](https://github.com/ProfessionalWiki/NeoWiki/discussions/996#discussioncomment-17920073), 2026-08-06).
 - **Q7 — where Mappings live.** Pages in the `Mapping:` namespace, listed on `Special:Mappings` and gated by the
-  `neowiki-mapping-edit` right ([reference](../authoring/mapping-format.md#ontology-mappings-are-wiki-pages)).
+  `sws-mapping-edit` right ([reference](../authoring/mapping-format.md#ontology-mappings-are-wiki-pages)).
 - **Q8 — language tags in a mapping.** A mapped property or contribution takes a `lang` tag, applied to the plain-string
   literals it produces ([reference](../authoring/mapping-format.md#format-version-1)); the native projection mints none.
 - **Q9 — multiple projections per wiki.** A wiki serves several sibling projections at once, selected per request, with

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\RestSetSubjectsOrderingPresenter;
+use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\RestSetSubjectsOrderingPresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -32,7 +32,7 @@ class SetSubjectsOrderingApi extends SimpleHandler {
 		$presenter = new RestSetSubjectsOrderingPresenter();
 
 		try {
-			NeoWikiExtension::getInstance()
+			SWSExtension::getInstance()
 				->newSetSubjectsOrderingAction( $presenter, $this->getAuthority() )
 				->setOrdering( $request );
 		} catch ( InvalidArgumentException $e ) {

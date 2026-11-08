@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseException;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySort;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectSummarySerializer;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\SubjectSummarySerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -66,7 +66,7 @@ class GetSubjectSummariesApi extends SimpleHandler {
 		return $this->getResponseFactory()->createJson( [
 			'subjects' => array_map(
 				SubjectSummarySerializer::serialize( ... ),
-				NeoWikiExtension::getInstance()->newSubjectSummaryHostSubjects()->addTo( $summaries->summaries )
+				SWSExtension::getInstance()->newSubjectSummaryHostSubjects()->addTo( $summaries->summaries )
 			),
 			'nextCursor' => $summaries->nextCursor?->encode(),
 		] );

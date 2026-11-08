@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Contracts\TransactionInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelationList;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
 
 /**
  * Reconciles the outgoing relations of a set of Subjects with the relations those Subjects hold.

@@ -1,9 +1,9 @@
 [
 	{
-		"path": "/neowiki/v0/query/sparql",
+		"path": "/sws/v0/query/sparql",
 		"method": [
 			"POST"
 		],
-		"factory": "ProfessionalWiki\\NeoWiki\\NeoWikiExtension::newSparqlQueryApi"
+		"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSparqlQueryApi"
 	}
 ]

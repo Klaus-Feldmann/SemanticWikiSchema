@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummary;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
 
 final class SubjectSummarySerializer {
 

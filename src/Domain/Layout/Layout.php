@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Layout;
+namespace ProfessionalWiki\SWS\Domain\Layout;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
 
 readonly class Layout {
 

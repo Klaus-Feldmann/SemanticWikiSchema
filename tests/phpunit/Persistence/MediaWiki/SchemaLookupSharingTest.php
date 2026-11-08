@@ -2,38 +2,38 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\NeoWiki\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CachingSchemaLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestPage;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPageContentFetcher;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use ProfessionalWiki\SWS\Tests\Data\TestPage;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\ObjectCache\EmptyBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 
 /**
  * The Schema of a Subject is needed by both the validation and the graph projection of every
  * Subject on a saved page. These pin that a page's Schemas are resolved once per Schema, not
  * once per Subject per path.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CachingSchemaLookup
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup
+ * @covers \ProfessionalWiki\SWS\SWSExtension
  * @group Database
  */
-class SchemaLookupSharingTest extends NeoWikiIntegrationTestCase {
+class SchemaLookupSharingTest extends SWSIntegrationTestCase {
 
 	private const SCHEMA_NAME = 'SharedLookupSchema';
 
@@ -63,7 +63,7 @@ class SchemaLookupSharingTest extends NeoWikiIntegrationTestCase {
 		$fetcher = $this->newFetcher();
 		$validator = new ProposedSubjectValidator(
 			schemaResolver: TestSources::newSchemaResolver( $this->newCachingLookup( $fetcher ) ),
-			subjectValidator: NeoWikiExtension::getInstance()->newSubjectValidator( $this->getTestUser()->getAuthority() ),
+			subjectValidator: SWSExtension::getInstance()->newSubjectValidator( $this->getTestUser()->getAuthority() ),
 		);
 
 		$validator->validate( $this->newSubject( 'sShrdLookup1115' ) );
@@ -75,7 +75,7 @@ class SchemaLookupSharingTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testServesOneSchemaLookupThroughoutARequest(): void {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		$this->assertSame( $extension->getSchemaLookup(), $extension->getSchemaLookup() );
 	}
@@ -85,13 +85,13 @@ class SchemaLookupSharingTest extends NeoWikiIntegrationTestCase {
 	 * name again on every page.
 	 */
 	public function testServesOneSchemaReferenceParserThroughoutARequest(): void {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		$this->assertSame( $extension->getSchemaReferenceParser(), $extension->getSchemaReferenceParser() );
 	}
 
 	private function newCountingProjectionStore( SpyPageContentFetcher $fetcher ): GraphDatabasePlugin {
-		return NeoWikiExtension::getInstance()->newNeo4jProjectionStore( $this->newCachingLookup( $fetcher ) );
+		return SWSExtension::getInstance()->newNeo4jProjectionStore( $this->newCachingLookup( $fetcher ) );
 	}
 
 	private function newCachingLookup( SpyPageContentFetcher $fetcher ): CachingSchemaLookup {
@@ -103,7 +103,7 @@ class SchemaLookupSharingTest extends NeoWikiIntegrationTestCase {
 				new WANObjectCache( [ 'cache' => new EmptyBagOStuff() ] )
 			),
 			schemaDeserializer: new SchemaPersistenceDeserializer(
-				NeoWikiExtension::getInstance()->getPropertyTypeLookup()
+				SWSExtension::getInstance()->getPropertyTypeLookup()
 			),
 			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
 			readAuthorizer: new StubPageReadAuthorizer( allowed: true ),

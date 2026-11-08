@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetPageSubjects;
+namespace ProfessionalWiki\SWS\Application\Queries\GetPageSubjects;
 
 interface GetPageSubjectsPresenter {
 

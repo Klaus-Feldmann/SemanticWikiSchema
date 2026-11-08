@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\TextContent;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionRecord;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader
  */
 class SubjectSlotReaderTest extends TestCase {
 

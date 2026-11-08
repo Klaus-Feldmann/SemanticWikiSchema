@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\GraphRebuild;
+namespace ProfessionalWiki\SWS\Domain\GraphRebuild;
 
 /**
  * Which half of a rebuild a run is in: reprojecting the pages the wiki has, or removing the ones it no

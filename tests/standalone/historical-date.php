@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 require __DIR__ . '/autoload.php';
 
-use ProfessionalWiki\NeoWiki\Domain\HistoricalDate;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\HistoricalDateType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use ProfessionalWiki\SWS\Domain\HistoricalDate;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\HistoricalDateType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
 
 $count = 0;
 function same(mixed $actual, mixed $expected, string $message): void {

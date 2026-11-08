@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Application\SubjectCountLookup;
+use ProfessionalWiki\SWS\Application\SubjectCountLookup;
 use stdClass;
 use Wikimedia\Rdbms\IConnectionProvider;
 
@@ -21,9 +21,9 @@ class DatabaseSubjectCountLookup implements SubjectCountLookup {
 
 	public function getSubjectCountsBySchema(): array {
 		$result = $this->connectionProvider->getReplicaDatabase()->newSelectQueryBuilder()
-			->select( [ 'nws_schema', 'subject_count' => 'COUNT(DISTINCT nws_subject_id)' ] )
+			->select( [ 'swss_schema', 'subject_count' => 'COUNT(DISTINCT swss_subject_id)' ] )
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE )
-			->groupBy( 'nws_schema' )
+			->groupBy( 'swss_schema' )
 			->caller( __METHOD__ )
 			->fetchResultSet();
 
@@ -31,7 +31,7 @@ class DatabaseSubjectCountLookup implements SubjectCountLookup {
 
 		/** @var stdClass $row */
 		foreach ( $result as $row ) {
-			$counts[(string)$row->nws_schema] = (int)$row->subject_count;
+			$counts[(string)$row->swss_schema] = (int)$row->subject_count;
 		}
 
 		return $counts;

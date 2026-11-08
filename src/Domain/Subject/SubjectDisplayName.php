@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Subject;
+namespace ProfessionalWiki\SWS\Domain\Subject;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
 
 /**
  * The name to show for a Subject. A Subject need not have a label, so every surface that displays one
  * needs a value to fall back on, and they all need the same one.
  *
- * Mirrored by resources/ext.neowiki/src/domain/chosenSubjectName.ts, which answers the same question
+ * Mirrored by resources/ext.sws/src/domain/chosenSubjectName.ts, which answers the same question
  * for a Subject that does not exist yet. Change one and change the other.
  */
 class SubjectDisplayName {

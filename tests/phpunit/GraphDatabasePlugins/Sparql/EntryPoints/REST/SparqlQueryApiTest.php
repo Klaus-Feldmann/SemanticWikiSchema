@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Permissions\Authority;
@@ -11,16 +11,16 @@ use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\RawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FakeSparqlQueryEndpoint;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi
  * @group Database
  */
 class SparqlQueryApiTest extends MediaWikiIntegrationTestCase {
@@ -83,7 +83,7 @@ class SparqlQueryApiTest extends MediaWikiIntegrationTestCase {
 		$this->assertSame( 'internalError', $body['errorType'] );
 	}
 
-	public function testReturns403WhenUserLacksNeowikiQueryRight(): void {
+	public function testReturns403WhenUserLacksSwsQueryRight(): void {
 		$authority = $this->mockAnonAuthorityWithPermissions( [] );
 
 		$response = $this->executeRequest(
@@ -100,7 +100,7 @@ class SparqlQueryApiTest extends MediaWikiIntegrationTestCase {
 	public function testRateLimitedReturns429(): void {
 		$this->overrideConfigValue(
 			MainConfigNames::RateLimits,
-			[ 'neowiki-query' => [ 'user' => [ 0, 60 ] ] ]
+			[ 'sws-query' => [ 'user' => [ 0, 60 ] ] ]
 		);
 
 		$response = $this->executeRequest(
@@ -108,7 +108,7 @@ class SparqlQueryApiTest extends MediaWikiIntegrationTestCase {
 			[ 'query' => 'SELECT * WHERE { ?s ?p ?o }' ],
 			authority: $this->mockUserAuthorityWithPermissions(
 				$this->getTestUser()->getUser(),
-				[ 'neowiki-query' ]
+				[ 'sws-query' ]
 			)
 		);
 		$body = $this->decodeBody( $response );

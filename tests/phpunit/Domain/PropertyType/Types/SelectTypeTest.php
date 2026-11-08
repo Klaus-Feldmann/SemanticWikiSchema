@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\PropertyType\Types;
+namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType
+ * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType
  */
 class SelectTypeTest extends TestCase {
 

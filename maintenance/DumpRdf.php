@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use Exception;
 use Maintenance;
-use ProfessionalWiki\NeoWiki\Application\Rdf\PageProjector;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageLoader;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfStreamWriter;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\Rdf\PageProjector;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfStreamWriter;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
 
@@ -39,7 +39,7 @@ class DumpRdf extends Maintenance {
 	}
 
 	public function execute(): void {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		$projectionName = $this->getOption( 'projection', RdfPageProjector::PROJECTION );
 		$projection = $extension->newUnrestrictedRdfProjection( $projectionName );

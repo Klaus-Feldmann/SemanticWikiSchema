@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseMappingNameLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseMappingNameLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseMappingNameLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseMappingNameLookup
  * @group Database
  */
-class DatabaseMappingNameLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseMappingNameLookupTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	/**
 	 * @var array<string, int>
@@ -118,7 +118,7 @@ class DatabaseMappingNameLookupTest extends NeoWikiIntegrationTestCase {
 		// it must keep querying past the first batch and yield every Mapping exactly once, in strictly
 		// ascending page-ID order — a single truncated batch would drop the tail.
 		$bulk = $this->createBarePages(
-			NeoWikiExtension::NS_MAPPING,
+			SWSExtension::NS_MAPPING,
 			'BulkMapping',
 			DatabaseMappingNameLookup::READABLE_NAMES_BATCH_SIZE + 20
 		);

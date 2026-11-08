@@ -1,0 +1,508 @@
+<template>
+	<div class="ext-sws-subject-picker">
+		<div class="ext-sws-subject-picker__row">
+			<CdxLookup
+				ref="lookupRef"
+				v-model:input-value="inputText"
+				:selected="selectedSubject"
+				:menu-items="menuItems"
+				:start-icon="props.startIcon"
+				:placeholder="$i18n( 'sws-subject-picker-placeholder' ).text()"
+				:status="effectiveStatus"
+				:aria-label="props.ariaLabel"
+				@update:selected="onSubjectSelected"
+				@blur="onBlur"
+			>
+				<!-- Codex shows this only for an empty menu. With create options present the
+					menu never is, so that case carries the same message as an unpickable item. -->
+				<template v-if="searching && !creationOffered" #no-results>
+					{{ $i18n( 'sws-subject-picker-no-results' ).text() }}
+				</template>
+			</CdxLookup>
+			<span class="ext-sws-subject-picker__suffix">
+				<!-- The target as the field is displaying it, not the one the relation holds: a field
+					showing a search of the user's names no Subject, so a suffix acting on that
+					target has nothing to act on that they can see. selectedName is set only where
+					a name is written into the field.
+					`name` is reserved on a slot — Vue reads it as the slot's own name. -->
+				<slot
+					name="suffix"
+					:shown-target="selectedName === '' ? null : props.selected"
+					:target-name="targetName"
+				/>
+			</span>
+		</div>
+		<CdxMessage
+			v-if="hasUnmatchedText"
+			type="error"
+			inline
+		>
+			{{ $i18n( 'sws-subject-picker-no-match' ).text() }}
+		</CdxMessage>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, inject, watch } from 'vue';
+import { CdxLookup, CdxMessage } from '@wikimedia/codex';
+import type { MenuItemData, ValidationStatusType } from '@wikimedia/codex';
+import { cdxIconAdd } from '@wikimedia/codex-icons';
+import type { Icon } from '@wikimedia/codex-icons';
+import { useSubjectStore } from '@/stores/SubjectStore.ts';
+import { SubjectCreationKey } from '@/components/common/SubjectCreation.ts';
+import { SubjectId } from '@/domain/SubjectId.ts';
+import type { Subject } from '@/domain/Subject.ts';
+import { SWSServices } from '@/SWSServices.ts';
+import { disambiguateSubjectLabels } from '@/presentation/disambiguateSubjectLabels.ts';
+import type { DisambiguatedSubjectLabel } from '@/presentation/disambiguateSubjectLabels.ts';
+import type { SubjectLabelResult } from '@/domain/SubjectLabelSearch.ts';
+
+interface SubjectPickerProps {
+	selected: string | null;
+	/**
+	 * The Schemas of this wiki the picked Subject may follow. Omitted, Subjects of every Schema are on
+	 * offer; an empty list offers none, as for a relation whose target Schemas are all another Source's.
+	 */
+	targetSchemas?: readonly string[];
+	startIcon?: Icon;
+	status?: ValidationStatusType | 'default';
+	ariaLabel?: string;
+}
+
+const props = withDefaults(
+	defineProps<SubjectPickerProps>(),
+	{
+		targetSchemas: undefined,
+		startIcon: undefined,
+		status: 'default',
+		ariaLabel: undefined
+	}
+);
+
+// Codex has no value of its own for either of these, so each is an ordinary menu item carrying a
+// value no Subject id can take: an id is 's' followed by 14 base58 characters. A create option
+// carries its Schema's name after the prefix.
+const CREATE_SUBJECT = '__create__';
+const NO_RESULTS = '__no_results__';
+
+const emit = defineEmits<{
+	'update:selected': [ value: string | null ];
+	'blur': [ hasUnmatchedText: boolean ];
+}>();
+
+const subjectStore = useSubjectStore();
+const subjectLabelSearch = SWSServices.getSubjectLabelSearch();
+
+// Absent unless the host can carry a Subject the wiki does not hold yet, which is what leaves the
+// picker offering only Subjects that already exist.
+const subjectCreation = inject( SubjectCreationKey, undefined );
+
+// Creation needs a Schema to create under, which a picker offering every Schema does not name.
+const creatableSchemas = computed( (): readonly string[] =>
+	subjectCreation === undefined ? [] : props.targetSchemas ?? []
+);
+
+const creationOffered = computed( (): boolean => creatableSchemas.value.length > 0 );
+
+const selectedSubject = ref<string | null>( props.selected );
+// The selected target's own name, for a suffix to say what it acts on. Dropped as soon as the
+// selection changes, so a control naming it falls back to the id rather than the previous target.
+const targetName = ref( '' );
+const inputText = ref<string | number>( '' );
+const searchResults = ref<SubjectLabelResult[]>( [] );
+const lookupRef = ref<InstanceType<typeof CdxLookup> | null>( null );
+// Idle until the user types, pending while the request is out, done once it has come back — which
+// is what lets the menu say "nothing found" only when a search actually found nothing, rather than
+// while it is still out.
+const searchStatus = ref<'idle' | 'pending' | 'done'>( 'idle' );
+
+const searching = computed( (): boolean => searchStatus.value !== 'idle' );
+const hasUnmatchedText = ref( false );
+let requestSequence = 0;
+// Moved by each creation and by a real pick, and by nothing else: a creation that lands after either
+// is abandoned, since it would otherwise overwrite what the user chose meanwhile.
+let creationSequence = 0;
+
+// The name the field is currently showing for its selection, so text the user typed can be told
+// apart from the label Codex and the watcher below write there themselves.
+const selectedName = ref( '' );
+
+// Subjects this session invented, which no search can return. Read through the host on every
+// evaluation, so a draft renamed in the editor is renamed here too.
+//
+// Named bare here, without the generated-name marker every display uses: picking an item writes the
+// string into this field's own text input, where the user can edit it and where it feeds the offer
+// to create a Subject under the text they typed.
+const draftRows = computed( (): SubjectLabelResult[] => {
+	const drafts: Subject[] = [];
+
+	for ( const schemaName of creatableSchemas.value ) {
+		drafts.push( ...( subjectCreation?.drafts( schemaName ) ?? [] ) );
+	}
+
+	return drafts.map( rowFor );
+} );
+
+// Neither a draft nor a Subject read by id carries a page title. Having none is a place of its own,
+// which is what tells namesakes among them apart by id.
+function rowFor( subject: Subject ): SubjectLabelResult {
+	return { id: subject.getId().text, label: subject.getDisplayName(), pageTitle: '' };
+}
+
+function draftNameOf( id: string ): string | undefined {
+	return draftRows.value.find( ( row ) => row.id === id )?.label;
+}
+
+// Only what the user actually typed: the field otherwise holds the selected Subject's own name,
+// which would offer to create a second Subject named after the one already chosen.
+const typedText = computed( (): string => {
+	const text = String( inputText.value ?? '' ).trim();
+
+	return text === selectedName.value ? '' : text;
+} );
+
+const createItems = computed( (): MenuItemData[] => creatableSchemas.value.map( ( schemaName ) => ( {
+	value: CREATE_SUBJECT + schemaName,
+	label: typedText.value === '' ?
+		mw.msg( 'sws-subject-picker-create', schemaName ) :
+		mw.msg( 'sws-subject-picker-create-named', typedText.value, schemaName ),
+	icon: cdxIconAdd
+} ) ) );
+
+// Matched here rather than by the search: these Subjects exist only in the editor.
+const matchingDraftRows = computed( (): SubjectLabelResult[] => {
+	const search = typedText.value.toLowerCase();
+
+	return draftRows.value.filter(
+		( row ) => search === '' || row.label.toLowerCase().includes( search )
+	);
+} );
+
+// The create options are present from the first render and never leave, which is what opens the
+// menu on focus before anything is typed: Codex expands an empty input's menu only when the
+// Lookup was built with items, and collapses it again the moment the list runs empty.
+const menuItems = computed( (): MenuItemData[] => {
+	// Every row offered is compared, drafts included: two unsaved Subjects of one Schema are named
+	// alike by default.
+	const rows = creationOffered.value ?
+		[ ...matchingDraftRows.value, ...searchResults.value ] :
+		searchResults.value;
+	const items = disambiguateSubjectLabels( rows ).map( menuItemFor );
+
+	if ( !creationOffered.value ) {
+		return items;
+	}
+
+	// Codex's own no-results slot is shown only for an empty menu, which the create options rule
+	// out, so that case carries the same message as an item nobody can pick.
+	if ( searchStatus.value === 'done' && items.length === 0 ) {
+		items.push( {
+			value: NO_RESULTS,
+			label: mw.msg( 'sws-subject-picker-no-results' ),
+			disabled: true
+		} );
+	}
+
+	items.push( ...createItems.value );
+
+	return items;
+} );
+
+const effectiveStatus = computed( (): ValidationStatusType | 'default' =>
+	hasUnmatchedText.value ? 'error' : props.status
+);
+
+// A Subject this session invented is named by the host: nothing can fetch one the server has
+// never been told about.
+async function resolveName( id: string | null ): Promise<string> {
+	if ( !id ) {
+		return '';
+	}
+
+	const draft = draftNameOf( id );
+	if ( draft !== undefined ) {
+		return draft;
+	}
+
+	return ( await fetchSubject( id ) )?.getDisplayName() ?? id;
+}
+
+// Answers with nothing rather than throwing for an id the wiki does not hold, or holds on a page
+// this user may not read.
+async function fetchSubject( id: string ): Promise<Subject | null> {
+	try {
+		return await subjectStore.getOrFetchSubject( new SubjectId( id ) );
+	} catch {
+		return null;
+	}
+}
+
+function showName( name: string ): void {
+	selectedName.value = name.trim();
+	targetName.value = name;
+	inputText.value = name;
+}
+
+resolveName( props.selected ).then( showName );
+
+watch( () => props.selected, async ( newSelected ) => {
+	selectedSubject.value = newSelected;
+	hasUnmatchedText.value = false;
+	// Both dropped before the await, not after: resolving the new name waits on the network, and
+	// until it lands the field is still showing the name of the target this one replaced.
+	targetName.value = '';
+	selectedName.value = '';
+
+	if ( newSelected !== null || searchStatus.value === 'idle' ) {
+		showName( await resolveName( newSelected ) );
+	}
+
+	searchStatus.value = 'idle';
+} );
+
+// A draft renamed in the editor renames the field pointing at it.
+watch( () => props.selected === null ? undefined : draftNameOf( props.selected ), ( name ) => {
+	if ( name !== undefined ) {
+		showName( name );
+	}
+} );
+
+// The field's value rather than CdxLookup's `input` event, as in PagePicker: Codex also emits that
+// event for text it writes itself, such as the label of an item just picked.
+watch( inputText, ( value ) => {
+	onFieldTextChanged( String( value ?? '' ) );
+} );
+
+async function onFieldTextChanged( value: string ): Promise<void> {
+	hasUnmatchedText.value = false;
+
+	// The selection's own name, written by Codex on a pick or by showName, is not the user typing.
+	// An emptied field never is that name, and has its own answer below.
+	if ( value !== '' && value.trim() === selectedName.value ) {
+		return;
+	}
+
+	// What the field shows is the user's now, so the name it held excuses no later text of theirs:
+	// typing the target's own name back has to search for it like any other.
+	selectedName.value = '';
+
+	if ( value === '' ) {
+		// Abandons a lookup still in flight, whose answer would otherwise fill the menu of a field
+		// the user has since emptied.
+		++requestSequence;
+		searchResults.value = [];
+		searchStatus.value = 'idle';
+
+		// Emptying a field the user typed over empties the relation, which Codex reports itself only
+		// while it still holds a selection. Codex also blanks the field for a target its menu does
+		// not list, such as one the host has just set; that target stands.
+		if ( selectedSubject.value === null && props.selected !== null ) {
+			emit( 'update:selected', null );
+		}
+
+		return;
+	}
+
+	searchStatus.value = 'pending';
+	const currentSequence = ++requestSequence;
+
+	const candidates = await candidatesFor( value );
+
+	if ( currentSequence !== requestSequence ) {
+		return;
+	}
+
+	searchResults.value = candidates;
+	searchStatus.value = 'done';
+}
+
+// An id names one Subject, so it is read rather than searched for. That read is how a Subject with
+// no label is reached at all, ADR 31 leaving such a Subject out of the label search. It does not
+// replace the search, though: the shape of an id is also the shape of an ordinary fifteen-letter
+// word, so text that names no usable Subject goes on to be searched for as a label.
+async function candidatesFor( value: string ): Promise<SubjectLabelResult[]> {
+	// A target Schema from another Source names nothing here: neither the label search nor the
+	// Schema an id-lookup would be matched against is this wiki's to answer with.
+	if ( props.targetSchemas?.length === 0 ) {
+		return [];
+	}
+
+	const text = value.trim();
+
+	if ( SubjectId.isValid( text ) ) {
+		const subject = await fetchSubject( text );
+
+		// A Subject of another Schema cannot be this relation's target, unless every Schema is on
+		// offer. One the user may not read never reaches here at all: the read fails instead of
+		// answering.
+		if ( subject !== null &&
+			( props.targetSchemas === undefined || props.targetSchemas.includes( subject.getSchemaName() ) )
+		) {
+			return [ rowFor( subject ) ];
+		}
+	}
+
+	return searchLabels( text, props.targetSchemas );
+}
+
+async function searchLabels( value: string, targetSchemas: readonly string[] | undefined ): Promise<SubjectLabelResult[]> {
+	try {
+		return await subjectLabelSearch.searchSubjectLabels( value, targetSchemas );
+	} catch {
+		return [];
+	}
+}
+
+// The id sits beside the label and the page on its own line: an id belongs to the Subject and
+// survives a move, while the page is only where it is stored today. Two fields rather than one
+// composed label, because picking a row writes its label into this field for the user to edit.
+// The id is never shortened: ids sort by mint time (ADR 14), so a prefix discriminates nothing.
+function menuItemFor( result: DisambiguatedSubjectLabel ): MenuItemData {
+	return {
+		value: result.id,
+		label: result.label,
+		description: result.showPageTitle ? result.pageTitle : undefined,
+		supportingText: result.showId ? mw.msg( 'parentheses', result.id ) : undefined
+	};
+}
+
+// Codex's selection is bound one way so that neither sentinel ever becomes it. Codex writes the
+// label of whatever it selects into the field, or nothing for an item its menu does not list: the
+// create option's label would replace the typed name, and putting back a target the user typed
+// over would blank the field.
+function onSubjectSelected( subjectId: string | null ): void {
+	const schemaToCreate = creatableSchemas.value.find( ( schemaName ) => subjectId === CREATE_SUBJECT + schemaName );
+
+	if ( schemaToCreate !== undefined ) {
+		createFromTypedText( schemaToCreate );
+		return;
+	}
+
+	// Codex refuses to select a disabled item, but the picker does not rely on that to keep its
+	// own sentinel out of a relation.
+	if ( subjectId === NO_RESULTS ) {
+		return;
+	}
+
+	selectedSubject.value = subjectId;
+
+	// Codex drops its selection whenever the text changes. The relation keeps its target while the
+	// user types over it, and the field watcher empties it once the field is empty.
+	if ( subjectId === null ) {
+		return;
+	}
+
+	// A pick outranks a creation still in flight.
+	++creationSequence;
+
+	// Recorded before the parent answers with a new props.selected: Codex writes the picked item's
+	// label into the field, and until this catches up that label would read as text the user had
+	// typed — which is what the create option is named after, and what starts a search.
+	const picked = menuItems.value.find( ( item ) => item.value === subjectId );
+	if ( picked !== undefined ) {
+		// Through showName, so the suffix's name is settled here rather than a round trip later,
+		// still naming the target this pick replaced.
+		showName( String( picked.label ?? '' ) );
+	}
+
+	searchStatus.value = 'idle';
+	hasUnmatchedText.value = false;
+	emit( 'update:selected', subjectId );
+}
+
+async function createFromTypedText( schemaName: string ): Promise<void> {
+	if ( subjectCreation === undefined ) {
+		return;
+	}
+
+	const currentCreation = ++creationSequence;
+
+	try {
+		// What the user typed names the new Subject, which is the only way it becomes findable
+		// again once saved: a Subject with no label is left out of the label search (ADR 31).
+		const subject = await subjectCreation.create(
+			schemaName,
+			typedText.value === '' ? null : typedText.value
+		);
+
+		if ( subject === null || currentCreation !== creationSequence ) {
+			return;
+		}
+
+		// A search still out would answer for text the new Subject's name now replaces.
+		++requestSequence;
+		searchStatus.value = 'idle';
+		hasUnmatchedText.value = false;
+		showName( subject.getDisplayName() );
+		selectedSubject.value = subject.getId().text;
+		emit( 'update:selected', subject.getId().text );
+	} catch ( error ) {
+		// Only a host breaking its contract throws: one that fails reports it and answers null.
+		console.error( 'Failed to create a Subject from the picker:', error );
+	}
+}
+
+function onBlur(): void {
+	hasUnmatchedText.value = !!inputText.value && selectedSubject.value === null;
+	emit( 'blur', hasUnmatchedText.value );
+}
+
+function focus(): void {
+	const input = ( lookupRef.value?.$el as HTMLElement )?.querySelector( 'input' );
+	input?.focus();
+}
+
+defineExpose( { focus } );
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-subject-picker {
+	/* One cell holding the field and whatever sits over its end. Overlapped by grid placement
+		rather than by positioning: `position: relative` here would recapture the containing block
+		Codex gives its menus inside a dialog, and silently clip every dropdown. */
+	&__row {
+		display: grid;
+		grid-template-columns: minmax( 0, 1fr );
+		align-items: start;
+
+		> * {
+			grid-area: 1 / 1;
+			/* A grid item's automatic minimum is its content, and Codex gives `.cdx-text-input` a
+				256px minimum, so without this the row cannot shrink below it. */
+			min-width: 0;
+		}
+	}
+
+	/* Positioned so it paints over the field: Codex gives `.cdx-text-input` `position: relative`,
+		and a positioned box paints above an unpositioned sibling whatever the source order says.
+		Safe here and not on the row: a leaf beside the field is no ancestor of the menu. */
+	&__suffix {
+		position: relative;
+		justify-self: end;
+		/* Only its own control takes the pointer; the rest of the cell is the field underneath. */
+		pointer-events: none;
+
+		> * {
+			pointer-events: auto;
+		}
+	}
+
+	/* Room for that control, so a long name ellipsises rather than running under it. Asked of the
+		rendered control, so an empty slot leaves the field its whole width. */
+	&__row:has( &__suffix > * ) .cdx-text-input__input {
+		padding-inline-end: @size-200;
+	}
+
+	/* The create options are the last items, and they offer an action rather than a result.
+		Codex sets its own pinned footer item apart the same way, and skips the rule when that item
+		is the only one — a line above a lone entry reads as a mistake. This menu draws the line
+		itself, above the first of them: `menuConfig`, all CdxLookup passes on to CdxMenu, has no
+		footer in its type, and a footer item is selectable like any other anyway. A create option
+		is told by its icon, which no other item of this menu has. */
+	.cdx-menu__listbox > .cdx-menu-item:not( :has( .cdx-menu-item__icon ) ) + .cdx-menu-item:has( .cdx-menu-item__icon ) {
+		border-top: @border-subtle;
+	}
+}
+</style>

@@ -1,4 +1,4 @@
-name: NeoWiki CI (browser)
+name: SWS CI (browser)
 
 on:
   workflow_dispatch:
@@ -90,11 +90,11 @@ jobs:
       - name: Install MediaWiki
         if: steps.cache-mediawiki.outputs.cache-hit != 'true'
         working-directory: ~
-        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} NeoWiki
+        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} SWS
 
       - uses: actions/checkout@v6
         with:
-          path: mediawiki/extensions/NeoWiki
+          path: mediawiki/extensions/SWS
 
       - run: composer update
 
@@ -105,12 +105,12 @@ jobs:
         with:
           node-version: '24'
 
-      - name: Build NeoWiki JavaScript
-        working-directory: mediawiki/extensions/NeoWiki/resources/ext.neowiki
+      - name: Build SWS JavaScript
+        working-directory: mediawiki/extensions/SWS/resources/ext.sws
         run: npm ci && npx vite build
 
       - name: Install Playwright
-        working-directory: mediawiki/extensions/NeoWiki/tests/e2e
+        working-directory: mediawiki/extensions/SWS/tests/e2e
         run: npm ci && npx playwright install --with-deps --only-shell chromium
 
       - name: Wait for Neo4j
@@ -128,7 +128,7 @@ jobs:
           timeout 30 bash -c "until curl -fsS -o /dev/null '$MW_SERVER$MW_SCRIPT_PATH/index.php'; do sleep 1; done"
 
       - name: Run browser tests
-        working-directory: mediawiki/extensions/NeoWiki/tests/e2e
+        working-directory: mediawiki/extensions/SWS/tests/e2e
         run: npx playwright test
 
       - name: Upload test results
@@ -137,5 +137,5 @@ jobs:
         with:
           name: browser-test-results-${{ matrix.mw }}
           path: |
-            mediawiki/extensions/NeoWiki/tests/e2e/test-results/
+            mediawiki/extensions/SWS/tests/e2e/test-results/
             ${{ runner.temp }}/php-server.log

@@ -68,7 +68,7 @@
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
 const icons = require( './icons.json' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 
 const HEX_REGEX = require( './hexRegex.js' );
 let nextId = 0;

@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\LinksRefreshHandler
+ * @covers \ProfessionalWiki\SWS\EntryPoints\LinksRefreshHandler
  * @group Database
  */
-class LinksRefreshGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class LinksRefreshGraphProjectionTest extends SWSIntegrationTestCase {
 
 	private const string TEMPLATE = 'Template:Links refresh probe';
 	private const string PAGE = 'Page using the links refresh probe';
@@ -28,9 +28,9 @@ class LinksRefreshGraphProjectionTest extends NeoWikiIntegrationTestCase {
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		// Some tests rebuild the singleton with a temporary NeoWikiRegistration hook; reset it so later tests
+		// Some tests rebuild the singleton with a temporary SWSRegistration hook; reset it so later tests
 		// get a clean instance.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testTemplateEditUpdatesTheCategoriesOfThePagesUsingIt(): void {

@@ -90,19 +90,19 @@
 <script>
 const vue = require( 'vue' );
 const codex = require( './codex.js' );
-const nw = require( 'ext.neowiki' );
+const nw = require( 'ext.sws' );
 
 // Example View Type: renders a Subject as a two-column card, loosely modelled on
 // the "document control" header BlueSpice shows on controlled documents. It
-// demonstrates assembling NeoWiki's building blocks from a separate extension:
+// demonstrates assembling SWS's building blocks from a separate extension:
 // the ViewProps contract ( subjectId, canEditSubject, layoutName ); the
 // subject / schema / layout stores for display; the repositories for the editing
-// reads ( NeoWiki ADR 30 / ADR 16 ); resolveDisplayProperties + the value-display
+// reads ( SWS ADR 30 / ADR 16 ); resolveDisplayProperties + the value-display
 // component registry to render each value with its property type's component;
 // and the shared SubjectEditorDialog for editing, reachable only through the edit
 // button the contract's canEditSubject gates. It also reads the Layout's settings — a
 // fullWidthProperties list — to decide which properties span the full width
-// instead of sitting in a column. NeoWiki populates the stores before mounting.
+// instead of sitting in a column. SWS populates the stores before mounting.
 // @vue/component
 module.exports = exports = {
 	components: {
@@ -118,9 +118,9 @@ module.exports = exports = {
 		const subjectStore = nw.useSubjectStore();
 		const schemaStore = nw.useSchemaStore();
 		const layoutStore = nw.useLayoutStore();
-		const componentRegistry = nw.NeoWikiServices.getComponentRegistry();
-		const subjectRepo = nw.NeoWikiServices.getSubjectRepository();
-		const schemaRepo = nw.NeoWikiServices.getSchemaRepository();
+		const componentRegistry = nw.SWSServices.getComponentRegistry();
+		const subjectRepo = nw.SWSServices.getSubjectRepository();
+		const schemaRepo = nw.SWSServices.getSchemaRepository();
 
 		// Opens the shared editor on freshly read data. See docs/extending/view-types.md.
 		const { editingSubject, editingSchema, editorOpen, openEditor } =

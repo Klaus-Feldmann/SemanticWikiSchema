@@ -1,0 +1,62 @@
+import { ref, type Ref } from 'vue';
+import { SWSServices } from '@/SWSServices.ts';
+import type { SubjectPermissionHints } from '@/application/SubjectPermissionHints.ts';
+
+export interface SubjectPermissions {
+	canCreateMainSubject: Ref<boolean>;
+	canCreateOtherSubject: Ref<boolean>;
+	canEditSubject: Ref<boolean>;
+	canDeleteSubject: Ref<boolean>;
+	canCreateSubjectPage: Ref<boolean>;
+	checkPermissions: ( pageId: number ) => Promise<void>;
+	checkCreateSubjectPagePermission: () => Promise<void>;
+}
+
+export function useSubjectPermissions(): SubjectPermissions {
+	const canCreateMainSubject = ref( false );
+	const canCreateOtherSubject = ref( false );
+	const canEditSubject = ref( false );
+	const canDeleteSubject = ref( false );
+	const canCreateSubjectPage = ref( false );
+	const hints: SubjectPermissionHints = SWSServices.getSubjectPermissionHints();
+
+	async function checkPermissions( pageId: number ): Promise<void> {
+		try {
+			const [ createMain, createOther, edit, del ] = await Promise.all( [
+				hints.canCreateMainSubject( pageId ),
+				hints.canCreateOtherSubject( pageId ),
+				hints.canEditSubject( pageId ),
+				hints.canDeleteSubject( pageId ),
+			] );
+			canCreateMainSubject.value = createMain;
+			canCreateOtherSubject.value = createOther;
+			canEditSubject.value = edit;
+			canDeleteSubject.value = del;
+		} catch ( error ) {
+			console.error( 'Failed to check subject permissions:', error );
+			canCreateMainSubject.value = false;
+			canCreateOtherSubject.value = false;
+			canEditSubject.value = false;
+			canDeleteSubject.value = false;
+		}
+	}
+
+	async function checkCreateSubjectPagePermission(): Promise<void> {
+		try {
+			canCreateSubjectPage.value = await hints.canCreateSubjectPage();
+		} catch ( error ) {
+			console.error( 'Failed to check subject page creation permission:', error );
+			canCreateSubjectPage.value = false;
+		}
+	}
+
+	return {
+		canCreateMainSubject,
+		canCreateOtherSubject,
+		canEditSubject,
+		canDeleteSubject,
+		canCreateSubjectPage,
+		checkPermissions,
+		checkCreateSubjectPagePermission,
+	};
+}

@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Semantic\{FieldValues,AnnotationPlanner};
+use ProfessionalWiki\SWS\Application\Semantic\{FieldValues,AnnotationPlanner};
 final class DeferredRelationTest extends TestCase {
     private function reader(array $relations, string $type='relation'): FieldValues {
         return new FieldValues(['name'=>'Person','properties'=>[

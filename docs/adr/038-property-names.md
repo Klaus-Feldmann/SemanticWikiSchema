@@ -8,12 +8,12 @@ Status: Accepted
 
 A Property name is both the label people see and the identifier everything else uses to refer to the Property
 Definition ([ADR 17](017-names-as-identifiers.md)). Statements store their values under it, and Layouts, Mappings,
-`{{#neowiki_value}}`, Lua and API clients refer to the Property by it. Projections turn it into Neo4j property keys and
+`{{#sws_value}}`, Lua and API clients refer to the Property by it. Projections turn it into Neo4j property keys and
 relationship types, and into RDF predicate IRIs.
 
 Take a Person Schema with a Property Definition "Birth date". What happens when someone adds "Birth_date" next to it,
-writes `{{#neowiki_value:birth date}}`, or builds a query language that puts a separator between Schema and Property
-names? That depends on when two names are the same, which characters a name may hold, and which names NeoWiki uses
+writes `{{#sws_value:birth date}}`, or builds a query language that puts a separator between Schema and Property
+names? That depends on when two names are the same, which characters a name may hold, and which names SWS uses
 itself.
 
 Schema names are page titles, so MediaWiki's title rules settle these questions for them; Property names need rules of
@@ -34,7 +34,7 @@ their own.
 5. A name is not empty, is not an integer, such as `2024` or `-1`, is not `.` or `..`, and is at most 255 bytes long in
    UTF-8.
 6. `id`, `name`, `wiki_id` and `__proto__` are reserved; "Name" and "ID" stay available.
-7. NeoWiki's APIs and editors accept a Statement only under a name that follows rules 3 to 6.
+7. SWS's APIs and editors accept a Statement only under a name that follows rules 3 to 6.
 8. These rules are the same on every wiki. Configuration does not change them.
 
 A Schema whose Property names break rules 2 to 6 cannot be saved. The
@@ -42,7 +42,7 @@ A Schema whose Property names break rules 2 to 6 cannot be saved. The
 
 ## Consequences
 
-- `{{#neowiki_value:birth date}}` shows nothing when the Property is "Birth date". Lua, Layouts and Mappings behave
+- `{{#sws_value:birth date}}` shows nothing when the Property is "Birth date". Lua, Layouts and Mappings behave
   the same way.
 - Names keep the case and style people type: "datePublished", "first_name" and "inception" stay as written, and so do
   their Neo4j keys and RDF IRIs.
@@ -62,7 +62,7 @@ A Schema whose Property names break rules 2 to 6 cannot be saved. The
 
 ### Page-title rules
 
-Treat underscores as spaces and capitalize the first letter, as MediaWiki does for titles and NeoWiki for Schema names:
+Treat underscores as spaces and capitalize the first letter, as MediaWiki does for titles and SWS for Schema names:
 "has_author" would be stored as "Has author".
 
 Not chosen because Properties are not pages, and this rewrites names people chose on purpose: more than half of the
@@ -73,7 +73,7 @@ change with them.
 
 Keep "birth date" as typed, but let it match "Birth date" everywhere.
 
-Not chosen because Neo4j, RDF, JSON and Lua match exactly, so everything that leaves NeoWiki would still need one
+Not chosen because Neo4j, RDF, JSON and Lua match exactly, so everything that leaves SWS would still need one
 spelling per Property, and every comparison in PHP, TypeScript and other consumers would need the same normalization.
 References written in other spellings would also make normalized matching impossible to drop later.
 
@@ -116,9 +116,9 @@ Forbid `.` too, so a query language can write `Schema.property`, as Semantic Med
 Not chosen because catalogue names often contain dots, such as "Inv.-Nr." or "No.", and the characters already forbidden
 give such syntaxes separators.
 
-### Moving NeoWiki's graph keys
+### Moving SWS's graph keys
 
-Let Properties be named `id`, `name` and `wiki_id` by renaming the keys NeoWiki writes on Neo4j nodes, for example to
+Let Properties be named `id`, `name` and `wiki_id` by renaming the keys SWS writes on Neo4j nodes, for example to
 `_name`.
 
 Not chosen because every Cypher query that reads a Subject's label as `s.name`, as the graph model documents, would

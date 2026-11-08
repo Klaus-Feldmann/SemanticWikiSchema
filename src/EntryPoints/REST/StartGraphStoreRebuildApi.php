@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildStartLockUnavailableException;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\GraphStoreStatusSerializer;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\GraphStoreStatusSerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -39,7 +39,7 @@ class StartGraphStoreRebuildApi extends SimpleHandler {
 		$this->csrfValidator->verifyCsrfToken();
 
 		try {
-			$run = NeoWikiExtension::getInstance()
+			$run = SWSExtension::getInstance()
 				->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE )
 				->startBackground( $name, RebuildTrigger::Api );
 		} catch ( UnknownGraphStoreException $e ) {

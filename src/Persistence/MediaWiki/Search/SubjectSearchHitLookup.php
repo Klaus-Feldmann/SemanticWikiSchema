@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Search;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchLanding;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -68,7 +68,7 @@ class SubjectSearchHitLookup {
 		}
 		catch ( Throwable $e ) {
 			$this->logger->warning(
-				'NeoWiki could not read the Subjects of the search result for {page}: {reason}',
+				'SWS could not read the Subjects of the search result for {page}: {reason}',
 				[ 'page' => $title->getPrefixedText(), 'reason' => $e->getMessage(), 'exception' => $e ]
 			);
 

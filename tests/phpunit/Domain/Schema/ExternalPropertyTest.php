@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\ExternalProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Domain\Schema\ExternalProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 
 class ExternalPropertyTest extends TestCase {
 	public function testReferencesSurvivePropertyJsonRoundTrips(): void {
@@ -29,7 +29,7 @@ class ExternalPropertyTest extends TestCase {
 	}
 
 	public function testSchemaContentValidationKnowsTheReferenceShape(): void {
-		$validator = \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaContentValidator::newInstance();
+		$validator = \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance();
 		foreach ( [ 'wikidata', 'wikibase-local' ] as $source ) {
 			$this->assertTrue( $validator->validate( json_encode( [ 'propertyDefinitions' => [
 				'Test' => [ 'type' => 'text', 'externalProperty' => [ 'source' => $source, 'id' => 'P31' ] ],

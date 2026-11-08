@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption
  */
 class SelectOptionTest extends TestCase {
 

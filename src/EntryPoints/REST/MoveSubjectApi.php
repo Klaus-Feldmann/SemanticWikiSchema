@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectRequest;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\RestMoveSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\RestMoveSubjectPresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -31,7 +31,7 @@ class MoveSubjectApi extends SimpleHandler {
 		$presenter = new RestMoveSubjectPresenter();
 
 		try {
-			NeoWikiExtension::getInstance()
+			SWSExtension::getInstance()
 				->newMoveSubjectAction( $presenter, $this->getAuthority() )
 				->moveSubject( new MoveSubjectRequest(
 					subjectId: $subjectId,

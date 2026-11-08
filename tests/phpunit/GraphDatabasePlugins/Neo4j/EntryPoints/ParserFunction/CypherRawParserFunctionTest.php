@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
 
 use Exception;
 use Laudis\Neo4j\Databags\Neo4jError;
@@ -12,19 +12,19 @@ use Laudis\Neo4j\Types\CypherMap;
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Parser;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\RawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
  */
 class CypherRawParserFunctionTest extends TestCase {
 
@@ -108,7 +108,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), '' );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-empty-query]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-empty-query]', $this->html( $result ) );
 	}
 
 	public function testDeniedQueryRightShowsLocalizedErrorInsteadOfRows(): void {
@@ -119,7 +119,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), 'MATCH (n:Person) RETURN n' );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-permission-denied]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-permission-denied]', $this->html( $result ) );
 		$this->assertStringNotContainsString( 'Alice', $this->html( $result ) );
 	}
 
@@ -128,7 +128,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), "CREATE (n:Person {name: 'Alice'})" );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-write-query]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-write-query]', $this->html( $result ) );
 	}
 
 	public function testEngineFailureShowsLocalizedBackendError(): void {
@@ -138,7 +138,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), 'MATCH (n) RETURN n' );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-backend-unavailable]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-backend-unavailable]', $this->html( $result ) );
 	}
 
 	public function testSyntaxErrorForwardsNeo4jDetailToLocalizedMessage(): void {
@@ -152,7 +152,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), 'MATCH (n) RETURN x' );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-syntax|', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-syntax|', $this->html( $result ) );
 		$this->assertStringContainsString( 'Invalid input near RETURN', $this->html( $result ) );
 	}
 
@@ -167,7 +167,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), 'MATCH (n) RETURN n' );
 
-		$this->assertStringContainsString( '[neowiki-cypher-error-backend-unavailable]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-cypher-error-backend-unavailable]', $this->html( $result ) );
 	}
 
 	public function testValidReadQueryReturnsFormattedResult(): void {
@@ -180,7 +180,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), 'MATCH (n:Person) RETURN n' );
 
-		$this->assertStringContainsString( '<div class="mw-neowiki-cypher-result"><pre>', $this->html( $result ) );
+		$this->assertStringContainsString( '<div class="mw-sws-cypher-result"><pre>', $this->html( $result ) );
 		$this->assertStringContainsString( 'Alice', $this->html( $result ) );
 		$this->assertStringContainsString( 'Bob', $this->html( $result ) );
 	}
@@ -190,7 +190,7 @@ class CypherRawParserFunctionTest extends TestCase {
 
 		$result = $parserFunction->handle( $this->createParser(), '  MATCH (n) RETURN n  ' );
 
-		$this->assertStringContainsString( '<div class="mw-neowiki-cypher-result"><pre>', $this->html( $result ) );
+		$this->assertStringContainsString( '<div class="mw-sws-cypher-result"><pre>', $this->html( $result ) );
 	}
 
 	public function testOutputIsHTMLEscaped(): void {

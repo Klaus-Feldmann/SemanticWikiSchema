@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateTimeProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\JsonSchemaAssertions;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateTimeProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty
  */
 class DateTimePropertyTest extends TestCase {
 

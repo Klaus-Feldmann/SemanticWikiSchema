@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\PropertyType;
+namespace ProfessionalWiki\SWS\Domain\PropertyType;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\BooleanType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\HistoricalDateType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\MonolingualTextType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\PageType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\WikitextType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\ImageType;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\HistoricalDateType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\MonolingualTextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\ImageType;
 
 class PropertyTypeRegistry implements PropertyTypeLookup {
 

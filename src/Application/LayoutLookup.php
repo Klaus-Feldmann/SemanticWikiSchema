@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
-use ProfessionalWiki\NeoWiki\Domain\Layout\Layout;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
 
 interface LayoutLookup {
 

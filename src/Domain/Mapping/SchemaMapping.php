@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 /**
  * One Schema's entry within a page-level {@see Mapping}. The Schema it applies to is its key in
@@ -11,7 +11,7 @@ namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
  *
  * It covers both structural directions of OntologyMapping.md § What makes this hard:
  *
- *  - **Expansion**, for a target that mediates relationships through event nodes NeoWiki's data does not
+ *  - **Expansion**, for a target that mediates relationships through event nodes SWS's data does not
  *    have: {@see $nodes} declares those nodes, and a {@see PropertyMapping::$node} attaches a property's
  *    values to one of them instead of to the Subject.
  *  - **Contraction**, for a flat target that does not want structure the data does carry:

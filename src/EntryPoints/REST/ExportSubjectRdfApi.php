@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -29,7 +29,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 	use ReadOnlyEndpoint;
 
 	public function run( string $subjectId ): Response {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 
 		// Validate the ID shape first, so a malformed value is a clean 400 rather than becoming a 500.
 		$id = $extension->getSubjectIdParser()->parse( $subjectId );
@@ -74,7 +74,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 
 	private function noDataResponse( string $subjectId ): Response {
 		return $this->getResponseFactory()->createHttpError( 404, [
-			'message' => 'No NeoWiki data found for subject: ' . $subjectId,
+			'message' => 'No SWS data found for subject: ' . $subjectId,
 		] );
 	}
 
@@ -99,7 +99,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'RDF projection to produce: "native" (default) for NeoWiki-native vocabulary, or an ontology target declared by a Mapping page (e.g. "edm"). An unknown target returns 400.',
+				self::PARAM_DESCRIPTION => 'RDF projection to produce: "native" (default) for SWS-native vocabulary, or an ontology target declared by a Mapping page (e.g. "edm"). An unknown target returns 400.',
 			],
 		];
 	}

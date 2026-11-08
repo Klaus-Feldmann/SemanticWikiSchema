@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Session\Session;
 use MediaWiki\Session\SessionId;
 use MediaWiki\Session\SessionProviderInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Every registered GET route must behave as a read endpoint. Driven off the route registrations so a
  * route added later cannot quietly opt out.
  *
  * Most tests use a non-persistent session: core overwrites the header for a persistent one, so the
- * cookieless anonymous case is the only one where NeoWiki's own value survives.
+ * cookieless anonymous case is the only one where SWS's own value survives.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ReadOnlyEndpoint
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReadOnlyEndpoint
  */
-class ReadOnlyEndpointTest extends NeoWikiIntegrationTestCase {
+class ReadOnlyEndpointTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	/**

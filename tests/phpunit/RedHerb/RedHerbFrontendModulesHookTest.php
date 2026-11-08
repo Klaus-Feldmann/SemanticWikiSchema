@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use MediaWiki\Output\OutputPage;
 use PHPUnit\Framework\TestCase;
@@ -18,7 +18,7 @@ class RedHerbFrontendModulesHookTest extends TestCase {
 		$modules = [];
 		$hook = new RedHerbFrontendModulesHook();
 
-		$hook->onNeoWikiGetFrontendModules(
+		$hook->onSWSGetFrontendModules(
 			$modules,
 			$this->createStub( OutputPage::class ),
 			$this->createStub( Skin::class )
@@ -34,7 +34,7 @@ class RedHerbFrontendModulesHookTest extends TestCase {
 		$modules = [ 'ext.preexisting' ];
 		$hook = new RedHerbFrontendModulesHook();
 
-		$hook->onNeoWikiGetFrontendModules(
+		$hook->onSWSGetFrontendModules(
 			$modules,
 			$this->createStub( OutputPage::class ),
 			$this->createStub( Skin::class )

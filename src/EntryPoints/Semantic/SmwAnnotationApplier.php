@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Semantic;
+namespace ProfessionalWiki\SWS\EntryPoints\Semantic;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\{Parser,ParserOptions,ParserOutput};
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\Semantic\AnnotationPlan;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIdentity;
+use ProfessionalWiki\SWS\Application\Semantic\AnnotationPlan;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIdentity;
 use SMW\DataModel\SemanticData;
 use SMW\ParserData;
 use SMW\ParserParameterProcessor;

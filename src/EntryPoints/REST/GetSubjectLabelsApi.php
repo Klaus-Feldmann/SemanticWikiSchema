@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\NeoWiki\Application\SubjectLabelLookupResult;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\SubjectLabelLookupResult;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -27,7 +27,7 @@ class GetSubjectLabelsApi extends SimpleHandler {
 					'pageTitle' => $result->pageTitle,
 				];
 			},
-			NeoWikiExtension::getInstance()->getSubjectLabelLookup()->getSubjectLabelsMatching(
+			SWSExtension::getInstance()->getSubjectLabelLookup()->getSubjectLabelsMatching(
 				$params['search'],
 				$params['limit'],
 				$params['schema'],

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** The same rule serves schema save validation, property lookup and value retrieval. */
 final class PropertyDatatypePolicy {

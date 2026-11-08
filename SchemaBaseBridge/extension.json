@@ -1,8 +1,8 @@
 {
 	"name": "SchemaBaseBridge",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
-	"namemsg": "neowikibasebridge-name",
-	"version": "0.19.1+2026-11-05",
+	"namemsg": "swsbasebridge-name",
+	"version": "0.20.0+2026-11-08",
 	"author": "Softwaredesign: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos.",
 	"type": "other",
 	"manifest_version": 2,
@@ -13,41 +13,41 @@
 		}
 	},
 	"AutoloadNamespaces": {
-		"NeoWikiBaseBridge\\": "src/"
+		"SWSBaseBridge\\": "src/"
 	},
 	"Hooks": {
-		"NeoWikiRegistration": "NeoWikiBaseBridge\\Hooks::onNeoWikiRegistration",
-		"ScribuntoExternalLibraries": "NeoWikiBaseBridge\\Hooks::onScribuntoExternalLibraries",
-		"BeforePageDisplay": "NeoWikiBaseBridge\\Hooks::onBeforePageDisplay"
+		"SWSRegistration": "SWSBaseBridge\\Hooks::onSWSRegistration",
+		"ScribuntoExternalLibraries": "SWSBaseBridge\\Hooks::onScribuntoExternalLibraries",
+		"BeforePageDisplay": "SWSBaseBridge\\Hooks::onBeforePageDisplay"
 	},
 	"APIModules": {
-		"neowikibaseidentity": "NeoWikiBaseBridge\\ApiIdentity",
-		"neowikibaseproperties": "NeoWikiBaseBridge\\ApiProperties",
-		"neowikibasevalues": "NeoWikiBaseBridge\\ApiExternalValues",
-		"neowikibasedataview": "NeoWikiBaseBridge\\ApiDataView"
+		"swsbaseidentity": "SWSBaseBridge\\ApiIdentity",
+		"swsbaseproperties": "SWSBaseBridge\\ApiProperties",
+		"swsbasevalues": "SWSBaseBridge\\ApiExternalValues",
+		"swsbasedataview": "SWSBaseBridge\\ApiDataView"
 	},
 	"MessagesDirs": {
-		"NeoWikiBaseBridge": [
+		"SWSBaseBridge": [
 			"i18n"
 		]
 	},
 	"config": {
-		"NeoWikiBaseBridgeLocalSiteId": {
+		"SWSBaseBridgeLocalSiteId": {
 			"value": null,
 			"description": "Optional explicit site ID of this wiki in the local Wikibase repository."
 		}
 	},
-	"descriptionmsg": "neowikibasebridge-desc",
+	"descriptionmsg": "swsbasebridge-desc",
 	"RestRoutes": [
 		{
-			"path": "/neowikibase/v1/page/{pageId}/export",
+			"path": "/swsbase/v1/page/{pageId}/export",
 			"method": "GET",
-			"class": "NeoWikiBaseBridge\\ExportPageDataViewApi"
+			"class": "SWSBaseBridge\\ExportPageDataViewApi"
 		},
 		{
-			"path": "/neowikibase/v1/subject/{subjectId}/export",
+			"path": "/swsbase/v1/subject/{subjectId}/export",
 			"method": "GET",
-			"class": "NeoWikiBaseBridge\\ExportSubjectDataViewApi"
+			"class": "SWSBaseBridge\\ExportSubjectDataViewApi"
 		}
 	]
 }

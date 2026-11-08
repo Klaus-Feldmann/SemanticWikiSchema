@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 interface IdGenerator {
 

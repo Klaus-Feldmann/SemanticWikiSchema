@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class DeleteSubjectApi extends SimpleHandler {
@@ -31,7 +31,7 @@ class DeleteSubjectApi extends SimpleHandler {
 		$body = $this->getValidatedBody() ?? [];
 		$comment = $body['comment'] ?? null;
 
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$id = $extension->getSubjectIdParser()->parse( $subjectId );
 
 		if ( $id === null ) {

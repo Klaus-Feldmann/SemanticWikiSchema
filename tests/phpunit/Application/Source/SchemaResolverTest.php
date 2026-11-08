@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Source;
+namespace ProfessionalWiki\SWS\Tests\Application\Source;
 
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Source\SourceRegistry;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySource;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver
+ * @covers \ProfessionalWiki\SWS\Application\Source\SchemaResolver
  */
 class SchemaResolverTest extends TestCase {
 
@@ -70,8 +70,8 @@ class SchemaResolverTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\NeoWiki\Domain\Schema\Schema[] $localSchemas
-	 * @param \ProfessionalWiki\NeoWiki\Domain\Schema\Schema[] $otherSchemas
+	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $localSchemas
+	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $otherSchemas
 	 */
 	private function newResolver(
 		array $localSchemas = [],
@@ -86,7 +86,7 @@ class SchemaResolverTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\NeoWiki\Domain\Schema\Schema[] $schemas
+	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $schemas
 	 */
 	private function newSource( array $schemas ): InMemorySource {
 		$source = new InMemorySource();

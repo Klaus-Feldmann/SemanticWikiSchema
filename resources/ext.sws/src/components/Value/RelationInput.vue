@@ -1,0 +1,174 @@
+<template>
+	<CdxField
+		:is-fieldset="true"
+		:messages="displayedFieldMessages"
+		:status="fieldStatus"
+		:optional="props.property.required === false"
+	>
+		<template #label>
+			{{ props.label }}
+			<CdxIcon
+				v-if="props.property.description"
+				v-tooltip="props.property.description"
+				:icon="cdxIconInfo"
+				class="ext-sws-value-input__description-icon"
+				size="small"
+			/>
+		</template>
+		<NeoMultiLookupInput
+			v-if="props.property.multiple"
+			:model-value="selectedIds"
+			:label="props.label"
+			@update:model-value="onSelectionsChanged"
+		>
+			<template #input="{ value, onUpdate, onBlur, onFocus, status, ariaLabel }">
+				<SubjectPicker
+					:selected="value"
+					:target-schemas="targetSchemaNames"
+					:start-icon="startIcon"
+					:status="status"
+					:aria-label="ariaLabel"
+					@update:selected="onUpdate"
+					@blur="onBlur"
+					@focusin="onFocus"
+				>
+					<template v-if="targetEditingEnabled" #suffix="{ shownTarget, targetName }">
+						<RelationTargetOpenButton
+							v-if="shownTarget"
+							:target="shownTarget"
+							:name="targetName"
+							@open="emit( 'edit-relation-target', $event )"
+						/>
+					</template>
+				</SubjectPicker>
+			</template>
+		</NeoMultiLookupInput>
+		<SubjectPicker
+			v-else
+			:selected="selectedId"
+			:target-schemas="targetSchemaNames"
+			:start-icon="startIcon"
+			:status="fieldStatus"
+			@update:selected="onSingleSelectionChanged"
+			@blur="onSingleBlur"
+		>
+			<template v-if="targetEditingEnabled" #suffix="{ shownTarget, targetName }">
+				<RelationTargetOpenButton
+					v-if="shownTarget"
+					:target="shownTarget"
+					:name="targetName"
+					@open="emit( 'edit-relation-target', $event )"
+				/>
+			</template>
+		</SubjectPicker>
+	</CdxField>
+</template>
+
+<script setup lang="ts">
+import { ref, watch, computed, toRef, inject } from 'vue';
+import { CdxField, CdxIcon, ValidationMessages } from '@wikimedia/codex';
+import { cdxIconInfo } from '@wikimedia/codex-icons';
+import RelationTargetOpenButton from '@/components/Value/RelationTargetOpenButton.vue';
+import NeoMultiLookupInput from '@/components/common/NeoMultiLookupInput.vue';
+import SubjectPicker from '@/components/common/SubjectPicker.vue';
+import { RelationTargetEditingKey, ValueInputEmits, ValueInputProps, ValueInputExposes } from '@/components/Value/ValueInputContract';
+import { localTargetSchemaNames, RelationProperty, RelationType } from '@/domain/propertyTypes/Relation.ts';
+import { Value, ValueType, RelationValue, relationValueWithTargets } from '@/domain/Value';
+import { SWSServices } from '@/SWSServices.ts';
+import { useServerViolations, violationStatus } from '@/composables/useServerViolations.ts';
+
+const props = withDefaults(
+	defineProps<ValueInputProps<RelationProperty>>(),
+	{
+		modelValue: undefined,
+		label: ''
+	}
+);
+
+const targetSchemaNames = computed<string[]>( () => localTargetSchemaNames( props.property ) );
+
+const startIcon = SWSServices.getComponentRegistry().getIcon( RelationType.typeName );
+
+const emit = defineEmits<ValueInputEmits>();
+
+const targetEditingEnabled = inject( RelationTargetEditingKey, false );
+
+const internalValue = ref<RelationValue | undefined>( undefined );
+const singleHasUnmatchedText = ref( false );
+
+const { firstMessages, emitClears } = useServerViolations(
+	toRef( props, 'property' ),
+	toRef( props, 'serverViolations' ),
+	emit
+);
+
+// One aggregate message for the whole property (NeoMultiLookupInput has no per-index slot).
+const displayedFieldMessages = computed( (): ValidationMessages => {
+	if ( singleHasUnmatchedText.value ) {
+		return {};
+	}
+	return firstMessages.value;
+} );
+
+const fieldStatus = computed( (): 'default' | 'error' | 'warning' => {
+	if ( props.property.multiple || singleHasUnmatchedText.value ) {
+		return 'default';
+	}
+	return violationStatus( displayedFieldMessages.value );
+} );
+
+function initializeInternalValue( value: Value | undefined ): void {
+	if ( value && value.type === ValueType.Relation ) {
+		const relValue = value as RelationValue;
+		internalValue.value = relValue.relations.length > 0 ? relValue : undefined;
+	} else {
+		internalValue.value = undefined;
+	}
+}
+
+initializeInternalValue( props.modelValue );
+
+watch( () => props.modelValue, ( newValue ) => {
+	initializeInternalValue( newValue );
+} );
+
+const selectedId = computed( (): string | null => {
+	if ( !internalValue.value || internalValue.value.relations.length === 0 ) {
+		return null;
+	}
+	return internalValue.value.relations[ 0 ].target.text;
+} );
+
+const selectedIds = computed( (): ( string | null )[] => {
+	if ( !internalValue.value ) {
+		return [];
+	}
+	return internalValue.value.relations.map( ( r ) => r.target.text );
+} );
+
+function onSingleSelectionChanged( id: string | null ): void {
+	singleHasUnmatchedText.value = false;
+	onSelectionsChanged( [ id ] );
+}
+
+function onSingleBlur( hasUnmatchedText: boolean ): void {
+	singleHasUnmatchedText.value = hasUnmatchedText;
+}
+
+function onSelectionsChanged( ids: ( string | null )[] ): void {
+	const targets = ids.filter( ( id ): id is string => id !== null );
+	const newRelationValue = targets.length > 0 ? relationValueWithTargets( internalValue.value, targets ) : undefined;
+
+	internalValue.value = newRelationValue;
+
+	emit( 'update:modelValue', newRelationValue );
+	emitClears( 'all' );
+}
+
+defineExpose<ValueInputExposes>( {
+	getCurrentValue: function(): Value | undefined {
+		return internalValue.value;
+	}
+} );
+
+</script>

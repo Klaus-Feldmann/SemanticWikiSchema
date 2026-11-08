@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages the Subjects are saved on and the database the counts are read from.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectCountsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectCountsApi
  * @group Database
  */
-class GetSubjectCountsApiTest extends NeoWikiIntegrationTestCase {
+class GetSubjectCountsApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
 
@@ -44,7 +44,7 @@ class GetSubjectCountsApiTest extends NeoWikiIntegrationTestCase {
 
 	public function testDeniesACallerWithoutTheQueryRight(): void {
 		$response = $this->executeHandler(
-			NeoWikiExtension::newGetSubjectCountsApi(),
+			SWSExtension::newGetSubjectCountsApi(),
 			self::request(),
 			authority: $this->mockAnonAuthorityWithoutPermissions( [ AuthorityBasedRawQueryAuthorizer::RIGHT ] )
 		);
@@ -55,7 +55,7 @@ class GetSubjectCountsApiTest extends NeoWikiIntegrationTestCase {
 
 	private function get(): ResponseInterface {
 		return $this->executeHandler(
-			NeoWikiExtension::newGetSubjectCountsApi(),
+			SWSExtension::newGetSubjectCountsApi(),
 			self::request(),
 			authority: $this->mockAnonAuthorityWithPermissions( [ AuthorityBasedRawQueryAuthorizer::RIGHT ] )
 		);

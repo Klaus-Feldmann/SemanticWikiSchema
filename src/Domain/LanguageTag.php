@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain;
+namespace ProfessionalWiki\SWS\Domain;
 
 /**
- * The shape a language tag must have wherever NeoWiki stores or emits one: on a
- * {@see \ProfessionalWiki\NeoWiki\Domain\Value\MonolingualText} part, on an RDF
- * {@see \ProfessionalWiki\NeoWiki\Domain\Rdf\Literal}, and on a Mapping's `lang`.
+ * The shape a language tag must have wherever SWS stores or emits one: on a
+ * {@see \ProfessionalWiki\SWS\Domain\Value\MonolingualText} part, on an RDF
+ * {@see \ProfessionalWiki\SWS\Domain\Rdf\Literal}, and on a Mapping's `lang`.
  *
  * Shape only. Case is left to the holder: a MonolingualText part lowercases its tag, while a
  * Mapping's `lang` is emitted as the author wrote it.

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\PropertyType\Types;
+namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateType
+ * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType
  */
 class DateTypeTest extends TestCase {
 

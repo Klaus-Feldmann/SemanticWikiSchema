@@ -16,7 +16,7 @@ A helpful report includes:
 
 ## Supported Versions
 
-NeoWiki is not yet intended for production use. Security fixes are applied
+SWS is not yet intended for production use. Security fixes are applied
 to `master` and ship in the next release.
 
 ## Disclosure

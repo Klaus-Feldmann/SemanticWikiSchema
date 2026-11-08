@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Page\DeletePageFactory;
 use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\Persistence\PageDeleter;
-use ProfessionalWiki\NeoWiki\Persistence\PageDeletionStatus;
+use ProfessionalWiki\SWS\Persistence\PageDeleter;
+use ProfessionalWiki\SWS\Persistence\PageDeletionStatus;
 
 class MediaWikiPageDeleter implements PageDeleter {
 

@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence;
+namespace ProfessionalWiki\SWS\Persistence;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 /**
  * Indexes nothing, for the paths that reproject a graph store rather than write a revision.

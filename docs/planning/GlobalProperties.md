@@ -8,7 +8,7 @@ Currently, Property Definitions are local to their Schema ([ADR 6](../adr/006-sc
 Schema and "Name" in a Company Schema are independent definitions that can have different types and constraints.
 
 Both Semantic MediaWiki and Wikibase use global properties: a property is defined once and reused across types.
-ECHOLOT consortium partners familiar with RDF and Linked Open Data have suggested NeoWiki should do the same,
+ECHOLOT consortium partners familiar with RDF and Linked Open Data have suggested SWS should do the same,
 since in RDF, properties like `dcterms:title` or `foaf:name` are globally defined.
 
 This document explores whether that change is warranted.
@@ -73,8 +73,8 @@ maps to `dcterms:title`" achieves interoperability without changing the data mod
 **Sub-property declarations can anchor local properties to ontology terms without a global registry.** A mapping can
 declare a native predicate a sub-property of an ontology term — Person's Name under `foaf:name`, City's Name under
 `dcterms:title`, kept apart by per-Schema predicates ([Q1](NativeRdfProjection.md#decided)) — and a `foaf:name` query
-then finds the local data: the ontology term becomes the shared anchor across Schemas and NeoWiki instances that a
-global property registry would otherwise provide. The stores NeoWiki ships with (QLever, Oxigraph) apply no RDFS
+then finds the local data: the ontology term becomes the shared anchor across Schemas and SWS instances that a
+global property registry would otherwise provide. The stores SWS ships with (QLever, Oxigraph) apply no RDFS
 entailment, so a query follows the declarations explicitly: `?p rdfs:subPropertyOf* foaf:name . ?s ?p ?o`. Consumers
 needing the ontology's own shape — `foaf:name` as the predicate — use an ontology projection
 ([OntologyMapping.md](OntologyMapping.md)); the declarations serve native-projection consumers. Not built; an option for
@@ -103,7 +103,7 @@ With global properties:
 Two use cases sharpen both columns above:
 
 - **For global-style use: load a standard ontology and go (takin).** Institutions that already live in a standard
-  (EDM, CIDOC-CRM, Wikidata's model) want to install NeoWiki, load that vocabulary, and produce conformant data
+  (EDM, CIDOC-CRM, Wikidata's model) want to install SWS, load that vocabulary, and produce conformant data
   natively — the way Omeka or Arches users work — without first inventing local names. Under local properties this is
   served by preloaded schema + ontology-mapping bundles ([OntologyMapping.md](OntologyMapping.md)): installing a
   bundle yields working Schemas plus projections in the target vocabulary out of the box.

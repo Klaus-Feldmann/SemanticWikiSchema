@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\StatementListBuilder;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Value\UnregisteredTypeValue;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubIdGenerator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubjectIds;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Value\UnregisteredTypeValue;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
+use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\StatementListBuilder
+ * @covers \ProfessionalWiki\SWS\Application\StatementListBuilder
  */
 class StatementListBuilderTest extends TestCase {
 
@@ -31,7 +31,7 @@ class StatementListBuilderTest extends TestCase {
 	public function testBuildsStructuredUrlEntriesWithoutFlattening(): void {
 		$entry = [ 'url' => 'https://example.org/?a=1&b=2', 'label' => 'Title', 'caption' => 'Source', 'captionPage' => 'Vermerk:Quelle' ];
 		$list = $this->newBuilder()->build( [ 'Source' => [ 'propertyType' => 'url', 'value' => [ $entry ] ] ] );
-		$this->assertSame( [ $entry ], $list->getStatement( new \ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName( 'Source' ) )->getValue()->toScalars() );
+		$this->assertSame( [ $entry ], $list->getStatement( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( 'Source' ) )->getValue()->toScalars() );
 	}
 
 	public function testRejectsBareUrlObjectInsteadOfAList(): void {

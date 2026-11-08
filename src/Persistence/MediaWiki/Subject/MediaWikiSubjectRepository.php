@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Content;
@@ -12,23 +12,23 @@ use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\DependentSubjectGuard;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 class MediaWikiSubjectRepository implements SubjectRepository {
 
-	public const string SLOT_NAME = 'neo';
+	public const string SLOT_NAME = 'sws';
 
 	public function __construct(
 		private readonly PageIdentifiersLookup $pageIdentifiersLookup,
@@ -132,7 +132,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			[
 				self::SLOT_NAME => $content,
 			],
-			CommentStoreComment::newUnsavedComment( $comment ?? 'Update NeoWiki subject' )
+			CommentStoreComment::newUnsavedComment( $comment ?? 'Update SWS subject' )
 		);
 	}
 
@@ -198,7 +198,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 					$this->dependentSubjectGuard->admit( PageSubjects::newEmpty(), $pageSubjects, new SubjectIdList( [] ) )
 				),
 			],
-			CommentStoreComment::newUnsavedComment( $comment ?? 'Create a page for a new NeoWiki subject' )
+			CommentStoreComment::newUnsavedComment( $comment ?? 'Create a page for a new SWS subject' )
 		);
 	}
 

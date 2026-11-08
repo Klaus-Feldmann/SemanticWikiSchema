@@ -1,48 +1,23 @@
 [
   {
-    "title": "Modul:NeoWiki",
-    "file": "Modul-NeoWiki.lua",
-    "sourceUrl": "https://aufeinwort.info/wiki/Modul:NeoWiki",
+    "title": "Modul:WikiSchema",
+    "file": "Modul-WikiSchema.lua",
     "model": "Scribunto",
-    "previousRevision": 269198,
-    "previousTimestamp": "2026-11-02T18:37:00Z",
-    "source": "Prepared 0.1.13 source; maintainer reports module installation in production",
-    "prepared": "2026-11-04"
+    "source": "Prepared 0.1.21 local rename candidate; not installed in the live wiki",
+    "prepared": "2026-11-08"
   },
   {
-    "title": "Modul:NeoWiki/API",
-    "file": "Modul-NeoWiki-API.lua",
-    "sourceUrl": "https://aufeinwort.info/wiki/Modul:NeoWiki/API",
-    "model": "Scribunto",
-    "previousRevision": 269216,
-    "previousTimestamp": "2026-11-03T06:43:16Z",
-    "source": "Prepared 0.1.13 source; maintainer reports module installation in production",
-    "prepared": "2026-11-04"
-  },
-  {
-    "title": "Modul:NeoWiki/config",
-    "file": "Modul-NeoWiki-config.lua",
-    "revision": 269184,
-    "timestamp": "2026-11-02T15:08:14Z",
-    "sourceUrl": "https://aufeinwort.info/wiki/Modul:NeoWiki/config",
-    "model": "Scribunto"
-  },
-  {
-    "title": "Vorlage:NeoWiki",
-    "file": "Vorlage-NeoWiki.wikitext",
-    "sourceUrl": "https://aufeinwort.info/wiki/Vorlage:NeoWiki",
+    "title": "Vorlage:WikiSchema",
+    "file": "Vorlage-WikiSchema.wikitext",
     "model": "wikitext",
-    "previousRevision": 269217,
-    "previousTimestamp": "2026-11-03T06:43:20Z",
-    "source": "Prepared 0.1.13 source; maintainer reports module installation in production",
-    "prepared": "2026-11-04"
+    "source": "Prepared 0.1.21 local rename candidate; not installed in the live wiki",
+    "prepared": "2026-11-08"
   },
   {
-    "title": "Vorlage:NeoWiki/URL-Zeile",
-    "file": "Vorlage-NeoWiki-URL-Zeile.wikitext",
-    "revision": 269181,
-    "timestamp": "2026-11-02T15:06:07Z",
-    "sourceUrl": "https://aufeinwort.info/wiki/Vorlage:NeoWiki/URL-Zeile",
-    "model": "wikitext"
+    "title": "Vorlage:WikiSchema/URL-Zeile",
+    "file": "Vorlage-WikiSchema-URL-Zeile.wikitext",
+    "model": "wikitext",
+    "source": "Prepared 0.1.21 local rename candidate; not installed in the live wiki",
+    "prepared": "2026-11-08"
   }
 ]

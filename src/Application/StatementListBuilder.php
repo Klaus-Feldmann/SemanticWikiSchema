@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\NeoWiki\Domain\Relation\Relation;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\NeoWiki\Domain\Value\BooleanValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\RelationValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\UrlValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\UnregisteredTypeValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\ValueType;
-use ProfessionalWiki\NeoWiki\Infrastructure\IdGenerator;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
+use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Value\UrlValue;
+use ProfessionalWiki\SWS\Domain\Value\UnregisteredTypeValue;
+use ProfessionalWiki\SWS\Domain\Value\ValueType;
+use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
 use Throwable;
 use TypeError;
 
@@ -60,7 +60,7 @@ readonly class StatementListBuilder {
 			if ( $propertyType === 'page' && is_array( $input ) && array_is_list( $input ) ) {
 				$input = array_map( static function ( mixed $part ): mixed {
 					if ( !is_string( $part ) || trim( $part ) === '' ) { return $part; }
-					return \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\LocalPageTitle::normalize( $part )
+					return \ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $part )
 						?? throw new InvalidArgumentException( 'Invalid local page title' );
 				}, $input );
 			}

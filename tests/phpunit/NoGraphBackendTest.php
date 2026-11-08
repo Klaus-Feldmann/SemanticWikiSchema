@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
@@ -16,32 +16,32 @@ use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphBackendNotConfiguredException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetReferencingSubjectsApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectLabelsApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\Scribunto\SubjectDataLookup;
-use ProfessionalWiki\NeoWiki\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use ProfessionalWiki\SWS\EntryPoints\Scribunto\SubjectDataLookup;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
 use TestLogger;
 
 /**
  * A wiki with no graph backend configured is a supported mode: Subjects are stored, found, read and
  * rendered without one, and only the query surfaces a backend brings are unavailable (#1040).
  *
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
+ * @covers \ProfessionalWiki\SWS\SWSExtension
  * @group Database
  */
-class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
+class NoGraphBackendTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	private const SUBJECT_ID = 's1zz1111111azz1';
@@ -51,14 +51,14 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 
 	public function testGetNeo4jPluginIsNullWithoutBackend(): void {
 		$plugin = $this->runWithoutGraphBackend(
-			static fn() => NeoWikiExtension::getInstance()->getNeo4jPlugin()
+			static fn() => SWSExtension::getInstance()->getNeo4jPlugin()
 		);
 
 		$this->assertNull( $plugin );
 	}
 
 	public function testGetNeo4jPluginIsPresentWhenConfigured(): void {
-		$this->assertNotNull( NeoWikiExtension::getInstance()->getNeo4jPlugin() );
+		$this->assertNotNull( SWSExtension::getInstance()->getNeo4jPlugin() );
 	}
 
 	public function testEditSucceedsWithoutBackend(): void {
@@ -78,7 +78,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 		$this->runWithoutGraphBackend( function (): void {
 			$this->createPageWithMottoSubject( 'NoBackendSubjectPage' );
 
-			$subject = NeoWikiExtension::getInstance()->getSubjectRepository()
+			$subject = SWSExtension::getInstance()->getSubjectRepository()
 				->getSubject( new SubjectId( self::SUBJECT_ID ) );
 
 			$this->assertNotNull( $subject );
@@ -89,7 +89,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 	public function testSubjectIsEditedThroughTheRepositoryWithoutBackend(): void {
 		$this->runWithoutGraphBackend( function (): void {
 			$this->createPageWithMottoSubject( 'NoBackendEditedSubjectPage' );
-			$repository = NeoWikiExtension::getInstance()->getSubjectRepository();
+			$repository = SWSExtension::getInstance()->getSubjectRepository();
 
 			$repository->updateSubject(
 				$this->mottoSubject( 'Rewritten' ),
@@ -103,7 +103,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 	public function testSubjectIsDeletedThroughTheRepositoryWithoutBackend(): void {
 		$this->runWithoutGraphBackend( function (): void {
 			$this->createPageWithMottoSubject( 'NoBackendDeletedSubjectPage' );
-			$repository = NeoWikiExtension::getInstance()->getSubjectRepository();
+			$repository = SWSExtension::getInstance()->getSubjectRepository();
 
 			$repository->deleteSubject( new SubjectId( self::SUBJECT_ID ), 'no-backend subject delete' );
 
@@ -117,7 +117,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 
 			return $this->parseWikitextOn(
 				'NoBackendValuePage',
-				'{{#neowiki_value: ' . self::PROPERTY . ' | subject=' . self::SUBJECT_ID . ' }}'
+				'{{#sws_value: ' . self::PROPERTY . ' | subject=' . self::SUBJECT_ID . ' }}'
 			);
 		} );
 
@@ -134,17 +134,17 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 		);
 
 		$this->assertStringContainsString( 'class="error"', $html );
-		$this->assertStringContainsString( '(neowiki-cypher-raw-error-not-configured)', $html );
+		$this->assertStringContainsString( '(sws-cypher-raw-error-not-configured)', $html );
 	}
 
 	/**
-	 * The engine behind the mw.neowiki.* getters, reached by Subject id, which is the path that needed
+	 * The engine behind the mw.sws.* getters, reached by Subject id, which is the path that needed
 	 * the reverse index.
 	 */
 	public function testLuaGetterReadsAValueBySubjectIdWithoutBackend(): void {
 		$value = $this->runWithoutGraphBackend( function (): array {
 			$this->createPageWithMottoSubject( 'NoBackendLuaPage' );
-			$resolver = NeoWikiExtension::getInstance()->newSubjectResolver( $this->sysopParserOn( 'NoBackendLuaPage' ) );
+			$resolver = SWSExtension::getInstance()->newSubjectResolver( $this->sysopParserOn( 'NoBackendLuaPage' ) );
 			return ( new SubjectDataLookup( $resolver ) )->getValue(
 				Title::newFromText( 'NoBackendLuaPage' ),
 				self::PROPERTY,
@@ -173,27 +173,27 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 		$out = $this->newContentPageOutput( 'NoBackendAppPage' );
 
 		$this->runWithoutGraphBackend( static function () use ( $out ): void {
-			NeoWikiHooks::onBeforePageDisplay( $out, $out->getSkin() );
+			SWSHooks::onBeforePageDisplay( $out, $out->getSkin() );
 		} );
 
-		$this->assertStringContainsString( 'ext-neowiki-app', $out->getHTML() );
+		$this->assertStringContainsString( 'ext-sws-app', $out->getHTML() );
 	}
 
 	public function testContentPageRenderInjectsTheAppWhenConfigured(): void {
 		$out = $this->newContentPageOutput( 'ConfiguredBackendViewPage' );
 
-		NeoWikiHooks::onBeforePageDisplay( $out, $out->getSkin() );
+		SWSHooks::onBeforePageDisplay( $out, $out->getSkin() );
 
-		$this->assertStringContainsString( 'ext-neowiki-app', $out->getHTML() );
+		$this->assertStringContainsString( 'ext-sws-app', $out->getHTML() );
 	}
 
 	public function testContentPageRenderIsSilentWithoutBackend(): void {
 		$out = $this->newContentPageOutput( 'NoBackendQuietPage' );
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 
 		$this->runWithoutGraphBackend( static function () use ( $out ): void {
-			NeoWikiHooks::onBeforePageDisplay( $out, $out->getSkin() );
+			SWSHooks::onBeforePageDisplay( $out, $out->getSkin() );
 		} );
 
 		$this->assertSame( [], $logger->getBuffer() );
@@ -205,13 +205,13 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 	public function testHalfConfiguredNeo4jIsReported(): void {
 		$out = $this->newContentPageOutput( 'HalfConfiguredPage' );
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 
 		$this->runWithoutGraphBackend( function () use ( $out ): void {
-			$this->overrideConfigValue( 'NeoWikiNeo4jInternalReadUrl', 'bolt://neo:7687' );
-			NeoWikiExtension::resetInstance();
+			$this->overrideConfigValue( 'SWSNeo4jInternalReadUrl', 'bolt://neo:7687' );
+			SWSExtension::resetInstance();
 
-			NeoWikiHooks::onBeforePageDisplay( $out, $out->getSkin() );
+			SWSHooks::onBeforePageDisplay( $out, $out->getSkin() );
 		} );
 
 		$this->assertStringContainsString( 'only one of the Neo4j read/write Bolt URLs', self::loggedText( $logger ) );
@@ -256,7 +256,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 		$listing = $this->runWithoutGraphBackend( function (): array {
 			$this->createPageWithMottoSubject( 'NoBackendListedPage' );
 
-			return $this->getJson( NeoWikiExtension::newGetSubjectSummariesApi(), [] );
+			return $this->getJson( SWSExtension::newGetSubjectSummariesApi(), [] );
 		} );
 
 		$this->assertSame( [ self::SUBJECT_ID ], array_column( $listing['subjects'], 'id' ) );
@@ -267,7 +267,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 			$this->createPageWithMottoSubject( 'NoBackendCountedPage' );
 
 			return $this->getJson(
-				NeoWikiExtension::newGetSubjectCountsApi(),
+				SWSExtension::newGetSubjectCountsApi(),
 				[],
 				$this->mockAnonAuthorityWithPermissions( [ AuthorityBasedRawQueryAuthorizer::RIGHT ] )
 			);
@@ -289,14 +289,14 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testLuaQueryOfferedWhenConfigured(): void {
-		$names = NeoWikiExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? [];
+		$names = SWSExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? [];
 
 		$this->assertContains( 'query', $names );
 	}
 
 	public function testLuaQueryNotOfferedWithoutBackend(): void {
 		$names = $this->runWithoutGraphBackend(
-			static fn() => NeoWikiExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? []
+			static fn() => SWSExtension::getInstance()->getNeo4jPlugin()?->getLuaLibraryFunctionNames() ?? []
 		);
 
 		$this->assertSame( [], $names );
@@ -306,7 +306,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 		$this->expectException( GraphBackendNotConfiguredException::class );
 
 		$this->runWithoutGraphBackend(
-			static fn() => NeoWikiExtension::getInstance()->getReadOnlyNeo4jClient()
+			static fn() => SWSExtension::getInstance()->getReadOnlyNeo4jClient()
 		);
 	}
 
@@ -324,7 +324,7 @@ class NoGraphBackendTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function mottoOfIndexedSubject(): ?string {
-		$subject = NeoWikiExtension::getInstance()->getSubjectRepository()
+		$subject = SWSExtension::getInstance()->getSubjectRepository()
 			->getSubject( new SubjectId( self::SUBJECT_ID ) );
 
 		$value = $subject?->getStatements()->getStatement( new PropertyName( self::PROPERTY ) )?->getValue();

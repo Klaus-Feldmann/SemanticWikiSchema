@@ -2,35 +2,35 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\MoveSubjectApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\MoveSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestMoveSubjectPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\MoveSubject\MoveSubjectAction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestMoveSubjectPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction
  * @group Database
  */
-class MoveSubjectApiTest extends NeoWikiIntegrationTestCase {
+class MoveSubjectApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SCHEMA = 'MoveSubjectApiTestSchema';
 
@@ -106,7 +106,7 @@ class MoveSubjectApiTest extends NeoWikiIntegrationTestCase {
 	public function testMovedSubjectRemainsFetchableByItsUnchangedId(): void {
 		$this->executeHandler( $this->newApi(), $this->newRequest() );
 
-		$subject = NeoWikiExtension::getInstance()->getSubjectRepository()->getSubject( $this->movedId() );
+		$subject = SWSExtension::getInstance()->getSubjectRepository()->getSubject( $this->movedId() );
 
 		$this->assertNotNull( $subject );
 		$this->assertSame( 'moved', $subject->label?->text );
@@ -244,7 +244,7 @@ class MoveSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function subjectsOf( int $pageId ): PageSubjects {
-		return NeoWikiExtension::getInstance()->getSubjectRepository()
+		return SWSExtension::getInstance()->getSubjectRepository()
 			->getSubjectsByPageId( new PageId( $pageId ) );
 	}
 

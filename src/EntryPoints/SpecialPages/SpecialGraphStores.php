@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Message\Message;
 use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\NothingToCancelException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\StoreSyncState;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
+use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToCancelException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use ProfessionalWiki\SWS\Application\GraphRebuild\StoreSyncState;
+use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 use Throwable;
 
 /**
@@ -62,7 +62,7 @@ class SpecialGraphStores extends SpecialPage {
 	}
 
 	public function getRestriction(): string {
-		return NeoWikiExtension::ADMIN_RIGHT;
+		return SWSExtension::ADMIN_RIGHT;
 	}
 
 	/**
@@ -102,7 +102,7 @@ class SpecialGraphStores extends SpecialPage {
 	 * @return string The message key suffix naming what happened, for the box the redirect lands on.
 	 */
 	private function runRequestedAction( string $storeName ): string {
-		$coordinator = NeoWikiExtension::getInstance()
+		$coordinator = SWSExtension::getInstance()
 			->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE );
 		$cancelling = $this->getRequest()->getText( self::ACTION_FIELD ) === self::CANCEL_ACTION;
 
@@ -131,8 +131,8 @@ class SpecialGraphStores extends SpecialPage {
 	}
 
 	private function logFailedAction( string $storeName, Throwable $e ): void {
-		LoggerFactory::getInstance( 'NeoWiki' )->error(
-			'NeoWiki could not act on graph store "' . $storeName . '" from Special:GraphStores. The store is '
+		LoggerFactory::getInstance( 'SWS' )->error(
+			'SWS could not act on graph store "' . $storeName . '" from Special:GraphStores. The store is '
 			. 'unchanged. Underlying error: ' . BackendFailureMessage::withoutCredentials( $e->getMessage() ),
 			[ 'exception' => $e, 'store' => $storeName ]
 		);
@@ -157,7 +157,7 @@ class SpecialGraphStores extends SpecialPage {
 			return;
 		}
 
-		$message = $this->msg( 'neowiki-graphstores-outcome-' . $outcome )
+		$message = $this->msg( 'sws-graphstores-outcome-' . $outcome )
 			->plaintextParams( $this->getRequest()->getText( 'store' ) );
 
 		if ( $message->isDisabled() ) {
@@ -172,10 +172,10 @@ class SpecialGraphStores extends SpecialPage {
 	}
 
 	private function buildStoreTable(): string {
-		$statuses = NeoWikiExtension::getInstance()->newGraphStoreStatusLookup()->getStatuses();
+		$statuses = SWSExtension::getInstance()->newGraphStoreStatusLookup()->getStatuses();
 
 		if ( $statuses === [] ) {
-			return Html::rawElement( 'p', [], $this->msg( 'neowiki-graphstores-nostores' )->escaped() );
+			return Html::rawElement( 'p', [], $this->msg( 'sws-graphstores-nostores' )->escaped() );
 		}
 
 		$rows = '';
@@ -184,7 +184,7 @@ class SpecialGraphStores extends SpecialPage {
 			$rows .= $this->buildStoreRow( $status );
 		}
 
-		return Html::rawElement( 'p', [], $this->msg( 'neowiki-graphstores-intro' )->escaped() )
+		return Html::rawElement( 'p', [], $this->msg( 'sws-graphstores-intro' )->escaped() )
 			. Html::rawElement( 'table', [ 'class' => 'wikitable' ], $this->buildTableHead() . $rows );
 	}
 
@@ -192,7 +192,7 @@ class SpecialGraphStores extends SpecialPage {
 		$headings = '';
 
 		foreach ( [ 'store', 'projection', 'state', 'lastrebuild', 'actions' ] as $column ) {
-			$headings .= Html::element( 'th', [], $this->msg( 'neowiki-graphstores-column-' . $column )->text() );
+			$headings .= Html::element( 'th', [], $this->msg( 'sws-graphstores-column-' . $column )->text() );
 		}
 
 		return Html::rawElement( 'tr', [], $headings );
@@ -201,9 +201,9 @@ class SpecialGraphStores extends SpecialPage {
 	private function buildStoreRow( GraphStoreStatus $status ): string {
 		return Html::rawElement(
 			'tr',
-			[ 'data-mw-neowiki-graph-store' => $status->name ],
+			[ 'data-mw-sws-graph-store' => $status->name ],
 			Html::element( 'td', [], $status->name )
-				. Html::element( 'td', [], $status->projection ?? $this->msg( 'neowiki-graphstores-projection-none' )->text() )
+				. Html::element( 'td', [], $status->projection ?? $this->msg( 'sws-graphstores-projection-none' )->text() )
 				. Html::element( 'td', [], $this->describeState( $status ) )
 				. Html::element( 'td', [], $this->describeLastRebuild( $status->lastSuccessfulRun ) )
 				. Html::rawElement( 'td', [], $this->buildActions( $status ) )
@@ -217,31 +217,31 @@ class SpecialGraphStores extends SpecialPage {
 	private function describeState( GraphStoreStatus $status ): string {
 		if ( $status->activeRun !== null ) {
 			return $status->activeRun->status === RebuildStatus::Queued
-				? $this->msg( 'neowiki-graphstores-state-queued' )->text()
+				? $this->msg( 'sws-graphstores-state-queued' )->text()
 				: $this->msg(
-					'neowiki-graphstores-state-running',
+					'sws-graphstores-state-running',
 					$this->getLanguage()->formatNum( $status->activeRun->processed ),
 					$this->getLanguage()->formatNum( $status->activeRun->failed )
 				)->text();
 		}
 
 		return match ( $status->state ) {
-			StoreSyncState::NeverBuilt => $this->msg( 'neowiki-graphstores-state-neverbuilt' )->text(),
+			StoreSyncState::NeverBuilt => $this->msg( 'sws-graphstores-state-neverbuilt' )->text(),
 			StoreSyncState::Stale => $this->msg(
-				'neowiki-graphstores-state-stale',
+				'sws-graphstores-state-stale',
 				$this->formatTime( $status->projectionChanged )
 			)->text(),
-			StoreSyncState::InSync => $this->msg( 'neowiki-graphstores-state-insync' )->text(),
+			StoreSyncState::InSync => $this->msg( 'sws-graphstores-state-insync' )->text(),
 		};
 	}
 
 	private function describeLastRebuild( ?RebuildRun $lastSuccessfulRun ): string {
 		if ( $lastSuccessfulRun === null ) {
-			return $this->msg( 'neowiki-graphstores-lastrebuild-never' )->text();
+			return $this->msg( 'sws-graphstores-lastrebuild-never' )->text();
 		}
 
 		return $this->msg(
-			'neowiki-graphstores-lastrebuild',
+			'sws-graphstores-lastrebuild',
 			$this->formatTime( $lastSuccessfulRun->finished ),
 			$this->getLanguage()->formatNum( $lastSuccessfulRun->processed ),
 			$this->getLanguage()->formatNum( $lastSuccessfulRun->failed )
@@ -260,8 +260,8 @@ class SpecialGraphStores extends SpecialPage {
 	 */
 	private function buildActions( GraphStoreStatus $status ): string {
 		return $status->activeRun === null
-			? $this->buildActionForm( $status->name, self::REBUILD_ACTION, 'neowiki-graphstores-rebuild' )
-			: $this->buildActionForm( $status->name, self::CANCEL_ACTION, 'neowiki-graphstores-cancel' );
+			? $this->buildActionForm( $status->name, self::REBUILD_ACTION, 'sws-graphstores-rebuild' )
+			: $this->buildActionForm( $status->name, self::CANCEL_ACTION, 'sws-graphstores-cancel' );
 	}
 
 	private function buildActionForm( string $storeName, string $action, string $labelMessage ): string {
@@ -292,11 +292,11 @@ class SpecialGraphStores extends SpecialPage {
 	}
 
 	public function getGroupName(): string {
-		return 'neowiki';
+		return 'sws';
 	}
 
 	public function getDescription(): Message {
-		return $this->msg( 'neowiki-special-graphstores' );
+		return $this->msg( 'sws-special-graphstores' );
 	}
 
 }

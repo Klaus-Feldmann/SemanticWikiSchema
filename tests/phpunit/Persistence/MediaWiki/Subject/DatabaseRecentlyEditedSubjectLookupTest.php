@@ -2,42 +2,42 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\TextContent;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**
  * Needs the database for the revision history it reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup
  * @group Database
  */
-class DatabaseRecentlyEditedSubjectLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseRecentlyEditedSubjectLookupTest extends SWSIntegrationTestCase {
 
 	private const string ADA = 'sTestRES1111111';
 	private const string GRACE = 'sTestRES1111112';
@@ -284,10 +284,10 @@ class DatabaseRecentlyEditedSubjectLookupTest extends NeoWikiIntegrationTestCase
 			connectionProvider: $this->getServiceContainer()->getConnectionProvider(),
 			slotRoleStore: $this->getServiceContainer()->getSlotRoleStore(),
 			revisionLookup: $this->getServiceContainer()->getRevisionLookup(),
-			revisionPolicy: NeoWikiExtension::getInstance()->getRevisionPolicy(),
+			revisionPolicy: SWSExtension::getInstance()->getRevisionPolicy(),
 			readAuthorizer: $readAuthorizer,
 			titleFormatter: $this->getServiceContainer()->getTitleFormatter(),
-			hostSubjectBuilder: NeoWikiExtension::getInstance()->newHostSubjectBuilder(),
+			hostSubjectBuilder: SWSExtension::getInstance()->newHostSubjectBuilder(),
 			revisionBound: $revisionBound,
 			readBound: $readBound,
 		);

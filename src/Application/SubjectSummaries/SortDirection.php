@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\SubjectSummaries;
+namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
 
 enum SortDirection: string {
 

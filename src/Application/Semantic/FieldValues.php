@@ -1,11 +1,11 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\Application\Semantic;
+namespace ProfessionalWiki\SWS\Application\Semantic;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\HistoricalDate;
-use ProfessionalWiki\NeoWiki\Domain\HistoricalCalendar;
+use ProfessionalWiki\SWS\Domain\HistoricalDate;
+use ProfessionalWiki\SWS\Domain\HistoricalCalendar;
 
 /** Pure, schema-driven read model. Caller supplies an authorized snapshot and lazy remote reader.
  * No global cache, no network, no store writes. One instance belongs to one snapshot.

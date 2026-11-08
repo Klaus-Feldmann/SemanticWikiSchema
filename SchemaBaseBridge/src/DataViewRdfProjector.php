@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\Domain\HistoricalDate;
-use ProfessionalWiki\NeoWiki\Domain\LanguageTag;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\{Iri, Literal, Quad, QuadList, RdfNamespaces, RdfTerm};
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\HistoricalDate;
+use ProfessionalWiki\SWS\Domain\LanguageTag;
+use ProfessionalWiki\SWS\Domain\Rdf\{Iri, Literal, Quad, QuadList, RdfNamespaces, RdfTerm};
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /** Read-time snapshot only. No graph-store projection or writes to research data. */
 final class DataViewRdfProjector {

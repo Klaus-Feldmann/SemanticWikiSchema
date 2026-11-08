@@ -26,8 +26,8 @@ mapped output side by side.
 
 ## Ontology Mappings are wiki pages
 
-A Mapping is a page in the **`Mapping:` namespace** with content model `NeoWikiMapping` (JSON), gated by the
-`neowiki-mapping-edit` right. Each Mapping page defines **one projection**, and the page title is the
+A Mapping is a page in the **`Mapping:` namespace** with content model `SWSMapping` (JSON), gated by the
+`sws-mapping-edit` right. Each Mapping page defines **one projection**, and the page title is the
 projection name you pass to the export surfaces: the page `Mapping:EDM` defines the `EDM` projection. The
 `Special:Mappings` page lists every Mapping on the wiki.
 
@@ -91,7 +91,7 @@ Each **schema** entry (a value in `schemas`) needs at least one of `subject` and
 |---|---|---|
 | `subject` | with `properties`/`nodes` | How the Subject itself projects (see below). Leave it out for an entry that only contributes to other Subjects. |
 | `nodes` | no | Node key → an intermediate node the projection synthesizes (see below). Keys match `^[A-Za-z_][A-Za-z0-9_-]*$` and appear in the node's IRI. At most 64. |
-| `properties` | no | NeoWiki property name → how to project it (see below). At most 500. |
+| `properties` | no | SWS property name → how to project it (see below). At most 500. |
 | `contributions` | no | Relation property name → values this Schema sends to the Subjects that property points at (see below). At most 32. |
 
 Each **subject** entry:
@@ -138,7 +138,7 @@ to an IRI containing an IRIREF-illegal character (`< > " { } | ^ \` backtick, sp
 
 The same checks re-run at **projection time**: a class, predicate, datatype, or prefix that does not re-expand
 safely is dropped, an unusable node takes everything below it with it, an invalid language tag falls back to a
-plain literal, and each is logged on the [`NeoWiki` channel](../operations/installation.md#logging). The projection
+plain literal, and each is logged on the [`SWS` channel](../operations/installation.md#logging). The projection
 degrades rather than aborting the export.
 
 ## What gets emitted

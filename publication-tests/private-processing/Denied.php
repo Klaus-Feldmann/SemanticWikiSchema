@@ -6,10 +6,10 @@ if ( \MediaWiki\MediaWikiServices::getInstance()->getMainConfig()->get( 'DBname'
 }
 
 require __DIR__ . '/Fixtures.php';
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIncomplete;
+use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
 $services->getHookContainer()->register('getUserPermissionsErrors',static function($page,$user,$action,&$result){
- if($action==='read' && $page->getPrefixedText()==='Schema:ProcessingTest' && $user->getName()===ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIdentity::NAME){$result=['badaccess-group0'];return false;}
+ if($action==='read' && $page->getPrefixedText()==='Schema:ProcessingTest' && $user->getName()===ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIdentity::NAME){$result=['badaccess-group0'];return false;}
  return true;
 });
 try {(new InternalPageProcessor())->refresh($title);throw new RuntimeException('schema ACL was bypassed');}catch(ProcessingIncomplete $e){}

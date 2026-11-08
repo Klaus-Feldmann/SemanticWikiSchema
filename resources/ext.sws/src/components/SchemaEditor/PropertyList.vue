@@ -1,0 +1,370 @@
+<template>
+	<div class="ext-sws-schema-editor__property-list">
+		<ul
+			ref="listRef"
+			role="listbox"
+			class="ext-sws-property-list"
+			@keydown="onKeydown"
+		>
+			<li
+				v-if="props.showsLabelRow"
+				role="option"
+				class="ext-sws-property-list__item ext-sws-property-list__item--subject-label"
+				:class="{ 'ext-sws-property-list__item--selected': isSubjectLabelSelected }"
+				:aria-selected="isSubjectLabelSelected"
+				:tabindex="isSubjectLabelTabStop ? 0 : -1"
+				@click="selectAndFocus( -1 )"
+			>
+				<CdxIcon
+					class="ext-sws-property-list__item__icon"
+					:icon="cdxIconTag"
+				/>
+				<span class="ext-sws-property-list__item__text">
+					<span class="ext-sws-property-list__item__text__label">
+						{{ $i18n( 'sws-schema-editor-subject-label' ).text() }}
+					</span>
+					<span class="ext-sws-property-list__item__text__description">
+						{{ describeType( TextType.typeName, false ) }}
+					</span>
+				</span>
+			</li>
+			<li
+				v-for="( property, index ) in propertyArray"
+				:key="property.name.toString()"
+				role="option"
+				class="ext-sws-property-list__item"
+				:class="{ 'ext-sws-property-list__item--selected': isSelected( property ) }"
+				:aria-selected="isSelected( property )"
+				:tabindex="isTabStop( property ) ? 0 : -1"
+				@click="selectAndFocus( index )"
+			>
+				<CdxIcon
+					v-if="getPropertyIcon( property )"
+					class="ext-sws-property-list__item__icon"
+					:icon="getPropertyIcon( property )!"
+				/>
+				<span class="ext-sws-property-list__item__text">
+					<span class="ext-sws-property-list__item__text__label">
+						{{ property.name.toString() }}
+					</span>
+					<span
+						v-if="describeType( property.type, property.required )"
+						class="ext-sws-property-list__item__text__description"
+					>
+						{{ describeType( property.type, property.required ) }}
+					</span>
+				</span>
+				<span class="ext-sws-property-list__item__actions">
+					<CdxButton
+						class="ext-sws-property-list__item__actions__delete"
+						:aria-label="$i18n( 'sws-schema-editor-delete-property' ).text()"
+						weight="quiet"
+						action="destructive"
+						@click.stop="emit( 'propertyDeleted', property.name )"
+					>
+						<CdxIcon :icon="cdxIconTrash" />
+					</CdxButton>
+					<span class="ext-sws-property-list__item__actions__drag-handle">
+						<CdxIcon
+							:icon="cdxIconDraggable"
+							:aria-hidden="true"
+						/>
+					</span>
+				</span>
+			</li>
+		</ul>
+		<button
+			class="ext-sws-property-list__add-item"
+			type="button"
+			:title="$i18n( 'sws-schema-editor-new-property-shortcut' ).text()"
+			aria-keyshortcuts="Control+Enter Meta+Enter"
+			@click="emit( 'addProperty' )"
+		>
+			<CdxIcon
+				class="ext-sws-property-list__item__icon"
+				:icon="cdxIconAdd"
+			/>
+			<span class="ext-sws-property-list__item__text">
+				<span class="ext-sws-property-list__item__text__label">
+					{{ $i18n( 'sws-schema-editor-new-property' ).text() }}
+				</span>
+			</span>
+		</button>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, nextTick } from 'vue';
+import { CdxButton, CdxIcon } from '@wikimedia/codex';
+import { cdxIconAdd, cdxIconDraggable, cdxIconTag, cdxIconTrash } from '@wikimedia/codex-icons';
+import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList.ts';
+import { PropertyDefinition, PropertyName } from '@/domain/PropertyDefinition.ts';
+import { TextType } from '@/domain/propertyTypes/Text.ts';
+import { SWSServices } from '@/SWSServices.ts';
+import { useSortable } from '@/composables/useSortable.ts';
+import type { Icon } from '@wikimedia/codex-icons';
+
+const props = defineProps<{
+	properties: PropertyDefinitionList;
+	/** The property whose row is selected. Without one, the Label row is, where it is shown. */
+	selectedPropertyName?: string;
+	showsLabelRow: boolean;
+}>();
+
+const emit = defineEmits<{
+	subjectLabelSelected: [];
+	propertySelected: [ name: PropertyName ];
+	addProperty: [];
+	propertyDeleted: [ name: PropertyName ];
+	propertyReordered: [ names: PropertyName[] ];
+}>();
+
+const componentRegistry = SWSServices.getComponentRegistry();
+
+const listRef = ref<HTMLElement | null>( null );
+
+const propertyArray = computed( (): PropertyDefinition[] => [ ...props.properties ] );
+
+const isSubjectLabelSelected = computed( (): boolean => props.showsLabelRow && props.selectedPropertyName === undefined );
+
+// Alone, the Label row has no other row to move to, so Tab passes the list.
+const isSubjectLabelTabStop = computed( (): boolean => isSubjectLabelSelected.value && propertyArray.value.length > 0 );
+
+function isSelected( property: PropertyDefinition ): boolean {
+	return property.name.toString() === props.selectedPropertyName;
+}
+
+// Without a Label row or a selection, the first property's row is the Tab stop.
+function isTabStop( property: PropertyDefinition ): boolean {
+	return isSelected( property ) ||
+		( !props.showsLabelRow && getSelectedIndex() === -1 && property === propertyArray.value[ 0 ] );
+}
+
+const firstPropertyRow = computed( (): number => props.showsLabelRow ? 1 : 0 );
+
+const firstSelectableIndex = computed( (): number => props.showsLabelRow ? -1 : 0 );
+
+function getPropertyIcon( property: PropertyDefinition ): Icon | undefined {
+	return componentRegistry.getIcon( property.type );
+}
+
+function describeType( type: string, required: boolean ): string {
+	const typeLabel = mw.msg( componentRegistry.getLabel( type ) );
+	return required ? typeLabel : `${ typeLabel }・${ mw.msg( 'sws-schema-editor-optional' ) }`;
+}
+
+// Indexes below are into the properties, with the Label row before them as -1. Without a Label row, -1
+// is no row at all.
+function getSelectedIndex(): number {
+	return propertyArray.value.findIndex( isSelected );
+}
+
+function focusItem( index: number ): void {
+	const items = listRef.value?.querySelectorAll<HTMLElement>( '[role="option"]' );
+	items?.[ index + firstPropertyRow.value ]?.focus();
+}
+
+// The focus follows the selection the parent makes of it, which the parent may refuse.
+async function selectAndFocus( index: number ): Promise<void> {
+	if ( index === -1 ) {
+		emit( 'subjectLabelSelected' );
+	} else {
+		emit( 'propertySelected', propertyArray.value[ index ].name );
+	}
+
+	await focusSelectedItem();
+}
+
+async function focusSelectedItem(): Promise<void> {
+	await nextTick();
+	focusItem( getSelectedIndex() );
+}
+
+function moveProperty( fromIndex: number, toIndex: number ): void {
+	const names = propertyArray.value.map( ( p ) => p.name );
+	const [ moved ] = names.splice( fromIndex, 1 );
+	names.splice( toIndex, 0, moved );
+	emit( 'propertyReordered', names );
+}
+
+function onKeydown( event: KeyboardEvent ): void {
+	const currentIndex = getSelectedIndex();
+	const lastIndex = propertyArray.value.length - 1;
+
+	if ( event.key === 'ArrowDown' ) {
+		event.preventDefault();
+		if ( event.altKey && currentIndex > -1 && currentIndex < lastIndex ) {
+			moveProperty( currentIndex, currentIndex + 1 );
+			focusSelectedItem();
+		} else if ( !event.altKey && currentIndex < lastIndex ) {
+			selectAndFocus( currentIndex + 1 );
+		}
+	} else if ( event.key === 'ArrowUp' ) {
+		event.preventDefault();
+		if ( event.altKey && currentIndex > 0 ) {
+			moveProperty( currentIndex, currentIndex - 1 );
+			focusSelectedItem();
+		} else if ( !event.altKey && currentIndex > firstSelectableIndex.value ) {
+			selectAndFocus( currentIndex - 1 );
+		}
+	}
+}
+
+useSortable( listRef, {
+	draggable: '.ext-sws-property-list__item:not(.ext-sws-property-list__item--subject-label)',
+	onReorder( oldIndex: number, newIndex: number ): void {
+		// SortableJS indexes count the Label row, which stays first, where it is shown.
+		moveProperty( oldIndex - firstPropertyRow.value, newIndex - firstPropertyRow.value );
+	}
+} );
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-property-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: @spacing-50;
+		padding: @spacing-50 @spacing-75;
+		border-radius: @border-radius-base;
+		cursor: grab;
+		user-select: none;
+		position: relative;
+		overflow: hidden;
+
+		&:hover {
+			background-color: @background-color-interactive-subtle;
+		}
+
+		&--selected {
+			background-color: @background-color-progressive-subtle;
+		}
+
+		&--subject-label {
+			cursor: pointer;
+		}
+
+		&--ghost {
+			opacity: 0.5;
+			background-color: @background-color-interactive-subtle;
+		}
+
+		&__icon.cdx-icon {
+			background-position: @background-position-base;
+			background-repeat: no-repeat;
+			background-size: @background-size-search-figure;
+			background-color: @background-color-interactive-subtle;
+			flex-shrink: 0;
+			box-sizing: @box-sizing-base;
+			min-width: @min-size-search-figure;
+			min-height: @min-size-search-figure;
+			width: @size-search-figure;
+			height: @size-search-figure;
+			border: @border-subtle;
+			border-radius: @border-radius-base;
+			color: @color-subtle;
+
+			svg {
+				min-width: @min-size-icon-medium;
+				min-height: @min-size-icon-medium;
+				width: @size-icon-medium;
+				height: @size-icon-medium;
+			}
+		}
+
+		&__text {
+			flex-grow: 1;
+			min-width: 0;
+
+			&__label {
+				display: block;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			&__description {
+				display: block;
+				font-size: @font-size-small;
+				color: @color-subtle;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
+
+		&__actions {
+			position: absolute;
+			inset-inline-end: 0;
+			top: 0;
+			bottom: 0;
+			display: flex;
+			align-items: center;
+			gap: @spacing-25;
+			padding-inline: @spacing-100 @spacing-50;
+			background: linear-gradient( to right, transparent, @background-color-base 40% );
+			opacity: 0;
+			transform: translateX( @spacing-75 );
+			transition: opacity @transition-duration-medium @transition-timing-function-system, transform @transition-duration-medium @transition-timing-function-system;
+
+			.ext-sws-property-list__item:hover &,
+			.ext-sws-property-list__item--selected &,
+			.ext-sws-property-list__item:has( :focus-visible ) & {
+				// :has( :focus-visible ) rather than :focus-within: keyboard tabbing must reveal the
+				// action controls, but a mouse click also focuses the button it hits and would keep the
+				// cluster pinned visible after the pointer leaves.
+				opacity: 1;
+				transform: translateX( 0 );
+			}
+
+			.ext-sws-property-list__item:hover & {
+				background: linear-gradient( to right, transparent, @background-color-interactive-subtle 40% );
+			}
+
+			.ext-sws-property-list__item--selected & {
+				background: linear-gradient( to right, transparent, @background-color-progressive-subtle 40% );
+			}
+
+			&__drag-handle {
+				min-width: @min-size-interactive-pointer;
+				min-height: @min-size-interactive-pointer;
+				padding-inline: @spacing-30; /* Replicate CdxButton padding */
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				box-sizing: border-box;
+
+				.cdx-icon {
+					color: @color-placeholder;
+				}
+			}
+		}
+	}
+
+	&__add-item {
+		display: flex;
+		align-items: center;
+		gap: @spacing-50;
+		padding: @spacing-50 @spacing-75;
+		border: 0;
+		border-radius: @border-radius-base;
+		background: none;
+		width: 100%;
+		cursor: pointer;
+		font: inherit;
+		color: inherit;
+		text-align: start;
+		margin-block-start: @spacing-100;
+
+		&:hover {
+			background-color: @background-color-interactive-subtle;
+		}
+	}
+}
+</style>

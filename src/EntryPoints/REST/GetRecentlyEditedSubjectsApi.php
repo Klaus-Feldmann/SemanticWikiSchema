@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectSummarySerializer;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
+use ProfessionalWiki\SWS\Presentation\SubjectSummarySerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
 /**
- * The per-property rules of a {@see Mapping}, keyed by NeoWiki property name.
+ * The per-property rules of a {@see Mapping}, keyed by SWS property name.
  */
 readonly class PropertyMappings {
 
 	/**
-	 * @param array<string, PropertyMapping> $mappings Keyed by NeoWiki property name.
+	 * @param array<string, PropertyMapping> $mappings Keyed by SWS property name.
 	 */
 	public function __construct(
 		private array $mappings = [],
@@ -22,7 +22,7 @@ readonly class PropertyMappings {
 	}
 
 	/**
-	 * @return array<string, PropertyMapping> Keyed by NeoWiki property name.
+	 * @return array<string, PropertyMapping> Keyed by SWS property name.
 	 */
 	public function asArray(): array {
 		return $this->mappings;

@@ -1,12 +1,12 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialLayouts;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialLayouts;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialLayouts
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialLayouts
  */
 class SpecialLayoutsTest extends SpecialPageTestBase {
 
@@ -21,7 +21,7 @@ class SpecialLayoutsTest extends SpecialPageTestBase {
 		[ $output ] = $this->executeSpecialPage();
 
 		$this->assertStringContainsString(
-			'id="ext-neowiki-layouts"',
+			'id="ext-sws-layouts"',
 			$output
 		);
 	}

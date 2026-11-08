@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Actions;
+namespace ProfessionalWiki\SWS\Tests\Application\Actions;
 
-use ProfessionalWiki\NeoWiki\Application\Actions\CreateSchema\CreateSchemaPresenter;
+use ProfessionalWiki\SWS\Application\Actions\CreateSchema\CreateSchemaPresenter;
 
 class CreateSchemaPresenterSpy implements CreateSchemaPresenter {
 

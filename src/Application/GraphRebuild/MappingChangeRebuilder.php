@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -72,7 +72,7 @@ class MappingChangeRebuilder {
 			$this->reportRebuildLeftAlone( $storeName );
 		} catch ( Throwable $e ) {
 			$this->logger->error(
-				'NeoWiki could not rebuild graph store "' . $storeName . '" after the Mapping defining its '
+				'SWS could not rebuild graph store "' . $storeName . '" after the Mapping defining its '
 				. 'projection changed, so the store still holds the old vocabulary. Rebuild it from '
 				. 'Special:GraphStores. Underlying error: '
 				. BackendFailureMessage::withoutCredentials( $e->getMessage() ),
@@ -87,7 +87,7 @@ class MappingChangeRebuilder {
 	 */
 	private function reportRebuildLeftAlone( string $storeName ): void {
 		$this->logger->info(
-			'NeoWiki left the rebuild graph store "' . $storeName . '" already had going to finish, rather '
+			'SWS left the rebuild graph store "' . $storeName . '" already had going to finish, rather '
 			. 'than restarting it for the Mapping that changed. It was started by hand, so somebody is '
 			. 'waiting on it. The store is reported as stale on Special:GraphStores once that run ends, and '
 			. 'rebuilding it from there picks up the new Mapping.',

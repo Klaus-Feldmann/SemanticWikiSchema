@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
 use RuntimeException;
 
 /**

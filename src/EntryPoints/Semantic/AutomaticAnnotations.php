@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Semantic;
+namespace ProfessionalWiki\SWS\EntryPoints\Semantic;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -10,11 +10,11 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\Application\Semantic\{AnnotationPlan,AnnotationPlanner,FieldSnapshot};
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIncomplete;
+use ProfessionalWiki\SWS\Application\Semantic\{AnnotationPlan,AnnotationPlanner,FieldSnapshot};
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
 
 /** Called only inside the authorized full revision worker, never on the anonymous view path. */
 final class AutomaticAnnotations {
@@ -36,10 +36,10 @@ final class AutomaticAnnotations {
             [$current, $currentSchema] = $pending[$index];
             $recorder->recordDependencyOnSchema($current->getSchemaReference());
             $reader = FieldSnapshot::reader($currentSchema,$current,static function() use($title,$current,$language,$context,$recorder): array {
-                if (!class_exists(\NeoWikiBaseBridge\ExternalValuesLookup::class)) {
+                if (!class_exists(\SWSBaseBridge\ExternalValuesLookup::class)) {
                     throw new ProcessingIncomplete('SemanticWikiSchema: source binding requires SchemaBaseBridge.');
                 }
-                return (new \NeoWikiBaseBridge\ExternalValuesLookup($context))->read($title,[
+                return (new \SWSBaseBridge\ExternalValuesLookup($context))->read($title,[
                     'pageid'=>$title->getArticleID(),'subject'=>$current->id->text,'language'=>$language,'presentation'=>false
                 ],$recorder,$current);
             });

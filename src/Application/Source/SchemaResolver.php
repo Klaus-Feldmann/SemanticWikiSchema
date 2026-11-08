@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Source;
+namespace ProfessionalWiki\SWS\Application\Source;
 
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceResolver;
-use ProfessionalWiki\NeoWiki\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceResolver;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
 
 /**
  * Resolves a Schema through the Source it is referenced from (ADR 23), which need not be the Source of
@@ -33,7 +33,7 @@ readonly class SchemaResolver implements SchemaReferenceResolver {
 
 		if ( $source === null ) {
 			$this->logger->warning(
-				'NeoWiki: no registered Source for Schema reference: ' . $reference->getText()
+				'SWS: no registered Source for Schema reference: ' . $reference->getText()
 			);
 			return null;
 		}

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Api\IApiMessage;
 use MediaWiki\MediaWikiServices;
@@ -11,12 +11,12 @@ use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseException;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
- * Changes a Schema page through one of MediaWiki's action modules rather than a NeoWiki save path, so that
+ * Changes a Schema page through one of MediaWiki's action modules rather than a SWS save path, so that
  * the change is authorized, validated and filtered exactly like editing or deleting the page in MediaWiki.
  */
 abstract class SchemaPageWriteApi extends ActionModuleBasedHandler {
@@ -71,8 +71,8 @@ abstract class SchemaPageWriteApi extends ActionModuleBasedHandler {
 
 	private function newSchemaPage(): ?Title {
 		return MediaWikiServices::getInstance()->getTitleFactory()->newFromText(
-			NeoWikiExtension::getInstance()->getPageIdentifiersResolver()->getTitleInNamespace(
-				NeoWikiExtension::NS_SCHEMA,
+			SWSExtension::getInstance()->getPageIdentifiersResolver()->getTitleInNamespace(
+				SWSExtension::NS_SCHEMA,
 				$this->getSchemaName()
 			)
 		);
@@ -96,7 +96,7 @@ abstract class SchemaPageWriteApi extends ActionModuleBasedHandler {
 	 * Returning false answers the request with 404.
 	 */
 	protected function mayActOn( Title $schemaPage ): bool {
-		return NeoWikiExtension::getInstance()
+		return SWSExtension::getInstance()
 			->newPageReadAuthorizer( $this->getAuthority() )
 			->authorizeReadByPageTitle( $schemaPage );
 	}

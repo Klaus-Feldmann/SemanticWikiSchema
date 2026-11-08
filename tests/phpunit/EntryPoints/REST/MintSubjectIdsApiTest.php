@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\SubjectIdMinter;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\MintSubjectIdsApi;
-use ProfessionalWiki\NeoWiki\Infrastructure\ProductionIdGenerator;
+use ProfessionalWiki\SWS\Application\SubjectIdMinter;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\EntryPoints\REST\MintSubjectIdsApi;
+use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\MintSubjectIdsApi
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectIdMinter
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\MintSubjectIdsApi
+ * @covers \ProfessionalWiki\SWS\Application\SubjectIdMinter
  */
 class MintSubjectIdsApiTest extends MediaWikiIntegrationTestCase {
 

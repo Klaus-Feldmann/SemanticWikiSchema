@@ -3,12 +3,12 @@ parameters:
 		-
 			message: "#^Call to static method getMain\\(\\) on an unknown class RequestContext\\.$#"
 			count: 1
-			path: src/NeoWikiExtension.php
+			path: src/SWSExtension.php
 
 		-
-			message: "#^Parameter \\#1 \\$titleParser of class ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher constructor expects TitleParser, MediaWiki\\\\Title\\\\TitleParser given\\.$#"
+			message: "#^Parameter \\#1 \\$titleParser of class ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher constructor expects TitleParser, MediaWiki\\\\Title\\\\TitleParser given\\.$#"
 			count: 1
-			path: src/NeoWikiExtension.php
+			path: src/SWSExtension.php
 
 		-
 			message: "#^Call to method getPrefixedText\\(\\) on an unknown class Title\\.$#"
@@ -36,17 +36,17 @@ parameters:
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) has invalid return type Content\\.$#"
+			message: "#^Method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) has invalid return type Content\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) should return Content\\|null but returns MediaWiki\\\\Content\\\\Content\\|null\\.$#"
+			message: "#^Method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) should return Content\\|null but returns MediaWiki\\\\Content\\\\Content\\|null\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:normalizeTitle\\(\\) has invalid return type TitleValue\\.$#"
+			message: "#^Method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:normalizeTitle\\(\\) has invalid return type TitleValue\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
@@ -61,22 +61,22 @@ parameters:
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Parameter \\$pageTitle of method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) has invalid type Title\\.$#"
+			message: "#^Parameter \\$pageTitle of method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:getPageContent\\(\\) has invalid type Title\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Parameter \\$pageTitle of method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:normalizeTitle\\(\\) has invalid type Title\\.$#"
+			message: "#^Parameter \\$pageTitle of method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:normalizeTitle\\(\\) has invalid type Title\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Parameter \\$titleParser of method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:__construct\\(\\) has invalid type TitleParser\\.$#"
+			message: "#^Parameter \\$titleParser of method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:__construct\\(\\) has invalid type TitleParser\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
 		-
-			message: "#^Property ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:\\$titleParser has unknown class TitleParser as its type\\.$#"
+			message: "#^Property ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\PageContentFetcher\\:\\:\\$titleParser has unknown class TitleParser as its type\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/PageContentFetcher.php
 
@@ -106,22 +106,22 @@ parameters:
 			path: src/Persistence/MediaWiki/Subject/PointInTimeSubjectLookup.php
 
 		-
-			message: "#^Parameter \\#1 \\$boolean of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\BooleanValue constructor expects bool, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$boolean of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\BooleanValue constructor expects bool, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/StatementDeserializer.php
 
 		-
-			message: "#^Parameter \\#1 \\$json of method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\Subject\\\\StatementDeserializer\\:\\:deserializeRelationValue\\(\\) expects array, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$json of method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\Subject\\\\StatementDeserializer\\:\\:deserializeRelationValue\\(\\) expects array, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/StatementDeserializer.php
 
 		-
-			message: "#^Parameter \\#1 \\$number of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\NumberValue constructor expects float\\|int, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$number of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\NumberValue constructor expects float\\|int, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/StatementDeserializer.php
 
 		-
-			message: "#^Parameter \\#1 \\.\\.\\.\\$strings of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\StringValue constructor expects string, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\.\\.\\.\\$strings of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\StringValue constructor expects string, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/StatementDeserializer.php
 
@@ -131,17 +131,17 @@ parameters:
 			path: src/Persistence/MediaWiki/Subject/SubjectContentDataDeserializer.php
 
 		-
-			message: "#^Parameter \\#1 \\$jsonArray of method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\Subject\\\\SubjectContentDataDeserializer\\:\\:deserializeSubjects\\(\\) expects array, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$jsonArray of method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\Subject\\\\SubjectContentDataDeserializer\\:\\:deserializeSubjects\\(\\) expects array, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/SubjectContentDataDeserializer.php
 
 		-
-			message: "#^Parameter \\#1 \\$text of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Subject\\\\SubjectId constructor expects string, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$text of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Subject\\\\SubjectId constructor expects string, mixed given\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/SubjectContentDataDeserializer.php
 
 		-
-			message: "#^Method ProfessionalWiki\\\\NeoWiki\\\\Persistence\\\\MediaWiki\\\\Subject\\\\SubjectContentDataSerializer\\:\\:serialize\\(\\) should return string but returns string\\|false\\.$#"
+			message: "#^Method ProfessionalWiki\\\\SWS\\\\Persistence\\\\MediaWiki\\\\Subject\\\\SubjectContentDataSerializer\\:\\:serialize\\(\\) should return string but returns string\\|false\\.$#"
 			count: 1
 			path: src/Persistence/MediaWiki/Subject/SubjectContentDataSerializer.php
 
@@ -171,12 +171,12 @@ parameters:
 			path: src/Presentation/CsrfValidator.php
 
 		-
-			message: "#^Parameter \\$request of method ProfessionalWiki\\\\NeoWiki\\\\Presentation\\\\CsrfValidator\\:\\:__construct\\(\\) has invalid type WebRequest\\.$#"
+			message: "#^Parameter \\$request of method ProfessionalWiki\\\\SWS\\\\Presentation\\\\CsrfValidator\\:\\:__construct\\(\\) has invalid type WebRequest\\.$#"
 			count: 1
 			path: src/Presentation/CsrfValidator.php
 
 		-
-			message: "#^Property ProfessionalWiki\\\\NeoWiki\\\\Presentation\\\\CsrfValidator\\:\\:\\$request has unknown class WebRequest as its type\\.$#"
+			message: "#^Property ProfessionalWiki\\\\SWS\\\\Presentation\\\\CsrfValidator\\:\\:\\$request has unknown class WebRequest as its type\\.$#"
 			count: 1
 			path: src/Presentation/CsrfValidator.php
 
@@ -196,32 +196,32 @@ parameters:
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$boolean of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\BooleanValue constructor expects bool, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$boolean of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\BooleanValue constructor expects bool, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$propertyType of method ProfessionalWiki\\\\NeoWiki\\\\Application\\\\StatementListBuilder\\:\\:deserializeValue\\(\\) expects string, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$propertyType of method ProfessionalWiki\\\\SWS\\\\Application\\\\StatementListBuilder\\:\\:deserializeValue\\(\\) expects string, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$json of method ProfessionalWiki\\\\NeoWiki\\\\Application\\\\StatementListBuilder\\:\\:deserializeRelationValue\\(\\) expects array, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$json of method ProfessionalWiki\\\\SWS\\\\Application\\\\StatementListBuilder\\:\\:deserializeRelationValue\\(\\) expects array, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$number of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\NumberValue constructor expects float\\|int, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\$number of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\NumberValue constructor expects float\\|int, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\.\\.\\.\\$strings of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Value\\\\StringValue constructor expects string, mixed given\\.$#"
+			message: "#^Parameter \\#1 \\.\\.\\.\\$strings of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Value\\\\StringValue constructor expects string, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 
 		-
-			message: "#^Parameter \\$format of class ProfessionalWiki\\\\NeoWiki\\\\Domain\\\\Statement constructor expects string, mixed given\\.$#"
+			message: "#^Parameter \\$format of class ProfessionalWiki\\\\SWS\\\\Domain\\\\Statement constructor expects string, mixed given\\.$#"
 			count: 1
 			path: src/Application/StatementListBuilder.php
 

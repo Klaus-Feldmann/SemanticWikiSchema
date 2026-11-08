@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 use JobQueueGroup;
 use JobSpecification;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildJobQueue;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\GraphRebuildJob;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildJobQueue;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\GraphRebuildJob;
 
 /**
  * Files rebuild batches on MediaWiki's job queue.

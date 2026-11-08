@@ -13,9 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 env:
-  IMAGE: ghcr.io/professionalwiki/neowiki
+  IMAGE: ghcr.io/professionalwiki/sws
   # A run on another branch builds as master too, but only master and tags publish.
-  NEOWIKI_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'master' }}
+  SWS_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || 'master' }}
   PUBLISH: ${{ github.ref == 'refs/heads/master' || github.ref_type == 'tag' }}
 
 jobs:
@@ -54,13 +54,13 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install NeoWiki JavaScript dependencies
+      - name: Install SWS JavaScript dependencies
         run: npm ci
-        working-directory: resources/ext.neowiki
+        working-directory: resources/ext.sws
 
-      - name: Build NeoWiki JavaScript
+      - name: Build SWS JavaScript
         run: npm run build
-        working-directory: resources/ext.neowiki
+        working-directory: resources/ext.sws
 
       - name: Resolve MediaWiki 1.43 commit
         id: mw
@@ -102,10 +102,10 @@ jobs:
 
       # TODO: additional extensions/skins?
 
-      # A cache hit restores the NeoWiki copy of the run that saved the cache;
-      # --delete drops the files removed from NeoWiki since.
-      - name: Copy built NeoWiki extension
-        run: rsync -a --delete --exclude='Docker/' ./ Docker/mediawiki/extensions/NeoWiki/
+      # A cache hit restores the SWS copy of the run that saved the cache;
+      # --delete drops the files removed from SWS since.
+      - name: Copy built SWS extension
+        run: rsync -a --delete --exclude='Docker/' ./ Docker/mediawiki/extensions/SWS/
 
       # Without buildx's default provenance attestation, each platform's image is pushed as one manifest
       # that its platform tag holds, rather than as an index whose child manifests are untagged.
@@ -138,8 +138,8 @@ jobs:
 
       - name: Push Docker Image
         run: |
-          docker tag "$IMAGE:$NEOWIKI_IMAGE_TAG" "$IMAGE:$NEOWIKI_IMAGE_TAG-${{ matrix.arch }}"
-          docker push "$IMAGE:$NEOWIKI_IMAGE_TAG-${{ matrix.arch }}"
+          docker tag "$IMAGE:$SWS_IMAGE_TAG" "$IMAGE:$SWS_IMAGE_TAG-${{ matrix.arch }}"
+          docker push "$IMAGE:$SWS_IMAGE_TAG-${{ matrix.arch }}"
         if: env.PUBLISH == 'true'
 
       # scripts/tag-release.sh commits this bundle into the release tag.
@@ -148,8 +148,8 @@ jobs:
         with:
           name: frontend-bundle
           path: |
-            resources/ext.neowiki/dist/neowiki.js
-            resources/ext.neowiki/dist/neowiki.css
+            resources/ext.sws/dist/sws.js
+            resources/ext.sws/dist/sws.css
           if-no-files-found: error
 
   publish_mediawiki:
@@ -168,11 +168,11 @@ jobs:
 
       - name: Publish multi-platform image
         run: |
-          tags=( --tag "$IMAGE:$NEOWIKI_IMAGE_TAG" )
-          if [[ $NEOWIKI_IMAGE_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          tags=( --tag "$IMAGE:$SWS_IMAGE_TAG" )
+          if [[ $SWS_IMAGE_TAG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             tags+=( --tag "$IMAGE:latest" )
           fi
-          docker buildx imagetools create "${tags[@]}" "$IMAGE:$NEOWIKI_IMAGE_TAG-amd64" "$IMAGE:$NEOWIKI_IMAGE_TAG-arm64"
+          docker buildx imagetools create "${tags[@]}" "$IMAGE:$SWS_IMAGE_TAG-amd64" "$IMAGE:$SWS_IMAGE_TAG-arm64"
 
       # Delete Older Images deletes untagged versions, which includes what a tagged index points at:
       # a platform image whose tag a newer run has already taken, as when one platform of a re-run fails.
@@ -182,7 +182,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_write_packages }}
         run: |
-          tagged=$(gh api --paginate /orgs/ProfessionalWiki/packages/container/neowiki/versions \
+          tagged=$(gh api --paginate /orgs/ProfessionalWiki/packages/container/sws/versions \
             --jq '.[] | select(.metadata.container.tags != []) | .name')
           children=
           for digest in $tagged; do
@@ -194,7 +194,7 @@ jobs:
       - name: Delete Older Images
         uses: actions/delete-package-versions@v5
         with:
-          package-name: 'neowiki'
+          package-name: 'sws'
           package-type: 'container'
           delete-only-untagged-versions: true
           ignore-versions: ${{ steps.children.outputs.regex }}

@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdsLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup
  * @group Database
  */
-class DatabasePageIdsLookupTest extends NeoWikiIntegrationTestCase {
+class DatabasePageIdsLookupTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();

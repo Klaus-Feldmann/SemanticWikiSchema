@@ -16,13 +16,13 @@ import { AuthoringState } from "../../editor/authoringState";
 
 import { HtmlSpinner } from "../../viewUtils/spinner";
 
-import { createNeoWikiFields, createNeoWikiThumbnail } from "./neoWikiFields";
-const NeoWikiFields = createNeoWikiFields(React);
-const NeoWikiThumbnail = createNeoWikiThumbnail(React);
+import { createSWSFields, createSWSThumbnail } from "./swsFields";
+const SWSFields = createSWSFields(React);
+const SWSThumbnail = createSWSThumbnail(React);
 
-import { createNeoWikiQIdRow, createNeoWikiDescriptionRow } from "./neoWikiQIds";
-const NeoWikiQIdRow = createNeoWikiQIdRow(React);
-const NeoWikiDescriptionRow = createNeoWikiDescriptionRow(React);
+import { createSWSQIdRow, createSWSDescriptionRow } from "./swsQIds";
+const SWSQIdRow = createSWSQIdRow(React);
+const SWSDescriptionRow = createSWSDescriptionRow(React);
 
 const FOAF_NAME = "http://xmlns.com/foaf/0.1/name";
 
@@ -60,7 +60,7 @@ export class StandardTemplate extends Component<TemplateProps, {}> {
             style={{ borderLeftColor: color }}
           >
             <div className={`${CLASS_NAME}__body-horizontal`}>
-              {<NeoWikiThumbnail iri={iri} fallback={this.renderThumbnail()} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
+              {<SWSThumbnail iri={iri} fallback={this.renderThumbnail()} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
               <div className={`${CLASS_NAME}__body-content`}>
                 <div title={types} className={`${CLASS_NAME}__type`}>
                   <div className={`${CLASS_NAME}__type-value`}>
@@ -70,10 +70,10 @@ export class StandardTemplate extends Component<TemplateProps, {}> {
                 <div className={`${CLASS_NAME}__label`} title={label}>
                   {label}
                 </div>
-                <NeoWikiQIdRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />
+                <SWSQIdRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />
               </div>
             </div>
-            <NeoWikiDescriptionRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />
+            <SWSDescriptionRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />
             {pinnedProperties ? (
               <div
                 className={`${CLASS_NAME}__pinned-props`}
@@ -92,7 +92,7 @@ export class StandardTemplate extends Component<TemplateProps, {}> {
             {this.renderPhoto()}
             <div className={`${CLASS_NAME}__dropdown-content`}>
               {this.renderIri(context)}
-              {<NeoWikiFields iri={iri} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
+              {<SWSFields iri={iri} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
               {editor.inAuthoringMode ? (
                 <hr className={`${CLASS_NAME}__hr`} />
               ) : null}

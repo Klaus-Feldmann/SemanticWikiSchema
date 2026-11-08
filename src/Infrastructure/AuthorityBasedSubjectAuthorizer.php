@@ -2,14 +2,14 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\SubjectPermissionHints;
-use ProfessionalWiki\NeoWiki\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Application\SubjectPermissionHints;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 class AuthorityBasedSubjectAuthorizer implements SubjectPermissionHints, SubjectWriteAuthorizer {
 

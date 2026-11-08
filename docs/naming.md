@@ -4,7 +4,7 @@ order: 3
 ---
 # Naming Conventions
 
-Code-facing naming rules for NeoWiki development. Domain vocabulary is defined in the [Glossary](glossary.md);
+Code-facing naming rules for SWS development. Domain vocabulary is defined in the [Glossary](glossary.md);
 this page covers names that never reach users.
 
 ## Data access and selection

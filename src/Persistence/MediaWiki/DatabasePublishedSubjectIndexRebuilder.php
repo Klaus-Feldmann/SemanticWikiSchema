@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use Generator;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Title\TitleFormatter;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectsToPublish;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
 use Psr\Log\LoggerInterface;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\IDBAccessObject;
@@ -89,12 +89,12 @@ class DatabasePublishedSubjectIndexRebuilder {
 	 */
 	private function pageIdsOfStrayRowsAfter( int $afterPageId ): array {
 		return array_map( 'intval', $this->db->newSelectQueryBuilder()
-			->select( 'nws_page_id' )
+			->select( 'swss_page_id' )
 			->distinct()
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE )
-			->where( $this->db->buildComparison( '>', [ 'nws_page_id' => $afterPageId ] ) )
-			->andWhere( 'nws_page_id NOT IN (' . SubjectSlotPages::newQuery( $this->db )->getSQL() . ')' )
-			->orderBy( 'nws_page_id' )
+			->where( $this->db->buildComparison( '>', [ 'swss_page_id' => $afterPageId ] ) )
+			->andWhere( 'swss_page_id NOT IN (' . SubjectSlotPages::newQuery( $this->db )->getSQL() . ')' )
+			->orderBy( 'swss_page_id' )
 			->limit( $this->batchSize )
 			->caller( __METHOD__ )
 			->fetchFieldValues() );
@@ -125,7 +125,7 @@ class DatabasePublishedSubjectIndexRebuilder {
 			$subjects = SubjectsToPublish::of( $published );
 		} catch ( UnreadableSubjectsException | RevisionAccessException $exception ) {
 			$this->logger->warning(
-				'NeoWiki left page {page} as it was in the published Subject index: the Subject data of its published '
+				'SWS left page {page} as it was in the published Subject index: the Subject data of its published '
 				. 'revision {revision} cannot be read. {message}',
 				[
 					'page' => $pageId,

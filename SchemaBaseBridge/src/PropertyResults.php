@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 /** Converts native API results to the source-qualified suggestion contract. */
 final class PropertyResults {

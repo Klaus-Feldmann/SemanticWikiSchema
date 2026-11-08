@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Subject\Exception;
+namespace ProfessionalWiki\SWS\Application\Subject\Exception;
 
 use Exception;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 /**
  * Thrown whatever the validation enforcement setting. The refused write has changed nothing.

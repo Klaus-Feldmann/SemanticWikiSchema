@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
 
 /**
  * The store's response to a query: the W3C `application/sparql-results+json` document, decoded and
- * otherwise unmodified. NeoWiki adds no envelope of its own around it (unlike the Cypher surface, whose
+ * otherwise unmodified. SWS adds no envelope of its own around it (unlike the Cypher surface, whose
  * result is assembled from non-JSON Bolt records) — every surface renders this document directly.
  */
 readonly class SparqlQueryResult {

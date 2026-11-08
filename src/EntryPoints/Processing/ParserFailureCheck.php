@@ -1,14 +1,14 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 /** Confirmed core sort-key warnings and Cite reference messages are not failed data computations.
  * Unknown errors remain blocked. This does not alter the HTML or hide the warning.
  */
 final class ParserFailureCheck {
-    public const OLD_KEY = 'NEOWIKIOLDKEY7CB32';
-    public const NEW_KEY = 'NEOWIKINEWKEY9AD46';
+    public const OLD_KEY = 'SWSOLDKEY7CB32';
+    public const NEW_KEY = 'SWSNEWKEY9AD46';
 
     public static function hasFailure(string $html, ?string $sortWarningTemplate): bool {
         // Never whitelist an actual Scribunto error, even if it appears inside other markup.

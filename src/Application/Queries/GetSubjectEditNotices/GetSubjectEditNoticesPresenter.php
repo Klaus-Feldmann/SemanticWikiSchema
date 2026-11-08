@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetSubjectEditNotices;
+namespace ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices;
 
-use ProfessionalWiki\NeoWiki\Domain\EditNotice\SubjectEditNotice;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
 
 interface GetSubjectEditNoticesPresenter {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use Maintenance;
 use MediaWiki\Content\JsonContent;
@@ -11,10 +11,10 @@ use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Storage\DerivedPageDataUpdater;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 
@@ -160,7 +160,7 @@ class GeneratePerformanceDump extends Maintenance {
 
 		// Read by the perf-import make target to report throughput without scanning the whole dump.
 		$this->write(
-			'  <!-- neowiki-perf pages="' . $this->pages
+			'  <!-- sws-perf pages="' . $this->pages
 			. '" total-subjects="' . $this->pages * $this->subjectsPerPage
 			. '" subjects-per-page="' . $this->subjectsPerPage . '" seed="' . $this->seed . '" -->' . "\n"
 		);
@@ -172,11 +172,11 @@ class GeneratePerformanceDump extends Maintenance {
 			. '    ' . $this->element( 'sitename', (string)$config->get( MainConfigNames::Sitename ) ) . "\n"
 			. '    ' . $this->element( 'dbname', (string)$config->get( MainConfigNames::DBname ) ) . "\n"
 			. '    ' . $this->element( 'base', Title::newMainPage()->getCanonicalURL() ) . "\n"
-			. '    ' . $this->element( 'generator', 'NeoWiki GeneratePerformanceDump' ) . "\n"
+			. '    ' . $this->element( 'generator', 'SWS GeneratePerformanceDump' ) . "\n"
 			. '    ' . $this->element( 'case', 'first-letter' ) . "\n"
 			. "    <namespaces>\n"
 			. '      ' . $this->namespaceElement( NS_MAIN ) . "\n"
-			. '      ' . $this->namespaceElement( NS_NEOWIKI_SCHEMA ) . "\n"
+			. '      ' . $this->namespaceElement( NS_SWS_SCHEMA ) . "\n"
 			. "    </namespaces>\n"
 			. "  </siteinfo>\n"
 		);
@@ -222,8 +222,8 @@ class GeneratePerformanceDump extends Maintenance {
 		}
 
 		$this->writePage(
-			title: $this->namespaceName( NS_NEOWIKI_SCHEMA ) . ':' . self::SCHEMA_NAME,
-			namespaceId: NS_NEOWIKI_SCHEMA,
+			title: $this->namespaceName( NS_SWS_SCHEMA ) . ':' . self::SCHEMA_NAME,
+			namespaceId: NS_SWS_SCHEMA,
 			model: SchemaContent::CONTENT_MODEL_ID,
 			text: $this->toSchemaJson( [
 				'description' => 'Synthetic Schema used by the generated performance-test Subjects.',
@@ -240,7 +240,7 @@ class GeneratePerformanceDump extends Maintenance {
 				namespaceId: NS_MAIN,
 				model: CONTENT_MODEL_WIKITEXT,
 				text: 'Synthetic performance-test page ' . $pageIndex . ' with ' . $this->subjectsPerPage
-					. ' Subjects in the NeoWiki subject slot.',
+					. ' Subjects in the SWS subject slot.',
 				subjectSlot: $this->buildPageSubjects( $pageIndex )
 			);
 
@@ -389,7 +389,7 @@ class GeneratePerformanceDump extends Maintenance {
 			. "    <revision>\n"
 			. '      ' . $this->element( 'timestamp', '2026-01-01T00:00:00Z' ) . "\n"
 			. "      <contributor>\n"
-			. '        ' . $this->element( 'username', 'NeoWiki' ) . "\n"
+			. '        ' . $this->element( 'username', 'SWS' ) . "\n"
 			. "      </contributor>\n"
 			. '      ' . $this->element( 'comment', 'Performance test data' ) . "\n"
 			. '      ' . $this->element( 'model', $model ) . "\n"

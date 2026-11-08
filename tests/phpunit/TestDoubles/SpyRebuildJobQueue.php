@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\TestDoubles;
+namespace ProfessionalWiki\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildJobQueue;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildJobQueue;
 use RuntimeException;
 use Throwable;
 

@@ -1,0 +1,3030 @@
+import { enableAutoUnmount, mount, VueWrapper, DOMWrapper, flushPromises } from '@vue/test-utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { computed, ref, nextTick } from 'vue';
+import SubjectCreatorDialog from '@/components/SubjectCreator/SubjectCreatorDialog.vue';
+import SchemaPicker from '@/components/common/SchemaPicker.vue';
+import SchemaCreatorDialog from '@/components/SchemaCreator/SchemaCreatorDialog.vue';
+import PagePicker from '@/components/common/PagePicker.vue';
+import { createPinia, setActivePinia } from 'pinia';
+import { useSubjectStore } from '@/stores/SubjectStore.ts';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
+import {
+	createI18nMock,
+	NewerCodexAccordionStub,
+	openDialogTitles,
+	setupMwMock,
+	toggleDetails,
+} from '../../VueTestHelpers.ts';
+import { newSchema, newSubject } from '@/TestHelpers.ts';
+import { PageSubjects } from '@/domain/PageSubjects.ts';
+import type { SubjectRepository } from '@/domain/SubjectRepository.ts';
+import { CdxDialog } from '@wikimedia/codex';
+import CloseConfirmationDialog from '@/components/common/CloseConfirmationDialog.vue';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { Service } from '@/SWSServices.ts';
+import { SubjectId } from '@/domain/SubjectId.ts';
+import { StatementList } from '@/domain/StatementList.ts';
+import { Statement } from '@/domain/Statement.ts';
+import { PropertyName } from '@/domain/PropertyDefinition.ts';
+import { TextType } from '@/domain/propertyTypes/Text.ts';
+import { newStringValue } from '@/domain/Value.ts';
+import { Schema } from '@/domain/Schema.ts';
+
+import { useSchemaPermissions } from '@/composables/useSchemaPermissions.ts';
+import { PageTitleTakenError } from '@/persistence/PageTitleTakenError';
+import { SubjectIdInUseError } from '@/persistence/SubjectIdInUseError';
+import { InvalidPageTitleError } from '@/persistence/InvalidPageTitleError';
+import SubjectEditorDialog from '@/components/SubjectEditor/SubjectEditorDialog.vue';
+import { Subject } from '@/domain/Subject.ts';
+import type { InitialPage } from '@/components/SubjectCreator/InitialPage.ts';
+import { WriteRefusedError } from '@/components/SubjectEditor/WriteRefusedError.ts';
+
+const PAGE_ID = 123;
+const PAGE_TITLE = 'Test Page';
+// wgPageName carries the prefixed title with underscores, which is what the placeholder reads.
+const PAGE_NAME = 'Test_Page';
+const SCHEMA_NAME = 'TestSchema';
+const NEW_SCHEMA_NAME = 'NewSchema';
+// The id minted for the Subject being created, which the panes and the tree name it by.
+const MINTED_ID = 'smintedAAAAAAA1';
+const CREATED_PAGE_ID = 777;
+const CREATED_PAGE_SUBJECT_ID = 's11111111111113';
+// What the editor writes with when the user gave no summary of their own.
+const DEFAULT_CREATE_SUMMARY = 'sws-subject-editor-summary-default-create';
+
+vi.mock( '@/composables/useSchemaPermissions.ts' );
+
+// The focus and dialog-stacking tests read the document, where a dialog an earlier test left
+// mounted would still be.
+enableAutoUnmount( afterEach );
+
+const canCreateSubjectPage = ref( true );
+const checkCreateSubjectPagePermission = vi.fn();
+
+vi.mock( '@/composables/useSubjectPermissions.ts', () => ( {
+	useSubjectPermissions: () => ( {
+		canCreateSubjectPage,
+		checkCreateSubjectPagePermission,
+	} ),
+} ) );
+
+interface Deferred<T> {
+	promise: Promise<T>;
+	resolve: ( value: T ) => void;
+	reject: ( error: unknown ) => void;
+}
+
+const SchemaPickerStub = {
+	template: '<div class="schema-lookup-stub"></div>',
+	props: { offersCreation: Boolean, schemaNames: { type: Array, default: undefined }, standaloneOnly: Boolean },
+	emits: [ 'select', 'create' ],
+	setup() {
+		return { focus: vi.fn() };
+	},
+};
+
+// What the panes inside the stubbed editor dialog hold, which is what its save hands back; the label
+// is also what the editor reports while the Subject is being edited. Reset per test by the
+// beforeEach below.
+const editedLabel = ref<string | null>( null );
+let editedStatements = (): StatementList => new StatementList( [
+	new Statement( new PropertyName( 'Color' ), TextType.typeName, newStringValue( 'Red' ) ),
+] );
+// Subjects the editing session invented alongside the one being created, which the editor writes
+// as creations of their own. Each carries the page its pane was opened against.
+let sessionDrafts: { subject: Subject; pageId: number; dependentSubjects?: Subject[] }[] = [];
+// What the pane of the Subject being created reports as its Dependent Subjects.
+let editedDependentSubjects: Subject[] = [];
+// Whether the stubbed editor dialog shows, as the real one does once it has read what the Subject's form needs, and
+// whether it shows that it is still reading, as the real one does once that takes a while. Reset per test by the
+// beforeEach below.
+const editorShows = ref( true );
+const editorShowsReading = ref( false );
+// What the last save through the stub threw, so a test can assert the save stopped there.
+let lastSaveError: unknown = null;
+// Stands in for the round trip the real write loop awaits before its first write — it flushes every
+// dirty pane's validation. A test holds it open to get at the window in which the footer is still
+// answerable while the save is under way.
+let beforeFirstWrite: Promise<unknown> = Promise.resolve();
+
+const SchemaCreatorDialogStub = {
+	name: 'SchemaCreatorDialog',
+	template: '<div class="schema-creator-dialog-stub"></div>',
+	props: { open: Boolean, initialName: String, subjectsAreDependent: { type: Boolean, default: undefined } },
+	emits: [ 'update:open', 'created' ],
+};
+
+const SummaryActionStub = {
+	name: 'SummaryAction',
+	template: '<div class="edit-summary-stub"><button class="save-button" @click="$emit( \'save\', \'\' )">Save</button></div>',
+	props: [ 'helpText', 'footerText', 'saveButtonLabel', 'saveDisabled' ],
+	emits: [ 'save' ],
+};
+
+/**
+ * Stands in for the editor dialog the creator opens on the Subject being created. It renders the
+ * question the creator puts in its footer, and its save runs what the real write loop runs: the
+ * Subject being created first, since its own write is what creates the page the rest are stored
+ * on, then every Subject the session invented alongside it, then the report that the save is
+ * through. A write that throws stops the loop, as it does there.
+ */
+const SubjectEditorDialogStub = {
+	name: 'SubjectEditorDialog',
+	components: { SummaryAction: SummaryActionStub },
+	template: '<div class="subject-editor-dialog-stub">' +
+		'<slot name="before-actions" :saving="saving" />' +
+		'<SummaryAction :save-disabled="saveDisabled" @save="runSave" />' +
+		'<button class="stub-close" @click="$emit( \'update:open\', false )">Close</button>' +
+		'</div>',
+	props: [ 'open', 'subject', 'schema', 'rootIsNew', 'saveDisabled', 'hostHasUnsavedChanges', 'onSave', 'onCreate', 'onSaveSchema', 'onSaved' ],
+	emits: [ 'update:open' ],
+	setup( props: Record<string, any> ) {
+		const saving = ref( false );
+
+		// As the real write loop does, an id the server already holds counts as a create that landed.
+		async function create( subject: Subject, pageId: number, dependentSubjects: Subject[], comment: string ): Promise<void> {
+			try {
+				await props.onCreate( subject, pageId, dependentSubjects, comment );
+			} catch ( error ) {
+				if ( !( error instanceof SubjectIdInUseError ) ) {
+					throw error;
+				}
+			}
+		}
+
+		async function runSave( summary: string ): Promise<void> {
+			// The real footer's button is disabled rather than ignored, which comes to the same
+			// thing: nothing is written while the host still has a question outstanding.
+			if ( props.saveDisabled ) {
+				return;
+			}
+
+			const comment = summary || DEFAULT_CREATE_SUMMARY;
+			lastSaveError = null;
+			saving.value = true;
+
+			try {
+				await beforeFirstWrite;
+
+				await create( editedRoot( props.subject as Subject ), 0, editedDependentSubjects, comment );
+
+				for ( const draft of sessionDrafts ) {
+					await create( draft.subject, draft.pageId, draft.dependentSubjects ?? [], comment );
+				}
+			} catch ( error ) {
+				lastSaveError = error;
+				return;
+			} finally {
+				saving.value = false;
+			}
+
+			props.onSaved();
+		}
+
+		return {
+			saving,
+			runSave,
+			rootLabel: editedLabel,
+			shown: editorShows,
+			visible: computed( () => editorShows.value || editorShowsReading.value ),
+		};
+	},
+};
+
+// The Subject being created as its pane holds it: the one the creator handed down, under whatever
+// has been typed into the pane since.
+function editedRoot( subject: Subject ): Subject {
+	return subject.withLabel( editedLabel.value ).withStatements( editedStatements() );
+}
+
+function schemaField( wrapper: VueWrapper ): DOMWrapper<Element> {
+	return wrapper.find( '.ext-sws-schema-picker input' );
+}
+
+// The name a screen reader announces for a field, from its aria-label or its label element. Not its
+// placeholder, which is gone once the user types.
+function labelOf( field: DOMWrapper<Element> ): string | undefined {
+	const input = field.element as HTMLInputElement;
+
+	return input.getAttribute( 'aria-label' ) ?? input.labels?.[ 0 ]?.textContent?.trim();
+}
+
+const CdxDialogStub = {
+	template: '<div class="cdx-dialog-stub"><slot name="header" /><slot /><slot name="footer" /></div>',
+	props: [ 'open', 'title', 'useCloseButton' ],
+	emits: [ 'update:open', 'default' ],
+};
+
+const CloseConfirmationDialogStub = {
+	template: '<div class="close-confirmation-stub"></div>',
+	props: [ 'open' ],
+	emits: [ 'discard', 'keep-editing' ],
+};
+
+const CdxRadioStub = {
+	name: 'CdxRadio',
+	template: '<label class="cdx-radio-stub" :data-value="inputValue">' +
+		'<input type="radio" :checked="modelValue === inputValue" :disabled="disabled"' +
+		' @change="$emit( \'update:modelValue\', inputValue )">' +
+		'<slot /><slot name="description" /></label>',
+	props: [ 'modelValue', 'inputValue', 'name', 'inline', 'disabled' ],
+	emits: [ 'update:modelValue' ],
+};
+
+describe( 'SubjectCreatorDialog', () => {
+	let pinia: ReturnType<typeof createPinia>;
+	let subjectStore: ReturnType<typeof useSubjectStore>;
+	let schemaStore: ReturnType<typeof useSchemaStore>;
+	const canCreateSchemas = ref( true );
+	const getSchemaMock = vi.fn();
+	let getPageSubjectsMock: ReturnType<typeof vi.fn>;
+	let mintSubjectIdMock: ReturnType<typeof vi.fn>;
+	let repositorySpy: ReturnType<typeof vi.spyOn>;
+
+	const STORE_WRITE_PARAMETERS = {
+		createMainSubject: [ 'pageId', 'label', 'schemaName', 'statements', 'dependentSubjects', 'comment', 'id' ],
+		createOtherSubject: [ 'pageId', 'label', 'schemaName', 'statements', 'dependentSubjects', 'comment', 'id' ],
+		createSubjectPage: [ 'label', 'schemaName', 'statements', 'dependentSubjects', 'comment', 'pageTitle', 'id' ],
+		createSubject: [ 'subject', 'pageId', 'dependentSubjects', 'comment' ],
+		updateSubject: [ 'subject', 'dependentSubjects', 'comment' ],
+	};
+
+	function callsTo( write: keyof typeof STORE_WRITE_PARAMETERS ): Record<string, unknown>[] {
+		return ( subjectStore[ write ] as ReturnType<typeof vi.fn> ).mock.calls.map( ( args ) =>
+			Object.fromEntries( STORE_WRITE_PARAMETERS[ write ].map( ( name, index ) => [ name, args[ index ] ] ) ) );
+	}
+
+	// Every route that makes the new Subject a page's Main Subject creates it under the id minted
+	// for it.
+	function expectMainSubjectCreated( pageId: number, label: string | null, schemaName: string, comment: string ): void {
+		expect( callsTo( 'createMainSubject' ) ).toContainEqual( expect.objectContaining( {
+			pageId,
+			label,
+			schemaName,
+			comment,
+			id: new SubjectId( MINTED_ID ),
+		} ) );
+	}
+
+	// Re-callable inside a test that needs another wiki configuration; the mount below reads it
+	// lazily, so re-stubbing before mounting is enough.
+	function stubMw( config: Record<string, unknown> = {} ): void {
+		setupMwMock( {
+			functions: [ 'msg', 'notify', 'config', 'storage', 'util' ],
+			config: {
+				wgArticleId: PAGE_ID,
+				wgTitle: PAGE_TITLE,
+				wgPageName: PAGE_NAME,
+				// Debounce 0 is blur-only mode: the dry-run fires on blur / pre-save
+				// (via flush()), which runs synchronously in tests.
+				wgSWSValidationDebounceMs: 0,
+				...config,
+			},
+		} );
+	}
+
+	const mountComponent = (
+		stubs: Record<string, any> = {},
+		props: Record<string, any> = {},
+		options: Record<string, any> = {},
+	): VueWrapper => (
+		mount( SubjectCreatorDialog, {
+			props: { open: false, hostPage: { hasMainSubject: false }, ...props },
+			...options,
+			global: {
+				plugins: [ pinia ],
+				stubs: {
+					SchemaPicker: SchemaPickerStub,
+					SubjectEditorDialog: SubjectEditorDialogStub,
+					SchemaCreatorDialog: SchemaCreatorDialogStub,
+					SummaryAction: SummaryActionStub,
+					CloseConfirmationDialog: CloseConfirmationDialogStub,
+					CdxDialog: CdxDialogStub,
+					CdxRadio: CdxRadioStub,
+					CdxMessage: true,
+					CdxField: {
+						template: '<div class="cdx-field-stub"><slot /><slot name="label" /><slot name="messages" /></div>',
+					},
+					CdxTextInput: {
+						template: '<input class="cdx-text-input-stub" :value="modelValue" :placeholder="placeholder" @input="$emit( \'update:modelValue\', $event.target.value )" />',
+						props: [ 'modelValue', 'placeholder', 'status' ],
+						emits: [ 'update:modelValue' ],
+						// Codex exposes focus(), which focuses the input; here that is the root.
+						methods: {
+							focus(): void {
+								( this.$el as HTMLInputElement ).focus();
+							},
+						},
+					},
+					teleport: true,
+					...stubs,
+				},
+				provide: {
+					[ Service.ComponentRegistry ]: SWSExtension.getInstance().getTypeSpecificComponentRegistry(),
+					[ Service.PropertyTypeRegistry ]: SWSExtension.getInstance().getPropertyTypeRegistry(),
+					[ Service.SchemaRepository ]: { getSchema: getSchemaMock },
+				},
+				mocks: {
+					$i18n: createI18nMock(),
+				},
+			},
+		} )
+	);
+
+	/** A Schema picked and still loading: what the Schema step has for a close to throw away. */
+	async function pickSchemaStillLoading( wrapper: VueWrapper ): Promise<void> {
+		getSchemaMock.mockReturnValue( new Promise<Schema>( () => {
+			// Never lands.
+		} ) );
+		wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+	}
+
+	/** Closes whichever step is showing, the way its own close button does. */
+	async function requestClose( wrapper: VueWrapper ): Promise<void> {
+		const editor = wrapper.findComponent( SubjectEditorDialog );
+
+		if ( editor.exists() ) {
+			editor.vm.$emit( 'update:open', false );
+		} else {
+			wrapper.findComponent( CdxDialog ).vm.$emit( 'update:open', false );
+		}
+
+		await flushPromises();
+	}
+
+	async function save( wrapper: VueWrapper, summary = '' ): Promise<void> {
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', summary );
+		await flushPromises();
+	}
+
+	let reloadMock: ReturnType<typeof vi.fn>;
+
+	beforeEach( () => {
+		editedLabel.value = null;
+		editedStatements = (): StatementList => new StatementList( [
+			new Statement( new PropertyName( 'Color' ), TextType.typeName, newStringValue( 'Red' ) ),
+		] );
+		sessionDrafts = [];
+		editedDependentSubjects = [];
+		editorShows.value = true;
+		editorShowsReading.value = false;
+		lastSaveError = null;
+		beforeFirstWrite = Promise.resolve();
+		reloadMock = vi.fn();
+		vi.stubGlobal( 'location', { href: '', reload: reloadMock } );
+
+		stubMw();
+
+		pinia = createPinia();
+		setActivePinia( pinia );
+
+		subjectStore = useSubjectStore();
+		subjectStore.createMainSubject = vi.fn().mockResolvedValue( new SubjectId( 's11111111111111' ) );
+		subjectStore.createOtherSubject = vi.fn().mockResolvedValue( new SubjectId( 's11111111111112' ) );
+		// The dry-run validation runs alongside the live validators; stub it so
+		// it does not reach the network and stays out of the way of these tests.
+		subjectStore.validateSubject = vi.fn().mockResolvedValue( [] );
+
+		schemaStore = useSchemaStore();
+		schemaStore.saveSchema = vi.fn().mockResolvedValue( undefined );
+
+		// The dialog reads the picked schema through the injected repository, not the store.
+		getSchemaMock.mockReset().mockResolvedValue( newSchema( { title: SCHEMA_NAME } ) );
+
+		// Picking a Schema mints the id the Subject being created is held under, so every path
+		// through the dialog reaches these.
+		mintSubjectIdMock = vi.fn().mockResolvedValue( new SubjectId( MINTED_ID ) );
+		getPageSubjectsMock = vi.fn().mockResolvedValue( {
+			pageSubjects: new PageSubjects( PAGE_ID, null, [] ),
+			referencedSubjects: [],
+			schemas: [],
+		} );
+		repositorySpy = vi.spyOn( SWSExtension.getInstance(), 'getSubjectRepository' ).mockReturnValue(
+			{ getPageSubjects: getPageSubjectsMock, mintSubjectId: mintSubjectIdMock } as unknown as SubjectRepository,
+		);
+
+		canCreateSubjectPage.value = true;
+		canCreateSchemas.value = true;
+		( useSchemaPermissions as any ).mockReturnValue( {
+			canCreateSchemas,
+			checkCreatePermission: vi.fn().mockResolvedValue( undefined ),
+		} );
+	} );
+
+	afterEach( () => {
+		repositorySpy.mockRestore();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'renders the dialog closed by default', () => {
+		const wrapper = mountComponent();
+		expect( wrapper.findComponent( CdxDialog ).props( 'open' ) ).toBe( false );
+	} );
+
+	it( 'renders the dialog open when the open prop is set', async () => {
+		const wrapper = mountComponent();
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+		expect( wrapper.findComponent( CdxDialog ).props( 'open' ) ).toBe( true );
+	} );
+
+	it( 'asks to be closed when the dialog is closed without changes', async () => {
+		const wrapper = mountComponent( {}, { open: true } );
+		await flushPromises();
+
+		wrapper.findComponent( CdxDialog ).vm.$emit( 'update:open', false );
+		await flushPromises();
+
+		expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+	} );
+
+	it( 'hides schema selector after schema selection', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		expect( wrapper.find( '.schema-lookup-stub' ).exists() ).toBe( true );
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		expect( wrapper.find( '.schema-lookup-stub' ).exists() ).toBe( false );
+	} );
+
+	it( 'focuses the schema picker when the dialog opens', async () => {
+		const wrapper = mountComponent();
+
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+
+		const pickerVm = wrapper.findComponent( SchemaPicker ).vm as any;
+		expect( pickerVm.focus ).toHaveBeenCalled();
+	} );
+
+	it( 'labels the schema field', async () => {
+		schemaStore.fetchAllSchemaSummaries = vi.fn().mockResolvedValue( [ { name: SCHEMA_NAME, description: '' } ] );
+		const wrapper = mountComponent( { SchemaPicker: false, CdxField: false, CdxTextInput: false }, { open: true } );
+		await flushPromises();
+
+		expect( labelOf( schemaField( wrapper ) ) ).toBe( 'sws-subject-creator-schema-field' );
+	} );
+
+	it( 'starts again at the schema picker when reopened after the subject step', async () => {
+		const wrapper = mountComponent();
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+		await requestClose( wrapper );
+
+		await wrapper.setProps( { open: false } );
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+
+		expect( wrapper.find( '.schema-lookup-stub' ).exists() ).toBe( true );
+		expect( wrapper.find( '.subject-editor-dialog-stub' ).exists() ).toBe( false );
+	} );
+
+	it( 'does not show label input or SubjectEditor before schema selection', () => {
+		const wrapper = mountComponent();
+
+		expect( wrapper.find( '.subject-editor-dialog-stub' ).exists() ).toBe( false );
+		expect( wrapper.find( '.edit-summary-stub' ).exists() ).toBe( false );
+	} );
+
+	it( 'loads the picked schema through the repository', async () => {
+		const picked = newSchema( { title: SCHEMA_NAME, description: 'from the repository' } );
+		getSchemaMock.mockResolvedValue( picked );
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		expect( getSchemaMock ).toHaveBeenCalledWith( SCHEMA_NAME );
+		expect( wrapper.findComponent( SubjectEditorDialog ).props( 'schema' ) ).toStrictEqual( picked );
+	} );
+
+	it( 'opens the editor on a Subject the wiki does not hold yet after schema selection', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		const editor = wrapper.findComponent( SubjectEditorDialog );
+
+		expect( editor.exists() ).toBe( true );
+		expect( editor.props( 'rootIsNew' ) ).toBe( true );
+		expect( ( editor.props( 'subject' ) as Subject ).getSchemaName() ).toBe( SCHEMA_NAME );
+		expect( ( editor.props( 'subject' ) as Subject ).getId().text ).toBe( MINTED_ID );
+	} );
+
+	// Nobody has named it yet, so it carries what the server derives for a label-less Subject
+	// (ADR 31): its Schema name, flagged as one nobody chose.
+	it( 'hands the editor a Subject whose name nobody chose', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		const subject = wrapper.findComponent( SubjectEditorDialog ).props( 'subject' ) as Subject;
+
+		expect( subject.getLabel() ).toBeNull();
+		expect( subject.getDisplayName() ).toBe( SCHEMA_NAME );
+		expect( subject.hasGeneratedDisplayName() ).toBe( true );
+	} );
+
+	// A further Subject on the page is not the Main Subject, so it needs no label.
+	it( 'leaves save reachable once a schema is picked, even with the label untouched', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		expect( wrapper.find( '.edit-summary-stub' ).exists() ).toBe( false );
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( false );
+	} );
+
+	it( 'calls createMainSubject on save with correct arguments', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		editedLabel.value = 'Typed label';
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', 'test summary' );
+		await flushPromises();
+
+		expectMainSubjectCreated( PAGE_ID, 'Typed label', SCHEMA_NAME, 'test summary' );
+	} );
+
+	it( 'sends no label when the field was left empty', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', 'test summary' );
+		await flushPromises();
+
+		expectMainSubjectCreated( PAGE_ID, null, SCHEMA_NAME, 'test summary' );
+	} );
+
+	it( 'does not pass summary when it is empty', async () => {
+		const wrapper = mountComponent();
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', '' );
+		await flushPromises();
+
+		expectMainSubjectCreated( PAGE_ID, null, SCHEMA_NAME, DEFAULT_CREATE_SUMMARY );
+	} );
+
+	it( 'calls createOtherSubject when the page already has a main subject', async () => {
+		const wrapper = mountComponent( {}, { hostPage: { hasMainSubject: true } } );
+		await flushPromises();
+
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		editedLabel.value = 'Typed label';
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', 'test summary' );
+		await flushPromises();
+
+		expect( callsTo( 'createOtherSubject' ) ).toContainEqual( expect.objectContaining( {
+			pageId: PAGE_ID,
+			label: 'Typed label',
+			schemaName: SCHEMA_NAME,
+			comment: 'test summary',
+			id: new SubjectId( MINTED_ID ),
+		} ) );
+		expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+	} );
+
+	it( 'reloads page after successful save', async () => {
+		const wrapper = mountComponent();
+
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', '' );
+		await flushPromises();
+
+		expect( mw.storage.session.set ).toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+		expect( reloadMock ).toHaveBeenCalled();
+	} );
+
+	it( 'lets a refused write reach the editor, and stays open', async () => {
+		subjectStore.createMainSubject = vi.fn().mockRejectedValue( new Error( 'Server error' ) );
+
+		const wrapper = mountComponent();
+
+		await wrapper.setProps( { open: true } );
+		await flushPromises();
+		await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+		await flushPromises();
+
+		await wrapper.findComponent( { name: 'SummaryAction' } ).vm.$emit( 'save', '' );
+		await flushPromises();
+
+		expect( ( lastSaveError as Error ).message ).toBe( 'Server error' );
+		expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+	} );
+
+	describe( 'a schema edited from the subject step', () => {
+		const EDITED_SCHEMA = newSchema( { title: SCHEMA_NAME, description: 'With another property' } );
+
+		/** As the editor's Schema badge does, once the Schema editor it opens is saved. */
+		async function saveEditedSchema( wrapper: VueWrapper ): Promise<void> {
+			await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+			await ( wrapper.findComponent( SubjectEditorDialog ).props( 'onSaveSchema' ) as any )( EDITED_SCHEMA, 'from the editor' );
+			await flushPromises();
+		}
+
+		it( 'is saved', async () => {
+			const wrapper = mountComponent();
+			await flushPromises();
+
+			await saveEditedSchema( wrapper );
+
+			expect( schemaStore.saveSchema ).toHaveBeenCalledWith( EDITED_SCHEMA, 'from the editor' );
+		} );
+
+		it( 'is handed to the editor', async () => {
+			const wrapper = mountComponent();
+			await flushPromises();
+
+			await saveEditedSchema( wrapper );
+
+			expect( wrapper.findComponent( SubjectEditorDialog ).props( 'schema' ) ).toStrictEqual( EDITED_SCHEMA );
+		} );
+	} );
+
+	describe( 'Dependent Subjects', () => {
+		const BIRTH_ID = 's1birthAAAAAAA1';
+		const birthSchema = newSchema( { title: 'Birth', subjectsAreDependent: true } );
+
+		beforeEach( () => {
+			getSchemaMock.mockImplementation( async ( name: string ) => name === 'Birth' ? birthSchema : newSchema( { title: name } ) );
+		} );
+
+		it( 'offers only the Schemas whose Subjects are standalone', async () => {
+			const wrapper = mountComponent();
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).props( 'standaloneOnly' ) ).toBe( true );
+		} );
+
+		it( 'stays at the Schema step for a Schema whose Subjects are dependent, saying why', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: 'Birth' } );
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+			expect( mw.notify ).toHaveBeenCalledWith( 'sws-create-subject-error-dependent-subjectsBirth', { type: 'error' } );
+		} );
+
+		it( 'writes the Dependent Subjects along with the Subject it creates', async () => {
+			const birth = newSubject( { id: BIRTH_ID, label: null, schemaName: 'Birth' } );
+			editedDependentSubjects = [ birth ];
+			const wrapper = mountComponent();
+			await flushPromises();
+			await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+
+			await save( wrapper, 'why' );
+
+			expect( callsTo( 'createMainSubject' ) ).toContainEqual( expect.objectContaining( {
+				pageId: PAGE_ID,
+				label: null,
+				schemaName: SCHEMA_NAME,
+				dependentSubjects: [ birth ],
+				comment: 'why',
+				id: new SubjectId( MINTED_ID ),
+			} ) );
+		} );
+
+		it( 'creates a Schema from the Schema step as one whose Subjects are standalone', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'create', NEW_SCHEMA_NAME );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaCreatorDialog ).props( 'subjectsAreDependent' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'while the editor reads what the Subject\'s form needs', () => {
+		beforeEach( () => {
+			editorShows.value = false;
+		} );
+
+		it( 'keeps the Schema step on screen until the editor shows', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+
+			editorShows.value = true;
+			await nextTick();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( false );
+		} );
+
+		it( 'hands over to the editor once the editor shows that it is reading', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			editorShowsReading.value = true;
+			await nextTick();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( false );
+		} );
+
+		it( 'goes back to the Schema step when the editor closes while it shows that it is reading', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			editorShowsReading.value = true;
+			await nextTick();
+
+			await wrapper.find( '.stub-close' ).trigger( 'click' );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+		} );
+
+		it( 'goes back to the Schema step when the editor closes before it shows', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await wrapper.find( '.stub-close' ).trigger( 'click' );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+		} );
+
+		it( 'takes no input on the Schema step meanwhile', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( CdxDialog ).attributes( 'inert' ) ).toBeDefined();
+		} );
+
+		it( 'takes input on the Schema step while no Schema is picked', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( CdxDialog ).attributes( 'inert' ) ).toBeUndefined();
+		} );
+
+		it( 'leaves no question about a close requested meanwhile once the editor shows', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+
+			wrapper.findComponent( CdxDialog ).vm.$emit( 'update:open', false );
+			await flushPromises();
+			editorShows.value = true;
+			await nextTick();
+
+			expect( wrapper.findComponent( CloseConfirmationDialog ).props( 'open' ) ).toBe( false );
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+		} );
+
+		it( 'leaves the picker unfocused when it opens on a pinned Schema', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( ( wrapper.findComponent( SchemaPicker ).vm as any ).focus ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'with an initial schema', () => {
+		it( 'opens on the second step with the initial schema loaded', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( getSchemaMock ).toHaveBeenCalledWith( SCHEMA_NAME );
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( false );
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( true );
+		} );
+
+		it( 'falls back to the picker when the initial schema cannot be loaded', async () => {
+			getSchemaMock.mockRejectedValue( new Error( 'No such schema' ) );
+			const wrapper = mountComponent( {}, { initialSchemaName: 'Missing' } );
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+		} );
+
+		it( 'stays on the pinned schema when reopened before the first open\'s schema arrived', async () => {
+			let resolveFirst!: ( schema: Schema ) => void;
+			let resolveSecond!: ( schema: Schema ) => void;
+			getSchemaMock
+				.mockReturnValueOnce( new Promise<Schema>( ( resolve ) => {
+					resolveFirst = resolve;
+				} ) )
+				.mockReturnValueOnce( new Promise<Schema>( ( resolve ) => {
+					resolveSecond = resolve;
+				} ) );
+
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+
+			await wrapper.setProps( { open: true } );
+			await nextTick();
+			await wrapper.setProps( { open: false } );
+			await nextTick();
+			await wrapper.setProps( { open: true } );
+			await nextTick();
+
+			resolveFirst( newSchema( { title: SCHEMA_NAME } ) );
+			await flushPromises();
+			resolveSecond( newSchema( { title: SCHEMA_NAME } ) );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( false );
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( true );
+		} );
+
+		it( 'leaves save reachable at once: the Subject is what the save exists to write', async () => {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME } );
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'the page choice', () => {
+		const EXISTING_PAGE_ID = 12;
+		const OTHER_PAGE_ID = 13;
+		const MAIN_ID = 's11111111111taa';
+		// Renders the field's error so the page-choice failures below are visible as text.
+		const CdxFieldWithMessagesStub = {
+			template: '<div class="cdx-field-stub"><slot name="label" /><slot />' +
+				'<span>{{ messages?.error }}</span></div>',
+			props: [ 'status', 'messages', 'isFieldset' ],
+		};
+
+		const I18nSlotStub = {
+			template: '<span>{{ messageKey }}<slot /></span>',
+			props: [ 'messageKey' ],
+		};
+
+		// Carries an input of its own, so that the picker being focused can be told from any
+		// other field being focused.
+		const PagePickerStub = {
+			name: 'PagePicker',
+			template: '<div class="page-picker-stub"><input ref="fieldRef" /></div>',
+			props: [ 'excludedPageId', 'existingPagesOnly', 'disabled', 'ariaLabel' ],
+			emits: [ 'update:selected' ],
+			setup() {
+				const fieldRef = ref<HTMLInputElement | null>( null );
+
+				return { fieldRef, focus: (): void => fieldRef.value?.focus() };
+			},
+		};
+
+		function mountDialog(
+			props: Record<string, any> = {},
+			options: Record<string, any> = {},
+			stubs: Record<string, any> = {},
+		): VueWrapper {
+			return mountComponent(
+				{ PagePicker: PagePickerStub, CdxField: CdxFieldWithMessagesStub, I18nSlot: I18nSlotStub, ...stubs },
+				props,
+				options,
+			);
+		}
+
+		/** The dialog as Special:CreateSubject and a Schema page mount it: with no page of its own. */
+		function mountWithoutHostPage( props: Record<string, any> = {} ): VueWrapper {
+			return mountDialog( { hostPage: null, ...props } );
+		}
+
+		async function pickSchema( wrapper: VueWrapper ): Promise<void> {
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+		}
+
+		function offeredChoices( wrapper: VueWrapper ): ( string | undefined )[] {
+			return wrapper.findAll( '.cdx-radio-stub' ).map( ( radio ) => radio.attributes( 'data-value' ) );
+		}
+
+		function offeredLabels( wrapper: VueWrapper ): string[] {
+			return wrapper.findAll( '.cdx-radio-stub' ).map( ( radio ) => radio.text() );
+		}
+
+		function chosenOption( wrapper: VueWrapper ): string | undefined {
+			return wrapper.findAll( '.cdx-radio-stub' )
+				.find( ( radio ) => ( radio.find( 'input' ).element as HTMLInputElement ).checked )
+				?.attributes( 'data-value' );
+		}
+
+		async function choose( wrapper: VueWrapper, value: string ): Promise<void> {
+			await wrapper.find( `.cdx-radio-stub[data-value="${ value }"] input` ).trigger( 'change' );
+			await flushPromises();
+		}
+
+		async function pickPage( wrapper: VueWrapper, choice: unknown ): Promise<void> {
+			wrapper.findComponent( PagePicker ).vm.$emit( 'update:selected', choice );
+			await flushPromises();
+		}
+
+		async function typeLabel( _wrapper: VueWrapper, label: string ): Promise<void> {
+			editedLabel.value = label;
+			await flushPromises();
+		}
+
+		function sectionIsOpen( wrapper: VueWrapper ): boolean {
+			return wrapper.find( '.ext-sws-subject-creator-page-section' )
+				.attributes( 'open' ) !== undefined;
+		}
+
+		function sectionHeader( wrapper: VueWrapper ): string {
+			return wrapper.find( '.ext-sws-subject-creator-page-section summary' ).text();
+		}
+
+		function shownChoice( wrapper: VueWrapper ): string {
+			return wrapper.find( '.ext-sws-subject-creator-page-section__choice' ).text();
+		}
+
+		async function openSection( wrapper: VueWrapper ): Promise<void> {
+			await toggleSection( wrapper, true );
+		}
+
+		async function closeSection( wrapper: VueWrapper ): Promise<void> {
+			await toggleSection( wrapper, false );
+		}
+
+		async function toggleSection( wrapper: VueWrapper, open: boolean ): Promise<void> {
+			await toggleDetails( wrapper.find( '.ext-sws-subject-creator-page-section' ).element, open );
+		}
+
+		/** A details element rendered open or closed reports it a task later. */
+		async function toggleReported(): Promise<void> {
+			await new Promise( ( resolve ) => {
+				setTimeout( resolve, 0 );
+			} );
+			await flushPromises();
+		}
+
+		function pageTitleField( wrapper: VueWrapper ): DOMWrapper<Element> {
+			return wrapper.find( '.ext-sws-subject-creator-page-title-field' );
+		}
+
+		function pageTitleInput( wrapper: VueWrapper ): DOMWrapper<Element> {
+			return wrapper.find( '.ext-sws-subject-creator-page-title-field .cdx-text-input-stub' );
+		}
+
+		function pageTitleValue( wrapper: VueWrapper ): string {
+			return ( pageTitleInput( wrapper ).element as HTMLInputElement ).value;
+		}
+
+		async function typePageTitle( wrapper: VueWrapper, title: string ): Promise<void> {
+			await pageTitleInput( wrapper ).setValue( title );
+			await flushPromises();
+		}
+
+		/** The title the one page created was sent with. */
+		function createdPageTitle(): unknown {
+			expect( subjectStore.createSubjectPage ).toHaveBeenCalledOnce();
+			return callsTo( 'createSubjectPage' )[ 0 ].pageTitle;
+		}
+
+		function createdPageDependentSubjects(): unknown {
+			expect( subjectStore.createSubjectPage ).toHaveBeenCalledOnce();
+			return callsTo( 'createSubjectPage' )[ 0 ].dependentSubjects;
+		}
+
+		function birthOfTheSubject(): Subject {
+			return newSubject( { id: 's1birthAAAAAAA1', label: null, schemaName: 'Birth' } );
+		}
+
+		function deferred<T>(): Deferred<T> {
+			let resolve!: ( value: T ) => void;
+			let reject!: ( error: unknown ) => void;
+			const promise = new Promise<T>( ( resolvePromise, rejectPromise ) => {
+				resolve = resolvePromise;
+				reject = rejectPromise;
+			} );
+
+			return { promise, resolve, reject };
+		}
+
+		function pageWithMainSubject( name: string ): unknown {
+			return {
+				pageSubjects: new PageSubjects( EXISTING_PAGE_ID, new SubjectId( MAIN_ID ), [
+					newSubject( { id: MAIN_ID, label: name } ),
+				] ),
+				referencedSubjects: [],
+				schemas: [],
+			};
+		}
+
+		async function pickPageWithMainSubject( wrapper: VueWrapper ): Promise<void> {
+			getPageSubjectsMock.mockResolvedValue( pageWithMainSubject( 'ACME Inc' ) );
+			await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+		}
+
+		beforeEach( () => {
+			subjectStore.createSubjectPage = vi.fn().mockResolvedValue( {
+				subjectId: new SubjectId( CREATED_PAGE_SUBJECT_ID ),
+				pageTitle: 'New Person',
+				pageId: CREATED_PAGE_ID,
+			} );
+
+			getPageSubjectsMock.mockResolvedValue( {
+				pageSubjects: new PageSubjects( EXISTING_PAGE_ID, null, [] ),
+				referencedSubjects: [],
+				schemas: [],
+			} );
+		} );
+
+		describe( 'opened on a page', () => {
+			it( 'offers that page, another page, and a new one', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				expect( offeredChoices( wrapper ) ).toEqual( [ 'thisPage', 'anotherPage', 'newPage' ] );
+			} );
+
+			it( 'names the page picked another one, the page being opened on being the first', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				expect( offeredLabels( wrapper ) ).toEqual( [
+					'sws-subject-creator-page-this',
+					'sws-subject-creator-page-another',
+					'sws-subject-creator-page-new',
+				] );
+			} );
+
+			it( 'starts on that page', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				expect( chosenOption( wrapper ) ).toBe( 'thisPage' );
+			} );
+
+			it( 'shows no page picker until another page is chosen', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				expect( wrapper.findComponent( PagePicker ).exists() ).toBe( false );
+
+				await choose( wrapper, 'anotherPage' );
+
+				expect( wrapper.findComponent( PagePicker ).exists() ).toBe( true );
+			} );
+
+			it( 'saves onto that page and reloads it', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				await save( wrapper, 'why' );
+
+				expectMainSubjectCreated( PAGE_ID, null, SCHEMA_NAME, 'why' );
+				expect( reloadMock ).toHaveBeenCalled();
+			} );
+		} );
+
+		describe( 'opened without a page', () => {
+			it( 'offers a new page first, then an existing one', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( offeredChoices( wrapper ) ).toEqual( [ 'newPage', 'anotherPage' ] );
+			} );
+
+			it( 'names the page picked an existing one: there is no page to call it another of', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( offeredLabels( wrapper ) ).toEqual( [
+					'sws-subject-creator-page-new',
+					'sws-subject-creator-page-existing',
+				] );
+			} );
+
+			it( 'starts on a new page', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( chosenOption( wrapper ) ).toBe( 'newPage' );
+			} );
+
+			it( 'requests no edit notices: there is no page whose notices would apply', async () => {
+				const getNotices = vi.fn().mockResolvedValue( [] );
+				const noticeRepositorySpy = vi.spyOn( SWSExtension.getInstance(), 'getEditNoticeRepository' )
+					.mockReturnValue( { getNotices } as never );
+
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( getNotices ).not.toHaveBeenCalled();
+
+				noticeRepositorySpy.mockRestore();
+			} );
+
+			// A page-first wiki is about pages, so the reader lands on the page the Subject went on
+			// even where the dialog was opened on none.
+			it( 'goes to the new page created for it', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'New Person' );
+
+				await save( wrapper );
+
+				expect( location.href ).toBe( '/wiki/New Person' );
+				expect( mw.storage.session.set )
+					.toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+				expect( reloadMock ).not.toHaveBeenCalled();
+			} );
+
+			it( 'goes to the existing page it was saved onto', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				await save( wrapper );
+
+				expect( location.href ).toBe( '/wiki/ACME Inc' );
+				expect( mw.storage.session.set )
+					.toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+			} );
+
+			it( 'goes to the page it joined where that page has a main subject', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+				await pickPageWithMainSubject( wrapper );
+
+				await save( wrapper );
+
+				expect( location.href ).toBe( '/wiki/ACME Inc' );
+			} );
+		} );
+
+		// On a subject-first wiki the Subject is the entity, so the dialog neither asks which page
+		// it goes on nor leaves for one (ADR 33).
+		describe( 'on a subject-first wiki', () => {
+
+			function mountSubjectFirst( props: Record<string, any> = {} ): VueWrapper {
+				stubMw( { wgSWSSubjectFirst: true } );
+				return mountDialog( props );
+			}
+
+			it( 'asks no page question', async () => {
+				const wrapper = mountSubjectFirst();
+				await pickSchema( wrapper );
+
+				expect( wrapper.find( '.ext-sws-subject-creator-page-section' ).exists() ).toBe( false );
+				expect( offeredChoices( wrapper ) ).toEqual( [] );
+			} );
+
+			it( 'gives the Subject a page of its own rather than the page it was opened on', async () => {
+				const wrapper = mountSubjectFirst();
+				await pickSchema( wrapper );
+
+				await save( wrapper, 'why' );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: null,
+					schemaName: SCHEMA_NAME,
+					comment: 'why',
+					pageTitle: undefined,
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+
+			it( 'creates the Subject on its own page together with its Dependent Subjects', async () => {
+				const birth = birthOfTheSubject();
+				editedDependentSubjects = [ birth ];
+				const wrapper = mountSubjectFirst();
+				await pickSchema( wrapper );
+
+				await save( wrapper, 'why' );
+
+				expect( createdPageDependentSubjects() ).toEqual( [ birth ] );
+			} );
+
+			it( 'asks nothing of a caller that preselected a new page but named none', async () => {
+				const wrapper = mountSubjectFirst( {
+					initialPage: { choice: 'newPage', fixed: false } as InitialPage,
+				} );
+				await pickSchema( wrapper );
+
+				expect( wrapper.find( '.ext-sws-subject-creator-page-section' ).exists() ).toBe( false );
+			} );
+
+			// The wiki titles a Subject's own page by its id, so a caller asking which page
+			// still leaves nothing to title.
+			it( 'asks for no page title where a caller asks which page', async () => {
+				const wrapper = mountSubjectFirst( {
+					initialPage: { choice: 'newPage', fixed: false } as InitialPage,
+				} );
+				await pickSchema( wrapper );
+
+				expect( pageTitleField( wrapper ).exists() ).toBe( false );
+			} );
+
+			it( 'sends no title for a new page where a caller asks which page', async () => {
+				const wrapper = mountSubjectFirst( {
+					initialPage: { choice: 'newPage', fixed: false } as InitialPage,
+				} );
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Amsterdam' );
+
+				await save( wrapper );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: 'Amsterdam',
+					schemaName: SCHEMA_NAME,
+					comment: DEFAULT_CREATE_SUMMARY,
+					pageTitle: undefined,
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+			} );
+
+			it( 'goes to the Subject itself, leaving no notice for a page to show', async () => {
+				const wrapper = mountSubjectFirst();
+				await pickSchema( wrapper );
+
+				await save( wrapper );
+
+				expect( location.href ).toBe( '/wiki/Special:Subject/' + CREATED_PAGE_SUBJECT_ID );
+				expect( mw.storage.session.set )
+					.not.toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+				expect( reloadMock ).not.toHaveBeenCalled();
+			} );
+
+			// The parser function names the page, and naming one is answering the question.
+			it( 'states the page the caller named all the same', async () => {
+				const wrapper = mountSubjectFirst( {
+					initialPage: { choice: 'thisPage', fixed: true } as InitialPage,
+				} );
+				await pickSchema( wrapper );
+
+				expect( wrapper.find( '.ext-sws-subject-creator-page-summary' ).exists() ).toBe( true );
+			} );
+
+			// Nothing would come of hiding the question from someone who cannot be given a new page.
+			it( 'asks the page question of a user who may not create pages', async () => {
+				canCreateSubjectPage.value = false;
+				const wrapper = mountSubjectFirst();
+				await pickSchema( wrapper );
+
+				expect( offeredChoices( wrapper ) ).toEqual( [ 'thisPage', 'anotherPage' ] );
+			} );
+
+			it( 'starts the page question collapsed where the dialog was opened on no page', async () => {
+				canCreateSubjectPage.value = false;
+				const wrapper = mountSubjectFirst( { hostPage: null } );
+				await pickSchema( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( false );
+			} );
+
+			it( 'asks for no page title where a caller fixed a new page', async () => {
+				const wrapper = mountSubjectFirst( {
+					initialPage: { choice: 'newPage', fixed: true } as InitialPage,
+				} );
+				await pickSchema( wrapper );
+
+				expect( pageTitleField( wrapper ).exists() ).toBe( false );
+			} );
+		} );
+
+		/**
+		 * Which options there are is a server answer, so offering some before it lands would change
+		 * the choice, and drop the page picked with it, under a user who had already answered.
+		 */
+		it( 'offers no page choice until it knows which options there are', async () => {
+			let answer!: () => void;
+			checkCreateSubjectPagePermission.mockImplementationOnce(
+				() => new Promise<void>( ( resolve ) => {
+					answer = () => {
+						canCreateSubjectPage.value = true;
+						resolve();
+					};
+				} ),
+			);
+			canCreateSubjectPage.value = false;
+			const wrapper = mountWithoutHostPage();
+			await pickSchema( wrapper );
+
+			expect( offeredChoices( wrapper ) ).toEqual( [] );
+
+			answer();
+			await flushPromises();
+
+			expect( offeredChoices( wrapper ) ).toEqual( [ 'newPage', 'anotherPage' ] );
+			expect( chosenOption( wrapper ) ).toBe( 'newPage' );
+		} );
+
+		describe( 'without the right to create pages', () => {
+			beforeEach( () => {
+				canCreateSubjectPage.value = false;
+			} );
+
+			it( 'shows a new page first where there is no page of its own', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( offeredChoices( wrapper ) ).toEqual( [ 'newPage', 'anotherPage' ] );
+			} );
+
+			it( 'disables a new page, saying why', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				const newPage = wrapper.find( '.cdx-radio-stub[data-value="newPage"]' );
+				expect( newPage.find( 'input' ).attributes( 'disabled' ) ).toBeDefined();
+				expect( newPage.text() ).toContain( 'sws-subject-creator-page-new-denied' );
+			} );
+
+			it( 'starts on another page where there is no page of its own', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( chosenOption( wrapper ) ).toBe( 'anotherPage' );
+			} );
+
+			it( 'starts open on the page to pick where there is no page of its own', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+		} );
+
+		describe( 'on a new page', () => {
+			async function chooseNewPage( wrapper: VueWrapper ): Promise<void> {
+				await pickSchema( wrapper );
+				await choose( wrapper, 'newPage' );
+			}
+
+			it( 'creates the subject together with its page', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'New Person' );
+
+				await save( wrapper, 'why' );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: 'New Person',
+					schemaName: SCHEMA_NAME,
+					comment: 'why',
+					pageTitle: 'New Person',
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+
+			it( 'creates the titled page together with the Dependent Subjects of its Subject', async () => {
+				const birth = birthOfTheSubject();
+				editedDependentSubjects = [ birth ];
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'New Person' );
+
+				await save( wrapper, 'why' );
+
+				expect( createdPageDependentSubjects() ).toEqual( [ birth ] );
+			} );
+
+			// Here the page is the entity, so it is never titled after a Subject id: with nothing to
+			// title it, the question comes back rather than a page nobody can read the name of.
+			it( 'refuses a new page without a title, writing nothing', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				await save( wrapper );
+
+				expect( pageTitleField( wrapper ).text() )
+					.toContain( 'sws-subject-creator-page-title-required' );
+				expect( subjectStore.createSubjectPage ).not.toHaveBeenCalled();
+				expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+			} );
+
+			// The field says why, so the editor need not say it again.
+			it( 'stops the save over a missing title as a refusal it reports itself', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				await save( wrapper );
+
+				expect( lastSaveError ).toBeInstanceOf( WriteRefusedError );
+			} );
+
+			it( 'stops the save over a taken title as a refusal it reports itself', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new PageTitleTakenError( 'Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Amsterdam' );
+
+				await save( wrapper );
+
+				expect( lastSaveError ).toBeInstanceOf( WriteRefusedError );
+			} );
+
+			it( 'stops the save over a title that titles no page as a refusal it reports itself', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new InvalidPageTitleError( 'Help:Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Help:Amsterdam' );
+
+				await save( wrapper );
+
+				expect( lastSaveError ).toBeInstanceOf( WriteRefusedError );
+			} );
+
+			it( 'refuses a new page whose title was cleared, though the Subject has a label', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft' );
+				await typePageTitle( wrapper, '' );
+
+				await save( wrapper );
+
+				expect( pageTitleField( wrapper ).text() )
+					.toContain( 'sws-subject-creator-page-title-required' );
+				expect( subjectStore.createSubjectPage ).not.toHaveBeenCalled();
+			} );
+
+			it( 'opens the section again when a title is still missing', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await save( wrapper );
+				await closeSection( wrapper );
+
+				await save( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+
+			it( 'withdraws the refusal once the label fills the title in', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await save( wrapper );
+
+				await typeLabel( wrapper, 'New Person' );
+
+				expect( pageTitleField( wrapper ).text() )
+					.not.toContain( 'sws-subject-creator-page-title-required' );
+			} );
+
+			it( 'takes a label typed after the refusal as the answer to it', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await save( wrapper );
+
+				await typeLabel( wrapper, 'New Person' );
+				await save( wrapper );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: 'New Person',
+					schemaName: SCHEMA_NAME,
+					comment: DEFAULT_CREATE_SUMMARY,
+					pageTitle: 'New Person',
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+			} );
+
+			it( 'navigates to the page the server created when opened on a page', async () => {
+				const wrapper = mountDialog();
+				await chooseNewPage( wrapper );
+				await typeLabel( wrapper, 'New Person' );
+
+				await save( wrapper );
+
+				expect( mw.storage.session.set ).toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+				expect( location.href ).toBe( '/wiki/New Person' );
+				expect( reloadMock ).not.toHaveBeenCalled();
+			} );
+
+			// The server normalizes the title it is sent, so the page may not carry it verbatim.
+			it( 'navigates to the title the server reported, not the one sent', async () => {
+				( subjectStore.createSubjectPage as any ).mockResolvedValue( {
+					subjectId: new SubjectId( 's11111111111113' ),
+					pageTitle: 'Delft Blue',
+				} );
+				const wrapper = mountDialog();
+				await chooseNewPage( wrapper );
+				await typeLabel( wrapper, 'delft Blue' );
+
+				await save( wrapper );
+
+				expect( location.href ).toBe( '/wiki/Delft Blue' );
+			} );
+
+			it( 'reports a title already taken at the page choice', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new PageTitleTakenError( 'Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Amsterdam' );
+
+				await save( wrapper );
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-takenAmsterdam' );
+				expect( location.href ).toBe( '' );
+			} );
+
+			it( 'leaves save reachable after a title already taken, so another label can answer it', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValueOnce( new PageTitleTakenError( 'Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Amsterdam' );
+				await save( wrapper );
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-taken' );
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( false );
+			} );
+
+		} );
+
+		describe( 'the section holding it', () => {
+			it( 'starts collapsed on the page the dialog was opened on, saying so', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( false );
+				expect( sectionHeader( wrapper ) ).toContain( 'sws-subject-creator-page-section' );
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-this' );
+			} );
+
+			// A new page has no title yet, so the section starts on the field that asks for one.
+			it( 'starts open where the dialog was opened on no page', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+
+			it( 'starts open again when the dialog is reopened', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await closeSection( wrapper );
+				await wrapper.setProps( { open: false } );
+
+				await pickSchema( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+
+			it( 'names the page picked', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-pickedACME Inc' );
+			} );
+
+			it( 'names no page before one is picked', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-another' );
+			} );
+
+			it( 'names the title typed for the page to create', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typePageTitle( wrapper, 'Delft' );
+
+				await closeSection( wrapper );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-new-titledDelft' );
+			} );
+
+			it( 'names the page to create after the label', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft Blue' );
+
+				await closeSection( wrapper );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-new-titledDelft Blue' );
+			} );
+
+			/** Open, the options say which one is chosen themselves. */
+			it( 'stops naming the choice once it is open', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				await openSection( wrapper );
+
+				expect( wrapper.find( '.ext-sws-subject-creator-page-section__choice' ).exists() ).toBe( false );
+			} );
+		} );
+
+		describe( 'focus in the section', () => {
+			/** Attached to the document, since that is where what has focus is read from. */
+			function mountAttached( props: Record<string, any> = {}, stubs: Record<string, any> = {} ): VueWrapper {
+				return mountDialog( props, { attachTo: document.body }, stubs );
+			}
+
+			function pickerInput( wrapper: VueWrapper ): Element {
+				return wrapper.find( '.page-picker-stub input' ).element;
+			}
+
+			function optionInput( wrapper: VueWrapper, value: string ): Element {
+				return wrapper.find( `.cdx-radio-stub[data-value="${ value }"] input` ).element;
+			}
+
+			it.each( [
+				[ 'Codex 1.14', {} ],
+				[ 'Codex 1.23 and later', { CdxAccordion: NewerCodexAccordionStub } ],
+			] )( 'moves into the title of the page to create when the section is opened on %s', async ( _codex, stubs ) => {
+				const wrapper = mountAttached( { hostPage: null }, stubs );
+				await pickSchema( wrapper );
+				await closeSection( wrapper );
+
+				await openSection( wrapper );
+
+				expect( document.activeElement ).toBe( pageTitleInput( wrapper ).element );
+			} );
+
+			// Focus belongs to the Subject being named first, which is what fills the title in.
+			it( 'leaves focus where it is when the page choice arrives after the Subject', async () => {
+				const permission = deferred<void>();
+				checkCreateSubjectPagePermission.mockImplementationOnce( () => permission.promise );
+				const wrapper = mountAttached( { hostPage: null } );
+				await pickSchema( wrapper );
+
+				permission.resolve();
+				await flushPromises();
+				await toggleReported();
+
+				expect( document.activeElement ).not.toBe( pageTitleInput( wrapper ).element );
+			} );
+
+			it( 'moves into the page picker when the section is opened on an existing page', async () => {
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+
+				await openSection( wrapper );
+
+				expect( document.activeElement ).toBe( pickerInput( wrapper ) );
+			} );
+
+			it( 'moves onto the choice made when the section is opened on a page already named', async () => {
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+
+				await openSection( wrapper );
+
+				expect( document.activeElement ).toBe( optionInput( wrapper, 'thisPage' ) );
+			} );
+
+			it( 'moves into the title of the page to create when a refusal opens the section', async () => {
+				const wrapper = mountAttached( { hostPage: null } );
+				await pickSchema( wrapper );
+				await closeSection( wrapper );
+
+				await save( wrapper );
+				await toggleReported();
+
+				expect( document.activeElement ).toBe( pageTitleInput( wrapper ).element );
+			} );
+
+			it( 'moves into the title of the page to create when a refusal finds the section open', async () => {
+				const wrapper = mountAttached( { hostPage: null } );
+				await pickSchema( wrapper );
+
+				await save( wrapper );
+				await toggleReported();
+
+				expect( document.activeElement ).toBe( pageTitleInput( wrapper ).element );
+			} );
+
+			it( 'leaves focus where it is when a page picked in the open section cannot be read', async () => {
+				const read = deferred<unknown>();
+				getPageSubjectsMock.mockImplementationOnce( () => read.promise );
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+				await openSection( wrapper );
+				await choose( wrapper, 'anotherPage' );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+				const elsewhere = wrapper.find( '.save-button' ).element as HTMLButtonElement;
+				elsewhere.focus();
+
+				read.reject( new Error( 'Graph store unavailable' ) );
+				await flushPromises();
+				await toggleReported();
+
+				expect( document.activeElement ).toBe( elsewhere );
+			} );
+
+			it( 'follows the choice to the title of the page to create', async () => {
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+				await openSection( wrapper );
+
+				await choose( wrapper, 'newPage' );
+
+				expect( document.activeElement ).toBe( pageTitleInput( wrapper ).element );
+			} );
+
+			it( 'follows the choice to the page picker', async () => {
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+				await openSection( wrapper );
+
+				await choose( wrapper, 'anotherPage' );
+
+				expect( document.activeElement ).toBe( pickerInput( wrapper ) );
+			} );
+
+			it( 'leaves focus alone for a choice with nothing left to fill in', async () => {
+				const wrapper = mountAttached();
+				await pickSchema( wrapper );
+				await openSection( wrapper );
+				await choose( wrapper, 'anotherPage' );
+				const elsewhere = wrapper.find( '.save-button' ).element as HTMLButtonElement;
+				elsewhere.focus();
+
+				await choose( wrapper, 'thisPage' );
+
+				expect( document.activeElement ).toBe( elsewhere );
+			} );
+		} );
+
+		describe( 'the title of the page to create', () => {
+			it( 'is asked for where a page is to be created', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				await choose( wrapper, 'newPage' );
+
+				expect( pageTitleField( wrapper ).exists() ).toBe( true );
+			} );
+
+			it( 'is not asked for where the page already exists', async () => {
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+
+				await choose( wrapper, 'anotherPage' );
+
+				expect( pageTitleField( wrapper ).exists() ).toBe( false );
+			} );
+
+			it( 'is filled in from the label', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+
+				await typeLabel( wrapper, 'Delft Blue' );
+
+				expect( pageTitleValue( wrapper ) ).toBe( 'Delft Blue' );
+			} );
+
+			it( 'keeps a title edited after the label filled it in', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft Blue' );
+				await typePageTitle( wrapper, 'Delft' );
+
+				await typeLabel( wrapper, 'Delft Blue pottery' );
+
+				expect( pageTitleValue( wrapper ) ).toBe( 'Delft' );
+			} );
+
+			it( 'stays empty once cleared, whatever the label becomes', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft Blue' );
+				await typePageTitle( wrapper, '' );
+
+				await typeLabel( wrapper, 'Delft' );
+
+				expect( pageTitleValue( wrapper ) ).toBe( '' );
+			} );
+
+			it( 'follows the label again once the dialog is reopened', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typePageTitle( wrapper, 'Delft' );
+				await wrapper.setProps( { open: false } );
+				await pickSchema( wrapper );
+
+				await typeLabel( wrapper, 'Amsterdam' );
+
+				expect( pageTitleValue( wrapper ) ).toBe( 'Amsterdam' );
+			} );
+
+			it( 'titles the page created', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft Blue' );
+				await typePageTitle( wrapper, 'Delft' );
+
+				await save( wrapper, 'why' );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: 'Delft Blue',
+					schemaName: SCHEMA_NAME,
+					comment: 'why',
+					pageTitle: 'Delft',
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+			} );
+
+			it( 'titles the page after the label where none was typed', async () => {
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typeLabel( wrapper, 'Delft Blue' );
+
+				await save( wrapper );
+
+				expect( callsTo( 'createSubjectPage' ) ).toContainEqual( expect.objectContaining( {
+					label: 'Delft Blue',
+					schemaName: SCHEMA_NAME,
+					comment: DEFAULT_CREATE_SUMMARY,
+					pageTitle: 'Delft Blue',
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+			} );
+		} );
+
+		describe( 'a page the server refused', () => {
+			it( 'opens the section on a title already taken, complaining at the title', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new PageTitleTakenError( 'Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typePageTitle( wrapper, 'Amsterdam' );
+				await closeSection( wrapper );
+
+				await save( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+				expect( pageTitleField( wrapper ).text() ).toContain( 'sws-subject-creator-page-takenAmsterdam' );
+			} );
+
+			it( 'opens the section on a title that titles no page, complaining at the title', async () => {
+				( subjectStore.createSubjectPage as any )
+					.mockRejectedValue( new InvalidPageTitleError( 'Help:Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typePageTitle( wrapper, 'Help:Amsterdam' );
+				await closeSection( wrapper );
+
+				await save( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+				expect( pageTitleField( wrapper ).text() )
+					.toContain( 'sws-subject-creator-page-title-invalidHelp:Amsterdam' );
+				expect( location.href ).toBe( '' );
+			} );
+
+			it( 'takes a changed title as the answer to one that titles no page', async () => {
+				( subjectStore.createSubjectPage as any )
+					.mockRejectedValueOnce( new InvalidPageTitleError( 'Help:Amsterdam' ) );
+				const wrapper = mountWithoutHostPage();
+				await pickSchema( wrapper );
+				await typePageTitle( wrapper, 'Help:Amsterdam' );
+				await save( wrapper );
+
+				await typePageTitle( wrapper, 'Amsterdam' );
+
+				expect( wrapper.text() ).not.toContain( 'sws-subject-creator-page-title-invalid' );
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( false );
+			} );
+
+			it( 'opens the section on a page whose subjects could not be read', async () => {
+				getPageSubjectsMock.mockRejectedValue( new Error( 'Graph store unavailable' ) );
+				const wrapper = mountDialog();
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+		} );
+
+		describe( 'on another page', () => {
+			async function chooseAnotherPage( wrapper: VueWrapper ): Promise<void> {
+				await pickSchema( wrapper );
+				await choose( wrapper, 'anotherPage' );
+			}
+
+			it( 'offers only pages that exist', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				expect( wrapper.findComponent( PagePicker ).props( 'existingPagesOnly' ) ).toBe( true );
+			} );
+
+			it( 'keeps save unavailable until a page is picked', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( true );
+
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( false );
+			} );
+
+			it( 'makes the subject the main subject of a page that has none, and goes there', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				await save( wrapper );
+
+				expectMainSubjectCreated( EXISTING_PAGE_ID, null, SCHEMA_NAME, DEFAULT_CREATE_SUMMARY );
+				expect( location.href ).toBe( '/wiki/ACME Inc' );
+				expect( mw.storage.session.set ).toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
+			} );
+
+			it( 'adds the subject alongside an existing main subject, under the label given', async () => {
+				editedDependentSubjects = [ newSubject( { id: 's1birthAAAAAAA1', label: null, schemaName: 'Birth' } ) ];
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPageWithMainSubject( wrapper );
+
+				await typeLabel( wrapper, 'Second opinion' );
+				await save( wrapper );
+
+				expect( callsTo( 'createOtherSubject' ) ).toContainEqual( expect.objectContaining( {
+					pageId: EXISTING_PAGE_ID,
+					label: 'Second opinion',
+					schemaName: SCHEMA_NAME,
+					dependentSubjects: editedDependentSubjects,
+					comment: DEFAULT_CREATE_SUMMARY,
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+
+			it( 'names the main subject the new one will sit beside', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				await pickPageWithMainSubject( wrapper );
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-has-main-subject' );
+				expect( wrapper.text() ).toContain( 'ACME Inc' );
+				expect( wrapper.text() ).not.toContain( 'sws-subject-creator-page-picked' );
+			} );
+
+			it( 'says the subject joins the page picked, which has no main subject to name it', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-pickedACME Inc' );
+			} );
+
+			/**
+			 * A page created for a Subject that nobody named is titled after that Subject, and an id
+			 * is not a name, so the Subject taking it over is not named by it either. The rule the
+			 * server applies once the Subject exists; this is the same rule, previewed.
+			 */
+			/**
+			 * Where the Subject lands depends on what the page holds, so the note that says where it
+			 * lands cannot be shown while that is still being read.
+			 */
+			it( 'names no page until what that page holds is known', async () => {
+				const slowRead = deferred<unknown>();
+				getPageSubjectsMock.mockReturnValueOnce( slowRead.promise );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( wrapper.text() ).not.toContain( 'sws-subject-creator-page-picked' );
+
+				slowRead.resolve( {
+					pageSubjects: new PageSubjects( EXISTING_PAGE_ID, null, [] ),
+					referencedSubjects: [],
+					schemas: [],
+				} );
+				await flushPromises();
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-pickedACME Inc' );
+			} );
+
+			it( 'names no page whose subjects could not be read', async () => {
+				getPageSubjectsMock.mockRejectedValue( new Error( 'Graph store unavailable' ) );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( wrapper.text() ).not.toContain( 'sws-subject-creator-page-picked' );
+			} );
+
+			/**
+			 * Another title answers a title already taken; a page that would not read is still
+			 * unread whatever else is typed, and saving onto it would guess at where the Subject goes.
+			 */
+			it( 'keeps a page that could not be read blocking while the rest of the form is edited', async () => {
+				getPageSubjectsMock.mockRejectedValue( new Error( 'Graph store unavailable' ) );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				wrapper.findComponent( SubjectEditorDialog ).vm.$emit( 'change' );
+				await flushPromises();
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-read-error' );
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( true );
+			} );
+
+			it( 'takes no further page while the save is in flight', async () => {
+				// The write loop flushes every pane's validation before its first write, and that
+				// round trip is the window in which the footer would otherwise still be answerable.
+				const flush = deferred<void>();
+				beforeFirstWrite = flush.promise;
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				const saved = save( wrapper );
+				await flushPromises();
+
+				expect( wrapper.findComponent( PagePicker ).props( 'disabled' ) ).toBe( true );
+				expect( wrapper.find( '.cdx-radio-stub input' ).attributes( 'disabled' ) ).toBeDefined();
+
+				flush.resolve();
+				await saved;
+				await flushPromises();
+
+				expect( wrapper.findComponent( PagePicker ).props( 'disabled' ) ).toBe( false );
+			} );
+
+			// The freeze is the first guard; this is the second. The write's own awaits sit past it,
+			// so the whole answer is read once rather than again on the far side of each one: the
+			// page the write lands on, and the page the dialog then says it landed on, cannot come
+			// apart.
+			it( 'reports the page that was answered when the write began', async () => {
+				const write = deferred<SubjectId>();
+				( subjectStore.createMainSubject as any ).mockReturnValue( write.promise );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				const saved = save( wrapper );
+				await flushPromises();
+				await pickPage( wrapper, null );
+				write.resolve( new SubjectId( MINTED_ID ) );
+				await saved;
+				await flushPromises();
+
+				expect( location.href ).toContain( 'ACME Inc' );
+				expect( reloadMock ).not.toHaveBeenCalled();
+			} );
+
+			it( 'blocks saving when the chosen page could not be read', async () => {
+				getPageSubjectsMock.mockRejectedValue( new Error( 'Graph store unavailable' ) );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( true );
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-read-error' );
+
+				await save( wrapper );
+
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+
+			it( 'ignores the main-subject answer for a page the user has moved off', async () => {
+				const slowRead = deferred<unknown>();
+				getPageSubjectsMock.mockReturnValueOnce( slowRead.promise );
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				await pickPage( wrapper, { pageId: OTHER_PAGE_ID, title: 'Other Page' } );
+				slowRead.resolve( pageWithMainSubject( 'ACME Inc' ) );
+				await flushPromises();
+
+				expect( wrapper.text() ).not.toContain( 'ACME Inc' );
+
+				await save( wrapper );
+
+				expectMainSubjectCreated( OTHER_PAGE_ID, null, SCHEMA_NAME, DEFAULT_CREATE_SUMMARY );
+			} );
+
+			it( 'drops the page picked once the choice moves back to a new page', async () => {
+				const wrapper = mountDialog();
+				await chooseAnotherPage( wrapper );
+				await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+				await choose( wrapper, 'newPage' );
+				await typeLabel( wrapper, 'New Person' );
+				await save( wrapper );
+
+				expect( subjectStore.createSubjectPage ).toHaveBeenCalled();
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+		} );
+
+		function closeWouldDiscard( wrapper: VueWrapper ): boolean {
+			return wrapper.findComponent( SubjectEditorDialog ).props( 'hostHasUnsavedChanges' ) as boolean;
+		}
+
+		it( 'reports nothing to discard once the page picked has been taken back', async () => {
+			const wrapper = mountWithoutHostPage( { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await choose( wrapper, 'anotherPage' );
+			await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+			await pickPage( wrapper, null );
+
+			expect( closeWouldDiscard( wrapper ) ).toBe( false );
+		} );
+
+		it( 'reports nothing to discard once the title typed for a new page has been taken back', async () => {
+			const wrapper = mountWithoutHostPage( { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await typePageTitle( wrapper, 'Delft' );
+			await typePageTitle( wrapper, '' );
+
+			expect( closeWouldDiscard( wrapper ) ).toBe( false );
+		} );
+
+		it( 'reports a title still typed as something a close would discard', async () => {
+			const wrapper = mountWithoutHostPage( { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await typePageTitle( wrapper, 'Delft' );
+
+			expect( closeWouldDiscard( wrapper ) ).toBe( true );
+		} );
+
+		// What fills it in is the Subject's label, an edit the editor reports itself.
+		it( 'reports nothing to discard for a title filled in from the label', async () => {
+			const wrapper = mountWithoutHostPage( { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await typeLabel( wrapper, 'Delft' );
+
+			expect( closeWouldDiscard( wrapper ) ).toBe( false );
+		} );
+
+		it( 'reports a page still picked as something a close would discard', async () => {
+			const wrapper = mountWithoutHostPage( { initialSchemaName: SCHEMA_NAME } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await choose( wrapper, 'anotherPage' );
+			await pickPage( wrapper, { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' } );
+
+			expect( closeWouldDiscard( wrapper ) ).toBe( true );
+		} );
+
+		describe( 'initialPage', () => {
+			// Renders its slot, so the error text is assertable.
+			const CdxMessageStub = {
+				template: '<div class="cdx-message-stub"><slot /></div>',
+				props: [ 'type', 'inline' ],
+			};
+
+			function mountWithInitialPage( initialPage: InitialPage, props: Record<string, any> = {} ): VueWrapper {
+				return mountComponent(
+					{
+						PagePicker: PagePickerStub,
+						CdxField: CdxFieldWithMessagesStub,
+						I18nSlot: I18nSlotStub,
+						CdxMessage: CdxMessageStub,
+					},
+					{ initialSchemaName: SCHEMA_NAME, initialPage, ...props },
+				);
+			}
+
+			async function open( wrapper: VueWrapper ): Promise<void> {
+				await wrapper.setProps( { open: true } );
+				await flushPromises();
+				// Second flush: the page is filled in after the choice watcher runs.
+				await flushPromises();
+				await wrapper.vm.$nextTick();
+			}
+
+			function fixedSection( wrapper: VueWrapper ): DOMWrapper<Element> {
+				return wrapper.find( '.ext-sws-subject-creator-page-summary' );
+			}
+
+			it( 'states a fixed this page and hides the choice', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'thisPage', fixed: true } );
+				await open( wrapper );
+
+				expect( fixedSection( wrapper ).exists() ).toBe( true );
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-this' );
+				expect( wrapper.findAll( '.cdx-radio-stub' ) ).toHaveLength( 0 );
+				expect( pageTitleField( wrapper ).exists() ).toBe( false );
+			} );
+
+			it( 'asks no title of a fixed new page that was given one', async () => {
+				const wrapper = mountWithInitialPage( {
+					choice: 'newPage',
+					page: { pageId: null, title: 'Ada Lovelace' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				expect( pageTitleField( wrapper ).exists() ).toBe( false );
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-new-titledAda Lovelace' );
+			} );
+
+			// The parser function names a new page without titling it, so the title is asked for
+			// below the page it names, as for any new page.
+			it( 'asks for the title of a fixed new page, filled in from the label', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+
+				await typeLabel( wrapper, 'New Person' );
+
+				expect( pageTitleValue( wrapper ) ).toBe( 'New Person' );
+			} );
+
+			it( 'saves a fixed new page under the title typed over the label', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+				await typeLabel( wrapper, 'Grace Hopper' );
+				await typePageTitle( wrapper, 'Grace Brewster Hopper' );
+
+				await save( wrapper );
+
+				expect( createdPageTitle() ).toBe( 'Grace Brewster Hopper' );
+			} );
+
+			it( 'refuses a fixed new page without a title, at its title field', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+
+				await save( wrapper );
+
+				expect( pageTitleField( wrapper ).text() )
+					.toContain( 'sws-subject-creator-page-title-required' );
+				expect( subjectStore.createSubjectPage ).not.toHaveBeenCalled();
+			} );
+
+			it( 'saves onto a fixed page without a main Subject as its main Subject', async () => {
+				const wrapper = mountWithInitialPage( {
+					choice: 'anotherPage',
+					page: { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-pickedACME Inc' );
+
+				await save( wrapper );
+
+				expectMainSubjectCreated( EXISTING_PAGE_ID, null, SCHEMA_NAME, DEFAULT_CREATE_SUMMARY );
+			} );
+
+			it( 'reads the fixed page only once opened', async () => {
+				const wrapper = mountWithInitialPage( {
+					choice: 'anotherPage',
+					page: { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' },
+					fixed: true,
+				} );
+				await flushPromises();
+
+				expect( getPageSubjectsMock ).not.toHaveBeenCalled();
+
+				await open( wrapper );
+
+				expect( getPageSubjectsMock ).toHaveBeenCalledWith( EXISTING_PAGE_ID );
+			} );
+
+			it( 'saves onto a fixed page with a main Subject as another Subject', async () => {
+				getPageSubjectsMock.mockResolvedValue( pageWithMainSubject( 'ACME Inc' ) );
+				const wrapper = mountWithInitialPage( {
+					choice: 'anotherPage',
+					page: { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				await save( wrapper );
+
+				expect( callsTo( 'createOtherSubject' ) ).toContainEqual( expect.objectContaining( {
+					pageId: EXISTING_PAGE_ID,
+					label: null,
+					schemaName: SCHEMA_NAME,
+					comment: DEFAULT_CREATE_SUMMARY,
+					id: new SubjectId( MINTED_ID ),
+				} ) );
+				expect( subjectStore.createMainSubject ).not.toHaveBeenCalled();
+			} );
+
+			it( 'shows an error and blocks saving when the fixed page cannot be read', async () => {
+				getPageSubjectsMock.mockRejectedValue( new Error( 'network down' ) );
+				const wrapper = mountWithInitialPage( {
+					choice: 'anotherPage',
+					page: { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				expect( wrapper.text() ).toContain( 'sws-subject-creator-page-read-errorACME Inc' );
+				expect( wrapper.findComponent( { name: 'SummaryAction' } ).props( 'saveDisabled' ) ).toBe( true );
+			} );
+
+			it( 'closes without confirming when only the fixed page was filled in', async () => {
+				const wrapper = mountWithInitialPage( {
+					choice: 'anotherPage',
+					page: { pageId: EXISTING_PAGE_ID, title: 'ACME Inc' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				// The page is filled in, which answering it by hand would report as a change.
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-pickedACME Inc' );
+				expect( wrapper.findComponent( SubjectEditorDialog ).props( 'hostHasUnsavedChanges' ) ).toBe( false );
+
+				await requestClose( wrapper );
+
+				expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+			} );
+
+			it( 'closes without confirming when only the fixed new page\'s title was given', async () => {
+				const wrapper = mountWithInitialPage( {
+					choice: 'newPage',
+					page: { pageId: null, title: 'Ada Lovelace' },
+					fixed: true,
+				} );
+				await open( wrapper );
+
+				expect( closeWouldDiscard( wrapper ) ).toBe( false );
+			} );
+
+			it( 'reports a title typed for a fixed new page as something a close would discard', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+
+				await typePageTitle( wrapper, 'Delft' );
+
+				expect( closeWouldDiscard( wrapper ) ).toBe( true );
+			} );
+
+			// The field below says the title itself.
+			it( 'names no title for a fixed new page in its summary line', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+
+				await typeLabel( wrapper, 'New Person' );
+
+				expect( shownChoice( wrapper ) ).toBe( 'sws-subject-creator-page-section-new' );
+			} );
+
+			it( 'preselects an unfixed page but still offers the choice', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: false } );
+				await open( wrapper );
+
+				expect( fixedSection( wrapper ).exists() ).toBe( false );
+				expect( chosenOption( wrapper ) ).toBe( 'newPage' );
+				expect( offeredChoices( wrapper ) ).toEqual( [ 'thisPage', 'anotherPage', 'newPage' ] );
+			} );
+
+			it( 'starts open on a new page the caller preselected', async () => {
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: false } );
+				await open( wrapper );
+
+				expect( sectionIsOpen( wrapper ) ).toBe( true );
+			} );
+
+			// The caller fixed a new page, so choosing the page that has the title is no answer.
+			it( 'asks for another title where a fixed new page\'s is taken', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new PageTitleTakenError( 'Paris' ) );
+				const wrapper = mountWithInitialPage( { choice: 'newPage', fixed: true } );
+				await open( wrapper );
+				await typeLabel( wrapper, 'Paris' );
+
+				await save( wrapper );
+
+				expect( pageTitleField( wrapper ).text() ).toContain( 'sws-subject-creator-page-taken-retitleParis' );
+			} );
+
+			it( 'reports a taken title of the fixed page\'s own as before', async () => {
+				( subjectStore.createSubjectPage as any ).mockRejectedValue( new PageTitleTakenError( 'Ada Lovelace' ) );
+				const wrapper = mountWithInitialPage( {
+					choice: 'newPage',
+					page: { pageId: null, title: 'Ada Lovelace' },
+					fixed: true,
+				} );
+				await open( wrapper );
+				await typeLabel( wrapper, 'Someone' );
+
+				await save( wrapper );
+
+				expect( fixedSection( wrapper ).text() ).toContain( 'sws-subject-creator-page-takenAda Lovelace' );
+			} );
+
+		} );
+	} );
+
+	describe( 'creating the schema from the picker', () => {
+		function schemaCreator( wrapper: VueWrapper ): VueWrapper<InstanceType<typeof SchemaCreatorDialog>> {
+			return wrapper.findComponent( SchemaCreatorDialog );
+		}
+
+		async function openSchemaCreator( wrapper: VueWrapper, typedName: string ): Promise<void> {
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'create', typedName );
+			await flushPromises();
+		}
+
+		/** As the creator's own save does: it reports the Schema it wrote, then closes. */
+		async function createSchema( wrapper: VueWrapper, schema: Schema ): Promise<void> {
+			schemaCreator( wrapper ).vm.$emit( 'created', schema );
+			schemaCreator( wrapper ).vm.$emit( 'update:open', false );
+			await flushPromises();
+		}
+
+		function subjectBeingCreated( wrapper: VueWrapper ): Subject {
+			return wrapper.findComponent( SubjectEditorDialog ).props( 'subject' ) as Subject;
+		}
+
+		beforeEach( () => {
+			getSchemaMock.mockImplementation( async ( name: string ) => newSchema( { title: name } ) );
+		} );
+
+		it( 'is offered to a user who may create schemas', async () => {
+			const wrapper = mountComponent();
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).props( 'offersCreation' ) ).toBe( true );
+		} );
+
+		it( 'is not offered to a user who may not create schemas', async () => {
+			canCreateSchemas.value = false;
+			const wrapper = mountComponent();
+			await flushPromises();
+
+			expect( wrapper.findComponent( SchemaPicker ).props( 'offersCreation' ) ).toBe( false );
+		} );
+
+		it( 'opens the schema creator on the name typed in the picker', async () => {
+			const wrapper = mountComponent();
+
+			await openSchemaCreator( wrapper, NEW_SCHEMA_NAME );
+
+			expect( schemaCreator( wrapper ).props( 'initialName' ) ).toBe( NEW_SCHEMA_NAME );
+		} );
+
+		it( 'opens the schema creator with no name when nothing was typed', async () => {
+			const wrapper = mountComponent();
+
+			await openSchemaCreator( wrapper, '' );
+
+			expect( schemaCreator( wrapper ).props( 'initialName' ) ).toBe( '' );
+		} );
+
+		// Named as the wiki saved it, under its page title, which is how the picker would list it; the
+		// name typed in the picker may have been changed in the creator since.
+		it( 'moves on to the subject step with the schema created there, under the name the wiki gave it', async () => {
+			const wrapper = mountComponent();
+			await openSchemaCreator( wrapper, 'sculpture' );
+
+			await createSchema( wrapper, newSchema( { title: 'statue' } ) );
+
+			expect( subjectBeingCreated( wrapper ).getSchemaName() ).toBe( 'Statue' );
+		} );
+
+		it( 'does not open the subject step for a schema picked before the schema creator opened', async () => {
+			let resolvePicked!: ( schema: Schema ) => void;
+			getSchemaMock.mockReturnValueOnce( new Promise<Schema>( ( resolve ) => {
+				resolvePicked = resolve;
+			} ) );
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'create', NEW_SCHEMA_NAME );
+			resolvePicked( newSchema( { title: SCHEMA_NAME } ) );
+			await flushPromises();
+
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+			expect( schemaCreator( wrapper ).exists() ).toBe( true );
+		} );
+
+		it( 'returns to the picker when the schema creator closes without creating one', async () => {
+			const wrapper = mountComponent();
+			await openSchemaCreator( wrapper, NEW_SCHEMA_NAME );
+
+			schemaCreator( wrapper ).vm.$emit( 'update:open', false );
+			await flushPromises();
+
+			expect( schemaCreator( wrapper ).exists() ).toBe( false );
+			expect( wrapper.findComponent( SchemaPicker ).exists() ).toBe( true );
+			expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+		} );
+	} );
+
+	describe( 'on a wiki without schemas', () => {
+		// The picker itself, attached to the document, where focus is read from: whether focusing the
+		// field opens its menu is decided by Codex's lookup. Codex messages render their text, so the
+		// sentence is found whichever element holds it.
+		function mountWithPicker(): VueWrapper {
+			return mountComponent( { SchemaPicker: false, CdxMessage: false }, {}, { attachTo: document.body } );
+		}
+
+		async function open( wrapper: VueWrapper ): Promise<void> {
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+		}
+
+		// None while the menu is closed: a closed menu shows the user nothing.
+		function shownOptions( wrapper: VueWrapper ): string[] {
+			if ( schemaField( wrapper ).attributes( 'aria-expanded' ) !== 'true' ) {
+				return [];
+			}
+
+			return wrapper.findAll( '[role="option"]' ).map( ( option ) => option.text() );
+		}
+
+		/** Holds back the answer that the user may create Schemas until the returned function gives it. */
+		function holdSchemaCreationRight(): () => void {
+			let grant!: () => void;
+			canCreateSchemas.value = false;
+			( useSchemaPermissions as any ).mockReturnValue( {
+				canCreateSchemas,
+				checkCreatePermission: () => new Promise<void>( ( resolve ) => {
+					grant = () => {
+						canCreateSchemas.value = true;
+						resolve();
+					};
+				} ),
+			} );
+
+			return () => grant();
+		}
+
+		beforeEach( () => {
+			schemaStore.fetchAllSchemaSummaries = vi.fn().mockResolvedValue( [] );
+		} );
+
+		it( 'opens on a focused field offering to create a schema when the permission answer comes late', async () => {
+			const grantSchemaCreation = holdSchemaCreationRight();
+			const wrapper = mountWithPicker();
+			await open( wrapper );
+
+			grantSchemaCreation();
+			await flushPromises();
+
+			expect( document.activeElement ).toBe( schemaField( wrapper ).element );
+			expect( shownOptions( wrapper ) ).toEqual( [ 'sws-schema-picker-create' ] );
+		} );
+
+		it( 'says so in place of the field to a user who may not create a schema', async () => {
+			canCreateSchemas.value = false;
+			const wrapper = mountWithPicker();
+
+			await open( wrapper );
+
+			expect( wrapper.text() ).toContain( 'sws-subject-creator-no-schemas' );
+			expect( schemaField( wrapper ).exists() ).toBe( false );
+		} );
+
+		// Saying so would send a user who may create a schema to ask someone else.
+		it( 'says nothing of it until it knows whether the user may create a schema', async () => {
+			holdSchemaCreationRight();
+			const wrapper = mountWithPicker();
+
+			await open( wrapper );
+
+			expect( wrapper.text() ).not.toContain( 'sws-subject-creator-no-schemas' );
+		} );
+	} );
+
+	describe( 'Close confirmation', () => {
+		it( 'asks before closing while a picked schema is still loading', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			await pickSchemaStillLoading( wrapper );
+
+			await requestClose( wrapper );
+
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+			expect( wrapper.findComponent( CloseConfirmationDialog ).props( 'open' ) ).toBe( true );
+		} );
+
+		it( 'closes without confirmation when there are no unsaved changes', async () => {
+			const wrapper = mountComponent();
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+
+			await requestClose( wrapper );
+
+			expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+		} );
+
+		it( 'closes dialog when discard is clicked in confirmation', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			await pickSchemaStillLoading( wrapper );
+			await requestClose( wrapper );
+
+			wrapper.findComponent( CloseConfirmationDialog ).vm.$emit( 'discard' );
+			await flushPromises();
+
+			expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+		} );
+
+		it( 'keeps dialog open when keep-editing is clicked in confirmation', async () => {
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			await pickSchemaStillLoading( wrapper );
+			await requestClose( wrapper );
+
+			wrapper.findComponent( CloseConfirmationDialog ).vm.$emit( 'keep-editing' );
+			await flushPromises();
+
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
+			expect( wrapper.findComponent( CloseConfirmationDialog ).props( 'open' ) ).toBe( false );
+		} );
+
+		it( 'does not ask again after closing when a close was requested while the picked schema loaded', async () => {
+			let resolveSchema!: ( schema: Schema ) => void;
+			getSchemaMock.mockReturnValue( new Promise<Schema>( ( resolve ) => {
+				resolveSchema = resolve;
+			} ) );
+			const wrapper = mountComponent();
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+			await requestClose( wrapper );
+			resolveSchema( newSchema( { title: SCHEMA_NAME } ) );
+			await flushPromises();
+			await requestClose( wrapper );
+
+			await wrapper.setProps( { open: false } );
+			await flushPromises();
+
+			expect( wrapper.findComponent( CloseConfirmationDialog ).props( 'open' ) ).toBe( false );
+		} );
+
+		it( 'asks nothing of its own once the editor reports a close', async () => {
+			const wrapper = mountComponent();
+
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			await wrapper.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+
+			await requestClose( wrapper );
+
+			expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+		} );
+	} );
+
+	// Run on Codex's real dialogs rather than stubs, so that the order they stand in the document is
+	// the order the user sees them stacked in.
+	describe( 'Dialog stacking', () => {
+		const SubjectEditorDialogWithCodexDialog = {
+			name: 'SubjectEditorDialog',
+			components: { CdxDialog },
+			template: '<CdxDialog :open="open" title="subject-editor" />',
+			props: [ 'open', 'subject', 'schema', 'rootIsNew', 'saveDisabled', 'hostHasUnsavedChanges', 'onSave', 'onCreate', 'onSaveSchema', 'onSaved' ],
+			emits: [ 'update:open' ],
+		};
+
+		const SchemaCreatorDialogWithCodexDialog = {
+			name: 'SchemaCreatorDialog',
+			components: { CdxDialog },
+			template: '<CdxDialog :open="open" title="schema-creator" />',
+			props: [ 'open', 'initialName' ],
+			emits: [ 'update:open', 'created' ],
+		};
+
+		function mountWithCodexDialogs(): VueWrapper {
+			return mountComponent( {
+				CdxDialog: false,
+				SubjectEditorDialog: SubjectEditorDialogWithCodexDialog,
+				SchemaCreatorDialog: SchemaCreatorDialogWithCodexDialog,
+				teleport: false,
+			} );
+		}
+
+		// The Schema and Subject steps here, and the reopening, are the test: they are what puts the
+		// Schema step's dialog into the document later than a dialog kept mounted.
+		it( 'shows the schema creator above a schema step shown again', async () => {
+			const dialog = mountWithCodexDialogs();
+			await dialog.setProps( { open: true } );
+			await flushPromises();
+			await dialog.findComponent( SchemaPicker ).vm.$emit( 'select', SCHEMA_NAME );
+			await flushPromises();
+			await requestClose( dialog );
+			await dialog.setProps( { open: false } );
+			await dialog.setProps( { open: true } );
+			await flushPromises();
+
+			dialog.findComponent( SchemaPicker ).vm.$emit( 'create', NEW_SCHEMA_NAME );
+			await flushPromises();
+
+			expect( openDialogTitles() ).toEqual( [ 'sws-subject-creator-title', 'schema-creator' ] );
+		} );
+	} );
+
+	describe( 'creating the Subject a relation points to', () => {
+		const TARGET_ID = 's1targetAAAAAA1';
+
+		async function openOnTarget( props: Record<string, any> = {} ): Promise<VueWrapper> {
+			const wrapper = mountComponent( {}, {
+				relationTarget: { subjectId: new SubjectId( TARGET_ID ), schemaNames: [ SCHEMA_NAME ] },
+				...props,
+			} );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			return wrapper;
+		}
+
+		it( 'opens on the Subject at once where it may have only one Schema', async () => {
+			const wrapper = await openOnTarget();
+
+			expect( wrapper.findComponent( SubjectEditorDialog ).props( 'schema' ).getName() ).toBe( SCHEMA_NAME );
+		} );
+
+		it( 'offers only the Schemas the Subject may have, and no new one', async () => {
+			const wrapper = await openOnTarget( {
+				relationTarget: { subjectId: new SubjectId( TARGET_ID ), schemaNames: [ 'City', 'Place' ] },
+			} );
+
+			expect( wrapper.findComponent( SchemaPicker ).props( 'schemaNames' ) ).toEqual( [ 'City', 'Place' ] );
+			expect( wrapper.findComponent( SchemaPicker ).props( 'offersCreation' ) ).toBe( false );
+		} );
+
+		it( 'creates the Subject under the id it was given', async () => {
+			const wrapper = await openOnTarget();
+
+			await save( wrapper );
+
+			expect( callsTo( 'createMainSubject' ) ).toContainEqual( expect.objectContaining( {
+				pageId: PAGE_ID,
+				label: null,
+				schemaName: SCHEMA_NAME,
+				comment: DEFAULT_CREATE_SUMMARY,
+				id: new SubjectId( TARGET_ID ),
+			} ) );
+		} );
+
+		it( 'reports the id as taken rather than taking the Subject as created', async () => {
+			( subjectStore.createOtherSubject as any ).mockRejectedValueOnce( new SubjectIdInUseError( TARGET_ID ) );
+			const wrapper = await openOnTarget( { hostPage: { hasMainSubject: true } } );
+
+			await save( wrapper );
+
+			expect( ( lastSaveError as Error ).message ).toBe( `sws-subject-creator-id-in-use${ TARGET_ID }` );
+			expect( reloadMock ).not.toHaveBeenCalled();
+		} );
+
+		it( 'reports the id as taken where the Subject was to get a page of its own', async () => {
+			stubMw( { wgSWSSubjectFirst: true } );
+			subjectStore.createSubjectPage = vi.fn().mockRejectedValue( new SubjectIdInUseError( TARGET_ID ) );
+			const wrapper = await openOnTarget();
+
+			await save( wrapper );
+
+			expect( ( lastSaveError as Error ).message ).toBe( `sws-subject-creator-id-in-use${ TARGET_ID }` );
+			expect( location.href ).toBe( '' );
+		} );
+
+		it( 'reports any other refusal as it came', async () => {
+			( subjectStore.createOtherSubject as any ).mockRejectedValueOnce( new Error( 'Server error' ) );
+			const wrapper = await openOnTarget( { hostPage: { hasMainSubject: true } } );
+
+			await save( wrapper );
+
+			expect( ( lastSaveError as Error ).message ).toBe( 'Server error' );
+		} );
+	} );
+
+	// Subjects invented while filling in a relation field, which the editor hands back as
+	// creations of their own once the save runs.
+	describe( 'the Subjects created alongside', () => {
+		const DRAFT_ID = 's1draftAAAAAAA1';
+		const OWN_PAGE_ID = 99;
+
+		function draft(): Subject {
+			return newSubject( { id: DRAFT_ID, label: 'A colleague', schemaName: 'Colleague' } );
+		}
+
+		function birth(): Subject {
+			return newSubject( { id: 's1birthAAAAAAA1', label: null, schemaName: 'Birth' } );
+		}
+
+		beforeEach( () => {
+			subjectStore.createSubject = vi.fn().mockResolvedValue( new SubjectId( DRAFT_ID ) );
+			subjectStore.createSubjectPage = vi.fn().mockResolvedValue( {
+				subjectId: new SubjectId( CREATED_PAGE_SUBJECT_ID ),
+				pageTitle: 'New Person',
+				pageId: CREATED_PAGE_ID,
+			} );
+			subjectStore.updateSubject = vi.fn().mockResolvedValue( undefined );
+			// The routes below that make a page of their own need something to title it with.
+			editedLabel.value = 'New Person';
+		} );
+
+		async function openOn( props: Record<string, any> = {} ): Promise<VueWrapper> {
+			const wrapper = mountComponent( {}, { initialSchemaName: SCHEMA_NAME, ...props } );
+			await wrapper.setProps( { open: true } );
+			await flushPromises();
+			return wrapper;
+		}
+
+		// The page does not exist while the dialog is open, so nothing can say where the draft
+		// goes until the write that creates it has answered.
+		it( 'stores one on the page the Subject\'s own write created', async () => {
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn( { hostPage: null } );
+
+			await save( wrapper );
+
+			expect( callsTo( 'createSubject' ) ).toContainEqual( expect.objectContaining( {
+				subject: expect.any( Subject ),
+				pageId: CREATED_PAGE_ID,
+				comment: DEFAULT_CREATE_SUMMARY,
+			} ) );
+		} );
+
+		it( 'stores one on the page answered in the footer', async () => {
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn();
+
+			await save( wrapper );
+
+			expect( callsTo( 'createSubject' ) ).toContainEqual( expect.objectContaining( {
+				subject: expect.any( Subject ),
+				pageId: PAGE_ID,
+				comment: DEFAULT_CREATE_SUMMARY,
+			} ) );
+		} );
+
+		// One created while drilled into another Subject belongs beside that Subject, not beside
+		// the one being created, and the editor has already resolved the page it is stored on.
+		it( 'stores one made against another Subject on that Subject\'s own page', async () => {
+			sessionDrafts = [ { subject: draft(), pageId: OWN_PAGE_ID } ];
+			const wrapper = await openOn( { hostPage: null } );
+
+			await save( wrapper );
+
+			expect( callsTo( 'createSubject' ) ).toContainEqual( expect.objectContaining( {
+				subject: expect.any( Subject ),
+				pageId: OWN_PAGE_ID,
+				comment: DEFAULT_CREATE_SUMMARY,
+			} ) );
+		} );
+
+		// A second pass over a root the first one created would be refused: its id, and any page
+		// title it was given, are taken now.
+		it( 'updates rather than creates the Subject again after a save that stopped part way', async () => {
+			( subjectStore.createSubject as any ).mockRejectedValueOnce( new Error( 'Server error' ) );
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			editedDependentSubjects = [ birth() ];
+			const wrapper = await openOn();
+
+			await save( wrapper );
+			await save( wrapper );
+
+			expect( subjectStore.createMainSubject ).toHaveBeenCalledTimes( 1 );
+			expect( callsTo( 'updateSubject' ) ).toContainEqual( expect.objectContaining( {
+				subject: expect.any( Subject ),
+				dependentSubjects: editedDependentSubjects,
+				comment: DEFAULT_CREATE_SUMMARY,
+			} ) );
+		} );
+
+		it( 'writes one with its Dependent Subjects', async () => {
+			sessionDrafts = [ { subject: draft(), pageId: 0, dependentSubjects: [ birth() ] } ];
+			const wrapper = await openOn();
+
+			await save( wrapper );
+
+			expect( callsTo( 'createSubject' )[ 0 ].dependentSubjects ).toEqual( [ birth() ] );
+		} );
+
+		it( 'keeps the id the server gave the Subject when it writes it again', async () => {
+			( subjectStore.createSubject as any ).mockRejectedValueOnce( new Error( 'Server error' ) );
+			( subjectStore.createMainSubject as any ).mockResolvedValue( new SubjectId( CREATED_PAGE_SUBJECT_ID ) );
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn();
+
+			await save( wrapper );
+			await save( wrapper );
+
+			const written = callsTo( 'updateSubject' )[ 0 ].subject as Subject;
+			expect( written.getId().text ).toBe( CREATED_PAGE_SUBJECT_ID );
+		} );
+
+		// The id was minted for this Subject alone, so the server holding it means this very create
+		// landed and only its answer was lost. Treating that as a failure leaves the dialog with no
+		// record of the Subject it made, and every retry repeats the refusal.
+		it( 'takes an id the server already holds as the Subject having been created', async () => {
+			( subjectStore.createOtherSubject as any ).mockRejectedValueOnce(
+				new SubjectIdInUseError( MINTED_ID ),
+			);
+			const wrapper = await openOn( { hostPage: { hasMainSubject: true } } );
+
+			await save( wrapper );
+
+			expect( lastSaveError ).toBeNull();
+			expect( reloadMock ).toHaveBeenCalled();
+		} );
+
+		it( 'writes the Subjects alongside onto the page that create had already reached', async () => {
+			( subjectStore.createOtherSubject as any ).mockRejectedValueOnce(
+				new SubjectIdInUseError( MINTED_ID ),
+			);
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn( { hostPage: { hasMainSubject: true } } );
+
+			await save( wrapper );
+
+			expect( callsTo( 'createSubject' ) ).toContainEqual( expect.objectContaining( {
+				subject: expect.any( Subject ),
+				pageId: PAGE_ID,
+				comment: DEFAULT_CREATE_SUMMARY,
+			} ) );
+		} );
+
+		it( 'writes them on a subject-first wiki even when the answer to its own create was lost', async () => {
+			stubMw( { wgSWSSubjectFirst: true } );
+			( subjectStore.createSubjectPage as any ).mockRejectedValueOnce( new SubjectIdInUseError( MINTED_ID ) );
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn();
+
+			await save( wrapper );
+
+			expect( lastSaveError ).toBeNull();
+			expect( subjectStore.createSubject ).toHaveBeenCalledOnce();
+		} );
+
+		// The whole save is through before anyone leaves the page: a Subject created alongside is
+		// written after the one that points at it, so navigating on that first write would take
+		// the rest of the save with it.
+		it( 'leaves only once every write is through', async () => {
+			sessionDrafts = [ { subject: draft(), pageId: 0 } ];
+			const wrapper = await openOn( { hostPage: null } );
+
+			await save( wrapper );
+
+			expect( subjectStore.createSubject ).toHaveBeenCalled();
+			expect( location.href ).toBe( '/wiki/New Person' );
+		} );
+	} );
+} );

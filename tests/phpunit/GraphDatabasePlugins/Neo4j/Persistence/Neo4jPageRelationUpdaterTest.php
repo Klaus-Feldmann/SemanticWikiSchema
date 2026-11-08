@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jOrphanCandidates;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jOrphanCandidates;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Drives the relation reconciliation for a single Subject. The multi-Subject batching it exists for
  * is covered by Neo4jProjectionStoreTest, which saves whole pages.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater
  * @group Database
  */
-class Neo4jPageRelationUpdaterTest extends NeoWikiIntegrationTestCase {
+class Neo4jPageRelationUpdaterTest extends SWSIntegrationTestCase {
 
 	private const string SUBJECT_ID = 'sTestSRU1111111';
 	private const string TARGET_SUBJECT_1 = 'sTestSRU1111112';
@@ -65,14 +65,14 @@ class Neo4jPageRelationUpdaterTest extends NeoWikiIntegrationTestCase {
 
 	private function updateRelations( TypedRelationList $relations ): void {
 		( new Neo4jPageRelationUpdater(
-			NeoWikiExtension::getInstance()->getNeo4jClient(),
+			SWSExtension::getInstance()->getNeo4jClient(),
 			self::WIKI_ID,
 			new Neo4jOrphanCandidates()
 		) )->updateRelations( [ self::SUBJECT_ID => $relations ] );
 	}
 
 	private function assertHasRelations( TypedRelationList $expected ): void {
-		$rows = NeoWikiExtension::getInstance()->getNeo4jClient()->run(
+		$rows = SWSExtension::getInstance()->getNeo4jClient()->run(
 			'MATCH (subject {id: $subjectId})-[relation]->(target)
        		RETURN relation, target.id as targetId
        		ORDER BY relation.id',
@@ -242,7 +242,7 @@ class Neo4jPageRelationUpdaterTest extends NeoWikiIntegrationTestCase {
 			] )
 		);
 
-		$result = NeoWikiExtension::getInstance()->getNeo4jClient()->run(
+		$result = SWSExtension::getInstance()->getNeo4jClient()->run(
 			'MATCH (subject {id: $subjectId})
        		RETURN subject',
 			[ 'subjectId' => self::SUBJECT_ID ]
@@ -263,7 +263,7 @@ class Neo4jPageRelationUpdaterTest extends NeoWikiIntegrationTestCase {
 			] )
 		);
 
-		$result = NeoWikiExtension::getInstance()->getNeo4jClient()->run(
+		$result = SWSExtension::getInstance()->getNeo4jClient()->run(
 			'MATCH (target {id: $targetId})
 				RETURN labels(target) AS labels, target.id AS id, target.wiki_id AS wikiId, size(keys(target)) AS propertyCount',
 			[ 'targetId' => $targetId ]

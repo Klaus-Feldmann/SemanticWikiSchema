@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\SetMainSubject;
+namespace ProfessionalWiki\SWS\Application\Actions\SetMainSubject;
 
-use ProfessionalWiki\NeoWiki\Domain\Validation\Violation;
+use ProfessionalWiki\SWS\Domain\Validation\Violation;
 
 interface SetMainSubjectPresenter {
 

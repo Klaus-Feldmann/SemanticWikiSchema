@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\DeleteSchemaApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\DeleteSchemaApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SchemaPageWriteApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SchemaPageWriteApi
  * @group Database
  */
-class DeleteSchemaApiTest extends NeoWikiIntegrationTestCase {
+class DeleteSchemaApiTest extends SWSIntegrationTestCase {
 
 	use RunsSchemaWriteEndpoints;
 
@@ -171,7 +171,7 @@ class DeleteSchemaApiTest extends NeoWikiIntegrationTestCase {
 			->join( 'comment', null, 'comment_id = log_comment_id' )
 			->where( [
 				'log_type' => 'delete',
-				'log_namespace' => NeoWikiExtension::NS_SCHEMA,
+				'log_namespace' => SWSExtension::NS_SCHEMA,
 				'log_title' => $schemaName,
 			] )
 			->caller( __METHOD__ )

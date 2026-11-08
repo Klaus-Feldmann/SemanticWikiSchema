@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use Exception;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * Needs the integration base class to set the wiki's Neo4j URLs, and the test Neo4j, which requires a login,
  * to show that the credentials still reach it.
  *
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::getNeo4jClient
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::getReadOnlyNeo4jClient
+ * @covers \ProfessionalWiki\SWS\SWSExtension::getNeo4jClient
+ * @covers \ProfessionalWiki\SWS\SWSExtension::getReadOnlyNeo4jClient
  */
-class Neo4jPasswordStaysOutOfErrorsTest extends NeoWikiIntegrationTestCase {
+class Neo4jPasswordStaysOutOfErrorsTest extends SWSIntegrationTestCase {
 
 	private const string MALFORMED_URL = 'bolt://neo4j:hunter2@neo:notaport';
 
@@ -35,14 +35,14 @@ class Neo4jPasswordStaysOutOfErrorsTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public static function clientProvider(): iterable {
-		yield 'write client' => [ static fn () => NeoWikiExtension::getInstance()->getNeo4jClient() ];
-		yield 'read client' => [ static fn () => NeoWikiExtension::getInstance()->getReadOnlyNeo4jClient() ];
+		yield 'write client' => [ static fn () => SWSExtension::getInstance()->getNeo4jClient() ];
+		yield 'read client' => [ static fn () => SWSExtension::getInstance()->getReadOnlyNeo4jClient() ];
 	}
 
 	public function testAConnectionErrorLeavesOutThePassword(): void {
 		$message = $this->errorFrom(
 			self::UNREACHABLE_URL,
-			static fn () => NeoWikiExtension::getInstance()->getNeo4jClient()->run( 'RETURN 1' )
+			static fn () => SWSExtension::getInstance()->getNeo4jClient()->run( 'RETURN 1' )
 		);
 
 		$this->assertStringContainsString( '127.0.0.1:1', $message );
@@ -51,7 +51,7 @@ class Neo4jPasswordStaysOutOfErrorsTest extends NeoWikiIntegrationTestCase {
 
 	public function testTheClientLogsInWithTheCredentialsInTheUrl(): void {
 		try {
-			$result = NeoWikiExtension::getInstance()->getNeo4jClient()->run( 'RETURN 1 AS n' );
+			$result = SWSExtension::getInstance()->getNeo4jClient()->run( 'RETURN 1 AS n' );
 		} catch ( Exception $e ) {
 			// Only an unreachable Neo4j is a reason to skip: a refused login is the failure this test is for.
 			if ( str_contains( $e->getMessage(), 'Cannot connect' ) ) {
@@ -66,9 +66,9 @@ class Neo4jPasswordStaysOutOfErrorsTest extends NeoWikiIntegrationTestCase {
 
 	private function errorFrom( string $url, callable $useClient ): string {
 		return $this->runWithoutGraphBackend( function () use ( $url, $useClient ): string {
-			$this->overrideConfigValue( 'NeoWikiNeo4jInternalReadUrl', $url );
-			$this->overrideConfigValue( 'NeoWikiNeo4jInternalWriteUrl', $url );
-			NeoWikiExtension::resetInstance();
+			$this->overrideConfigValue( 'SWSNeo4jInternalReadUrl', $url );
+			$this->overrideConfigValue( 'SWSNeo4jInternalWriteUrl', $url );
+			SWSExtension::resetInstance();
 
 			try {
 				$useClient();

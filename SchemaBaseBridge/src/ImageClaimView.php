@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\Domain\ImageReference;
+use ProfessionalWiki\SWS\Domain\ImageReference;
 
 /** commonsMedia denotes Commons files in standard Wikidata AND Wikibase. The claim source is retained by the field. */
 final class ImageClaimView {

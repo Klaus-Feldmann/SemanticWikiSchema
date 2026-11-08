@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigValidator;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigValidator;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigValidator
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigValidator
  */
 class ConfigValidatorTest extends TestCase {
 
@@ -49,28 +49,28 @@ class ConfigValidatorTest extends TestCase {
 
 	public function testUnknownKeyIsRejected(): void {
 		$this->assertSame(
-			[ [ ConfigValidator::ERROR_UNKNOWN_KEY, 'NeoWikiSparqlStores' ] ],
-			$this->validate( '{ "NeoWikiSparqlStores": [] }' )
+			[ [ ConfigValidator::ERROR_UNKNOWN_KEY, 'SWSSparqlStores' ] ],
+			$this->validate( '{ "SWSSparqlStores": [] }' )
 		);
 	}
 
 	public function testWrongTypeForBooleanSettingIsRejected(): void {
 		$this->assertSame(
-			[ [ 'neowiki-config-error-invalid-boolean', 'autoRenderMainSubject' ] ],
+			[ [ 'sws-config-error-invalid-boolean', 'autoRenderMainSubject' ] ],
 			$this->validate( '{ "autoRenderMainSubject": "yes" }' )
 		);
 	}
 
 	public function testWrongTypeForSubjectFirstSettingIsRejected(): void {
 		$this->assertSame(
-			[ [ 'neowiki-config-error-invalid-boolean', 'subjectFirst' ] ],
+			[ [ 'sws-config-error-invalid-boolean', 'subjectFirst' ] ],
 			$this->validate( '{ "subjectFirst": "yes" }' )
 		);
 	}
 
 	public function testWrongShapeForDataLanguagesIsRejected(): void {
 		$this->assertSame(
-			[ [ 'neowiki-config-error-invalid-language-list', 'dataLanguages' ] ],
+			[ [ 'sws-config-error-invalid-language-list', 'dataLanguages' ] ],
 			$this->validate( '{ "dataLanguages": "de" }' )
 		);
 	}
@@ -79,7 +79,7 @@ class ConfigValidatorTest extends TestCase {
 		$this->assertEqualsCanonicalizing(
 			[
 				[ ConfigValidator::ERROR_UNKNOWN_KEY, 'nope' ],
-				[ 'neowiki-config-error-invalid-boolean', 'subjectFirst' ],
+				[ 'sws-config-error-invalid-boolean', 'subjectFirst' ],
 			],
 			$this->validate( '{ "nope": 1, "subjectFirst": "x" }' )
 		);

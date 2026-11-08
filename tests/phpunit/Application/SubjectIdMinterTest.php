@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\SubjectIdMinter;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Infrastructure\IdGenerator;
-use ProfessionalWiki\NeoWiki\Infrastructure\ProductionIdGenerator;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\IncrementalIdGenerator;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SequenceIdGenerator;
+use ProfessionalWiki\SWS\Application\SubjectIdMinter;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
+use ProfessionalWiki\SWS\Tests\TestDoubles\IncrementalIdGenerator;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SequenceIdGenerator;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectIdMinter
+ * @covers \ProfessionalWiki\SWS\Application\SubjectIdMinter
  */
 class SubjectIdMinterTest extends TestCase {
 

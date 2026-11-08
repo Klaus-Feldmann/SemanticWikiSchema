@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\LayoutLookup;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Layout\Layout;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\LayoutLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class WikiPageLayoutLookup implements LayoutLookup {
 
@@ -27,7 +27,7 @@ class WikiPageLayoutLookup implements LayoutLookup {
 	}
 
 	public function getLayout( LayoutName $layoutName ): ?Layout {
-		$title = $this->titleFactory->newFromText( $layoutName->getText(), NeoWikiExtension::NS_LAYOUT );
+		$title = $this->titleFactory->newFromText( $layoutName->getText(), SWSExtension::NS_LAYOUT );
 
 		if ( $title === null || !$title->exists() ) {
 			return null;
@@ -58,7 +58,7 @@ class WikiPageLayoutLookup implements LayoutLookup {
 		$content = $this->pageContentFetcher->getPageContent(
 			$title,
 			$this->authority,
-			NeoWikiExtension::NS_LAYOUT
+			SWSExtension::NS_LAYOUT
 		);
 
 		if ( $content instanceof LayoutContent ) {

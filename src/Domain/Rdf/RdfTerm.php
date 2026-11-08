@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Domain\Rdf;
 
 /**
  * An RDF term that can occupy the object position of a {@see Quad}: an {@see Iri} or a {@see Literal}.

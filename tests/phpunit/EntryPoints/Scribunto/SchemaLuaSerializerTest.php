@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Scribunto;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Scribunto;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\NumberProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\RelationProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\UrlProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Scribunto\SchemaLuaSerializer;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Scribunto\SchemaLuaSerializer
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer
  */
 class SchemaLuaSerializerTest extends TestCase {
 
@@ -242,7 +242,7 @@ class SchemaLuaSerializerTest extends TestCase {
 	}
 
 	/**
-	 * @param array<string, \ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition> $props
+	 * @param array<string, \ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition> $props
 	 */
 	private function schemaWith( array $props ): Schema {
 		return new Schema(

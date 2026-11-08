@@ -1,19 +1,19 @@
 ---
 title: Qualifiers and References
-description: How NeoWiki models Wikibase-style qualifiers, references, and rank with Subjects, Relations, and Schemas.
+description: How SWS models Wikibase-style qualifiers, references, and rank with Subjects, Relations, and Schemas.
 order: 3
 ---
 # Qualifiers and References
 
-NeoWiki Statements have no qualifiers, references, or rank, unlike Wikibase Statements. A Statement is flat: one
+SWS Statements have no qualifiers, references, or rank, unlike Wikibase Statements. A Statement is flat: one
 property and its Value, with no inner structure. You express qualified and referenced data by reifying it — the value
 that needs context becomes its own Subject with its own Schema, linked from the main Subject by a Relation. A page can
 hold any number of Subjects ([ADR 7](adr/007-multiple-subjects-per-page.md)), so this adds Subjects, not a page per
 value.
 
-![A Wikibase statement with a qualifier and a reference, and the same data in NeoWiki as a Relation to a Subject whose properties hold the qualifier and reference](qualifiers-and-references.svg)
+![A Wikibase statement with a qualifier and a reference, and the same data in SWS as a Relation to a Subject whose properties hold the qualifier and reference](qualifiers-and-references.svg)
 
-NeoWiki is a [Property Graph](https://en.wikipedia.org/wiki/Property_graph): Subjects are nodes with typed properties
+SWS is a [Property Graph](https://en.wikipedia.org/wiki/Property_graph): Subjects are nodes with typed properties
 and Relations are edges.
 
 For the underlying concepts (Subject, Statement, Relation, Schema), see the [Glossary](glossary.md).
@@ -51,12 +51,12 @@ Subject's Schema.
 
 ## Rank
 
-NeoWiki has no rank. What rank encodes is ordinary data: model it explicitly — typically a date property for current
+SWS has no rank. What rank encodes is ordinary data: model it explicitly — typically a date property for current
 vs. historical values, or a status property for deprecated ones.
 
 ## Mapping from Wikibase
 
-| Wikibase | NeoWiki |
+| Wikibase | SWS |
 |---|---|
 | Statement | A Subject's Statement (property + value), or a Relation |
 | Qualifier | A property on a linked Subject (reify the value or the link) |

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Tests\Domain\Mapping;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\CurieExpander;
+use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Mapping\CurieExpander
+ * @covers \ProfessionalWiki\SWS\Domain\Mapping\CurieExpander
  */
 class CurieExpanderTest extends TestCase {
 

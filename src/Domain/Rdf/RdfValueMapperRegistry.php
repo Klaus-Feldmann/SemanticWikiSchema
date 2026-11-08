@@ -2,28 +2,28 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Domain\Rdf;
 
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\BooleanType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\NeoWiki\Domain\HistoricalDate;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\MonolingualTextType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateTimeProperty;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualText;
-use ProfessionalWiki\NeoWiki\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\NeoValue;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
+use ProfessionalWiki\SWS\Domain\HistoricalDate;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\MonolingualTextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
+use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
+use ProfessionalWiki\SWS\Domain\Value\NeoValue;
 
 /**
  * Maps a Statement's {@see NeoValue} to the RDF {@see RdfTerm}s that represent it — {@see Literal}s, or
  * {@see Iri}s for values that denote a resource (a url) — keyed by the Statement's Property Type. The
  * seam mirrors Neo4jValueBuilderRegistry so extension-defined property types can contribute their RDF
- * representation via NeoWikiRegistrar::addRdfValueMapper.
+ * representation via SWSRegistrar::addRdfValueMapper.
  *
  * Relation values are not mapped here; the projector reifies them separately (two-layer approach).
  * A Property Type without a mapper (including an unregistered type) yields null and is skipped,
@@ -66,7 +66,7 @@ class RdfValueMapperRegistry {
 		$registry->registerMapper( 'page', static function ( NeoValue $value ): array {
 			$result = [];
 			foreach ( (array)$value->toScalars() as $text ) {
-				$normal = is_string( $text ) ? \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\LocalPageTitle::normalize( $text ) : null;
+				$normal = is_string( $text ) ? \ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $text ) : null;
 				if ( $normal !== null ) {
 					$result[] = new Iri( \MediaWiki\Title\Title::newFromText( $normal )->getFullURL() );
 				}
@@ -119,7 +119,7 @@ class RdfValueMapperRegistry {
 	 * @return RdfTerm[]
 	 */
 	private static function urlMapper( NeoValue $value ): array {
-		$scalars = $value instanceof \ProfessionalWiki\NeoWiki\Domain\Value\UrlValue ? $value->urls() : $value->toScalars();
+		$scalars = $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ? $value->urls() : $value->toScalars();
 
 		if ( !is_array( $scalars ) ) {
 			return [];

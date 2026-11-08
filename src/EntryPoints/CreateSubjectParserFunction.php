@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use Closure;
 use InvalidArgumentException;
@@ -10,12 +10,12 @@ use MediaWiki\Html\Html;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutputFlags;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Actions\SubjectsAction;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * Only the parsed page's own Subjects are resolved at parse time: they live in its revision, so it
@@ -82,7 +82,7 @@ class CreateSubjectParserFunction {
 			}
 
 			if ( !str_contains( $arg, '=' ) ) {
-				return $this->renderError( $parser, 'neowiki-create-subject-error-positional', trim( $arg ) );
+				return $this->renderError( $parser, 'sws-create-subject-error-positional', trim( $arg ) );
 			}
 
 			[ $key, $value ] = explode( '=', $arg, 2 );
@@ -91,7 +91,7 @@ class CreateSubjectParserFunction {
 			if ( !in_array( $key, [ self::ARG_SCHEMA, self::ARG_PAGE, self::ARG_TEXT ], true ) ) {
 				return $this->renderError(
 					$parser,
-					'neowiki-create-subject-error-unknown-arg',
+					'sws-create-subject-error-unknown-arg',
 					$key !== '' ? $key : $arg
 				);
 			}
@@ -111,7 +111,7 @@ class CreateSubjectParserFunction {
 	 * @return array<string, string>|string
 	 */
 	private function buildAttributes( Parser $parser, array $named ): array|string {
-		$attributes = [ 'class' => 'ext-neowiki-create-subject-button' ];
+		$attributes = [ 'class' => 'ext-sws-create-subject-button' ];
 
 		$schemaName = $named[self::ARG_SCHEMA] ?? null;
 
@@ -119,21 +119,21 @@ class CreateSubjectParserFunction {
 			$schemaTitle = $this->existingSchemaTitle( $parser, $schemaName );
 
 			if ( $schemaTitle === null ) {
-				return $this->renderError( $parser, 'neowiki-create-subject-error-unknown-schema', $schemaName );
+				return $this->renderError( $parser, 'sws-create-subject-error-unknown-schema', $schemaName );
 			}
 
 			if ( $this->hasDependentSubjects( $parser, $schemaTitle ) ) {
-				return $this->renderError( $parser, 'neowiki-create-subject-error-dependent-subjects', $schemaTitle->getText() );
+				return $this->renderError( $parser, 'sws-create-subject-error-dependent-subjects', $schemaTitle->getText() );
 			}
 
 			// Subjects store their Schema under the name its page is titled with, not as typed.
-			$attributes['data-mw-neowiki-schema'] = $schemaTitle->getText();
+			$attributes['data-mw-sws-schema'] = $schemaTitle->getText();
 		}
 
 		$text = $named[self::ARG_TEXT] ?? null;
 
 		if ( $text !== null ) {
-			$attributes['data-mw-neowiki-text'] = $text;
+			$attributes['data-mw-sws-text'] = $text;
 		}
 
 		$page = $this->pageAttributes( $parser, $named[self::ARG_PAGE] ?? null );
@@ -149,10 +149,10 @@ class CreateSubjectParserFunction {
 	 * A page whose Schema does not exist yet renders an error, so the link re-parses it once the Schema is created.
 	 */
 	private function existingSchemaTitle( Parser $parser, string $schemaName ): ?Title {
-		$title = Title::newFromText( $schemaName, NeoWikiExtension::NS_SCHEMA );
+		$title = Title::newFromText( $schemaName, SWSExtension::NS_SCHEMA );
 
 		// A prefix naming another namespace names a page that cannot be a Schema.
-		if ( $title === null || !$title->inNamespace( NeoWikiExtension::NS_SCHEMA ) ) {
+		if ( $title === null || !$title->inNamespace( SWSExtension::NS_SCHEMA ) ) {
 			return null;
 		}
 
@@ -180,14 +180,14 @@ class CreateSubjectParserFunction {
 		}
 
 		if ( $page === self::PAGE_NEW ) {
-			return [ 'data-mw-neowiki-page' => self::PAGE_NEW ];
+			return [ 'data-mw-sws-page' => self::PAGE_NEW ];
 		}
 
 		if ( $page === self::PAGE_THIS ) {
 			// A page that cannot hold Subjects falls back to a new page rather than an error.
 			$pageCanHoldSubjects = SubjectsAction::isEligibleTitle( $parser->getTitle() );
 
-			return [ 'data-mw-neowiki-page' => $pageCanHoldSubjects ? self::PAGE_THIS : self::PAGE_NEW ];
+			return [ 'data-mw-sws-page' => $pageCanHoldSubjects ? self::PAGE_THIS : self::PAGE_NEW ];
 		}
 
 		return $this->namedPageAttributes( $parser, $page );
@@ -205,7 +205,7 @@ class CreateSubjectParserFunction {
 			return [];
 		}
 
-		return [ 'data-mw-neowiki-page-has-main-subject' => $this->hasMainSubject( $title ) ];
+		return [ 'data-mw-sws-page-has-main-subject' => $this->hasMainSubject( $title ) ];
 	}
 
 	private function hasMainSubject( Title $title ): string {
@@ -222,7 +222,7 @@ class CreateSubjectParserFunction {
 
 		// canExist() rules out interwiki links and special pages.
 		if ( $title === null || !$title->canExist() ) {
-			return $this->renderError( $parser, 'neowiki-create-subject-error-invalid-page', $page );
+			return $this->renderError( $parser, 'sws-create-subject-error-invalid-page', $page );
 		}
 
 		$pageId = $title->getArticleID();
@@ -233,7 +233,7 @@ class CreateSubjectParserFunction {
 		if ( $pageId === 0 && $this->subjectFirst ) {
 			return $this->renderError(
 				$parser,
-				'neowiki-create-subject-error-uncreatable-page-subject-first',
+				'sws-create-subject-error-uncreatable-page-subject-first',
 				$title->getPrefixedText()
 			);
 		}
@@ -243,14 +243,14 @@ class CreateSubjectParserFunction {
 		if ( $pageId === 0 && !$title->inNamespace( NS_MAIN ) ) {
 			return $this->renderError(
 				$parser,
-				'neowiki-create-subject-error-uncreatable-page',
+				'sws-create-subject-error-uncreatable-page',
 				$title->getPrefixedText()
 			);
 		}
 
 		return [
-			'data-mw-neowiki-page-title' => $title->getPrefixedText(),
-			'data-mw-neowiki-page-id' => (string)$pageId,
+			'data-mw-sws-page-title' => $title->getPrefixedText(),
+			'data-mw-sws-page-id' => (string)$pageId,
 		];
 	}
 
@@ -258,8 +258,8 @@ class CreateSubjectParserFunction {
 	 * Help and Project pages carry no Subjects, so nothing else loads the frontend there.
 	 */
 	private function loadFrontend( Parser $parser ): void {
-		$parser->getOutput()->addModules( [ 'ext.neowiki' ] );
-		$parser->getOutput()->addModuleStyles( [ 'ext.neowiki.styles' ] );
+		$parser->getOutput()->addModules( [ 'ext.sws' ] );
+		$parser->getOutput()->addModuleStyles( [ 'ext.sws.styles' ] );
 	}
 
 	/**

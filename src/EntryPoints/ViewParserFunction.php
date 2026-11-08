@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Presentation\ViewHtmlBuilder;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
 
 class ViewParserFunction {
 
@@ -63,7 +63,7 @@ class ViewParserFunction {
 		[ $positional, $named ] = $classified;
 
 		if ( count( $positional ) > 1 ) {
-			return $this->renderError( $parser, 'neowiki-view-error-extra-positional', $positional[1] );
+			return $this->renderError( $parser, 'sws-view-error-extra-positional', $positional[1] );
 		}
 
 		return $this->resolveSubjectAndLayout( $parser, $positional[0] ?? '', $named );
@@ -89,7 +89,7 @@ class ViewParserFunction {
 			if ( $key !== self::ARG_SUBJECT && $key !== self::ARG_LAYOUT ) {
 				return $this->renderError(
 					$parser,
-					'neowiki-view-error-unknown-arg',
+					'sws-view-error-unknown-arg',
 					$key !== '' ? $key : $arg
 				);
 			}
@@ -108,7 +108,7 @@ class ViewParserFunction {
 		$namedSubject = $named[self::ARG_SUBJECT] ?? '';
 
 		if ( $positionalSubject !== '' && $namedSubject !== '' ) {
-			return $this->renderError( $parser, 'neowiki-view-error-conflicting-subject' );
+			return $this->renderError( $parser, 'sws-view-error-conflicting-subject' );
 		}
 
 		$subjectId = $this->pickSubjectId( $positionalSubject, $namedSubject );

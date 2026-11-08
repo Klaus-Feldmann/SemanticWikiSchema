@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\LayoutPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\WikiPageLayoutLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\WikiPageLayoutLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup
  */
 class WikiPageLayoutLookupTest extends MediaWikiIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	public function testUnreadableLayoutPageIsNullAndContentIsNeverFetched(): void {
 		$fetcher = $this->createMock( PageContentFetcher::class );
@@ -47,7 +47,7 @@ class WikiPageLayoutLookupTest extends MediaWikiIntegrationTestCase {
 		$title->method( 'getPrefixedDBkey' )->willReturn( 'Layout:Person_card' );
 
 		$titleFactory = $this->createStub( TitleFactory::class );
-		$titleFactory->method( 'newFromText' )->with( 'Person card', NeoWikiExtension::NS_LAYOUT )->willReturn( $title );
+		$titleFactory->method( 'newFromText' )->with( 'Person card', SWSExtension::NS_LAYOUT )->willReturn( $title );
 
 		return new WikiPageLayoutLookup(
 			pageContentFetcher: $fetcher,

@@ -1,0 +1,273 @@
+<template>
+	<div class="ext-sws-layout-creator">
+		<CdxField
+			:status="nameStatus"
+			:messages="nameError ? { error: nameError } : {}"
+		>
+			<CdxTextInput
+				ref="nameInputRef"
+				v-model="layoutName"
+				:placeholder="$i18n( 'sws-layout-creator-name-placeholder' ).text()"
+				@input="onNameInput"
+			/>
+			<template #label>
+				{{ $i18n( 'sws-layout-creator-name-field' ).text() }}
+			</template>
+		</CdxField>
+
+		<CdxField>
+			<SchemaPicker
+				:selected="selectedSchema"
+				@select="onSchemaSelected"
+			/>
+			<template #label>
+				{{ $i18n( 'sws-layout-creator-schema-field' ).text() }}
+			</template>
+		</CdxField>
+
+		<CdxField>
+			<CdxSelect
+				v-model:selected="selectedViewType"
+				:menu-items="viewTypeMenuItems"
+				:default-label="$i18n( 'sws-layout-creator-view-type-placeholder' ).text()"
+				@update:selected="onChange"
+			/>
+			<template #label>
+				{{ $i18n( 'sws-layout-creator-view-type-field' ).text() }}
+			</template>
+		</CdxField>
+
+		<div
+			v-if="selectedSchema"
+			class="ext-sws-layout-creator__display-rules"
+		>
+			<CdxMessage
+				v-if="schemaFetchFailed"
+				type="error"
+				:inline="true"
+			>
+				{{ $i18n( 'sws-layout-editor-schema-fetch-error' ).text() }}
+			</CdxMessage>
+			<DisplayRuleList
+				v-else
+				:schema-properties="schemaProperties"
+				:display-rules="currentDisplayRules"
+				:properties-targeting-dependent-subjects="targetingDependentSubjects"
+				@update:display-rules="onDisplayRulesChanged"
+			/>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref, shallowRef } from 'vue';
+import { CdxField, CdxMessage, CdxSelect, CdxTextInput } from '@wikimedia/codex';
+import type { MenuItemData, ValidationStatusType } from '@wikimedia/codex';
+import { SWSServices } from '@/SWSServices.ts';
+import { Layout, type DisplayRule } from '@/domain/Layout.ts';
+import type { PropertyDefinition, PropertyName } from '@/domain/PropertyDefinition.ts';
+import DisplayRuleList from '@/components/LayoutEditor/DisplayRuleList.vue';
+import SchemaPicker from '@/components/common/SchemaPicker.vue';
+import { propertiesTargetingDependentSubjects } from '@/domain/propertyTypes/Relation.ts';
+import { subjectsAreDependentIn } from '@/application/SchemaLookup.ts';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
+
+const emit = defineEmits<{
+	change: [];
+}>();
+
+const layoutRepo = SWSServices.getLayoutRepository();
+const schemaRepo = SWSServices.getSchemaRepository();
+const schemaStore = useSchemaStore();
+
+const DEBOUNCE_DELAY = 300;
+const DEFAULT_VIEW_TYPE = 'infobox';
+
+const layoutName = ref( '' );
+const nameError = ref( '' );
+const nameStatus = ref<ValidationStatusType>( 'default' );
+const nameInputRef = ref<InstanceType<typeof CdxTextInput> | null>( null );
+const selectedSchema = ref<string | null>( null );
+const selectedViewType = ref<string | null>( DEFAULT_VIEW_TYPE );
+const schemaProperties = shallowRef<PropertyDefinition[]>( [] );
+const targetingDependentSubjects = shallowRef<PropertyName[]>( [] );
+const schemaFetchFailed = ref( false );
+const currentDisplayRules = shallowRef<DisplayRule[]>( [] );
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+let requestSequence = 0;
+
+const viewTypeMenuItems = computed<MenuItemData[]>( () =>
+	SWSServices.getViewTypeRegistry().getTypeNames().map(
+		( name ) => ( { label: name, value: name } )
+	)
+);
+
+function onChange(): void {
+	emit( 'change' );
+}
+
+async function onSchemaSelected( schemaName: string ): Promise<void> {
+	selectedSchema.value = schemaName;
+	schemaProperties.value = [];
+	targetingDependentSubjects.value = [];
+	schemaFetchFailed.value = false;
+
+	currentDisplayRules.value = [];
+	emit( 'change' );
+
+	try {
+		const [ schema, summaries ] = await Promise.all( [
+			schemaRepo.getSchema( schemaName ),
+			schemaStore.fetchAllSchemaSummaries()
+		] );
+
+		// Answered after another Schema was picked, whose properties the list is for.
+		if ( selectedSchema.value !== schemaName ) {
+			return;
+		}
+
+		schemaProperties.value = [ ...schema.getPropertyDefinitions() ];
+		targetingDependentSubjects.value = propertiesTargetingDependentSubjects( schema, subjectsAreDependentIn( summaries ) )
+			.map( ( property ) => property.name );
+	} catch ( error ) {
+		if ( selectedSchema.value !== schemaName ) {
+			return;
+		}
+
+		console.error( 'Failed to fetch schema:', error );
+		schemaFetchFailed.value = true;
+	}
+}
+
+function onDisplayRulesChanged( rules: DisplayRule[] ): void {
+	currentDisplayRules.value = rules;
+	emit( 'change' );
+}
+
+function onNameInput(): void {
+	nameError.value = '';
+	nameStatus.value = 'default';
+	emit( 'change' );
+	clearDebounceTimer();
+	requestSequence++;
+
+	const name = layoutName.value.trim();
+
+	if ( !name ) {
+		nameError.value = mw.msg( 'sws-layout-creator-name-required' );
+		nameStatus.value = 'error';
+		return;
+	}
+
+	const expectedSequence = requestSequence;
+	debounceTimer = setTimeout( () => checkDuplicateName( name, expectedSequence ), DEBOUNCE_DELAY );
+}
+
+async function checkDuplicateName( name: string, expectedSequence: number ): Promise<void> {
+	try {
+		await layoutRepo.getLayout( name );
+
+		if ( expectedSequence !== requestSequence ) {
+			return;
+		}
+
+		nameError.value = mw.msg( 'sws-layout-creator-name-taken' );
+		nameStatus.value = 'error';
+	} catch {
+		// Layout not found — name is available
+	}
+}
+
+function clearDebounceTimer(): void {
+	if ( debounceTimer !== null ) {
+		clearTimeout( debounceTimer );
+		debounceTimer = null;
+	}
+}
+
+async function validate(): Promise<boolean> {
+	clearDebounceTimer();
+	requestSequence++;
+
+	const name = layoutName.value.trim();
+
+	if ( !name ) {
+		nameError.value = mw.msg( 'sws-layout-creator-name-required' );
+		nameStatus.value = 'error';
+		return false;
+	}
+
+	try {
+		await layoutRepo.getLayout( name );
+		nameError.value = mw.msg( 'sws-layout-creator-name-taken' );
+		nameStatus.value = 'error';
+		return false;
+	} catch {
+		// Layout not found — name is available
+	}
+
+	if ( !selectedSchema.value ) {
+		return false;
+	}
+
+	if ( !selectedViewType.value ) {
+		return false;
+	}
+
+	return true;
+}
+
+function getLayout(): Layout | null {
+	const name = layoutName.value.trim();
+
+	if ( !name || !selectedSchema.value || !selectedViewType.value ) {
+		return null;
+	}
+
+	const displayRules = [ ...currentDisplayRules.value ];
+	return new Layout( name, selectedSchema.value, selectedViewType.value, '', displayRules, {} );
+}
+
+function reset(): void {
+	clearDebounceTimer();
+	requestSequence++;
+	layoutName.value = '';
+	nameError.value = '';
+	nameStatus.value = 'default';
+	selectedSchema.value = null;
+	selectedViewType.value = DEFAULT_VIEW_TYPE;
+	schemaProperties.value = [];
+	targetingDependentSubjects.value = [];
+	schemaFetchFailed.value = false;
+
+	currentDisplayRules.value = [];
+}
+
+export interface LayoutCreatorExposes {
+	validate: () => Promise<boolean>;
+	getLayout: () => Layout | null;
+	reset: () => void;
+}
+
+defineExpose( { validate, getLayout, reset } );
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-layout-creator {
+	display: flex;
+	flex-direction: column;
+	gap: @spacing-100;
+	padding: @spacing-100;
+
+	@media ( min-width: @min-width-breakpoint-desktop ) {
+		padding: @spacing-150;
+	}
+
+	&__display-rules {
+		border-block-start: @border-subtle;
+		padding-block-start: @spacing-100;
+	}
+}
+</style>

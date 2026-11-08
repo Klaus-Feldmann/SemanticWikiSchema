@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\JsonContent;
@@ -10,11 +10,11 @@ use MediaWiki\Content\WikitextContent;
 use MediaWiki\Permissions\Authority;
 use MediaWikiIntegrationTestCase;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MediaWikiWikiConfigSource;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageContentFetcher;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageContentFetcher;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MediaWikiWikiConfigSource
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
  */
 class MediaWikiWikiConfigSourceTest extends MediaWikiIntegrationTestCase {
 
@@ -22,7 +22,7 @@ class MediaWikiWikiConfigSourceTest extends MediaWikiIntegrationTestCase {
 		return new MediaWikiWikiConfigSource(
 			new StubPageContentFetcher( $content, $throw ),
 			$this->createMock( Authority::class ),
-			'NeoWiki',
+			'SWS',
 			$logger ?? new TestLogger()
 		);
 	}
@@ -54,7 +54,7 @@ class MediaWikiWikiConfigSourceTest extends MediaWikiIntegrationTestCase {
 
 	public function testReadsThePageAtMostOnce(): void {
 		$fetcher = new StubPageContentFetcher( new JsonContent( '{}' ) );
-		$source = new MediaWikiWikiConfigSource( $fetcher, $this->createMock( Authority::class ), 'NeoWiki', new TestLogger() );
+		$source = new MediaWikiWikiConfigSource( $fetcher, $this->createMock( Authority::class ), 'SWS', new TestLogger() );
 
 		$source->readConfig();
 		$source->readConfig();

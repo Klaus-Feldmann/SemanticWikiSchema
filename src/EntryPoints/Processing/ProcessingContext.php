@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;

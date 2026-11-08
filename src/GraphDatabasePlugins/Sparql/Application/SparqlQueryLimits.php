@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\User\User;
 
 /**
- * Per-tier resource cap for a SPARQL query, read from the shared `NeoWikiQueryLimits` config — the same
+ * Per-tier resource cap for a SPARQL query, read from the shared `SWSQueryLimits` config — the same
  * config the Neo4j surfaces use. Mirrors
- * {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits}, but carries
+ * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits}, but carries
  * only `timeoutSeconds`: unlike Cypher, the SPARQL surfaces do not apply the `maxRows` cap (see
  * {@see SparqlQueryService} for why truncating the W3C results document is out of scope here).
  */
@@ -40,7 +40,7 @@ readonly class SparqlQueryLimits {
 
 	private static function forTier( string $tier ): self {
 		/** @var array<string, array{timeoutSeconds: int, maxRows: int}> $config */
-		$config = MediaWikiServices::getInstance()->getMainConfig()->get( 'NeoWikiQueryLimits' );
+		$config = MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSQueryLimits' );
 
 		return new self(
 			timeoutSeconds: (int)$config[$tier]['timeoutSeconds'],

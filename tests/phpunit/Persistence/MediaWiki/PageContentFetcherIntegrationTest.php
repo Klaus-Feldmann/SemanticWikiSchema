@@ -2,25 +2,25 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentFetcher
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver
  * @group Database
  */
-class PageContentFetcherIntegrationTest extends NeoWikiIntegrationTestCase {
+class PageContentFetcherIntegrationTest extends SWSIntegrationTestCase {
 
 	private const TITLE = 'PageContentFetcherIntegrationTest';
 
 	public function setUp(): void {
-		$savingStatus = NeoWikiExtension::getInstance()->getPageContentSaver()->saveContent(
+		$savingStatus = SWSExtension::getInstance()->getPageContentSaver()->saveContent(
 			Title::newFromText( self::TITLE ),
 			[
 				'main' => new WikitextContent( 'foo' ),
@@ -33,7 +33,7 @@ class PageContentFetcherIntegrationTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testCanGetMainContent(): void {
-		$content = NeoWikiExtension::getInstance()->getPageContentFetcher()->getPageContent(
+		$content = SWSExtension::getInstance()->getPageContentFetcher()->getPageContent(
 			self::TITLE,
 			$this->getTestSysop()->getAuthority()
 		);
@@ -43,7 +43,7 @@ class PageContentFetcherIntegrationTest extends NeoWikiIntegrationTestCase {
 
 	public function testReturnsNullForNonExistingPage(): void {
 		$this->assertNull(
-				NeoWikiExtension::getInstance()->getPageContentFetcher()->getPageContent(
+				SWSExtension::getInstance()->getPageContentFetcher()->getPageContent(
 				self::TITLE . '404',
 				$this->getTestSysop()->getAuthority()
 			)
@@ -52,16 +52,16 @@ class PageContentFetcherIntegrationTest extends NeoWikiIntegrationTestCase {
 
 	public function testReturnsNullForNonExistingSlot(): void {
 		$this->assertNull(
-			NeoWikiExtension::getInstance()->getPageContentFetcher()->getPageContent(
+			SWSExtension::getInstance()->getPageContentFetcher()->getPageContent(
 				self::TITLE,
 				$this->getTestSysop()->getAuthority(),
-				slotName: 'neo'
+				slotName: 'sws'
 			)
 		);
 	}
 
 	//public function testCanGetSpecialSlotContent(): void {
-	//	$content = NeoWikiExtension::getInstance()->getPageContentFetcher()->getPageContent(
+	//	$content = SWSExtension::getInstance()->getPageContentFetcher()->getPageContent(
 	//		self::TITLE,
 	//		$this->getTestSysop()->getAuthority(),
 	//		slotName: 'blocks'
@@ -74,7 +74,7 @@ class PageContentFetcherIntegrationTest extends NeoWikiIntegrationTestCase {
 	//}
 
 	public function testCanUseTitleObject(): void {
-		$content = NeoWikiExtension::getInstance()->getPageContentFetcher()->getPageContent(
+		$content = SWSExtension::getInstance()->getPageContentFetcher()->getPageContent(
 			Title::newFromText( self::TITLE ),
 			$this->getTestSysop()->getAuthority()
 		);

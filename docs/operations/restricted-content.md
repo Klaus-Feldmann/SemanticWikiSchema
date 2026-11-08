@@ -5,7 +5,7 @@ order: 5
 
 # Restricted content
 
-NeoWiki gates every read on the page that stores the data, with the reader's own rights, and has nothing finer than
+SWS gates every read on the page that stores the data, with the reader's own rights, and has nothing finer than
 the page ([ADR 27](../adr/027-access-control.md)). Page protection and `$wgNamespaceProtection` do not restrict
 reading ([Permissions](../api/rest-api.md#permissions)).
 
@@ -16,23 +16,23 @@ reading ([Permissions](../api/rest-api.md#permissions)).
 | Subject, subject-label search, Schema, Layout, Mapping and RDF reads over [REST](../api/rest-api.md#permissions) | The storing page's `read` | Absent data, never `403` |
 | `{{#view}}` | The storing page's `read`, per viewer over REST | Nothing rendered |
 | Links in Recent changes and watchlists to a page titled by a Subject id, which show its Main Subject's label | The linked page's `read`, per viewer | The page title |
-| `{{#neowiki_value}}` and the `nw.` accessors | The storing page's `read`, as the parsing user | Empty output, `nil`, or an empty table |
-| `{{#cypher_raw}}`, `{{#sparql_raw}}`, `nw.query`, `nw.sparqlQuery` | The parsing user's [`neowiki-query`](../api/query-api.md#permissions), a whole-store read | An error box; in Lua, no results |
-| `POST /query/cypher`, `POST /query/sparql` | The caller's `neowiki-query` | `403` |
-| Graph-store status and rebuilds | The caller's `neowiki-admin` (`sysop` by default) | `403` |
-| Subject counts on Special:Schemas and `GET /subject-counts` | The reader's `neowiki-query`: the counts include Subjects on pages they cannot read | No counts; `GET /subject-counts` answers `403` |
+| `{{#sws_value}}` and the `nw.` accessors | The storing page's `read`, as the parsing user | Empty output, `nil`, or an empty table |
+| `{{#cypher_raw}}`, `{{#sparql_raw}}`, `nw.query`, `nw.sparqlQuery` | The parsing user's [`sws-query`](../api/query-api.md#permissions), a whole-store read | An error box; in Lua, no results |
+| `POST /query/cypher`, `POST /query/sparql` | The caller's `sws-query` | `403` |
+| Graph-store status and rebuilds | The caller's `sws-admin` (`sysop` by default) | `403` |
+| Subject counts on Special:Schemas and `GET /subject-counts` | The reader's `sws-query`: the counts include Subjects on pages they cannot read | No counts; `GET /subject-counts` answers `403` |
 | Subjects from a [Subject Source](../extending/subject-sources.md) | Nothing: no page to authorize against, so a Source must serve only what every reader may see | — |
 
 On a wiki that requires login to read, `{{#view}}` renders nothing for anonymous readers on a page opened through
 `$wgWhitelistRead`: they get no [REST](../api/rest-api.md#permissions) at all.
 
-## Narrowing `neowiki-query`
+## Narrowing `sws-query`
 
-NeoWiki grants the right to `*`. Withdrawing it denies anonymous readers the Subject counts and any query surface.
+SWS grants the right to `*`. Withdrawing it denies anonymous readers the Subject counts and any query surface.
 
 ```php
-$wgGroupPermissions['*']['neowiki-query'] = false;
-$wgGroupPermissions['user']['neowiki-query'] = true;
+$wgGroupPermissions['*']['sws-query'] = false;
+$wgGroupPermissions['user']['sws-query'] = true;
 ```
 
 Check `Special:ListGroupRights`, then load a page with a raw query while logged out. OAuth consumers and bot
@@ -47,10 +47,10 @@ results.
 ## Removing the Lua library
 
 ```php
-$wgNeoWikiEnableLua = false;
+$wgSWSEnableLua = false;
 ```
 
-`require('mw.neowiki')` then fails like any missing module, so a page whose module uses the library shows a script
+`require('mw.sws')` then fails like any missing module, so a page whose module uses the library shows a script
 error and joins the pages-with-script-errors category. A module can still reach the parser functions through
 `frame:preprocess`, under the same gates as in wikitext.
 

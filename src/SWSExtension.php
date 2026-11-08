@@ -1,0 +1,2438 @@
+<?php
+
+declare( strict_types = 1 );
+
+namespace ProfessionalWiki\SWS;
+
+use Closure;
+use Exception;
+use InvalidArgumentException;
+use LogicException;
+use Laudis\Neo4j\ClientBuilder;
+use Laudis\Neo4j\Contracts\ClientInterface;
+use MediaWiki\Context\RequestContext;
+use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MainConfigNames;
+use MediaWiki\MediaWikiServices;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Permissions\Authority;
+use MediaWiki\Permissions\UltimateAuthority;
+use MediaWiki\Rest\Response;
+use MediaWiki\Revision\RevisionRecord;
+use MediaWiki\Session\CsrfTokenSet;
+use MediaWiki\Title\Title;
+use MediaWiki\User\UserIdentityValue;
+use MessageLocalizer;
+use Opis\JsonSchema\Validator;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPagePresenter;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectPresenter;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\Application\Actions\DeleteSubject\DeleteSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction;
+use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
+use ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectAction;
+use ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Actions\UpdateStatement\UpdateStatementAction;
+use ProfessionalWiki\SWS\Application\Actions\UpdateStatement\UpdateStatementPresenter;
+use ProfessionalWiki\SWS\Application\StatementListBuilder;
+use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
+use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigValidator;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigSource;
+use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
+use ProfessionalWiki\SWS\Application\PageSubjectsAtRevisionLookup;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
+use ProfessionalWiki\SWS\Application\SubjectContentRepository;
+use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery;
+use ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
+use ProfessionalWiki\SWS\Application\Queries\ValidateSubjectUpdate\ValidateSubjectUpdateQuery;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
+use ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider;
+use ProfessionalWiki\SWS\Application\EditNotice\InterfaceMessageNoticeProvider;
+use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
+use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
+use ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
+use ProfessionalWiki\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Application\SubjectCountLookup;
+use ProfessionalWiki\SWS\Application\SubjectLabelLookup;
+use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
+use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
+use ProfessionalWiki\SWS\Application\HostSubjectBuilder;
+use ProfessionalWiki\SWS\Application\LayoutLookup;
+use ProfessionalWiki\SWS\Application\SubjectPermissionHints;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\ReadAuthorizedSubjectLookup;
+use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
+use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
+use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
+use ProfessionalWiki\SWS\Application\LastEditorPagesRebuilder;
+use ProfessionalWiki\SWS\Application\PageRebuilder;
+use ProfessionalWiki\SWS\Application\FailureIsolatingRevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicyRegistry;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\SubjectIdMinter;
+use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
+use ProfessionalWiki\SWS\Application\SubjectLookup;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Application\SubjectResolver;
+use ProfessionalWiki\SWS\Application\MappingLookup;
+use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
+use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageExporter;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
+use ProfessionalWiki\SWS\Application\Rdf\RdfProjectionResolution;
+use ProfessionalWiki\SWS\Application\Rdf\RdfSubjectExporter;
+use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use ProfessionalWiki\SWS\EntryPoints\REST\ExportPageRdfApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Application\Source\LocalSource;
+use ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
+use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
+use ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetMappingSummariesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaNamesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaSummariesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectCountsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
+use ProfessionalWiki\SWS\EntryPoints\REST\MintSubjectIdsApi;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
+use ProfessionalWiki\SWS\EntryPoints\REST\RemoveStatementApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectUpdateApi;
+use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer;
+use ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder;
+use ProfessionalWiki\SWS\Infrastructure\TitleBasedPageIdentifiersResolver;
+use ProfessionalWiki\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectContentRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PointInTimeSubjectLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSubjectCountLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseMappingNameLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
+use ProfessionalWiki\SWS\Persistence\MappingNameLookup;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin;
+use ProfessionalWiki\SWS\Persistence\DeletedPageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\NullPublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\NullSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
+use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
+use ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder;
+use ProfessionalWiki\SWS\Infrastructure\MediaWikiRebuildJobQueue;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
+use ProfessionalWiki\SWS\Persistence\SchemaNameLookup;
+use ProfessionalWiki\SWS\Persistence\LayoutNameLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLayoutNameLookup;
+use ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder;
+use ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\FrontendModuleLoader;
+use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
+use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
+use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
+use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
+use ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder;
+use RuntimeException;
+use Wikimedia\Rdbms\IDatabase;
+
+class SWSExtension {
+
+	public const int NS_SCHEMA = 7474;
+	public const int NS_LAYOUT = 7476;
+	public const int NS_MAPPING = 7478;
+	public const int NS_SUBJECT = 7480;
+
+	/**
+	 * The page in the MediaWiki namespace holding the on-wiki JSON configuration (MediaWiki:SWS).
+	 */
+	public const string CONFIG_PAGE_TITLE = 'SWS';
+
+	/**
+	 * The right to administer SWS's own machinery — reading how far each graph store is from the wiki,
+	 * and rebuilding one. Separate from editing content, because it is about the installation rather than
+	 * about what the wiki says.
+	 */
+	public const string ADMIN_RIGHT = 'sws-admin';
+
+	public const string SUBJECT_SEARCH_FIELD = 'sws_text';
+
+	/**
+	 * Most rows one Subject listing request reads while dropping rows the caller may not read (ADR 27). A page of
+	 * 50 needs 51 readable rows, so this leaves room for many unreadable ones before a page ends short.
+	 */
+	private const int SUBJECT_SUMMARY_SCAN_BOUND = 1000;
+
+	/**
+	 * How far back the recently edited Subjects look: the wiki's newest revisions, of any page.
+	 */
+	private const int RECENTLY_EDITED_SUBJECTS_REVISION_BOUND = 2000;
+
+	/**
+	 * Most pages and edits one request for the recently edited Subjects reads. 50 Subjects on pages of their own take
+	 * about 100.
+	 */
+	private const int RECENTLY_EDITED_SUBJECTS_READ_BOUND = 200;
+
+	private PropertyTypeRegistry $propertyTypeRegistry;
+	private PagePropertyProviderRegistry $pagePropertyProviderRegistry;
+	private SubjectEditNoticeProviderRegistry $subjectEditNoticeProviderRegistry;
+	private SourceRegistry $sourceRegistry;
+	private Neo4jValueBuilderRegistry $valueBuilderRegistry;
+	private RdfValueMapperRegistry $rdfValueMapperRegistry;
+	private bool $extensionsRegistered = false;
+	private SubjectRepository $subjectRepository;
+	private CompositeGraphDatabasePlugin $graphDatabasePlugin;
+	private CompositeGraphDatabasePlugin $isolatingGraphDatabasePlugin;
+	private GraphDatabasePluginRegistry $graphDatabasePluginRegistry;
+	private RevisionPolicyRegistry $revisionPolicyRegistry;
+	private ?Neo4jPlugin $neo4jPlugin = null;
+	/** @var array<string, SparqlPlugin>|null Keys are store names */
+	private ?array $sparqlPlugins = null;
+	private ClientInterface $neo4jClient;
+	private ClientInterface $readOnlyNeo4jClient;
+	private ?WikiConfigSource $wikiConfigSource = null;
+	private ?SchemaLookup $schemaLookup = null;
+	private ?SchemaResolver $unrestrictedSchemaResolver = null;
+	private ?SubjectSearchHitLookup $subjectSearchHitLookup = null;
+	private ?SchemaReferenceParser $schemaReferenceParser = null;
+	private ?SubjectInPlaceOfPageTitleLookup $subjectInPlaceOfPageTitleLookup = null;
+	/** @var array<string, SchemaLookup> */
+	private array $schemaLookupsByUser = [];
+	private static ?self $instance = null;
+
+	public static function getInstance(): self {
+		self::$instance ??= new self(
+			( new SWSConfigFactory( LoggerFactory::getInstance( 'SWS' ) ) )
+				->buildFromMediaWikiConfig( MediaWikiServices::getInstance()->getMainConfig() )
+		);
+
+		return self::$instance;
+	}
+
+	// Test seam: SWSExtension caches config-derived state in a singleton with no other reset.
+	// Tests that vary graph-backend config must rebuild it. See SWSIntegrationTestCase::runWithoutGraphBackend().
+	public static function resetInstance(): void {
+		self::$instance = null;
+	}
+
+	public static function onExtensionRegistration(): void {
+		self::requireComposerLibraries( Validator::class );
+
+		// This registration-time gate must agree with SWSConfig::hasNeo4jBackend() at request time,
+		// so both resolve the URLs through the shared SWSConfigFactory::resolveReadUrl/resolveWriteUrl helpers.
+		$readUrl = SWSConfigFactory::resolveReadUrl(
+			is_string( $GLOBALS['wgSWSNeo4jInternalReadUrl'] ?? null ) ? $GLOBALS['wgSWSNeo4jInternalReadUrl'] : null
+		);
+		$writeUrl = SWSConfigFactory::resolveWriteUrl(
+			is_string( $GLOBALS['wgSWSNeo4jInternalWriteUrl'] ?? null ) ? $GLOBALS['wgSWSNeo4jInternalWriteUrl'] : null
+		);
+
+		$GLOBALS['wgRestAPIAdditionalRouteFiles'] = array_merge(
+			$GLOBALS['wgRestAPIAdditionalRouteFiles'] ?? [],
+			Neo4jRouteRegistration::routeFiles( $readUrl, $writeUrl ),
+			SparqlRouteRegistration::routeFiles( $GLOBALS['wgSWSSparqlStores'] ?? null )
+		);
+
+		self::registerPoweredByBadge();
+		self::registerCirrusSearchWeight();
+		self::searchTheSubjectNamespaceByDefault();
+	}
+
+	public static function requireComposerLibraries( string $libraryClass ): void {
+		if ( !class_exists( $libraryClass ) ) {
+			throw new RuntimeException(
+				"SWS's Composer libraries are missing. Add extensions/SemanticWikiSchema/composer.json to the merge-plugin " .
+				"include list in MediaWiki's composer.local.json, then run composer update --no-dev there."
+			);
+		}
+	}
+
+	private static function searchTheSubjectNamespaceByDefault(): void {
+		$GLOBALS['wgNamespacesToBeSearchedDefault'][self::NS_SUBJECT] ??= true;
+	}
+
+	/**
+	 * Weights SWS's field as heavily as a page's own text in a plain CirrusSearch search.
+	 */
+	private static function registerCirrusSearchWeight(): void {
+		if ( !is_array( $GLOBALS['wgCirrusSearchWeights'] ?? null ) ) {
+			return;
+		}
+
+		$GLOBALS['wgCirrusSearchWeights'][self::SUBJECT_SEARCH_FIELD] ??= 1;
+	}
+
+	private static function registerPoweredByBadge(): void {
+		if ( isset( $GLOBALS['wgFooterIcons']['poweredbysws']['sws'] ) ) {
+			return;
+		}
+
+		$GLOBALS['wgFooterIcons']['poweredbysws']['sws'] = self::poweredByBadge(
+			$GLOBALS['wgExtensionAssetsPath'],
+			MW_VERSION
+		);
+	}
+
+	/**
+	 * MediaWiki 1.43 throws on the 'sources' key, so the compact icon for narrow screens starts at 1.44,
+	 * where core shows its own badge the same way.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function poweredByBadge( string $extensionAssetsPath, string $mediaWikiVersion ): array {
+		$images = $extensionAssetsPath . '/SemanticWikiSchema/resources/images';
+		$badge = [
+			'src' => $images . '/poweredby_semantic_wikischema.svg',
+			'url' => 'https://github.com/Klaus-Feldmann/SemanticWikiSchema',
+			'alt' => 'Powered by Semantic WikiSchema',
+			'lang' => 'en',
+		];
+
+		if ( version_compare( $mediaWikiVersion, '1.44', '<' ) ) {
+			return $badge;
+		}
+
+		return array_merge( $badge, [
+			'src' => $images . '/poweredby_semantic_wikischema_compact.svg',
+			'width' => 25,
+			'height' => 25,
+			'sources' => [
+				[
+					'media' => '(min-width: 500px)',
+					'srcset' => $images . '/poweredby_semantic_wikischema.svg',
+					'width' => 88,
+					'height' => 31,
+				],
+			],
+		] );
+	}
+
+	private function __construct(
+		public readonly SWSConfig $config
+	) {
+	}
+
+	public function getPropertyTypeRegistry(): PropertyTypeRegistry {
+		if ( !isset( $this->propertyTypeRegistry ) ) {
+			$this->propertyTypeRegistry = PropertyTypeRegistry::withCoreTypes( $this->getSchemaReferenceParser() );
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->propertyTypeRegistry;
+	}
+
+	public function getPropertyTypeLookup(): PropertyTypeLookup {
+		return $this->getPropertyTypeRegistry();
+	}
+
+	public function getValueBuilderRegistry(): Neo4jValueBuilderRegistry {
+		if ( !isset( $this->valueBuilderRegistry ) ) {
+			$this->valueBuilderRegistry = Neo4jValueBuilderRegistry::withCoreBuilders();
+		}
+
+		return $this->valueBuilderRegistry;
+	}
+
+	public function getRdfValueMapperRegistry(): RdfValueMapperRegistry {
+		if ( !isset( $this->rdfValueMapperRegistry ) ) {
+			$this->rdfValueMapperRegistry = RdfValueMapperRegistry::withCoreMappers();
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->rdfValueMapperRegistry;
+	}
+
+	public function getRevisionPolicyRegistry(): RevisionPolicyRegistry {
+		if ( !isset( $this->revisionPolicyRegistry ) ) {
+			$this->revisionPolicyRegistry = new RevisionPolicyRegistry( LoggerFactory::getInstance( 'SWS' ) );
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->revisionPolicyRegistry;
+	}
+
+	public function getRevisionPolicy(): RevisionPolicy {
+		return new FailureIsolatingRevisionPolicy(
+			$this->getRevisionPolicyRegistry()->getPolicy(),
+			LoggerFactory::getInstance( 'SWS' )
+		);
+	}
+
+	private function ensureExtensionsRegistered(): void {
+		if ( $this->extensionsRegistered ) {
+			return;
+		}
+
+		$this->extensionsRegistered = true;
+
+		MediaWikiServices::getInstance()->getHookContainer()->run(
+			'SWSRegistration',
+			[ new SWSRegistrar(
+				$this->getPropertyTypeRegistry(),
+				$this->getValueBuilderRegistry(),
+				$this->getPagePropertyProviderRegistry(),
+				$this->getGraphDatabasePluginRegistry(),
+				$this->getRdfValueMapperRegistry(),
+				$this->getSubjectEditNoticeProviderRegistry(),
+				$this->getRevisionPolicyRegistry(),
+				$this->getSourceRegistry(),
+			) ]
+		);
+	}
+
+	public function newSubjectContentDataDeserializer(): SubjectContentDataDeserializer {
+		return new SubjectContentDataDeserializer(
+			new StatementDeserializer( $this->getPropertyTypeLookup(), $this->getSubjectIdParser() ),
+			LoggerFactory::getInstance( 'SWS' ),
+			$this->getSchemaReferenceParser()
+		);
+	}
+
+	/**
+	 * Held for the process: the parser's normalizer remembers the Schema names it has resolved, and a
+	 * fresh one per read would throw that away, parsing every name again on every page.
+	 */
+	public function getSchemaReferenceParser(): SchemaReferenceParser {
+		$this->schemaReferenceParser ??= new SchemaReferenceParser(
+			$this->config->wikiId,
+			new TitleBasedSchemaReferenceNormalizer( MediaWikiServices::getInstance()->getTitleFactory() )
+		);
+
+		return $this->schemaReferenceParser;
+	}
+
+	/**
+	 * Parses Subject ids arriving from outside — a REST path, a revision slot, a Lua call — into
+	 * {@see \ProfessionalWiki\SWS\Domain\Subject\SubjectId}s. The local Source key is the
+	 * MediaWiki Wiki ID (ADR 22), so an id naming this wiki explicitly canonicalizes to its bare form.
+	 */
+	public function getSubjectIdParser(): SubjectIdParser {
+		return new SubjectIdParser( $this->config->wikiId );
+	}
+
+	/**
+	 * Seeded with the interface-message source, so admin-written notices come before any an
+	 * extension contributes.
+	 */
+	public function getSubjectEditNoticeProviderRegistry(): SubjectEditNoticeProviderRegistry {
+		if ( !isset( $this->subjectEditNoticeProviderRegistry ) ) {
+			$this->subjectEditNoticeProviderRegistry = new SubjectEditNoticeProviderRegistry();
+			$this->subjectEditNoticeProviderRegistry->addProvider(
+				new InterfaceMessageNoticeProvider(
+					new MediaWikiEditNoticeMessageRenderer(
+						RequestContext::getMain(),
+						MediaWikiServices::getInstance()->getTitleFactory()
+					)
+				)
+			);
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->subjectEditNoticeProviderRegistry;
+	}
+
+	/**
+	 * The Sources this wiki resolves Subjects and Schemas through (ADR 23). The local one is always
+	 * registered, under the MediaWiki Wiki ID; extensions add theirs through
+	 * {@see SWSRegistrar::addSource()}.
+	 */
+	public function getSourceRegistry(): SourceRegistry {
+		if ( !isset( $this->sourceRegistry ) ) {
+			$this->sourceRegistry = new SourceRegistry( $this->config->wikiId );
+			// Registered as a factory: registration runs on every request, and building the Source
+			// wires up the Subject repository and the Schema lookup, which a request that reads no
+			// Subject has no use for.
+			$this->sourceRegistry->registerSource(
+				$this->config->wikiId,
+				fn (): LocalSource => $this->newLocalSource(
+					fn (): SubjectLookup => $this->getSubjectRepository(),
+					$this->getSchemaLookup()
+				)
+			);
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->sourceRegistry;
+	}
+
+	/**
+	 * @param Closure(): SubjectLookup $subjectLookup
+	 */
+	private function newLocalSource( Closure $subjectLookup, SchemaLookup $schemaLookup ): LocalSource {
+		return new LocalSource(
+			subjectLookup: $subjectLookup,
+			schemaLookup: $schemaLookup,
+			baseUri: $this->getRdfNamespaces()->subjectIriBase(),
+		);
+	}
+
+	/**
+	 * Resolves each Schema through the Source it is referenced from; the counterpart of
+	 * {@see self::getSourceRoutingSubjectLookup()} for Schemas.
+	 */
+	public function getSchemaResolver(): SchemaResolver {
+		return new SchemaResolver(
+			$this->getSourceRegistry(),
+			LoggerFactory::getInstance( 'SWS' )
+		);
+	}
+
+	/**
+	 * Reads every Subject through its own Source. The seam that lets a Subject from elsewhere be
+	 * fetched by id; with only the local Source registered it resolves exactly what $localSubjectLookup does.
+	 *
+	 * The local read strategy is the caller's, because it is the caller that knows which Subjects of this wiki
+	 * it may see: the published revision for a reader (#1398), only readable pages for a validation pass
+	 * (#1046). A Source of somewhere else has no such variants — it vouches for what it returns (ADR 23) — so
+	 * it is reached the same way whoever asks.
+	 */
+	public function getSourceRoutingSubjectLookup( SubjectLookup $localSubjectLookup ): SubjectLookup {
+		return new SourceRoutingSubjectLookup(
+			$this->getSourceRegistry()->withLocalSource(
+				$this->newLocalSource( fn (): SubjectLookup => $localSubjectLookup, $this->getSchemaLookup() )
+			),
+			LoggerFactory::getInstance( 'SWS' )
+		);
+	}
+
+	/**
+	 * Resolves Schemas for one reader rather than for the request. The parse-time surfaces read as the
+	 * user the page is parsed for (#1346), which is not the user who made the request: on the canonical
+	 * parse of a save it is the anonymous user, so taking the request's authority would bake a Schema
+	 * only the saver may read into output every reader is served from the parser cache.
+	 */
+	public function getSchemaResolverFor( Authority $authority ): SchemaResolver {
+		return $this->newSchemaResolver( $this->getSchemaLookupFor( $authority ) );
+	}
+
+	private function newSchemaResolver( SchemaLookup $localSchemaLookup ): SchemaResolver {
+		return new SchemaResolver(
+			$this->getSourceRegistry()->withLocalSource(
+				$this->newLocalSource( fn (): SubjectLookup => $this->getSubjectRepository(), $localSchemaLookup )
+			),
+			LoggerFactory::getInstance( 'SWS' )
+		);
+	}
+
+	public function getPagePropertyProviderRegistry(): PagePropertyProviderRegistry {
+		if ( !isset( $this->pagePropertyProviderRegistry ) ) {
+			$this->pagePropertyProviderRegistry = new PagePropertyProviderRegistry();
+			$this->pagePropertyProviderRegistry->addProvider( new CorePagePropertyProvider() );
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->pagePropertyProviderRegistry;
+	}
+
+	/**
+	 * Hook-facing write path (edit/delete/undelete/import). The projection's two halves are isolated and
+	 * logged, so a failure never aborts the triggering user operation: each backend, so one failing
+	 * backend does not starve the others, and the page-properties build, since it parses the page and
+	 * runs extension-contributed providers. See FailureIsolatingGraphDatabasePlugin and
+	 * FailureIsolatingPagePropertiesSource.
+	 *
+	 * The subject -> page index and the published Subject index are deliberately outside that isolation:
+	 * SWS's own features read them rather than a graph, so they are written on the connection the
+	 * operation is already using and fail the operation with it.
+	 */
+	public function getStoreContentUC(): OnRevisionCreatedHandler {
+		return $this->newStoreContentHandler(
+			$this->getIsolatingGraphDatabasePlugin(),
+			$this->newSubjectPageIndex(),
+			$this->newPublishedSubjectIndex(),
+			new FailureIsolatingPagePropertiesSource(
+				$this->getPagePropertiesBuilder(),
+				LoggerFactory::getInstance( 'SWS' )
+			)
+		);
+	}
+
+	/**
+	 * Refresh path, for a page whose published state changed without an edit: an approval extension's
+	 * rebuild(), and the job that reprojects the pages a block hid a user on. Failures propagate so a job
+	 * fails and is retried, rather than the hook path's isolation swallowing them and leaving a skip
+	 * nobody can act on. An approval changes what a page publishes, so this writes the published Subject
+	 * index; graph rebuilds go through newPageRebuilderFor(), which does not.
+	 */
+	private function newRebuildStoreContentHandler(): OnRevisionCreatedHandler {
+		return $this->newStoreContentHandler(
+			$this->getGraphDatabasePlugin(),
+			new NullSubjectPageIndex(),
+			$this->newPublishedSubjectIndex(),
+			$this->getPagePropertiesBuilder()
+		);
+	}
+
+	private function newStoreContentHandler(
+		GraphDatabasePlugin $graphDatabasePlugin,
+		SubjectPageIndex $subjectPageIndex,
+		PublishedSubjectIndex $publishedSubjectIndex,
+		PagePropertiesSource $pagePropertiesSource,
+	): OnRevisionCreatedHandler {
+		return new OnRevisionCreatedHandler(
+			$graphDatabasePlugin,
+			$subjectPageIndex,
+			$publishedSubjectIndex,
+			$pagePropertiesSource,
+			$this->getRevisionPolicy(),
+			MediaWikiServices::getInstance()->getTitleFormatter(),
+			LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	private function newSubjectPageIndex(): SubjectPageIndex {
+		return new DatabaseSubjectPageIndex(
+			MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
+		);
+	}
+
+	private function newPublishedSubjectIndex(): PublishedSubjectIndex {
+		return new DatabasePublishedSubjectIndex(
+			MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase(),
+			$this->newUnrestrictedDependentSubjectRules()
+		);
+	}
+
+	/**
+	 * Resolves every Schema, whoever makes the request: the published Subject index gives every reader the same
+	 * rows, and maintenance scripts, which write it too, run as an anonymous user.
+	 */
+	public function newUnrestrictedDependentSubjectRules(): DependentSubjectRules {
+		// A lookup of its own rather than the pinned one, so that a long-running job runner sees a Schema's
+		// approval change, which leaves the revision the pinned lookup caches by as it was.
+		return new DependentSubjectRules( $this->newSchemaResolver(
+			$this->newSchemaLookup( $this->newUnrestrictedAuthority() )
+		) );
+	}
+
+	/**
+	 * Resolves every Schema, whoever makes the request, for the graph stores and the RDF dump: maintenance
+	 * scripts and job runners write them as an anonymous user. Pinned for the process, as getSchemaLookup() is,
+	 * so that a rebuild builds each Source once.
+	 */
+	private function getUnrestrictedSchemaResolver(): SchemaResolver {
+		$this->unrestrictedSchemaResolver ??= $this->newSchemaResolver(
+			$this->newSchemaLookup( $this->newUnrestrictedAuthority() )
+		);
+
+		return $this->unrestrictedSchemaResolver;
+	}
+
+	private function newUnrestrictedAuthority(): Authority {
+		return new UltimateAuthority( new UserIdentityValue( 0, 'SWS' ) );
+	}
+
+	public function getPagePropertiesBuilder(): PagePropertiesBuilder {
+		return new PagePropertiesBuilder(
+			revisionStore: MediaWikiServices::getInstance()->getRevisionStore(),
+			contentHandlerFactory: MediaWikiServices::getInstance()->getContentHandlerFactory(),
+			titleFormatter: MediaWikiServices::getInstance()->getTitleFormatter(),
+			providerRegistry: $this->getPagePropertyProviderRegistry(),
+		);
+	}
+
+	public function getRdfNamespaces(): RdfNamespaces {
+		return new RdfNamespaces( $this->config->rdfBaseUri );
+	}
+
+	public function getRdfSerializer(): RdfSerializer {
+		return new HardfRdfSerializer( $this->getRdfNamespaces()->prefixMap(), LoggerFactory::getInstance( 'SWS' ) );
+	}
+
+	private function newRdfPageProjector( SchemaResolver $schemaResolver ): RdfPageProjector {
+		return new RdfPageProjector(
+			$this->getRdfValueMapperRegistry(),
+			$this->getRdfNamespaces(),
+			$schemaResolver,
+			$this->newSubjectIriResolver(),
+			LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	private function newSubjectIriResolver(): SubjectIriResolver {
+		return new SubjectIriResolver(
+			$this->getRdfNamespaces(),
+			$this->getSourceRegistry(),
+			LoggerFactory::getInstance( 'SWS' )
+		);
+	}
+
+	public function newRdfPageLoader(): RdfPageLoader {
+		return new RdfPageLoader(
+			MediaWikiServices::getInstance()->getWikiPageFactory(),
+			$this->getPagePropertiesBuilder(),
+			$this->getRevisionPolicy(),
+		);
+	}
+
+	public function newRdfPageExporterForProjection( RdfProjection $projection ): RdfPageExporter {
+		return new RdfPageExporter(
+			$this->newRdfPageLoader(),
+			$projection->projector,
+			$projection->serializer,
+		);
+	}
+
+	public function newRdfSubjectExporterForProjection( RdfProjection $projection, Authority $authority ): RdfSubjectExporter {
+		return new RdfSubjectExporter(
+			$this->newSubjectHostingPageResolver( $authority ),
+			$this->newRdfPageLoader(),
+			$projection->projector,
+			$projection->serializer,
+		);
+	}
+
+	public function newSubjectHostingPageResolver( Authority $authority ): SubjectHostingPageResolver {
+		return new SubjectHostingPageResolver(
+			$this->getPageIdentifiersLookup(),
+			$this->newPageReadAuthorizer( $authority ),
+		);
+	}
+
+	/**
+	 * The projection for a name, or null when the name is neither "native" nor a target any Mapping page
+	 * declares. The seam the SPARQL store plugin (#586) consumes for its own store (it needs only
+	 * {@see RdfProjection::$projector}), and DumpRdf for the dump; both read every Schema and Mapping,
+	 * whoever makes the request. The RDF export surfaces use {@see self::resolveRdfProjection()} instead,
+	 * which reads them as the requester and also reports the known names on the unknown-target path.
+	 * Ontology mappings hold only the target vocabulary; Subject IRIs stay native, so the native prefixes
+	 * always seed the serializer.
+	 */
+	public function newUnrestrictedRdfProjection( string $projectionName ): ?RdfProjection {
+		return $this->resolveRdfProjectionWith(
+			$projectionName,
+			$this->getUnrestrictedSchemaResolver(),
+			$this->newMappingLookup( $this->newUnrestrictedAuthority() )
+		)->projection;
+	}
+
+	/**
+	 * Resolves a projection name to its projector and serializer, or — when the name is neither "native"
+	 * nor a Mapping page's name — to the known projection names for a 400/usage message. The name is the
+	 * Mapping page title, so resolution is one title lookup; the known-names list is needed only on the
+	 * unknown path and reads just the page names (no content parsing).
+	 */
+	public function resolveRdfProjection( string $projectionName ): RdfProjectionResolution {
+		return $this->resolveRdfProjectionWith( $projectionName, $this->getSchemaResolver(), $this->getMappingLookup() );
+	}
+
+	private function resolveRdfProjectionWith(
+		string $projectionName,
+		SchemaResolver $schemaResolver,
+		MappingLookup $mappingLookup
+	): RdfProjectionResolution {
+		if ( $projectionName === RdfPageProjector::PROJECTION ) {
+			return RdfProjectionResolution::projection(
+				new RdfProjection( $this->newRdfPageProjector( $schemaResolver ), $this->getRdfSerializer() )
+			);
+		}
+
+		$mapping = $this->loadMappingByName( $projectionName, $mappingLookup );
+
+		if ( $mapping === null ) {
+			return RdfProjectionResolution::unknownTarget( $this->getRdfProjectionNames() );
+		}
+
+		return RdfProjectionResolution::projection(
+			new RdfProjection(
+				new OntologyMappingProjector(
+					$mapping,
+					$this->getRdfNamespaces(),
+					$this->getRdfValueMapperRegistry(),
+					$this->newSubjectIriResolver(),
+					LoggerFactory::getInstance( 'SWS' ),
+				),
+				new HardfRdfSerializer( $this->ontologyPrefixMap( $mapping ), LoggerFactory::getInstance( 'SWS' ) ),
+			)
+		);
+	}
+
+	/**
+	 * The Mapping page for a projection name, or null when the name is not a usable Mapping name (empty
+	 * or reserved) or no such page exists. Title normalization applies inside the lookup, so first-letter
+	 * case behaves exactly like a `[[Mapping:...]]` link.
+	 */
+	private function loadMappingByName( string $projectionName, MappingLookup $mappingLookup ): ?Mapping {
+		try {
+			$name = new MappingName( $projectionName );
+		} catch ( InvalidArgumentException ) {
+			return null;
+		}
+
+		return $mappingLookup->getMapping( $name );
+	}
+
+	/**
+	 * The known projection names: "native" plus the name of every Mapping page. Used to reject an unknown
+	 * projection with a helpful list of the valid ones.
+	 *
+	 * @return string[]
+	 */
+	public function getRdfProjectionNames(): array {
+		return array_merge(
+			[ RdfPageProjector::PROJECTION ],
+			array_map(
+				static fn ( MappingName $name ): string => $name->getText(),
+				$this->getMappingNameLookup()->getMappingNames()
+			)
+		);
+	}
+
+	/**
+	 * The known projection names the given authority may read, for the REST 400 body. "native" is not a
+	 * page and is always kept; a Mapping name is kept only when its page is readable, so a read-restricted
+	 * Mapping page's title never leaks into the error (#1046, mirroring the Schema
+	 * {@see \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup} read filter). This is
+	 * the REST boundary; the system-context {@see self::getRdfProjectionNames()} used by DumpRdf and the
+	 * SPARQL store stays unfiltered.
+	 *
+	 * @param string[] $names
+	 * @return string[]
+	 */
+	public function filterReadableProjectionNames( array $names, Authority $authority ): array {
+		$readAuthorizer = $this->newPageReadAuthorizer( $authority );
+		$titleFactory = MediaWikiServices::getInstance()->getTitleFactory();
+
+		return array_values( array_filter(
+			$names,
+			static function ( string $name ) use ( $readAuthorizer, $titleFactory ): bool {
+				if ( $name === RdfPageProjector::PROJECTION ) {
+					return true;
+				}
+
+				$title = $titleFactory->newFromText( $name, SWSExtension::NS_MAPPING );
+
+				return $title !== null && $readAuthorizer->authorizeReadByPageTitle( $title );
+			}
+		) );
+	}
+
+	/**
+	 * The configuration the Subject UI reads wherever it is mounted — the Data tab's action and
+	 * Special:Subject alike — so a row offers the same export menu and concept URI on both.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function getSubjectUiJsConfigVars( Authority $authority ): array {
+		return [
+			// Drives the RDF export menus. Filtered by the viewing user's read authority so restricted
+			// Mapping page titles never reach a reader who cannot see them.
+			'wgSWSMappings' => $this->getReadableMappingSummaries( $authority ),
+			// The copy-IRI control appends the Subject id to this base to show the full neo-subj:
+			// concept URI, deriving it from the same server-side rule the RDF export mints IRIs with.
+			'wgSWSSubjectIriBase' => $this->getRdfNamespaces()->subjectIriBase(),
+		];
+	}
+
+	/**
+	 * @return list<array{name: string, schemas: list<string>}>
+	 */
+	private function getReadableMappingSummaries( Authority $authority ): array {
+		$mappingLookup = $this->newMappingLookup( $authority );
+		$summaries = [];
+
+		foreach ( $this->getMappingNameLookup()->getMappingNames() as $name ) {
+			$mapping = $mappingLookup->getMapping( $name );
+
+			if ( $mapping !== null ) {
+				$summaries[] = [
+					'name' => $name->getText(),
+					'schemas' => $mapping->getSchemaNames(),
+				];
+			}
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * The native prefixes (Subject IRIs stay native) plus the Mapping's declared ontology prefixes, for
+	 * readable output. Both the label and the namespace of each prefix are dropped defensively when unsafe,
+	 * so a Mapping can never inject a `@prefix` declaration (or a triple broken out of one) into the
+	 * document, even though save-time validation already rejects them — an import bypasses that validation.
+	 *
+	 * @return array<string, string>
+	 */
+	private function ontologyPrefixMap( Mapping $mapping ): array {
+		$prefixes = $this->getRdfNamespaces()->prefixMap();
+
+		foreach ( $mapping->prefixes as $label => $namespace ) {
+			if ( CurieExpander::isValidPrefixLabel( (string)$label ) && CurieExpander::isSafeAbsoluteIri( $namespace ) ) {
+				$prefixes[$label] = $namespace;
+			}
+		}
+
+		return $prefixes;
+	}
+
+	public function getMappingLookup(): MappingLookup {
+		return $this->newMappingLookup( $this->getRequestAuthority() );
+	}
+
+	private function newMappingLookup( Authority $authority ): MappingLookup {
+		return new WikiPageMappingLookup(
+			jsonLookup: $this->newPublishedPageJsonLookup( $authority ),
+			mappingDeserializer: $this->getMappingPersistenceDeserializer(),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+		);
+	}
+
+	public function getMappingNameLookup(): MappingNameLookup {
+		return new DatabaseMappingNameLookup(
+			db: $this->getDbConnection(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+		);
+	}
+
+	public function getMappingPersistenceDeserializer(): MappingPersistenceDeserializer {
+		return new MappingPersistenceDeserializer();
+	}
+
+	public static function newExportPageRdfApi(): ExportPageRdfApi {
+		return new ExportPageRdfApi();
+	}
+
+	public static function newExportSubjectRdfApi(): ExportSubjectRdfApi {
+		return new ExportSubjectRdfApi();
+	}
+
+	public static function newResolveSubjectIriApi(): ResolveSubjectIriApi {
+		return new ResolveSubjectIriApi();
+	}
+
+	/**
+	 * Propagating fan-out over every backend, used by update.php's initialization so an unreachable
+	 * backend is reported rather than passed over. A rebuild does not use it: it is scoped to one store.
+	 */
+	public function getGraphDatabasePlugin(): GraphDatabasePlugin {
+		if ( !isset( $this->graphDatabasePlugin ) ) {
+			$this->graphDatabasePlugin = new CompositeGraphDatabasePlugin( ...$this->getGraphDatabasePlugins() );
+		}
+
+		return $this->graphDatabasePlugin;
+	}
+
+	/**
+	 * Hook-path fan-out: each backend individually wrapped so a projection failure is isolated and
+	 * logged rather than aborting the triggering user operation.
+	 */
+	private function getIsolatingGraphDatabasePlugin(): GraphDatabasePlugin {
+		if ( !isset( $this->isolatingGraphDatabasePlugin ) ) {
+			$logger = LoggerFactory::getInstance( 'SWS' );
+
+			$this->isolatingGraphDatabasePlugin = new CompositeGraphDatabasePlugin(
+				...array_map(
+					static fn ( GraphDatabasePlugin $plugin ) => new FailureIsolatingGraphDatabasePlugin( $plugin, $logger ),
+					$this->getGraphDatabasePlugins()
+				)
+			);
+		}
+
+		return $this->isolatingGraphDatabasePlugin;
+	}
+
+	/**
+	 * The graph database plugins to fan out to, in the order they are projected into.
+	 *
+	 * @return GraphDatabasePlugin[]
+	 */
+	private function getGraphDatabasePlugins(): array {
+		return array_values( $this->getNamedGraphDatabasePlugins() );
+	}
+
+	/**
+	 * Every configured graph database backend under the name that identifies it: core (bundled) plugins
+	 * first, then extension plugins. A rebuild is scoped to one store by looking it up here.
+	 *
+	 * Core's plugins are seeded directly here, not via the registry. Registering the Neo4j plugin via
+	 * the registry would make getGraphDatabasePluginRegistry() build it, whose construction transitively
+	 * fires the SWSRegistration hook and re-enters that accessor. Composing core here keeps the
+	 * registry extension-only and the plugin order deterministic.
+	 *
+	 * The two sets cannot collide: the registry is told the bundled names up front and refuses a plugin
+	 * taking one, which is what makes an extension naming itself after a bundled backend a warning
+	 * rather than a plugin dropped in silence here.
+	 *
+	 * @return array<string, GraphDatabasePlugin> Keys are store names
+	 */
+	public function getNamedGraphDatabasePlugins(): array {
+		return $this->getCoreGraphDatabasePlugins() + $this->getGraphDatabasePluginRegistry()->getPlugins();
+	}
+
+	/**
+	 * The names the bundled backends answer to, read from configuration rather than from the backends
+	 * themselves: building those fires the SWSRegistration hook, which is what asks for these.
+	 *
+	 * Neo4j's name is reserved whether or not a Neo4j backend is configured, so a plugin cannot claim it
+	 * on one wiki and lose it on the next.
+	 *
+	 * @return string[]
+	 */
+	private function getBundledStoreNames(): array {
+		return array_merge(
+			[ Neo4jPlugin::STORE_NAME ],
+			array_map(
+				static fn ( SparqlStoreConfig $store ): string => $store->name,
+				$this->config->sparqlStores
+			)
+		);
+	}
+
+	/**
+	 * The bundled backends, in deterministic order: Neo4j first when configured, then one SPARQL plugin
+	 * per configured store (#586). Empty when neither is configured.
+	 *
+	 * @return array<string, GraphDatabasePlugin> Keys are store names
+	 */
+	private function getCoreGraphDatabasePlugins(): array {
+		$plugins = [];
+
+		$neo4jPlugin = $this->getNeo4jPlugin();
+		if ( $neo4jPlugin !== null ) {
+			$plugins[Neo4jPlugin::STORE_NAME] = $neo4jPlugin->getGraphDatabasePlugin();
+		}
+
+		foreach ( $this->getSparqlPlugins() as $storeName => $sparqlPlugin ) {
+			$plugins[$storeName] = $sparqlPlugin->getGraphDatabasePlugin();
+		}
+
+		return $plugins;
+	}
+
+	/**
+	 * One SPARQL plugin per configured store, under the name that store is addressed by, and cached like
+	 * the Neo4j plugin. Construction is I/O-free (no HTTP, no projection resolution), so building these
+	 * outside the failure isolation is safe.
+	 *
+	 * @return array<string, SparqlPlugin> Keys are store names, in configuration order
+	 */
+	private function getSparqlPlugins(): array {
+		if ( $this->sparqlPlugins === null ) {
+			$plugins = [];
+
+			foreach ( $this->config->sparqlStores as $store ) {
+				$plugins[$store->name] = $this->buildSparqlPlugin( $store );
+			}
+
+			$this->sparqlPlugins = $plugins;
+		}
+
+		return $this->sparqlPlugins;
+	}
+
+	/**
+	 * The first configured SPARQL store's plugin, or null when none is configured. The read surfaces
+	 * (parser function, Lua, REST) target this one store; multi-store query addressing is a follow-up.
+	 */
+	public function getFirstSparqlPlugin(): ?SparqlPlugin {
+		return array_values( $this->getSparqlPlugins() )[0] ?? null;
+	}
+
+	// Guard for surfaces whose registration is already gated on a configured store, so callers get a
+	// non-null plugin without repeating the null handling.
+	public function requireFirstSparqlPlugin(): SparqlPlugin {
+		$plugin = $this->getFirstSparqlPlugin();
+		if ( $plugin === null ) {
+			throw new LogicException( 'A configured SPARQL store is required here.' );
+		}
+
+		return $plugin;
+	}
+
+	public function newSparqlQueryService( Authority $authority ): SparqlQueryService {
+		return $this->requireFirstSparqlPlugin()->newQueryService( $authority );
+	}
+
+	public function newSparqlQueryRunner( Parser $parser ): SparqlQueryRunner {
+		return $this->requireFirstSparqlPlugin()->newLuaQueryRunner( $parser );
+	}
+
+	public static function newSparqlQueryApi(): SparqlQueryApi {
+		$extension = self::getInstance();
+
+		return new SparqlQueryApi( $extension->newSparqlQueryService( $extension->getRequestAuthority() ) );
+	}
+
+	private function buildSparqlPlugin( SparqlStoreConfig $store ): SparqlPlugin {
+		return new SparqlPlugin(
+			store: $store,
+			// The projection is resolved lazily per save through this seam (never at construction), so
+			// the store tracks the current Mapping definitions. Closures, not $this, keep the store
+			// depending on the narrow resolver rather than the whole extension.
+			projectionResolver: new CallbackProjectionResolver(
+				fn ( string $projectionName ): ?RdfProjection => $this->newUnrestrictedRdfProjection( $projectionName ),
+				fn (): array => $this->getRdfProjectionNames(),
+			),
+			namespaces: $this->getRdfNamespaces(),
+			httpRequestFactory: MediaWikiServices::getInstance()->getHttpRequestFactory(),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	public function getGraphDatabasePluginRegistry(): GraphDatabasePluginRegistry {
+		if ( !isset( $this->graphDatabasePluginRegistry ) ) {
+			$this->graphDatabasePluginRegistry = new GraphDatabasePluginRegistry(
+				LoggerFactory::getInstance( 'SWS' )
+			);
+			$this->graphDatabasePluginRegistry->reserveNames( ...$this->getBundledStoreNames() );
+		}
+
+		$this->ensureExtensionsRegistered();
+
+		return $this->graphDatabasePluginRegistry;
+	}
+
+	public function getNeo4jPlugin(): ?Neo4jPlugin {
+		if ( !$this->config->hasNeo4jBackend() ) {
+			return null;
+		}
+
+		if ( $this->neo4jPlugin === null ) {
+			$this->neo4jPlugin = $this->buildNeo4jPlugin( $this->getUnrestrictedSchemaResolver() );
+		}
+
+		return $this->neo4jPlugin;
+	}
+
+	// Guard for surfaces whose registration is already gated on a configured backend, so callers get a
+	// non-null plugin without repeating the null handling.
+	public function requireNeo4jPlugin(): Neo4jPlugin {
+		$plugin = $this->getNeo4jPlugin();
+		if ( $plugin === null ) {
+			throw new LogicException( 'A configured Neo4j backend is required here.' );
+		}
+
+		return $plugin;
+	}
+
+	// Test seam: lets tests build a projection store with a custom SchemaLookup.
+	// This is a hack; we should have a proper test environment.
+	public function newNeo4jProjectionStore( SchemaLookup $schemaLookup ): GraphDatabasePlugin {
+		return $this->buildNeo4jPlugin( $this->newSchemaResolverServedBy( $schemaLookup ) )->getGraphDatabasePlugin();
+	}
+
+	/**
+	 * A resolver whose local Source serves $schemaLookup's Schemas. Part of the same test hack: it
+	 * holds no other Source, so only the local half of resolution is exercised through it.
+	 */
+	private function newSchemaResolverServedBy( SchemaLookup $schemaLookup ): SchemaResolver {
+		$registry = new SourceRegistry( $this->config->wikiId );
+		$registry->registerSource(
+			$this->config->wikiId,
+			fn (): LocalSource => new LocalSource(
+				subjectLookup: fn (): SubjectLookup => $this->getSubjectRepository(),
+				schemaLookup: $schemaLookup,
+				baseUri: $this->getRdfNamespaces()->subjectIriBase(),
+			)
+		);
+
+		return new SchemaResolver( $registry, LoggerFactory::getInstance( 'SWS' ) );
+	}
+
+	private function buildNeo4jPlugin( SchemaResolver $schemaResolver ): Neo4jPlugin {
+		return new Neo4jPlugin(
+			client: $this->getNeo4jClient(),
+			readOnlyClient: $this->getReadOnlyNeo4jClient(),
+			schemaResolver: $schemaResolver,
+			valueBuilderRegistry: $this->getValueBuilderRegistry(),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+			wikiId: $this->config->wikiId,
+		);
+	}
+
+	public function getNeo4jClient(): ClientInterface {
+		if ( !isset( $this->neo4jClient ) ) {
+			$writeUrl = $this->config->neo4jInternalWriteUrl;
+			if ( $writeUrl === null ) {
+				throw new GraphBackendNotConfiguredException();
+			}
+			$this->neo4jClient = self::newNeo4jClient( $writeUrl );
+		}
+
+		return $this->neo4jClient;
+	}
+
+	public function getReadOnlyNeo4jClient(): ClientInterface {
+		if ( !isset( $this->readOnlyNeo4jClient ) ) {
+			$readUrl = $this->config->neo4jInternalReadUrl;
+			if ( $readUrl === null ) {
+				throw new GraphBackendNotConfiguredException();
+			}
+			$this->readOnlyNeo4jClient = self::newNeo4jClient( $readUrl );
+		}
+
+		return $this->readOnlyNeo4jClient;
+	}
+
+	private static function newNeo4jClient( string $url ): ClientInterface {
+		$neo4jUrl = Neo4jUrl::fromString( $url );
+
+		return ClientBuilder::create()
+			->withDriver( 'default', $neo4jUrl->address, $neo4jUrl->authentication )
+			->withDefaultDriver( 'default' )
+			->build();
+	}
+
+	public function newCypherQueryService( Authority $authority ): Neo4jQueryService {
+		return $this->requireNeo4jPlugin()->newQueryService( $authority );
+	}
+
+	public function newCypherQueryRunner( Parser $parser ): CypherQueryRunner {
+		return $this->requireNeo4jPlugin()->newLuaQueryRunner( $parser );
+	}
+
+	public static function newCypherQueryApi(): CypherQueryApi {
+		$extension = self::getInstance();
+
+		return new CypherQueryApi( $extension->newCypherQueryService( $extension->getRequestAuthority() ) );
+	}
+
+	public function getWriteQueryEngine(): Neo4jWriteQueryEngine {
+		return $this->requireNeo4jPlugin()->getWriteQueryEngine();
+	}
+
+	public function isDevelopmentUIEnabled(): bool {
+		return $this->config->enableDevelopmentUIs;
+	}
+
+	public function shouldAutoRenderMainSubject(): bool {
+		return $this->getWikiConfigLookup()->getEffectiveValue( 'autoRenderMainSubject' ) === true;
+	}
+
+	/**
+	 * Whether this wiki puts Subjects before pages (ADR 33), combining
+	 * the on-wiki configuration page with $wgSWSSubjectFirst (the page wins when it sets a valid
+	 * boolean).
+	 */
+	public function isSubjectFirst(): bool {
+		return $this->getWikiConfigLookup()->getEffectiveValue( 'subjectFirst' ) === true;
+	}
+
+	/**
+	 * The configured data languages, in their configured order: empty for the content language, which
+	 * a malformed LocalSettings.php value also comes down to.
+	 *
+	 * @return string[]
+	 */
+	public function getDataLanguages(): array {
+		/** @var string[] $languages */
+		$languages = $this->getWikiConfigLookup()->getEffectiveValue( 'dataLanguages' );
+
+		return $languages;
+	}
+
+	public function getSubjectPageNamespace(): int {
+		if ( !$this->isSubjectFirst() ) {
+			return NS_MAIN;
+		}
+
+		$namespace = MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSSubjectPageNamespace' );
+
+		if ( !is_int( $namespace ) ) {
+			throw new LogicException( '$wgSWSSubjectPageNamespace must be a namespace id' );
+		}
+
+		return $namespace;
+	}
+
+	/**
+	 * The combining lookup for the exposed settings. Built fresh each call so the PHP fallback and the
+	 * kill switch are read live from MainConfig (overridable in tests without a singleton rebuild), while
+	 * the page read is memoized on the shared source, keeping it to at most one read per request.
+	 */
+	public function getWikiConfigLookup(): WikiConfigLookup {
+		return $this->newWikiConfigLookup( $this->getWikiConfigSource() );
+	}
+
+	private function newWikiConfigLookup( WikiConfigSource $source ): WikiConfigLookup {
+		return new WikiConfigLookup(
+			$this->getConfigSchema(),
+			$source,
+			MediaWikiServices::getInstance()->getMainConfig(),
+			$this->isInWikiConfigEnabled(),
+			LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	private function getWikiConfigSource(): WikiConfigSource {
+		// Cached so MediaWiki:SWS is read at most once per request. Never read during extension setup:
+		// this is only reached when a request resolves an exposed setting.
+		$this->wikiConfigSource ??= $this->newWikiConfigSource( $this->getRevisionPolicy(), $this->getRequestAuthority() );
+
+		return $this->wikiConfigSource;
+	}
+
+	private function newWikiConfigSource( RevisionPolicy $revisionPolicy, Authority $authority ): WikiConfigSource {
+		return new MediaWikiWikiConfigSource(
+			$this->newPageContentFetcher( $revisionPolicy ),
+			$authority,
+			self::CONFIG_PAGE_TITLE,
+			LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	public function getConfigSchema(): ConfigSchema {
+		return new ConfigSchema();
+	}
+
+	public function getConfigValidator(): ConfigValidator {
+		return new ConfigValidator( $this->getConfigSchema() );
+	}
+
+	public function newConfigDocumentationBuilder( MessageLocalizer $messageLocalizer ): ConfigDocumentationBuilder {
+		return new ConfigDocumentationBuilder( $this->getConfigSchema(), $messageLocalizer );
+	}
+
+	public function newConfigEditorJsConfigBuilder( Authority $authority ): ConfigEditorJsConfigBuilder {
+		return new ConfigEditorJsConfigBuilder(
+			$this->getConfigSchema(),
+			// The latest revision, which Edit source edits too, rather than the one a revision policy
+			// publishes: the form saves over it.
+			$this->newWikiConfigLookup( $this->newWikiConfigSource( new NullRevisionPolicy(), $authority ) ),
+		);
+	}
+
+	/**
+	 * Whether the on-wiki configuration page may be read and written. Read live from MainConfig so the
+	 * kill switch applies per request and tests can toggle it without rebuilding the singleton.
+	 */
+	public function isInWikiConfigEnabled(): bool {
+		return MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSEnableInWikiConfig' ) === true;
+	}
+
+	/**
+	 * Whether the given title is the on-wiki configuration page and reading it is enabled.
+	 */
+	public function isConfigPage( Title $title ): bool {
+		return $this->isInWikiConfigEnabled()
+			&& $title->getNamespace() === NS_MEDIAWIKI
+			&& $title->getText() === self::CONFIG_PAGE_TITLE;
+	}
+
+	public function isLuaEnabled(): bool {
+		return MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSEnableLua' ) === true;
+	}
+
+	public function getPageContentFetcher(): PageContentFetcher {
+		return $this->newPageContentFetcher( $this->getRevisionPolicy() );
+	}
+
+	private function newPageContentFetcher( RevisionPolicy $revisionPolicy ): PageContentFetcher {
+		return new PageContentFetcher(
+			MediaWikiServices::getInstance()->getTitleParser(),
+			MediaWikiServices::getInstance()->getRevisionLookup(),
+			$revisionPolicy
+		);
+	}
+
+	public function getPageContentSaver(): PageContentSaver {
+		return new PageContentSaver(
+			wikiPageFactory: MediaWikiServices::getInstance()->getWikiPageFactory(),
+			performer: $this->getRequestAuthority(),
+		);
+	}
+
+	private function getRequestAuthority(): Authority {
+		return RequestContext::getMain()->getAuthority();
+	}
+
+	public function newViewHtmlBuilder(): ViewHtmlBuilder {
+		return new ViewHtmlBuilder(
+			subjectContentRepository: $this->newSubjectContentRepository( $this->getRequestAuthority() )
+		);
+	}
+
+	public function newPageSubjectsLookup(): PageSubjectsLookup {
+		return new PageSubjectsLookup( $this->getSubjectRepository() );
+	}
+
+	public function newSubjectSearchTextLookup(): SubjectSearchTextLookup {
+		return new SubjectSearchTextLookup(
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			textBuilder: $this->newSubjectSearchTextBuilder()
+		);
+	}
+
+	private function newSubjectSearchTextBuilder(): SubjectSearchTextBuilder {
+		return new SubjectSearchTextBuilder(
+			$this->getPropertyTypeLookup(),
+			$this->getSchemaResolver()
+		);
+	}
+
+	public function getSubjectSearchHitLookup(): SubjectSearchHitLookup {
+		$this->subjectSearchHitLookup ??= new SubjectSearchHitLookup(
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			hitBuilder: new SubjectSearchHitBuilder( $this->newSubjectSearchTextBuilder(), $this->newDependentSubjectRules() ),
+			logger: LoggerFactory::getInstance( 'SWS' )
+		);
+
+		return $this->subjectSearchHitLookup;
+	}
+
+	public function newSubjectSearchHitHtmlBuilder( MessageLocalizer $messageLocalizer ): SubjectSearchHitHtmlBuilder {
+		return new SubjectSearchHitHtmlBuilder(
+			$messageLocalizer,
+			MediaWikiServices::getInstance()->getContentLanguage()
+		);
+	}
+
+	public function newFrontendModuleLoader(): FrontendModuleLoader {
+		$debounceMs = MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSValidationDebounceMs' );
+
+		return new FrontendModuleLoader(
+			hookContainer: MediaWikiServices::getInstance()->getHookContainer(),
+			validationDebounceMs: is_int( $debounceMs ) ? $debounceMs : 300,
+			validationEnforced: $this->isValidationEnforced(),
+			subjectFirst: $this->isSubjectFirst(),
+			dataLanguages: $this->getDataLanguages(),
+		);
+	}
+
+	public function newSubjectContentRepository( Authority $authority ): SubjectContentRepository {
+		return new MediaWikiSubjectContentRepository(
+			wikiPageFactory: MediaWikiServices::getInstance()->getWikiPageFactory(),
+			authority: $authority,
+			pageContentSaver: $this->getPageContentSaver(),
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+		);
+	}
+
+	public function newSubjectResolver( Parser $parser ): SubjectResolver {
+		$authority = ParserAuthority::of( $parser );
+
+		return new SubjectResolver(
+			subjectContentRepository: $this->newSubjectContentRepository( $authority ),
+			// Latest, deliberately: the parse-time surfaces read what the editor sees, and the page gate
+			// below is what keeps a restricted page out of the parser cache.
+			subjectLookup: $this->getSourceRoutingSubjectLookup( $this->getSubjectRepository() ),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+			pageDependencyRecorder: new ParserPageDependencyRecorder( $parser ),
+			schemaResolver: $this->getSchemaResolverFor( $authority ),
+		);
+	}
+
+	public function newPageRebuilder(): PageRebuilder {
+		return $this->newPageRebuilderWith( $this->newRebuildStoreContentHandler() );
+	}
+
+	/**
+	 * Reprojects the pages one user is the last editor of, after a block hid their name or an unblock
+	 * showed it again (#1246). Failures propagate, as on the rebuild path it is built from: this runs in
+	 * a job, where a failure is what makes the queue try again.
+	 */
+	public function newLastEditorPagesRebuilder(): LastEditorPagesRebuilder {
+		return new LastEditorPagesRebuilder(
+			new DatabaseLastEditorPageIdsLookup(
+				MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase(),
+				MediaWikiServices::getInstance()->getActorNormalization()
+			),
+			$this->newPageRebuilder(),
+			MediaWikiServices::getInstance()->getTitleFactory()
+		);
+	}
+
+	/**
+	 * Maintenance rebuild path: projects into the one store the run is scoped to, and no other. The
+	 * plugin is used unwrapped, so a projection failure escapes to the rebuild, which decides whether it
+	 * costs a page or the whole run — the hook path's isolation would swallow it and report every page
+	 * as rebuilt.
+	 */
+	public function newPageRebuilderFor( GraphDatabasePlugin $store ): PageRebuilder {
+		return $this->newPageRebuilderWith(
+			$this->newStoreContentHandler(
+				$store,
+				new NullSubjectPageIndex(),
+				new NullPublishedSubjectIndex(),
+				$this->getPagePropertiesBuilder()
+			)
+		);
+	}
+
+	/**
+	 * Hook paths that project a page they did not themselves write a revision for: import, undeletion,
+	 * a revision-visibility change, and a links refresh. Projects the current revision like the rebuild path,
+	 * but with the hook path's failure isolation, since a projection failure must not abort the user's operation.
+	 * The page is indexed as an edit does it, which costs reads but no write where, as on the visibility
+	 * path, no Subject changed.
+	 */
+	public function newHookPageRebuilder(): PageRebuilder {
+		return $this->newPageRebuilderWith( $this->getStoreContentUC() );
+	}
+
+	private function newPageRebuilderWith( OnRevisionCreatedHandler $handler ): PageRebuilder {
+		return new PageRebuilder(
+			$handler,
+			MediaWikiServices::getInstance()->getWikiPageFactory()
+		);
+	}
+
+	public function newPageIdsLookup(): PageIdsLookup {
+		return new DatabasePageIdsLookup(
+			MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase()
+		);
+	}
+
+	public function newDeletedPageIdsLookup(): DeletedPageIdsLookup {
+		return new DatabaseDeletedPageIdsLookup(
+			MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase()
+		);
+	}
+
+	/**
+	 * @param int<1, max> $backgroundBatchSize How many pages a background batch projects. Production
+	 *        callers pass {@see GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE}; a test passes a size it
+	 *        can drive several batches with.
+	 */
+	public function newGraphRebuildCoordinator( int $backgroundBatchSize ): GraphRebuildCoordinator {
+		$runs = $this->newRebuildRunRepository();
+
+		return new GraphRebuildCoordinator(
+			stores: $this->getNamedGraphDatabasePlugins(),
+			runs: $this->newRebuildRunRepository(),
+			startLock: $this->newRebuildStartLock(),
+			executor: $this->newGraphRebuildExecutor(),
+			jobQueue: new MediaWikiRebuildJobQueue(
+				MediaWikiServices::getInstance()->getJobQueueGroup()
+			),
+			newPageRebuilder: fn ( GraphDatabasePlugin $store ): PageRebuilder
+				=> $this->newPageRebuilderFor( $store ),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+			backgroundBatchSize: $backgroundBatchSize,
+		);
+	}
+
+	public function newGraphRebuildExecutor(): GraphRebuildExecutor {
+		return new GraphRebuildExecutor(
+			pageIds: $this->newPageIdsLookup(),
+			deletedPageIds: $this->newDeletedPageIdsLookup(),
+			runs: $this->newRebuildRunRepository(),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	public function newRebuildStartLock(): RebuildStartLock {
+		return new DatabaseRebuildStartLock( MediaWikiServices::getInstance()->getConnectionProvider() );
+	}
+
+	public function newGraphStoreStatusLookup(): GraphStoreStatusLookup {
+		return new GraphStoreStatusLookup(
+			projectionsByStore: $this->getStoreProjections(),
+			runs: $this->newRebuildRunRepository(),
+			projectionChanges: new MappingPageChangeTimeLookup(
+				MediaWikiServices::getInstance()->getTitleFactory(),
+				MediaWikiServices::getInstance()->getRevisionLookup(),
+				MediaWikiServices::getInstance()->getConnectionProvider(),
+			),
+		);
+	}
+
+	/**
+	 * Whether this wiki has asked for the stores a changed Mapping defines the contents of to be rebuilt.
+	 * Read live from MainConfig, so the setting applies per request.
+	 */
+	public function shouldRebuildOnMappingChange(): bool {
+		return MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSAutoRebuildOnMappingChange' ) === true;
+	}
+
+	public function newMappingChangeRebuilder(): MappingChangeRebuilder {
+		return new MappingChangeRebuilder(
+			projectionsByStore: $this->getMappingDefinedStoreProjections(),
+			coordinator: $this->newGraphRebuildCoordinator( GraphRebuildCoordinator::BACKGROUND_BATCH_SIZE ),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	/**
+	 * The store projections a Mapping page defines, each read as the page name it is, so that a projection
+	 * configured as "edm" matches an edit to Mapping:Edm exactly as a link to it would.
+	 *
+	 * The native projection is not one of them: SWS's own code defines it, and creating a page called
+	 * Mapping:Native changes nothing about what a store holding it should contain.
+	 *
+	 * @return array<string, ?string> Keys are store names
+	 */
+	public function getMappingDefinedStoreProjections(): array {
+		$titleFactory = MediaWikiServices::getInstance()->getTitleFactory();
+
+		return array_map(
+			static fn ( ?string $projection ): ?string
+				=> $projection === null || $projection === RdfPageProjector::PROJECTION
+					? null
+					: $titleFactory->newFromText( $projection, self::NS_MAPPING )?->getText(),
+			$this->getStoreProjections()
+		);
+	}
+
+	/**
+	 * What each configured store holds: the name of its RDF projection, or null for a backend that holds
+	 * no RDF at all — Neo4j, and any backend an extension contributed.
+	 *
+	 * @return array<string, ?string> Keys are store names, in the order they are projected into
+	 */
+	private function getStoreProjections(): array {
+		$projections = array_fill_keys( array_keys( $this->getNamedGraphDatabasePlugins() ), null );
+
+		foreach ( $this->config->sparqlStores as $store ) {
+			$projections[$store->name] = $store->projection;
+		}
+
+		return $projections;
+	}
+
+	public function newRebuildRunRepository(): RebuildRunRepository {
+		return new DatabaseRebuildRunRepository(
+			MediaWikiServices::getInstance()->getConnectionProvider()
+		);
+	}
+
+	public function newCreateSubjectAction( CreateSubjectPresenter $presenter, Authority $authority ): CreateSubjectAction {
+		return new CreateSubjectAction(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			schemaResolver: $this->getSchemaResolver(),
+			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
+			pageIdentifiersResolver: $this->getPageIdentifiersResolver(),
+			schemaReferenceParser: $this->getSchemaReferenceParser(),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
+			validationEnforced: $this->isValidationEnforced(),
+		);
+	}
+
+	private function newDependentSubjectBuilder(): DependentSubjectBuilder {
+		return new DependentSubjectBuilder(
+			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			schemaReferenceParser: $this->getSchemaReferenceParser(),
+			schemaResolver: $this->getSchemaResolver(),
+			statementListBuilder: $this->getStatementListBuilder(),
+			dependentSubjectRules: $this->newDependentSubjectRules(),
+		);
+	}
+
+	private function newDependentSubjectValidator( Authority $authority ): DependentSubjectValidator {
+		return new DependentSubjectValidator( $this->newProposedSubjectValidator( $authority ) );
+	}
+
+	private function getNewSubjectIdResolver(): NewSubjectIdResolver {
+		return new NewSubjectIdResolver(
+			subjectIdParser: $this->getSubjectIdParser(),
+			idGenerator: $this->getIdGenerator(),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+		);
+	}
+
+	public function newCreateSubjectPageAction( CreateSubjectPagePresenter $presenter, Authority $authority ): CreateSubjectPageAction {
+		return new CreateSubjectPageAction(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			schemaResolver: $this->getSchemaResolver(),
+			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
+			pageIdentifiersResolver: $this->getPageIdentifiersResolver(),
+			schemaReferenceParser: $this->getSchemaReferenceParser(),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
+			validationEnforced: $this->isValidationEnforced(),
+			subjectFirst: $this->isSubjectFirst(),
+			subjectPageNamespace: $this->getSubjectPageNamespace(),
+		);
+	}
+
+	public function getPageIdentifiersResolver(): PageIdentifiersResolver {
+		return new TitleBasedPageIdentifiersResolver(
+			MediaWikiServices::getInstance()->getTitleFactory()
+		);
+	}
+
+	public function newSubjectIdMinter(): SubjectIdMinter {
+		return new SubjectIdMinter( $this->getIdGenerator() );
+	}
+
+	public function getSubjectRepository(): SubjectRepository {
+		// TODO: re-enable using the same instance. For some reason this causes an isolation issue in the integration tests
+		//if ( !isset( $this->subjectRepository ) ) {
+			$this->subjectRepository = $this->newSubjectRepository();
+		//}
+
+		return $this->subjectRepository;
+	}
+
+	public function newSubjectRepository(): MediaWikiSubjectRepository {
+		return new MediaWikiSubjectRepository(
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			pageContentSaver: $this->getPageContentSaver(),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			contentHandlerFactory: MediaWikiServices::getInstance()->getContentHandlerFactory(),
+			dependentSubjectGuard: $this->newDependentSubjectGuard( $this->getRequestAuthority() ),
+		);
+	}
+
+	private function newDependentSubjectGuard( Authority $authority ): DependentSubjectGuard {
+		return new DependentSubjectGuard(
+			rules: $this->newDependentSubjectRules(),
+			subjectLookup: fn (): SubjectLookup => $this->newReadAuthorizedSubjectLookup( $authority ),
+		);
+	}
+
+	private function newReadAuthorizedSubjectLookup( Authority $authority ): SubjectLookup {
+		return $this->getSourceRoutingSubjectLookup( new ReadAuthorizedSubjectLookup(
+			subjectLookup: $this->getSubjectRepository(),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+		) );
+	}
+
+	public function newDependentSubjectRules(): DependentSubjectRules {
+		return new DependentSubjectRules( $this->getSchemaResolver() );
+	}
+
+	private function getIdGenerator(): IdGenerator {
+		return new ProductionIdGenerator();
+	}
+
+	public function getStatementListBuilder(): StatementListBuilder {
+		return new StatementListBuilder(
+			propertyTypeLookup: $this->getPropertyTypeLookup(),
+			idGenerator: $this->getIdGenerator(),
+			subjectIdParser: $this->getSubjectIdParser()
+		);
+	}
+
+	/**
+	 * Kept for the request: links find only what a list read up front through this same instance.
+	 */
+	public function getSubjectInPlaceOfPageTitleLookup(): SubjectInPlaceOfPageTitleLookup {
+		$this->subjectInPlaceOfPageTitleLookup ??= new SubjectInPlaceOfPageTitleLookup(
+			MediaWikiServices::getInstance()->getRevisionStore(),
+			MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase(),
+			$this->getRevisionPolicy(),
+			fn ( Authority $reader ): PageReadAuthorizer => $this->newPageReadAuthorizer( $reader ),
+			maxPages: 250
+		);
+
+		return $this->subjectInPlaceOfPageTitleLookup;
+	}
+
+	public function getPageIdentifiersLookup(): PageIdentifiersLookup {
+		return new DatabasePageIdentifiersLookup(
+			MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase(),
+			MediaWikiServices::getInstance()->getTitleFormatter()
+		);
+	}
+
+	public function newDeleteSubjectAction( Authority $authority ): DeleteSubjectAction {
+		return new DeleteSubjectAction(
+			subjectRepository: $this->getSubjectRepository(),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+		);
+	}
+
+	public function newSetMainSubjectAction( SetMainSubjectPresenter $presenter, Authority $authority ): SetMainSubjectAction {
+		return new SetMainSubjectAction(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+		);
+	}
+
+	public function newMoveSubjectAction( MoveSubjectPresenter $presenter, Authority $authority ): MoveSubjectAction {
+		return new MoveSubjectAction(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+			dependentSubjectRules: $this->newDependentSubjectRules(),
+		);
+	}
+
+	public function newSetSubjectsOrderingAction( SetSubjectsOrderingPresenter $presenter, Authority $authority ): SetSubjectsOrderingAction {
+		return new SetSubjectsOrderingAction(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+		);
+	}
+
+	public function newSubjectPermissionHints( Authority $authority ): SubjectPermissionHints {
+		return $this->newAuthorityBasedSubjectAuthorizer( $authority );
+	}
+
+	public function newSubjectWriteAuthorizer( Authority $authority ): SubjectWriteAuthorizer {
+		return $this->newAuthorityBasedSubjectAuthorizer( $authority );
+	}
+
+	public function newUserAccessClass(): UserAccessClass {
+		return new UserAccessClass(
+			userGroupManager: MediaWikiServices::getInstance()->getUserGroupManager(),
+			permissionManager: MediaWikiServices::getInstance()->getPermissionManager(),
+		);
+	}
+
+	public function newPageReadAuthorizer( Authority $authority ): PageReadAuthorizer {
+		return new AuthorityBasedPageReadAuthorizer(
+			authority: $authority,
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			logger: LoggerFactory::getInstance( 'SWS' ),
+		);
+	}
+
+	private function newAuthorityBasedSubjectAuthorizer( Authority $authority ): AuthorityBasedSubjectAuthorizer {
+		return new AuthorityBasedSubjectAuthorizer(
+			authority: $authority,
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+		);
+	}
+
+	public function newGetSchemaQuery( GetSchemaPresenter $presenter ): GetSchemaQuery {
+		return new GetSchemaQuery(
+			presenter: $presenter,
+			schemaLookup: $this->getSchemaLookup(),
+			serializer: $this->getSchemaPresentationSerializer()
+		);
+	}
+
+	public function newGetLayoutQuery( GetLayoutPresenter $presenter ): GetLayoutQuery {
+		return new GetLayoutQuery(
+			presenter: $presenter,
+			layoutLookup: $this->getLayoutLookup(),
+			serializer: new LayoutPresentationSerializer(),
+		);
+	}
+
+	// Pinned to the authority of first use. The pin fixes the authority behind
+	// both the Schema read gate and the inner lookup's revision-audience filter, and it lives as long
+	// as this singleton, so its scope is the PHP process: one request under mod_php, a whole run under
+	// a maintenance script. It narrows ADR 027's "every access decision runs against the caller's
+	// Authority" to the process's first authority, which is safe because the in-request switches go
+	// weaker to stronger — a login or account creation mutating the main context — where reusing the
+	// anonymous resolutions can only under-serve. Core's one switch the other way, beginAccountCreation()
+	// dropping a temp account to a fresh anonymous user, moves between two near-anonymous authorities.
+	// Not for parse-time reads: those run as the user the page is parsed for, which the request's user
+	// is not during the canonical parse of an edit; they use getSchemaLookupFor() instead.
+	public function getSchemaLookup(): SchemaLookup {
+		$this->schemaLookup ??= $this->newSchemaLookup( $this->getRequestAuthority() );
+
+		return $this->schemaLookup;
+	}
+
+	/**
+	 * One lookup per authority for the process, so a batch of parses under one canonical user keeps
+	 * the process-local cache tier across pages. The read gate runs per call before that cache.
+	 */
+	public function getSchemaLookupFor( Authority $authority ): SchemaLookup {
+		$this->schemaLookupsByUser[$authority->getUser()->getName()] ??= $this->newSchemaLookup( $authority );
+
+		return $this->schemaLookupsByUser[$authority->getUser()->getName()];
+	}
+
+	private function newSchemaLookup( Authority $authority ): SchemaLookup {
+		return new CachingSchemaLookup(
+			jsonLookup: $this->newPublishedPageJsonLookup( $authority ),
+			schemaDeserializer: $this->getPersistenceSchemaDeserializer(),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+		);
+	}
+
+	private function newPublishedPageJsonLookup( Authority $authority ): PublishedPageJsonLookup {
+		return new PublishedPageJsonLookup(
+			pageContentFetcher: $this->getPageContentFetcher(),
+			authority: $authority,
+			cache: MediaWikiServices::getInstance()->getMainWANObjectCache(),
+		);
+	}
+
+	public function getSchemaPresentationSerializer(): SchemaPresentationSerializer {
+		return new SchemaPresentationSerializer();
+	}
+
+	public function newJsonSchemaSerializer( string $documentUrl ): JsonSchemaSerializer {
+		return new JsonSchemaSerializer( documentUrl: $documentUrl );
+	}
+
+	public function getPersistenceSchemaDeserializer(): SchemaPersistenceDeserializer {
+		return new SchemaPersistenceDeserializer(
+			propertyTypeLookup: $this->getPropertyTypeLookup(),
+		);
+	}
+
+	public function getLayoutLookup(): LayoutLookup {
+		return new WikiPageLayoutLookup(
+			pageContentFetcher: $this->getPageContentFetcher(),
+			authority: $this->getRequestAuthority(),
+			layoutDeserializer: $this->getLayoutPersistenceDeserializer(),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+		);
+	}
+
+	private function getLayoutPersistenceDeserializer(): LayoutPersistenceDeserializer {
+		return new LayoutPersistenceDeserializer( $this->getSchemaReferenceParser() );
+	}
+
+	public function getSchemaNameLookup(): SchemaNameLookup {
+		return new DatabaseSchemaNameLookup(
+			db: $this->getDbConnection(),
+			searchEngine: MediaWikiServices::getInstance()->newSearchEngine(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+		);
+	}
+
+	public function newSubjectCountLookup(): SubjectCountLookup {
+		return new CachingSubjectCountLookup(
+			lookup: new DatabaseSubjectCountLookup( MediaWikiServices::getInstance()->getConnectionProvider() ),
+			cache: MediaWikiServices::getInstance()->getMainWANObjectCache(),
+		);
+	}
+
+	public function newSubjectSummaryLookup(): SubjectSummaryLookup {
+		$searchTimeLimit = MediaWikiServices::getInstance()->getMainConfig()
+			->get( MainConfigNames::MaxExecutionTimeForExpensiveQueries );
+
+		return new DatabaseSubjectSummaryLookup(
+			connectionProvider: MediaWikiServices::getInstance()->getConnectionProvider(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			scanBound: self::SUBJECT_SUMMARY_SCAN_BOUND,
+			searchTimeLimit: is_int( $searchTimeLimit ) ? $searchTimeLimit : 0,
+		);
+	}
+
+	public function newRecentlyEditedSubjectLookup(): RecentlyEditedSubjectLookup {
+		return new DatabaseRecentlyEditedSubjectLookup(
+			connectionProvider: MediaWikiServices::getInstance()->getConnectionProvider(),
+			slotRoleStore: MediaWikiServices::getInstance()->getSlotRoleStore(),
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			revisionPolicy: $this->getRevisionPolicy(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFormatter: MediaWikiServices::getInstance()->getTitleFormatter(),
+			hostSubjectBuilder: $this->newHostSubjectBuilder(),
+			revisionBound: self::RECENTLY_EDITED_SUBJECTS_REVISION_BOUND,
+			readBound: self::RECENTLY_EDITED_SUBJECTS_READ_BOUND,
+		);
+	}
+
+	public function getSubjectLabelLookup(): SubjectLabelLookup {
+		return new DatabaseSubjectLabelLookup(
+			connectionProvider: MediaWikiServices::getInstance()->getConnectionProvider(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+		);
+	}
+
+	public function getReferencingSubjectLookup(): ReferencingSubjectLookup {
+		return new DatabaseReferencingSubjectLookup( MediaWikiServices::getInstance()->getConnectionProvider() );
+	}
+
+	public function getDbConnection(): IDatabase {
+		$db = MediaWikiServices::getInstance()
+			->getDBLoadBalancerFactory()
+			->getMainLB()
+			->getConnection( (int)DB_PRIMARY );
+
+		if ( !$db ) {
+			throw new Exception( 'No connection to the database' );
+		}
+
+		return $db;
+	}
+
+	public function newGetSubjectEditNoticesQuery(
+		GetSubjectEditNoticesPresenter $presenter,
+		Authority $authority
+	): GetSubjectEditNoticesQuery {
+		return new GetSubjectEditNoticesQuery(
+			presenter: $presenter,
+			registry: $this->getSubjectEditNoticeProviderRegistry(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			contextFactory: new TitleBasedSubjectEditNoticeContextFactory(
+				MediaWikiServices::getInstance()->getTitleFactory(),
+				MediaWikiServices::getInstance()->getNamespaceInfo()
+			),
+			environment: new RequestContextSubjectEditNoticeEnvironment(
+				MediaWikiServices::getInstance()->getTitleFactory()
+			),
+		);
+	}
+
+	public function newGetMainSubjectQuery( GetMainSubjectPresenter $presenter, Authority $authority ): GetMainSubjectQuery {
+		return new GetMainSubjectQuery(
+			presenter: $presenter,
+			pageSubjectsLookup: $this->newPageSubjectsLookup(),
+			pageIdentifiersResolver: $this->getPageIdentifiersResolver(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+		);
+	}
+
+	public function newGetPageSubjectsQuery( GetPageSubjectsPresenter $presenter, Authority $authority ): GetPageSubjectsQuery {
+		return new GetPageSubjectsQuery(
+			presenter: $presenter,
+			subjectRepository: $this->getSubjectRepository(),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $this->newPageSubjectsLookup() ),
+			subjectLookup: $this->getSourceRoutingSubjectLookup( $this->getSubjectRepository() ),
+			schemaLookup: $this->getSchemaLookup(),
+			schemaSerializer: $this->getSchemaPresentationSerializer(),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+		);
+	}
+
+	private function newPublishedSubjectLookup(): PublishedSubjectLookup {
+		return new PublishedSubjectLookup(
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			revisionPolicy: $this->getRevisionPolicy(),
+		);
+	}
+
+	public function newGetSubjectQuery( GetSubjectPresenter $presenter, Authority $authority ): GetSubjectQuery {
+		$publishedSubjectLookup = $this->newPublishedSubjectLookup();
+
+		return new GetSubjectQuery(
+			presenter: $presenter,
+			subjectLookup: $this->getSourceRoutingSubjectLookup( $publishedSubjectLookup ),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $publishedSubjectLookup ),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+			dependentSubjectRules: $this->newDependentSubjectRules(),
+		);
+	}
+
+	public function newGetSubjectQueryForRevision( GetSubjectPresenter $presenter, RevisionRecord $revision, Authority $authority ): GetSubjectQuery {
+		$pointInTimeSubjectLookup = new PointInTimeSubjectLookup(
+			revisionLookup: MediaWikiServices::getInstance()->getRevisionLookup(),
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			connectionProvider: MediaWikiServices::getInstance()->getConnectionProvider(),
+			primaryRevision: $revision,
+		);
+
+		return new GetSubjectQuery(
+			presenter: $presenter,
+			subjectLookup: $pointInTimeSubjectLookup,
+			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $pointInTimeSubjectLookup ),
+			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+			dependentSubjectRules: $this->newDependentSubjectRules(),
+		);
+	}
+
+	public function newGetReferencingSubjectsQuery(
+		GetReferencingSubjectsPresenter $presenter,
+		Authority $authority
+	): GetReferencingSubjectsQuery {
+		$publishedSubjectLookup = $this->newPublishedSubjectLookup();
+
+		return new GetReferencingSubjectsQuery(
+			presenter: $presenter,
+			referencingSubjectLookup: $this->getReferencingSubjectLookup(),
+			subjectLookup: $this->getSourceRoutingSubjectLookup( $publishedSubjectLookup ),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $publishedSubjectLookup ),
+			subjectIdParser: $this->getSubjectIdParser(),
+		);
+	}
+
+	private function newSubjectResponseItemFactory( PageSubjectsAtRevisionLookup $pageSubjectsLookup ): SubjectResponseItemFactory {
+		return new SubjectResponseItemFactory( $pageSubjectsLookup, $this->newHostSubjectBuilder() );
+	}
+
+	public function newHostSubjectBuilder(): HostSubjectBuilder {
+		return new HostSubjectBuilder( $this->newDependentSubjectRules() );
+	}
+
+	public function newSubjectSummaryHostSubjects(): SubjectSummaryHostSubjects {
+		return new SubjectSummaryHostSubjects(
+			dependentSubjectRules: $this->newDependentSubjectRules(),
+			hostSubjectBuilder: $this->newHostSubjectBuilder(),
+			pageSubjectsLookup: $this->newPublishedSubjectLookup(),
+		);
+	}
+
+	public function newReplaceSubjectAction( ReplaceSubjectPresenter $presenter, Authority $authority ): ReplaceSubjectAction {
+		return new ReplaceSubjectAction(
+			subjectRepository: $this->getSubjectRepository(),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			schemaResolver: $this->getSchemaResolver(),
+			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $this->newPageSubjectsLookup() ),
+			presenter: $presenter,
+			validationEnforced: $this->isValidationEnforced(),
+		);
+	}
+
+	public function newUpdateStatementAction( UpdateStatementPresenter $presenter, Authority $authority ): UpdateStatementAction {
+		return new UpdateStatementAction(
+			subjectRepository: $this->getSubjectRepository(),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			schemaResolver: $this->getSchemaResolver(),
+			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
+			responseItemFactory: $this->newSubjectResponseItemFactory( $this->newPageSubjectsLookup() ),
+			presenter: $presenter,
+			validationEnforced: $this->isValidationEnforced(),
+		);
+	}
+
+	private function isValidationEnforced(): bool {
+		return $this->getWikiConfigLookup()->getEffectiveValue( 'enforceValidation' ) === true;
+	}
+
+	public function newSubjectValidator( Authority $authority ): SubjectValidator {
+		return new SubjectValidator(
+			propertyTypeLookup: $this->getPropertyTypeLookup(),
+			subjectLookup: $this->newReadAuthorizedSubjectLookup( $authority ),
+			sourceRegistry: $this->getSourceRegistry(),
+		);
+	}
+
+	public function newProposedSubjectValidator( Authority $authority ): ProposedSubjectValidator {
+		return new ProposedSubjectValidator(
+			schemaResolver: $this->getSchemaResolver(),
+			subjectValidator: $this->newSubjectValidator( $authority ),
+		);
+	}
+
+	public function newValidateSubjectQuery( Authority $authority ): ValidateSubjectQuery {
+		return new ValidateSubjectQuery(
+			schemaResolver: $this->getSchemaResolver(),
+			subjectValidator: $this->newSubjectValidator( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			schemaReferenceParser: $this->getSchemaReferenceParser(),
+		);
+	}
+
+	public function newValidateSubjectUpdateQuery( Authority $authority ): ValidateSubjectUpdateQuery {
+		return new ValidateSubjectUpdateQuery(
+			subjectRepository: $this->getSubjectRepository(),
+			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
+			statementListBuilder: $this->getStatementListBuilder(),
+			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
+			subjectIdParser: $this->getSubjectIdParser(),
+		);
+	}
+
+	public static function newValidateSubjectApi(): ValidateSubjectApi {
+		return new ValidateSubjectApi();
+	}
+
+	public static function newMintSubjectIdsApi(): MintSubjectIdsApi {
+		return new MintSubjectIdsApi(
+			subjectIdMinter: self::getInstance()->newSubjectIdMinter(),
+		);
+	}
+
+	public static function newValidateSubjectUpdateApi(): ValidateSubjectUpdateApi {
+		return new ValidateSubjectUpdateApi();
+	}
+
+	public static function newCreateMainSubjectApi(): CreateSubjectApi {
+		return new CreateSubjectApi(
+			isMainSubject: true,
+			csrfValidator: self::getCsrfValidator()
+		);
+	}
+
+	public static function newCreateOtherSubjectApi(): CreateSubjectApi {
+		return new CreateSubjectApi(
+			isMainSubject: false,
+			csrfValidator: self::getCsrfValidator()
+		);
+	}
+
+	public static function newCreateSubjectPageApi(): CreateSubjectPageApi {
+		return new CreateSubjectPageApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newGetSubjectApi(): GetSubjectApi|Response {
+		return new GetSubjectApi();
+	}
+
+	public static function newGetSubjectEditNoticesApi(): GetSubjectEditNoticesApi {
+		return new GetSubjectEditNoticesApi();
+	}
+
+	public static function newGetMainSubjectApi(): GetMainSubjectApi {
+		return new GetMainSubjectApi();
+	}
+
+	public static function newGetPageSubjectsApi(): GetPageSubjectsApi {
+		return new GetPageSubjectsApi();
+	}
+
+	public static function newReplaceSubjectApi(): ReplaceSubjectApi {
+		return new ReplaceSubjectApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newDeleteSubjectApi(): DeleteSubjectApi {
+		return new DeleteSubjectApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newSetStatementApi(): SetStatementApi {
+		return new SetStatementApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newRemoveStatementApi(): RemoveStatementApi {
+		return new RemoveStatementApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newSetMainSubjectApi(): SetMainSubjectApi {
+		return new SetMainSubjectApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newMoveSubjectApi(): MoveSubjectApi {
+		return new MoveSubjectApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newSetSubjectsOrderingApi(): SetSubjectsOrderingApi {
+		return new SetSubjectsOrderingApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newGetSchemaApi(): GetSchemaApi {
+		return new GetSchemaApi();
+	}
+
+	public static function newSaveSchemaApi(): SaveSchemaApi {
+		return new SaveSchemaApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newDeleteSchemaApi(): DeleteSchemaApi {
+		return new DeleteSchemaApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newGetJsonSchemaApi(): GetJsonSchemaApi {
+		return new GetJsonSchemaApi();
+	}
+
+	public static function newGetLayoutApi(): GetLayoutApi {
+		return new GetLayoutApi();
+	}
+
+	public static function newGetSchemaNamesApi(): GetSchemaNamesApi {
+		return new GetSchemaNamesApi();
+	}
+
+	public static function newGetSchemaSummariesApi(): GetSchemaSummariesApi {
+		return new GetSchemaSummariesApi();
+	}
+
+	public static function newGetSubjectSummariesApi(): GetSubjectSummariesApi {
+		return new GetSubjectSummariesApi( self::getInstance()->newSubjectSummaryLookup() );
+	}
+
+	public static function newGetRecentlyEditedSubjectsApi(): GetRecentlyEditedSubjectsApi {
+		return new GetRecentlyEditedSubjectsApi( self::getInstance()->newRecentlyEditedSubjectLookup() );
+	}
+
+	public static function newGetSubjectCountsApi(): GetSubjectCountsApi {
+		return new GetSubjectCountsApi( self::getInstance()->newSubjectCountLookup() );
+	}
+
+	public function getLayoutNameLookup(): LayoutNameLookup {
+		return new DatabaseLayoutNameLookup(
+			db: $this->getDbConnection(),
+			readAuthorizer: $this->newPageReadAuthorizer( $this->getRequestAuthority() ),
+			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+		);
+	}
+
+	public static function newGetLayoutSummariesApi(): GetLayoutSummariesApi {
+		return new GetLayoutSummariesApi();
+	}
+
+	public static function newGetMappingSummariesApi(): GetMappingSummariesApi {
+		return new GetMappingSummariesApi();
+	}
+
+	public static function newGetGraphStoresApi(): GetGraphStoresApi {
+		return new GetGraphStoresApi();
+	}
+
+	public static function newStartGraphStoreRebuildApi(): StartGraphStoreRebuildApi {
+		return new StartGraphStoreRebuildApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newCancelGraphStoreRebuildApi(): CancelGraphStoreRebuildApi {
+		return new CancelGraphStoreRebuildApi( csrfValidator: self::getCsrfValidator() );
+	}
+
+	public static function newGetSubjectLabelsApi(): GetSubjectLabelsApi {
+		return new GetSubjectLabelsApi();
+	}
+
+	public static function newGetReferencingSubjectsApi(): GetReferencingSubjectsApi {
+		return new GetReferencingSubjectsApi();
+	}
+
+	private static function getCsrfValidator(): CsrfValidator {
+		$request = ( \RequestContext::getMain() )->getRequest();
+		return new CsrfValidator(
+			$request,
+			new CsrfTokenSet( $request )
+		);
+	}
+
+	public function getSWSRootDirectory(): string {
+		return __DIR__ . '/..';
+	}
+
+}

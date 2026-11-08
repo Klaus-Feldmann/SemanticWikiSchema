@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Maintenance;
+namespace ProfessionalWiki\SWS\Tests\Maintenance;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Language\RawMessage;
@@ -11,24 +11,24 @@ use MediaWiki\Revision\RenderedRevision;
 use MediaWiki\Status\Status;
 use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Maintenance\ClearDefaultSubjectLabels;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Maintenance\ClearDefaultSubjectLabels;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
 // Its RUN_MAINTENANCE_IF_MAIN guard is a no-op under PHPUnit, so this does not execute the script.
 require_once __DIR__ . '/../../../maintenance/ClearDefaultSubjectLabels.php';
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\ClearDefaultSubjectLabels
+ * @covers \ProfessionalWiki\SWS\Maintenance\ClearDefaultSubjectLabels
  * @group Database
  */
-class ClearDefaultSubjectLabelsTest extends NeoWikiIntegrationTestCase {
+class ClearDefaultSubjectLabelsTest extends SWSIntegrationTestCase {
 
 	private const string MAIN_ID = 's11111111111111';
 	private const string OTHER_SUBJECT_ID = 's22222222222222';
@@ -264,7 +264,7 @@ class ClearDefaultSubjectLabelsTest extends NeoWikiIntegrationTestCase {
 			TestSubject::build( id: self::MAIN_ID, label: 'Vincent van Gogh' )
 		);
 		$this->indexPage(
-			$this->createPageWithoutTellingNeoWiki(
+			$this->createPageWithoutTellingSWS(
 				'Broken subject page',
 				TestSubject::jsonThatDoesNotDeserialize( self::SECOND_PAGE_MAIN_ID )
 			),

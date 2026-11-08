@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use LogicException;
 use MediaWiki\Content\JsonContent;
@@ -46,7 +46,7 @@ class PublishedPageJsonLookup {
 
 		/** @var string|false $json */
 		$json = $this->cache->getWithSetCallback(
-			$this->cache->makeKey( 'neowiki-published-json', self::CACHE_VERSION, (int)$revision->getId() ),
+			$this->cache->makeKey( 'sws-published-json', self::CACHE_VERSION, (int)$revision->getId() ),
 			WANObjectCache::TTL_DAY,
 			fn (): string|false => $this->readJson( $revision )
 		);

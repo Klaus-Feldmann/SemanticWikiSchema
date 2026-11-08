@@ -2,36 +2,36 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Title\Title;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ExportPageRdfApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingPagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\ExportPageRdfApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingPagePropertyProvider;
 use RuntimeException;
 use Wikimedia\Rdbms\DBUnexpectedError;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ExportPageRdfApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\RdfFormatNegotiation
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ExportPageRdfApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\RdfFormatNegotiation
  * @group Database
  */
-class ExportPageRdfApiTest extends NeoWikiIntegrationTestCase {
+class ExportPageRdfApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SCHEMA = 'ExportPageRdfApiTestSchema';
 	private const string SUBJECT_ID = 'sTestERA1111111';
@@ -173,7 +173,7 @@ JSON
 	}
 
 	public function testExportsThePageMetadataOfAPageWithoutSubjects(): void {
-		$plainPage = $this->insertPage( 'ExportPageRdfApiTest_Plain', 'Just wikitext, no NeoWiki subjects.' );
+		$plainPage = $this->insertPage( 'ExportPageRdfApiTest_Plain', 'Just wikitext, no SWS subjects.' );
 
 		$response = $this->export( pageId: $plainPage['id'] );
 
@@ -218,7 +218,7 @@ JSON
 
 		$this->assertSame( 404, $response->getStatusCode() );
 		$this->assertStringContainsString(
-			'No NeoWiki data found for page: ' . $this->pageId,
+			'No SWS data found for page: ' . $this->pageId,
 			$response->getBody()->getContents()
 		);
 	}
@@ -265,7 +265,7 @@ JSON
 	}
 
 	public function testLeavesOutASubjectWhoseSchemaTheReaderMayNotRead(): void {
-		$this->denyReadingPagesIn( NeoWikiExtension::NS_SCHEMA );
+		$this->denyReadingPagesIn( SWSExtension::NS_SCHEMA );
 
 		$body = $this->export()->getBody()->getContents();
 
@@ -275,7 +275,7 @@ JSON
 
 	public function testAMappingTheReaderMayNotReadIsAnUnknownProjection(): void {
 		$this->createEdmMapping();
-		$this->denyReadingPagesIn( NeoWikiExtension::NS_MAPPING );
+		$this->denyReadingPagesIn( SWSExtension::NS_MAPPING );
 
 		$this->assertSame( 400, $this->export( query: [ 'projection' => 'EDM' ] )->getStatusCode() );
 	}

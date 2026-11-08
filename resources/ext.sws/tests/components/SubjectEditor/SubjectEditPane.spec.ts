@@ -1,0 +1,919 @@
+import { DOMWrapper, flushPromises, mount, VueWrapper } from '@vue/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { nextTick, toRaw } from 'vue';
+import { createPinia, setActivePinia } from 'pinia';
+import SubjectEditPane from '@/components/SubjectEditor/SubjectEditPane.vue';
+import SubjectEditor from '@/components/SubjectEditor/SubjectEditor.vue';
+import SubjectViolationBanners from '@/components/common/SubjectViolationBanners.vue';
+import EditableText from '@/components/common/EditableText.vue';
+import { Subject } from '@/domain/Subject.ts';
+import { Schema } from '@/domain/Schema.ts';
+import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList.ts';
+import { StatementList } from '@/domain/StatementList.ts';
+import { Statement } from '@/domain/Statement.ts';
+import { newTextProperty } from '@/domain/propertyTypes/Text.ts';
+import { newNumberProperty } from '@/domain/propertyTypes/Number.ts';
+import { TextType } from '@/domain/propertyTypes/Text.ts';
+import { newRelation, newStringValue, RelationValue } from '@/domain/Value.ts';
+import { newRelationProperty, RelationType } from '@/domain/propertyTypes/Relation.ts';
+import { PropertyName } from '@/domain/PropertyDefinition.ts';
+import { PageIdentifiers } from '@/domain/PageIdentifiers.ts';
+import { newSchema, newSubject, unresolvedPage } from '@/TestHelpers.ts';
+import { useSubjectStore } from '@/stores/SubjectStore.ts';
+import { SWSTestServices } from '../../SWSTestServices.ts';
+import { createI18nMock, setupMwMock } from '../../VueTestHelpers.ts';
+import type { SubjectViolation } from '@/domain/SubjectViolation';
+import { DependentSubjectEditingKey, type DependentSubjectEditing } from '@/components/SubjectEditor/DependentSubjectEditing.ts';
+
+const $i18n = createI18nMock();
+
+const testPage = new PageIdentifiers( 42, 'Test page' );
+
+function subjectStoredOn( page: PageIdentifiers ): Subject {
+	return newSubject( { id: 's11111111111111', label: 'Test Subject', schemaName: 'TestSchema', pageIdentifiers: page } );
+}
+
+const defaultSubject = subjectStoredOn( testPage );
+
+const defaultSchema = newSchema();
+
+const schemaWithNameAndAge = newSchema( {
+	title: 'TestSchema',
+	description: 'A test schema',
+	properties: new PropertyDefinitionList( [ newTextProperty( { name: 'Name' } ), newNumberProperty( { name: 'Age' } ) ] ),
+} );
+
+// Stores no label (ADR 31), so its name on screen is the server's derived one: here the
+// page it is the Main Subject of.
+const labellessSubject = newSubject( {
+	id: 's11111111111111',
+	label: null,
+	displayName: 'Test page',
+	schemaName: 'TestSchema',
+	pageIdentifiers: testPage,
+} );
+
+// Stores no label and is not a page's Main Subject (ADR 31) - the shape a Subject invented mid-edit has.
+const unnamedSubject = newSubject( {
+	id: 's33333333333333',
+	label: null,
+	displayNameIsGenerated: true,
+	schemaName: 'TestSchema',
+	pageIdentifiers: testPage,
+} );
+
+const subjectWithOnlyName = defaultSubject.withStatements(
+	new StatementList( [ new Statement( new PropertyName( 'Name' ), TextType.typeName, newStringValue( 'Alice' ) ) ] ),
+);
+
+interface MountPaneOptions {
+	subject?: Subject;
+	schema?: Schema;
+	nested?: boolean;
+	isNew?: boolean;
+	unsavedTargetIds?: readonly string[];
+	provide?: Record<symbol, unknown>;
+}
+
+let pinia: ReturnType<typeof createPinia>;
+
+// What mw.config answers, read at each call, so a test can switch the wiki to subject-first.
+let wikiConfig: Record<string, unknown> = {};
+
+function mountPane( {
+	subject = defaultSubject,
+	schema = defaultSchema,
+	nested = false,
+	isNew = false,
+	unsavedTargetIds = [],
+	provide = {},
+}: MountPaneOptions = {} ): VueWrapper {
+	return mount( SubjectEditPane, {
+		props: {
+			subject,
+			schema,
+			nested,
+			isNew,
+			unsavedTargetIds,
+		},
+		global: {
+			mocks: {
+				$i18n,
+			},
+			plugins: [ pinia ],
+			provide: { ...SWSTestServices.getServices(), ...provide },
+			directives: {
+				tooltip: {},
+			},
+			stubs: {
+				teleport: true,
+			},
+		},
+	} );
+}
+
+// A client-held copy of subjectWithOnlyName with its own label and Name value, so an
+// assertion can tell which copy the form is showing.
+function namedCopy( label: string, name: string ): Subject {
+	return subjectWithOnlyName
+		.withLabel( label )
+		.withStatements( new StatementList( [
+			new Statement( new PropertyName( 'Name' ), TextType.typeName, newStringValue( name ) ),
+		] ) );
+}
+
+function fieldValue( wrapper: VueWrapper, propertyName: string ): unknown {
+	const statements = wrapper.findComponent( SubjectEditor ).props( 'statements' ) as StatementList;
+	return [ ...statements ].find( ( s ) => s.propertyName.toString() === propertyName )?.value;
+}
+
+// A relation field with a target picked, as the pane shows it for a Subject read from the server.
+const relationSchema = newSchema( {
+	title: 'TestSchema',
+	description: 'A test schema',
+	properties: new PropertyDefinitionList( [ newRelationProperty( { name: 'Author' } ) ] ),
+} );
+
+const subjectWithAuthor = defaultSubject.withStatements( new StatementList( [ new Statement(
+	new PropertyName( 'Author' ),
+	RelationType.typeName,
+	new RelationValue( [ newRelation( undefined, 's22222222222222' ) ] ),
+) ] ) );
+
+describe( 'SubjectEditPane', () => {
+	beforeEach( () => {
+		// Debounce 0 is blur-only mode: the dry-run fires on blur / pre-save
+		// (via flush()), which runs synchronously in tests.
+		wikiConfig = { wgSWSValidationDebounceMs: 0 };
+		setupMwMock( {
+			functions: [ 'message', 'msg', 'notify', 'config', 'util' ],
+			messages: {
+				// The parameter sits mid-string, so an assertion can tell the page name apart from
+				// the sentence around it.
+				'sws-subject-editor-stored-on': ( page ) => `Kept on ${ page } for now`,
+			},
+			config: wikiConfig,
+		} );
+
+		pinia = createPinia();
+		setActivePinia( pinia );
+
+		// The dry-run validation runs alongside the live validators; stub it so
+		// it does not reach the network and stays out of the way of these tests.
+		useSubjectStore().validateSubjectUpdate = vi.fn().mockResolvedValue( [] );
+	} );
+
+	// Only a host that can open a target in place turns the per-target edit button on; the
+	// pane is that host, and nothing else on this branch provides the key.
+	it( 'offers to edit a relation target in place', async () => {
+		const wrapper = mountPane( { subject: subjectWithAuthor, schema: relationSchema } );
+
+		// Awaited because the control follows the name the field is showing, which is fetched.
+		await flushPromises();
+
+		expect( wrapper.find( '.ext-sws-relation-input__open-target' ).exists() ).toBe( true );
+	} );
+
+	it( 'renders one field per schema property, including properties the subject lacks', () => {
+		const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+
+		// Direct children only: each value-input component nests a .cdx-field of its own,
+		// so an unscoped selector double-counts.
+		expect( wrapper.findAll( '.ext-sws-subject-editor > .cdx-field' ) ).toHaveLength( 2 );
+	} );
+
+	it( 'flips hasChanged when a value input reports change', async () => {
+		const wrapper = mountPane();
+
+		expect( ( wrapper.vm as any ).hasChanged ).toBe( false );
+
+		wrapper.findComponent( SubjectEditor ).vm.$emit( 'change' );
+		await nextTick();
+
+		expect( ( wrapper.vm as any ).hasChanged ).toBe( true );
+	} );
+
+	it( 'buildUpdatedSubject drops valueless statements', () => {
+		const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+
+		const updated = ( wrapper.vm as any ).buildUpdatedSubject() as Subject | null;
+
+		expect( updated ).not.toBeNull();
+		expect( [ ...updated!.getStatements() ] ).toHaveLength( 1 );
+	} );
+
+	it( 'keeps the Statements its Schema does not declare in the Subject it builds', async () => {
+		const born = new Statement(
+			new PropertyName( 'Born' ),
+			RelationType.typeName,
+			new RelationValue( [ newRelation( undefined, 's1birthAAAAAAA1' ) ] ),
+		);
+		const wrapper = mountPane( {
+			subject: subjectWithOnlyName.withStatements( new StatementList( [ ...subjectWithOnlyName.getStatements(), born ] ) ),
+			schema: schemaWithNameAndAge,
+		} );
+
+		await wrapper.find( 'input' ).setValue( 'Ada' );
+
+		const built = ( wrapper.vm as any ).buildUpdatedSubject() as Subject;
+		expect( built.getStatementValue( new PropertyName( 'Name' ) ) ).toEqual( newStringValue( 'Ada' ) );
+		expect( built.getStatements().get( new PropertyName( 'Born' ) ) ).toEqual( born );
+	} );
+
+	it( 'routes anchorless server violations to the banner and anchored ones to the field', async () => {
+		// A schema that declares 'Name', so its violation has a field on screen to anchor to;
+		// the subject holds no statements, so anchoring against the subject instead of the
+		// schema's rendered fields would misroute it. 'Ghost' is anchorless despite naming
+		// a property.
+		const wrapper = mountPane( { schema: schemaWithNameAndAge } );
+
+		( wrapper.vm as any ).setServerViolations( [
+			{ propertyName: null, code: 'some-subject-level-code', args: [], severity: 'error', valuePartIndex: null },
+			{ propertyName: 'Name', code: 'some-field-code', args: [], severity: 'error', valuePartIndex: null },
+			{ propertyName: 'Ghost', code: 'some-unrendered-code', args: [], severity: 'error', valuePartIndex: null },
+		] as SubjectViolation[] );
+		await nextTick();
+
+		const bannered = wrapper.findComponent( SubjectViolationBanners )
+			.props( 'violations' ) as SubjectViolation[];
+		expect( bannered.map( ( violation ) => violation.code ) )
+			.toStrictEqual( [ 'some-subject-level-code', 'some-unrendered-code' ] );
+		// The field-anchored one still reaches the editor, which renders it at its field.
+		expect( wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) ).toHaveLength( 3 );
+	} );
+
+	// The host replaces the Subject when it opens the editor on another root; the pane starts
+	// over from it, label and fields alike.
+	it( 'starts over from a replaced subject', async () => {
+		const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+
+		expect( ( wrapper.vm as any ).label ).toBe( 'Test Subject' );
+		expect( fieldValue( wrapper, 'Name' ) ).toEqual( newStringValue( 'Alice' ) );
+
+		await wrapper.setProps( { subject: namedCopy( 'Replaced', 'Bob' ) } );
+
+		expect( ( wrapper.vm as any ).label ).toBe( 'Replaced' );
+		expect( fieldValue( wrapper, 'Name' ) ).toEqual( newStringValue( 'Bob' ) );
+	} );
+
+	describe( 'The snapshot the tree reads', () => {
+		it( 'exposes the harvested subject after a relation change, and the seeded one before', async () => {
+			const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+
+			// Through toRaw: the harness hands props down through a reactive container, so the
+			// pane sees a proxy of the very Subject passed in.
+			expect( toRaw( ( wrapper.vm as any ).editedSubject ) ).toBe( subjectWithOnlyName );
+
+			wrapper.findComponent( SubjectEditor ).vm.$emit( 'relation-change' );
+			await nextTick();
+
+			expect( toRaw( ( wrapper.vm as any ).editedSubject ) ).not.toBe( subjectWithOnlyName );
+			expect( ( wrapper.vm as any ).editedSubject )
+				.toEqual( ( wrapper.vm as any ).buildUpdatedSubject() );
+		} );
+
+		// A reopened pane would otherwise seed the tree with relations the form no longer shows.
+		it( 'follows a replaced subject rather than the earlier harvest', async () => {
+			const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+			wrapper.findComponent( SubjectEditor ).vm.$emit( 'relation-change' );
+			await nextTick();
+
+			const replacement = namedCopy( 'Replaced', 'Carol' );
+			await wrapper.setProps( { subject: replacement } );
+
+			expect( toRaw( ( wrapper.vm as any ).editedSubject ) ).toBe( replacement );
+		} );
+	} );
+
+	describe( 'Where the subject is stored', () => {
+		function storageLine( wrapper: VueWrapper ): Omit<DOMWrapper<Element>, 'exists'> {
+			return wrapper.get( '.ext-sws-subject-edit-pane__storage' );
+		}
+
+		// A wrapping link would make the words around the name clickable, and a message of their
+		// own would fix their place in the sentence for every language.
+		it( 'links the page name alone, inside the message the translation orders', () => {
+			const wrapper = mountPane( { nested: true } );
+
+			expect( storageLine( wrapper ).text() ).toBe( 'Kept on Test page for now' );
+			expect( wrapper.get( '.ext-sws-subject-edit-pane__page' ).text() ).toBe( 'Test page' );
+		} );
+
+		// A Subject bound for a page the save has yet to settle carries the page without a title
+		// for it, so there is nothing to point at and nothing to name.
+		it( 'names no storage page for one still to be settled', () => {
+			const wrapper = mountPane( {
+				subject: subjectStoredOn( PageIdentifiers.notYetCreated() ),
+				nested: true,
+			} );
+
+			expect( wrapper.find( '.ext-sws-subject-edit-pane__storage' ).exists() ).toBe( false );
+		} );
+
+		// PageIdentifiers types both fields as present; a payload for a page the API could not
+		// resolve omits them, which an empty-string check alone would let through as a link to
+		// nowhere.
+		it( 'names no storage page the API could not resolve', () => {
+			const wrapper = mountPane( {
+				subject: subjectStoredOn( unresolvedPage() ),
+				nested: true,
+			} );
+
+			expect( wrapper.find( '.ext-sws-subject-edit-pane__storage' ).exists() ).toBe( false );
+		} );
+
+		it( 'names no storage page on a subject-first wiki', () => {
+			wikiConfig.wgSWSSubjectFirst = true;
+
+			const wrapper = mountPane( { nested: true } );
+
+			expect( wrapper.find( '.ext-sws-subject-edit-pane__storage' ).exists() ).toBe( false );
+		} );
+
+		it( 'links the storage page in a new tab, so following it cannot discard a pending edit', () => {
+			const wrapper = mountPane( { nested: true } );
+
+			const link = wrapper.get( '.ext-sws-subject-edit-pane__page' );
+			expect( link.attributes( 'href' ) ).toBe( '/wiki/Test page' );
+			expect( link.attributes( 'target' ) ).toBe( '_blank' );
+			expect( link.attributes( 'rel' ) ).toBe( 'noopener' );
+		} );
+
+		// The root's Subject is stored on the page the editor was opened from.
+		it( 'says nothing about storage in the root pane', () => {
+			const wrapper = mountPane();
+
+			expect( wrapper.find( '.ext-sws-subject-edit-pane__storage' ).exists() ).toBe( false );
+		} );
+
+		// The navigator already draws a dot on every edited subject. A second dot here would show
+		// on nested subjects alone, so an edited child would carry two and an edited root none.
+		it( 'leaves the unsaved dot to the navigator when the form is edited', async () => {
+			const wrapper = mountPane( { nested: true } );
+
+			wrapper.findComponent( SubjectEditor ).vm.$emit( 'change' );
+			await nextTick();
+
+			expect( ( wrapper.vm as any ).hasChanged ).toBe( true );
+			expect( wrapper.find( '.ext-sws-unsaved-dot' ).exists() ).toBe( false );
+		} );
+	} );
+
+	// The pane prints no name of its own, and may hold a Subject other than the one the dialog
+	// is titled after, so the region's name is all a screen-reader user has.
+	it( 'names the pane region after its own subject', () => {
+		const wrapper = mountPane( { nested: true } );
+
+		expect( wrapper.get( '.ext-sws-subject-edit-pane' ).attributes( 'aria-label' ) )
+			.toBe( 'Test Subject' );
+	} );
+
+	// The dialog's header shows only the Subject's id, so the root's region carries the name
+	// like every other pane's.
+	it( 'names the root pane\'s region after its subject too', () => {
+		const wrapper = mountPane();
+
+		expect( wrapper.get( '.ext-sws-subject-edit-pane' ).attributes( 'aria-label' ) )
+			.toBe( 'Test Subject' );
+	} );
+
+	it( 'names the region of a label-less subject by its display name', () => {
+		const wrapper = mountPane( { subject: labellessSubject, nested: true } );
+
+		expect( wrapper.get( '.ext-sws-subject-edit-pane' ).attributes( 'aria-label' ) )
+			.toBe( 'Test page' );
+	} );
+
+	describe( 'The Schema beside the name', () => {
+		it( 'shows the schema as a badge beside a labelled subject', () => {
+			const wrapper = mountPane();
+
+			expect( wrapper.get( '.ext-sws-schema-name__text' ).text() ).toBe( 'TestSchema' );
+		} );
+
+		// The name beside it says the same word, but only the badge is a link to the Schema and the
+		// way into its editor.
+		it( 'shows the badge for a subject labelled after its schema', () => {
+			const labelledAfterSchema = newSubject( { label: 'TestSchema', schemaName: 'TestSchema' } );
+			const wrapper = mountPane( { subject: labelledAfterSchema, nested: true } );
+
+			expect( wrapper.get( '.ext-sws-schema-name__text' ).text() ).toBe( 'TestSchema' );
+		} );
+	} );
+
+	// The field edits the stored label, which is empty here.
+	it( 'starts the label field empty for a label-less subject', () => {
+		const wrapper = mountPane( { subject: labellessSubject } );
+
+		expect( ( wrapper.vm as any ).label ).toBe( '' );
+	} );
+
+	// A cleared field means the Subject has no label, not that it has an empty one.
+	it( 'saves a cleared label as no label', () => {
+		const wrapper = mountPane();
+
+		( wrapper.vm as any ).setLabel( '   ' );
+
+		expect( ( ( wrapper.vm as any ).buildUpdatedSubject() as Subject ).getLabel() ).toBeNull();
+	} );
+
+	it( 'validates a cleared label as no label', async () => {
+		const validate = vi.fn().mockResolvedValue( [] );
+		useSubjectStore().validateSubjectUpdate = validate;
+		const wrapper = mountPane();
+
+		( wrapper.vm as any ).setLabel( '' );
+		await flushPromises();
+
+		expect( validate ).toHaveBeenLastCalledWith(
+			defaultSubject.getId(),
+			null,
+			expect.any( StatementList ),
+		);
+	} );
+
+	function schemaWithTextProperty( propertyName: string ): Schema {
+		return newSchema( {
+			title: 'TestSchema',
+			description: 'A test schema',
+			properties: new PropertyDefinitionList( [ newTextProperty( { name: propertyName } ) ] ),
+		} );
+	}
+
+	function sentPropertyNames( validate: ReturnType<typeof vi.fn>, call: number ): string[] {
+		const statements = validate.mock.calls[ call ][ 2 ] as StatementList;
+		return [ ...statements ].map( ( s ) => s.propertyName.toString() );
+	}
+
+	it( 'revalidates when the schema prop is replaced', async () => {
+		const violation: SubjectViolation = {
+			propertyName: 'Name', code: 'max-length', args: [ 5 ], severity: 'error', valuePartIndex: null,
+		};
+		const validate = vi.fn().mockResolvedValueOnce( [ violation ] ).mockResolvedValue( [] );
+		useSubjectStore().validateSubjectUpdate = validate;
+		const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithTextProperty( 'Name' ) } );
+		await flushPromises();
+		expect( wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) ).toEqual( [ violation ] );
+
+		await wrapper.setProps( { schema: schemaWithTextProperty( 'Name' ) } );
+		await flushPromises();
+
+		expect( wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) ).toEqual( [] );
+	} );
+
+	// The schema decides which fields the editor renders, so reading the form any earlier
+	// validates the fields the replaced schema was showing.
+	it( 'reads the form under the new schema, not the one it replaced', async () => {
+		const validate = vi.fn().mockResolvedValue( [] );
+		useSubjectStore().validateSubjectUpdate = validate;
+		const wrapper = mountPane( { subject: subjectWithOnlyName, schema: schemaWithTextProperty( 'Name' ) } );
+		await flushPromises();
+		expect( sentPropertyNames( validate, 0 ) ).toEqual( [ 'Name' ] );
+
+		await wrapper.setProps( { schema: schemaWithTextProperty( 'Nickname' ) } );
+		await flushPromises();
+
+		// The renamed field starts empty, so a read of the new form sends no values; the
+		// old form would still have sent Name.
+		expect( validate ).toHaveBeenCalledTimes( 2 );
+		expect( sentPropertyNames( validate, 1 ) ).toEqual( [] );
+	} );
+
+	function violation( code: string, propertyName: string ): SubjectViolation {
+		return { propertyName, code, args: [], severity: 'error', valuePartIndex: null };
+	}
+
+	function violationCodes( wrapper: VueWrapper ): string[] {
+		return ( wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) as SubjectViolation[] )
+			.map( ( v ) => v.code );
+	}
+
+	// A Subject this session invented has no stored version to dry-run an update against, so the
+	// pane validates it the way the subject creator does.
+	describe( 'Validating a subject the server has never seen', () => {
+		function stubCreationValidation( violations: SubjectViolation[] = [] ): ReturnType<typeof vi.fn> {
+			const validate = vi.fn().mockResolvedValue( violations );
+			useSubjectStore().validateSubject = validate;
+			return validate;
+		}
+
+		it( 'validates it under its own label, schema and current values', async () => {
+			const validate = stubCreationValidation();
+
+			mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge, isNew: true } );
+			await flushPromises();
+
+			expect( validate ).toHaveBeenCalledWith( 'Test Subject', 'TestSchema', expect.any( StatementList ) );
+			expect( sentPropertyNames( validate, 0 ) ).toEqual( [ 'Name' ] );
+		} );
+
+		it( 'never dry-runs it as an update, which has no stored version to run against', async () => {
+			stubCreationValidation();
+			const update = vi.fn().mockResolvedValue( [] );
+			useSubjectStore().validateSubjectUpdate = update;
+
+			mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge, isNew: true } );
+			await flushPromises();
+
+			expect( update ).not.toHaveBeenCalled();
+		} );
+
+		// Its fields all start empty, so an unfilled required one is a field the user is still on
+		// their way to, not a gap. Anything else needs a value to occur.
+		it( 'withholds an unfilled required field while surfacing every other violation', async () => {
+			stubCreationValidation( [ violation( 'required', 'Name' ), violation( 'max-length', 'Name' ) ] );
+
+			const wrapper = mountPane( { schema: schemaWithNameAndAge, isNew: true } );
+			await flushPromises();
+
+			expect( violationCodes( wrapper ) ).toEqual( [ 'max-length' ] );
+		} );
+	} );
+
+	it( 'validates a subject the server already has as an update', async () => {
+		const update = vi.fn().mockResolvedValue( [] );
+		useSubjectStore().validateSubjectUpdate = update;
+
+		mountPane( { subject: subjectWithOnlyName, schema: schemaWithNameAndAge } );
+		await flushPromises();
+
+		expect( update ).toHaveBeenCalledWith(
+			subjectWithOnlyName.getId(),
+			'Test Subject',
+			expect.any( StatementList ),
+		);
+	} );
+
+	// An existing subject is expected to be complete, so an empty required field is a real gap.
+	it( 'surfaces an unfilled required field on a subject the server already has', async () => {
+		useSubjectStore().validateSubjectUpdate = vi.fn().mockResolvedValue( [ violation( 'required', 'Name' ) ] );
+
+		const wrapper = mountPane( { schema: schemaWithNameAndAge } );
+		await flushPromises();
+
+		expect( violationCodes( wrapper ) ).toEqual( [ 'required' ] );
+	} );
+
+	// A relation naming a Subject this session invented resolves for the user, who has that
+	// Subject in front of them, and not for the server, which has never been told about it.
+	describe( 'Complaints about a relation target this session has not written yet', () => {
+		const unwrittenId = 's22222222222222';
+		const otherId = 's99999999999999';
+
+		function targetNotFound( id: string ): SubjectViolation {
+			return {
+				propertyName: 'Author',
+				code: 'relation-target-not-found',
+				args: [ id ],
+				severity: 'warning',
+				valuePartIndex: 0,
+			};
+		}
+
+		function surfacedViolations( wrapper: VueWrapper ): SubjectViolation[] {
+			return wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) as SubjectViolation[];
+		}
+
+		it( 'withholds the dry-run complaint naming an unwritten target, and keeps one naming another', async () => {
+			useSubjectStore().validateSubjectUpdate = vi.fn().mockResolvedValue( [
+				targetNotFound( unwrittenId ),
+				targetNotFound( otherId ),
+			] );
+
+			const wrapper = mountPane( { schema: relationSchema, unsavedTargetIds: [ unwrittenId ] } );
+			await flushPromises();
+
+			expect( surfacedViolations( wrapper ) ).toEqual( [ targetNotFound( otherId ) ] );
+		} );
+
+		// A Subject the session invented is validated as a creation, and points at the session's
+		// other inventions just as often.
+		it( 'withholds it from the creation dry-run as well', async () => {
+			useSubjectStore().validateSubject = vi.fn().mockResolvedValue( [
+				targetNotFound( unwrittenId ),
+				targetNotFound( otherId ),
+			] );
+
+			const wrapper = mountPane( {
+				schema: relationSchema,
+				isNew: true,
+				unsavedTargetIds: [ unwrittenId ],
+			} );
+			await flushPromises();
+
+			expect( surfacedViolations( wrapper ) ).toEqual( [ targetNotFound( otherId ) ] );
+		} );
+
+		// A rejected save hands its 422 body straight to the pane, bypassing the dry-run.
+		it( 'withholds it from the violations a rejected save pushes in', async () => {
+			const wrapper = mountPane( { schema: relationSchema, unsavedTargetIds: [ unwrittenId ] } );
+			await flushPromises();
+
+			( wrapper.vm as any ).setServerViolations( [
+				targetNotFound( unwrittenId ),
+				targetNotFound( otherId ),
+			] );
+			await nextTick();
+
+			expect( surfacedViolations( wrapper ) ).toEqual( [ targetNotFound( otherId ) ] );
+		} );
+
+		// Only "there is no such Subject" is untrue of what the session is about to save. The id
+		// carries no exemption of its own, so a violation naming it under any other code stands.
+		it( 'leaves a violation of another code naming the same target alone', async () => {
+			const otherCode: SubjectViolation = {
+				propertyName: 'Author',
+				code: 'some-other-code',
+				args: [ unwrittenId ],
+				severity: 'error',
+				valuePartIndex: 0,
+			};
+			useSubjectStore().validateSubjectUpdate = vi.fn().mockResolvedValue( [ otherCode ] );
+
+			const wrapper = mountPane( { schema: relationSchema, unsavedTargetIds: [ unwrittenId ] } );
+			await flushPromises();
+
+			expect( surfacedViolations( wrapper ) ).toEqual( [ otherCode ] );
+		} );
+	} );
+
+	describe( 'Renaming from a pane', () => {
+		async function typeName( wrapper: VueWrapper, name: string ): Promise<Omit<DOMWrapper<Element>, 'exists'>> {
+			await wrapper.get( 'button[aria-label="sws-subject-editor-rename"]' ).trigger( 'click' );
+			const input = wrapper.get( '.ext-sws-editable-text__input input' );
+			await input.setValue( name );
+			return input;
+		}
+
+		async function rename( wrapper: VueWrapper, name: string ): Promise<void> {
+			const input = await typeName( wrapper, name );
+			await input.trigger( 'keydown.enter' );
+		}
+
+		// The label, or what stands in for it while the field is empty.
+		function labelLine( wrapper: VueWrapper ): string {
+			return wrapper.get( '.ext-sws-subject-edit-pane__name' ).text();
+		}
+
+		it( 'flips hasChanged as soon as a name is typed, before it is committed', async () => {
+			const wrapper = mountPane();
+
+			await typeName( wrapper, 'Alice' );
+
+			expect( ( wrapper.vm as any ).hasChanged ).toBe( true );
+		} );
+
+		it( 'commits a name still being typed before validating for a save', async () => {
+			const wrapper = mountPane();
+			await typeName( wrapper, 'Alice' );
+
+			await ( wrapper.vm as any ).flushValidation();
+
+			expect( ( ( wrapper.vm as any ).buildUpdatedSubject() as Subject ).getLabel() ).toBe( 'Alice' );
+		} );
+
+		it( 'withdraws hasChanged when the typed name is discarded', async () => {
+			const wrapper = mountPane();
+
+			const input = await typeName( wrapper, 'Alice' );
+			await input.trigger( 'keyup.esc' );
+
+			expect( ( wrapper.vm as any ).hasChanged ).toBe( false );
+		} );
+
+		it( 'saves the committed name as the subject\'s label', async () => {
+			const wrapper = mountPane( { nested: true } );
+
+			await rename( wrapper, 'Renamed' );
+
+			expect( ( ( wrapper.vm as any ).buildUpdatedSubject() as Subject ).getLabel() ).toBe( 'Renamed' );
+		} );
+
+		// The dialog's header shows only the Subject's id, so the root is renamed where every
+		// other pane is renamed: in the pane itself.
+		it( 'gives the root pane a rename control, like every other pane', () => {
+			const wrapper = mountPane();
+
+			expect( wrapper.findComponent( EditableText ).exists() ).toBe( true );
+		} );
+
+		it( 'shows the page name in the empty label field of a subject named after its page', () => {
+			const wrapper = mountPane( { subject: labellessSubject } );
+
+			expect( labelLine( wrapper ) ).toBe( 'Test page' );
+		} );
+
+		it( 'says no label is defined for a subject shown under its id', () => {
+			const wrapper = mountPane( { subject: unnamedSubject } );
+
+			expect( labelLine( wrapper ) ).toBe( 'sws-subject-no-label' );
+		} );
+
+		it( 'says no label is defined once a label is cleared, even to only spaces', async () => {
+			const wrapper = mountPane();
+
+			await rename( wrapper, '   ' );
+
+			expect( labelLine( wrapper ) ).toBe( 'sws-subject-no-label' );
+		} );
+
+		it( 'keeps the schema badge once an unnamed subject is given a label of its own', async () => {
+			const wrapper = mountPane( { subject: unnamedSubject, nested: true } );
+
+			await rename( wrapper, 'Alice' );
+
+			expect( wrapper.get( '.ext-sws-schema-name__text' ).text() ).toBe( 'TestSchema' );
+		} );
+	} );
+
+	describe( 'Labelling a subject being created', () => {
+		beforeEach( () => {
+			useSubjectStore().validateSubject = vi.fn().mockResolvedValue( [] );
+		} );
+
+		it( 'offers an optional label field in place of the rename button', () => {
+			const wrapper = mountPane( { subject: unnamedSubject, isNew: true, nested: true } );
+
+			const fieldLabel = wrapper.get( '.ext-sws-subject-edit-pane__label .cdx-label' ).text();
+			expect( fieldLabel ).toContain( 'sws-subject-editor-label' );
+			expect( fieldLabel ).toContain( '(optional)' );
+			expect( wrapper.find( 'button[aria-label="sws-subject-editor-rename"]' ).exists() ).toBe( false );
+		} );
+
+		it( 'labels the subject as the label is typed', async () => {
+			const wrapper = mountPane( { subject: unnamedSubject, isNew: true } );
+
+			await wrapper.get( '.ext-sws-subject-edit-pane__label input' ).setValue( 'Ada' );
+
+			expect( ( ( wrapper.vm as any ).buildUpdatedSubject() as Subject ).getLabel() ).toBe( 'Ada' );
+		} );
+
+		it( 'shows the label a draft was created with', () => {
+			const wrapper = mountPane( { subject: unnamedSubject.withLabel( 'Ada' ), isNew: true, nested: true } );
+
+			expect( ( wrapper.get( '.ext-sws-subject-edit-pane__label input' ).element as HTMLInputElement ).value )
+				.toBe( 'Ada' );
+		} );
+	} );
+
+	describe( 'A Dependent Subject edited on its own', () => {
+		const birthSchema = newSchema( { title: 'Birth', subjectsAreDependent: true } );
+		const birth = newSubject( {
+			id: 's1birthAAAAAAA1',
+			label: null,
+			displayNameIsGenerated: true,
+			schemaName: 'Birth',
+			pageIdentifiers: testPage,
+		} );
+
+		it( 'offers no label to give it', () => {
+			const wrapper = mountPane( { subject: birth, schema: birthSchema } );
+
+			expect( wrapper.findComponent( EditableText ).exists() ).toBe( false );
+			expect( wrapper.find( '.ext-sws-subject-edit-pane__label' ).exists() ).toBe( false );
+			expect( wrapper.get( '.ext-sws-subject-edit-pane__name' ).text() ).toBe( '(s1birthAAAAAAA1)' );
+		} );
+	} );
+
+	describe( 'Dependent Subjects in the form', () => {
+		const BIRTH_ID = 's1birthAAAAAAA1';
+		const birthSchema = newSchema( {
+			title: 'Birth',
+			subjectsAreDependent: true,
+			properties: new PropertyDefinitionList( [ newTextProperty( { name: 'Date' } ) ] ),
+		} );
+		const hostSchema = newSchema( {
+			properties: new PropertyDefinitionList( [
+				newTextProperty( { name: 'Name' } ),
+				newRelationProperty( { name: 'Birth', targetSchemas: [ 'Birth' ] } ),
+			] ),
+		} );
+		const birth = newSubject( {
+			id: BIRTH_ID,
+			label: null,
+			schemaName: 'Birth',
+			pageIdentifiers: testPage,
+			statements: new StatementList( [
+				new Statement( new PropertyName( 'Date' ), TextType.typeName, newStringValue( '1881' ) ),
+			] ),
+		} );
+		const host = defaultSubject.withStatements( new StatementList( [ new Statement(
+			new PropertyName( 'Birth' ),
+			RelationType.typeName,
+			new RelationValue( [ newRelation( undefined, BIRTH_ID ) ] ),
+		) ] ) );
+
+		const editing: DependentSubjectEditing = {
+			targetsDependentSubjects: ( property ) => property.targetSchemas.includes( 'Birth' ),
+			schema: ( name ) => name === 'Birth' ? birthSchema : undefined,
+			subject: ( id ) => id === BIRTH_ID ? birth : undefined,
+			isNew: () => false,
+			markChanged: () => undefined,
+			add: () => Promise.resolve( null ),
+			unsavedTargetIds: () => [],
+		};
+
+		function mountHost(): VueWrapper {
+			return mountPane( { subject: host, schema: hostSchema, provide: { [ DependentSubjectEditingKey as symbol ]: editing } } );
+		}
+
+		function violation( propertyName: string, code: string, subjectId?: string ): SubjectViolation {
+			return { propertyName, code, args: [], severity: 'error', valuePartIndex: null, ...( subjectId === undefined ? {} : { subjectId } ) };
+		}
+
+		function bannerCodes( wrapper: VueWrapper ): string[] {
+			return ( wrapper.findAllComponents( SubjectViolationBanners )[ 0 ].props( 'violations' ) as SubjectViolation[] )
+				.map( ( shown ) => shown.code );
+		}
+
+		function messageInGroup( wrapper: VueWrapper ): string {
+			return wrapper.get( '.ext-sws-dependent-subject-editor .cdx-field__validation-message' ).text();
+		}
+
+		it( 'reports the Dependent Subjects its form shows, for the save to carry', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			expect( ( ( wrapper.vm as any ).buildDependentSubjects() as Subject[] ).map( ( each ) => each.getId().text ) )
+				.toEqual( [ BIRTH_ID ] );
+		} );
+
+		it( 'counts an edit inside a Dependent Subject as a change of its own', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			wrapper.findComponent( SubjectEditor ).vm.$emit( 'dependent-subject-change', false );
+			await nextTick();
+
+			expect( ( wrapper.vm as any ).hasChanged ).toBe( true );
+		} );
+
+		it( 'takes in the Dependent Subjects again after a relation inside one changed', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			wrapper.findComponent( SubjectEditor ).vm.$emit( 'dependent-subject-change', true );
+			await nextTick();
+
+			expect( ( ( wrapper.vm as any ).editedDependentSubjects as Subject[] ).map( ( each ) => each.getId().text ) )
+				.toEqual( [ BIRTH_ID ] );
+		} );
+
+		it( 'drops the cards of the Dependent Subjects removed before its Subject was written', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+			await wrapper.find( '.ext-sws-dependent-subject-editor__remove' ).trigger( 'click' );
+			await flushPromises();
+			expect( wrapper.find( '.ext-sws-dependent-subjects-input__removed' ).exists() ).toBe( true );
+
+			( wrapper.vm as any ).markWritten();
+			await nextTick();
+
+			expect( wrapper.find( '.ext-sws-dependent-subjects-input__removed' ).exists() ).toBe( false );
+		} );
+
+		it( 'reports none where its Schema has no field for them', () => {
+			const wrapper = mountPane();
+
+			expect( ( wrapper.vm as any ).buildDependentSubjects() ).toEqual( [] );
+		} );
+
+		it( 'shows what a refused save reported on a Dependent Subject at that Subject\'s field', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			( wrapper.vm as any ).setServerViolations( [ violation( 'Date', 'some-field-code', BIRTH_ID ) ] );
+			await flushPromises();
+
+			expect( messageInGroup( wrapper ) ).toBe( 'sws-field-some-field-code' );
+			expect( bannerCodes( wrapper ) ).toEqual( [] );
+		} );
+
+		it( 'keeps what a refused save reported on its own Subject, named or not, at its own fields', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			( wrapper.vm as any ).setServerViolations( [
+				violation( 'Name', 'unnamed-code' ),
+				violation( 'Name', 'named-code', defaultSubject.getId().text ),
+			] );
+			await nextTick();
+
+			expect( ( wrapper.findComponent( SubjectEditor ).props( 'serverViolations' ) as SubjectViolation[] )
+				.map( ( shown ) => shown.code ) ).toEqual( [ 'unnamed-code', 'named-code' ] );
+			expect( bannerCodes( wrapper ) ).toEqual( [] );
+		} );
+
+		// Not at the field of the same name, which is another Subject's.
+		it( 'shows what a refused save reported on a Subject the form does not show in its banners', async () => {
+			const wrapper = mountHost();
+			await flushPromises();
+
+			( wrapper.vm as any ).setServerViolations( [ violation( 'Name', 'elsewhere-code', 's1goneAAAAAAAA1' ) ] );
+			await nextTick();
+
+			expect( bannerCodes( wrapper ) ).toEqual( [ 'elsewhere-code' ] );
+		} );
+	} );
+
+} );

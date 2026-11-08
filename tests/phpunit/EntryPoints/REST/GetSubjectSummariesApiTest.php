@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectSummariesApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages the Subjects are saved on and the database the list is read from.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectSummariesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi
  * @group Database
  */
-class GetSubjectSummariesApiTest extends NeoWikiIntegrationTestCase {
+class GetSubjectSummariesApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
 
@@ -170,7 +170,7 @@ class GetSubjectSummariesApiTest extends NeoWikiIntegrationTestCase {
 		$this->createPageWithSubjects( 'Secret', TestSubject::build( id: 'sTestGSS1111112', label: 'Secret', schemaName: new SchemaName( 'Computer' ) ), new SubjectMap() );
 
 		RequestContext::getMain()->setUser( $this->getTestUser()->getUser() );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		$this->setTemporaryHook(
 			'getUserPermissionsErrors',
 			static function ( $title, $user, $action, &$result ): bool {
@@ -210,7 +210,7 @@ class GetSubjectSummariesApiTest extends NeoWikiIntegrationTestCase {
 	 */
 	private function get( array $queryParams ): array {
 		return json_decode( $this->executeHandler(
-			NeoWikiExtension::newGetSubjectSummariesApi(),
+			SWSExtension::newGetSubjectSummariesApi(),
 			new RequestData( [ 'method' => 'GET', 'queryParams' => $queryParams ] )
 		)->getBody()->getContents(), true );
 	}

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\NumberProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\NumberProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty
  */
 class NumberPropertyTest extends PropertyTestCase {
 

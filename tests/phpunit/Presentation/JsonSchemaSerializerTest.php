@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Presentation\JsonSchemaSerializer;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use stdClass;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\JsonSchemaSerializer
+ * @covers \ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer
  */
 class JsonSchemaSerializerTest extends TestCase {
 
-	private const string DOCUMENT_URL = 'https://example.com/w/rest.php/neowiki/v0/schema/Company/json-schema';
+	private const string DOCUMENT_URL = 'https://example.com/w/rest.php/sws/v0/schema/Company/json-schema';
 
 	/**
 	 * Nothing a built-in Property Definition emits, so that finding it proves it came from the definition.

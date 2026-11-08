@@ -1,9 +1,9 @@
 name: SemanticWikiSchema candidate checks
 on:
   push:
-    branches: [master, semantic-0.1.19]
+    branches: [master, semantic-0.1.22]
   pull_request:
-    branches: [master, semantic-0.1.19]
+    branches: [master, semantic-0.1.22]
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,12 +24,12 @@ jobs:
         run: composer install --working-dir=publication-tests/dependencies --no-interaction --prefer-dist
       - name: PHP standalone checks
         env:
-          NEOWIKI_TEST_VENDOR: ${{ github.workspace }}/publication-tests/dependencies/vendor/autoload.php
+          SWS_TEST_VENDOR: ${{ github.workspace }}/publication-tests/dependencies/vendor/autoload.php
         run: |
           publication-tests/dependencies/vendor/bin/phpunit -c publication-tests/phpunit.xml
           for script in publication-tests/*-contract.php; do php "$script"; done
       - name: Data UI checks
-        working-directory: resources/ext.neowiki
+        working-directory: resources/ext.sws
         run: |
           npm ci --ignore-scripts
           npm test -- --run

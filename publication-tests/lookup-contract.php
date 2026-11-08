@@ -23,22 +23,22 @@ namespace MediaWiki\Title {
   public static function newFromText($text){return new self(42,$text);}
  }
 }
-namespace ProfessionalWiki\NeoWiki {
- class NeoWikiExtension {
+namespace ProfessionalWiki\SWS {
+ class SWSExtension {
   public static $instance;
   public static function getInstance(){return self::$instance;}
-  public function getRdfNamespaces(){return new \ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces('https://example.org');}
-  public function getRdfSerializer(){return new \ProfessionalWiki\NeoWiki\Infrastructure\Rdf\HardfRdfSerializer($this->getRdfNamespaces()->prefixMap(),new \Psr\Log\NullLogger());}
+  public function getRdfNamespaces(){return new \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces('https://example.org');}
+  public function getRdfSerializer(){return new \ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer($this->getRdfNamespaces()->prefixMap(),new \Psr\Log\NullLogger());}
   public function newPageSubjectsLookup(){return $this;}
   public function getPageSubjects($id){return \Harness\State::$page;}
   public function getSchemaResolverFor($auth){return $this;}
   public function getSchema($ref){if(\Harness\State::$schemaError)throw new \RuntimeException('schema');return \Harness\State::$schema;}
-  public function getSubjectIdParser(){return new \ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdParser('local');}
+  public function getSubjectIdParser(){return new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser('local');}
   public function newSubjectHostingPageResolver($auth){return $this;}
-  public function resolveReadableHostingPage($id){return \Harness\State::$targetAllowed ? new class { public function getId(){return new \ProfessionalWiki\NeoWiki\Domain\Page\PageId(42);} public function getTitle(){return 'Zielseite';} } : null;}
+  public function resolveReadableHostingPage($id){return \Harness\State::$targetAllowed ? new class { public function getId(){return new \ProfessionalWiki\SWS\Domain\Page\PageId(42);} public function getTitle(){return 'Zielseite';} } : null;}
  }
 }
-namespace NeoWikiBaseBridge {
+namespace SWSBaseBridge {
  class PageIdentityLookup {
   public function wikidata($title){return ['status'=>'resolved','id'=>'Q619','url'=>'https://www.wikidata.org/wiki/Q619'];}
   public function wikibase($title,$auth){return ['status'=>'missing'];}
@@ -63,10 +63,10 @@ namespace Harness {
 }
 namespace {
  require __DIR__.'/bootstrap.php';
- use ProfessionalWiki\NeoWiki\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
- use ProfessionalWiki\NeoWiki\Domain\Schema\Property\TextProperty;
- use ProfessionalWiki\NeoWiki\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
- use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
+ use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
+ use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
+ use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+ use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
  $checks=0;
  function check($condition,$why){global $checks;if(!$condition)throw new RuntimeException($why);$checks++;}
  $core=new PropertyCore('',false,null);
@@ -74,8 +74,8 @@ namespace {
  $main=new Subject(new SubjectId('sF1FCQPNcwQdw4B'),null,SchemaReference::local(new SchemaName('Person')),new StatementList([]));
  $other=new Subject(new SubjectId('sF16iHXBMTQdHDY'),null,SchemaReference::local(new SchemaName('Person')),new StatementList([]));
  \Harness\State::$page=new PageSubjects($main,new SubjectMap($other));
- \ProfessionalWiki\NeoWiki\NeoWikiExtension::$instance=new \ProfessionalWiki\NeoWiki\NeoWikiExtension();
- $context=new \Harness\Context();$lookup=new \NeoWikiBaseBridge\DataViewLookup($context);$title=new \MediaWiki\Title\Title();
+ \ProfessionalWiki\SWS\SWSExtension::$instance=new \ProfessionalWiki\SWS\SWSExtension();
+ $context=new \Harness\Context();$lookup=new \SWSBaseBridge\DataViewLookup($context);$title=new \MediaWiki\Title\Title();
  $v=$lookup->read($title,'de');
  check(count($v['subjects'])===2,'all page subjects');check($v['subjects'][0]['isMainSubject']===true,'main');check($v['subjects'][1]['isMainSubject']===false,'other');
  check(\Harness\State::$seen===[$main->id->text,$other->id->text],'source request bound to each subject');
@@ -87,8 +87,8 @@ namespace {
  \Harness\State::$sourceError=true;$v=$lookup->read($title,'de');check($v['identities']['wikidata']['id']==='Q619','identity retained on source failure');check($v['complete']===false,'description failure explicit');\Harness\State::$sourceError=false;
  \Harness\State::$schemaError=true;$v=$lookup->read($title,'de');check($v['subjects'][0]['schemaStatus']==='unavailable' && !$v['complete'],'missing schema');
  \Harness\State::$schemaError=false;
- $r=new \ProfessionalWiki\NeoWiki\Domain\Relation\Relation(new \ProfessionalWiki\NeoWiki\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),$other->id);
- $main->setStatements(new StatementList([new \ProfessionalWiki\NeoWiki\Domain\Statement(new PropertyName('Bezug'),'relation',new \ProfessionalWiki\NeoWiki\Domain\Value\RelationValue($r)),new \ProfessionalWiki\NeoWiki\Domain\Statement(new PropertyName('Studium'),'page',new \ProfessionalWiki\NeoWiki\Domain\Value\StringValue('Universität Wien'))]));
+ $r=new \ProfessionalWiki\SWS\Domain\Relation\Relation(new \ProfessionalWiki\SWS\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),$other->id);
+ $main->setStatements(new StatementList([new \ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Bezug'),'relation',new \ProfessionalWiki\SWS\Domain\Value\RelationValue($r)),new \ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Studium'),'page',new \ProfessionalWiki\SWS\Domain\Value\StringValue('Universität Wien'))]));
  $v=$lookup->read($title,'de');
  check($v['subjects'][0]['fields'][1]['ownValues'][0]['target']===['id'=>$other->id->text,'status'=>'unavailable'],'unreadable target metadata withheld');
  check(str_contains($v['subjects'][0]['fields'][2]['ownValues'][0]['url'],'Universit'),'local page URL');

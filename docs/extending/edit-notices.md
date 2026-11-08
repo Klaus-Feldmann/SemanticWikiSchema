@@ -24,7 +24,7 @@ class ApprovalEditNoticeProvider implements SubjectEditNoticeProvider {
 }
 ```
 
-Register with `NeoWikiRegistrar::addSubjectEditNoticeProvider()`. Provider `html` is inserted as given: escape it
+Register with `SWSRegistrar::addSubjectEditNoticeProvider()`. Provider `html` is inserted as given: escape it
 yourself. Notices render in registration order after the ones admins write as interface messages; providers are not
 called for pages the requesting user may not read. `SubjectEditNoticeContext` exposes `$pageId`, `$pageDbKey`,
 `$namespaceId`, and `$schemaName` when a Schema is known.

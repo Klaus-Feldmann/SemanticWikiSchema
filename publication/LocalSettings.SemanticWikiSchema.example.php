@@ -1,7 +1,7 @@
 <?php
 /** Selected non-secret settings from the tested AufEinWort setup.
  * Merge into the existing LocalSettings; do not replace the whole file.
- * Original NeoWiki/Bridge load lines and an older registration include must
+ * Original SWS/Bridge load lines and an older registration include must
  * be removed/replaced for the switch. Load each component only once.
  * Prerequisites retain their existing installation/loading configuration.
  */
@@ -10,21 +10,21 @@ $wgUseParsoidLinksUpdate = false;
 
 wfLoadExtension( 'SemanticWikiSchema' );
 wfLoadExtension( 'SchemaBaseBridge', "$IP/extensions/SemanticWikiSchema/SchemaBaseBridge/extension.json" );
-$wgNeoWikiEnableLua = true;
-$wgNeoWikiAutoRenderMainSubject = false;
-$wgNeoWikiSubjectFirst = false;
+$wgSWSEnableLua = true;
+$wgSWSAutoRenderMainSubject = false;
+$wgSWSSubjectFirst = false;
 
-// This is the separate NeoWiki graph dataset. Preserve these deployed values.
-$wgNeoWikiSparqlStores = [
+// This is the separate SWS graph dataset. Preserve these deployed values.
+$wgSWSSparqlStores = [
     [
-        'name' => 'aewi-neowiki',
+        'name' => 'aewi-sws',
         'updateUrl' => 'http://127.0.0.1:3331/neowiki/update',
         'queryUrl' => 'http://127.0.0.1:3331/neowiki/query',
         'projection' => 'native',
     ],
 ];
 // Do not change the existing RDF base IRI when renaming the extension.
-// Set NeoWikiRdfBaseUri only if the existing deployment already sets it.
+// Set SWSRdfBaseUri only if the existing deployment already sets it.
 
 // Existing local Wikibase sitelink site IDs; other deployments use their own IDs.
 $wgWBClientSettings['siteGlobalID'] = 'aewi';
@@ -46,7 +46,7 @@ $smwgSparqlEndpoint = [
     'data' => '',
 ];
 
-// Observed MediaWiki:NeoWiki JSON remains unchanged:
+// Observed MediaWiki:SWS JSON remains unchanged:
 // { "subjectFirst": false, "dataLanguages": ["de", "la", "grc", "en"] }
 // The existing deployment has wgJobRunRate=0 and uses an external job runner.
 // This example does not configure that runner or change access permissions.
@@ -54,3 +54,13 @@ $smwgSparqlEndpoint = [
 // Optional private-wiki policy. Internal processing supports this without data/schema/module whitelists:
 // $wgGroupPermissions['*']['read'] = false;
 // Keep the existing external job runner active for derived-data updates.
+
+// Optional overrides only; no old Werk-specific naming rules are supplied.
+// With no setting, schema field names become SMW property names.
+// URL subobjects default to Quellen-URL, Quellentitel, Quellenbezeichnung,
+// Quellenbezeichnungsseite, WikiSchema-Feld and WikiSchema-Subjekt.
+// Reprocess affected pages after changing these server settings.
+// $wgWikiSchemaSmwMapping = [
+//     'properties' => [ 'Person' => [ 'Schemafeld' => 'SMW-Eigenschaft' ] ],
+//     'urlEntries' => [ 'subject' => 'Subjektkennung' ],
+// ];

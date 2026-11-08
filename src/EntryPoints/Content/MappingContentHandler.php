@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -15,12 +15,12 @@ use MediaWiki\Page\PageReference;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\Mapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingContentValidator;
-use ProfessionalWiki\NeoWiki\Presentation\MappingPageHtmlBuilder;
-use ProfessionalWiki\NeoWiki\Presentation\MappingPageRendering;
+use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingContentValidator;
+use ProfessionalWiki\SWS\Presentation\MappingPageHtmlBuilder;
+use ProfessionalWiki\SWS\Presentation\MappingPageRendering;
 use StatusValue;
 use stdClass;
 
@@ -45,7 +45,7 @@ class MappingContentHandler extends JsonContentHandler {
 		try {
 			new MappingName( $title->getText() );
 		} catch ( InvalidArgumentException $exception ) {
-			$status->fatal( 'neowiki-mapping-name-invalid', $exception->getMessage() );
+			$status->fatal( 'sws-mapping-name-invalid', $exception->getMessage() );
 		}
 
 		$validator = MappingContentValidator::newInstance( MediaWikiServices::getInstance()->getTitleParser() );
@@ -53,8 +53,8 @@ class MappingContentHandler extends JsonContentHandler {
 		if ( !$validator->validate( $content->getText() ) ) {
 			$this->reportValidationErrors(
 				$status,
-				'neowiki-mapping-invalid',
-				'neowiki-mapping-invalid-detail',
+				'sws-mapping-invalid',
+				'sws-mapping-invalid-detail',
 				$validator->getErrors()
 			);
 		}
@@ -103,7 +103,7 @@ class MappingContentHandler extends JsonContentHandler {
 
 		$parserOutput->setContentHolderText(
 			Html::warningBox(
-				wfMessage( 'neowiki-mapping-unsupported-version' )
+				wfMessage( 'sws-mapping-unsupported-version' )
 					->params( (string)$version )
 					->inContentLanguage()
 					->escaped()
@@ -132,7 +132,7 @@ class MappingContentHandler extends JsonContentHandler {
 
 		$parserOutput->setContentHolderText( $rendering->html );
 		$this->registerLinks( $parserOutput, $rendering );
-		$parserOutput->addModuleStyles( [ 'mediawiki.content.json', 'ext.neowiki.styles' ] );
+		$parserOutput->addModuleStyles( [ 'mediawiki.content.json', 'ext.sws.styles' ] );
 	}
 
 	private function registerLinks( ParserOutput $parserOutput, MappingPageRendering $rendering ): void {
@@ -169,7 +169,7 @@ JSON
 	}
 
 	public function canBeUsedOn( Title $title ): bool {
-		return $title->getNamespace() === NeoWikiExtension::NS_MAPPING;
+		return $title->getNamespace() === SWSExtension::NS_MAPPING;
 	}
 
 }

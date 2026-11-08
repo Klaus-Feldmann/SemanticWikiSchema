@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
 
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Parser;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\RawQueryAuthorizer;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FakeSparqlQueryEndpoint;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubRawQueryAuthorizer;
+use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
  */
 class SparqlRawParserFunctionTest extends TestCase {
 
@@ -62,7 +62,7 @@ class SparqlRawParserFunctionTest extends TestCase {
 		$result = $this->parserFunction( FakeSparqlQueryEndpoint::returning( self::RESULTS ), new StubRawQueryAuthorizer( false ) )
 			->handle( $this->createParser(), 'SELECT * WHERE { ?s ?p ?o }' );
 
-		$this->assertStringContainsString( '[neowiki-sparql-error-permission-denied]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-sparql-error-permission-denied]', $this->html( $result ) );
 		$this->assertStringNotContainsString( 'Bach', $this->html( $result ) );
 	}
 
@@ -70,7 +70,7 @@ class SparqlRawParserFunctionTest extends TestCase {
 		$result = $this->parserFunction( FakeSparqlQueryEndpoint::returning( self::RESULTS ) )
 			->handle( $this->createParser(), '   ' );
 
-		$this->assertStringContainsString( '[neowiki-sparql-error-empty-query]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-sparql-error-empty-query]', $this->html( $result ) );
 	}
 
 	public function testStoreRejectionShowsLocalizedSyntaxErrorWithDetail(): void {
@@ -78,7 +78,7 @@ class SparqlRawParserFunctionTest extends TestCase {
 			FakeSparqlQueryEndpoint::failingWith( new SparqlQueryFailedException( 'https://s.example', 400, 'bad token FOO' ) )
 		)->handle( $this->createParser(), 'FOO' );
 
-		$this->assertStringContainsString( '[neowiki-sparql-error-syntax|', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-sparql-error-syntax|', $this->html( $result ) );
 		$this->assertStringContainsString( 'bad token FOO', $this->html( $result ) );
 	}
 
@@ -87,14 +87,14 @@ class SparqlRawParserFunctionTest extends TestCase {
 			FakeSparqlQueryEndpoint::failingWith( new SparqlQueryFailedException( 'https://s.example', 0, '' ) )
 		)->handle( $this->createParser(), 'SELECT * WHERE { ?s ?p ?o }' );
 
-		$this->assertStringContainsString( '[neowiki-sparql-error-store-unavailable]', $this->html( $result ) );
+		$this->assertStringContainsString( '[sws-sparql-error-store-unavailable]', $this->html( $result ) );
 	}
 
 	public function testValidQueryReturnsFormattedJsonResult(): void {
 		$result = $this->parserFunction( FakeSparqlQueryEndpoint::returning( self::RESULTS ) )
 			->handle( $this->createParser(), 'SELECT ?label WHERE { ?s ?p ?label }' );
 
-		$this->assertStringContainsString( '<div class="mw-neowiki-sparql-result"><pre>', $this->html( $result ) );
+		$this->assertStringContainsString( '<div class="mw-sws-sparql-result"><pre>', $this->html( $result ) );
 		$this->assertStringContainsString( 'Bach', $this->html( $result ) );
 		$this->assertStringContainsString( 'bindings', $this->html( $result ) );
 	}

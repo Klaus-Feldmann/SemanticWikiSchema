@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
 
 class SpecialMappings extends SpecialPage {
 
@@ -22,16 +22,16 @@ class SpecialMappings extends SpecialPage {
 		parent::execute( $subPage );
 		$this->addHelpLink( DocumentationUrl::AuthoringMappings->value, true );
 
-		NeoWikiExtension::getInstance()->newFrontendModuleLoader()->load( $this->getOutput(), $this->getSkin() );
-		$this->getOutput()->addHTML( '<div id="ext-neowiki-mappings"></div>' );
+		SWSExtension::getInstance()->newFrontendModuleLoader()->load( $this->getOutput(), $this->getSkin() );
+		$this->getOutput()->addHTML( '<div id="ext-sws-mappings"></div>' );
 	}
 
 	public function getGroupName(): string {
-		return 'neowiki';
+		return 'sws';
 	}
 
 	public function getDescription(): Message {
-		return $this->msg( 'neowiki-special-mappings' );
+		return $this->msg( 'sws-special-mappings' );
 	}
 
 }

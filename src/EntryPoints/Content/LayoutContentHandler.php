@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content;
+namespace ProfessionalWiki\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -11,9 +11,9 @@ use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\LayoutContentValidator;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutContentValidator;
 use StatusValue;
 
 class LayoutContentHandler extends JsonContentHandler {
@@ -36,7 +36,7 @@ class LayoutContentHandler extends JsonContentHandler {
 		try {
 			new LayoutName( $title->getText() );
 		} catch ( InvalidArgumentException $exception ) {
-			$status->fatal( 'neowiki-layout-name-invalid', $exception->getMessage() );
+			$status->fatal( 'sws-layout-name-invalid', $exception->getMessage() );
 		}
 
 		$validator = LayoutContentValidator::newInstance();
@@ -44,8 +44,8 @@ class LayoutContentHandler extends JsonContentHandler {
 		if ( !$validator->validate( $content->getText() ) ) {
 			$this->reportValidationErrors(
 				$status,
-				'neowiki-layout-invalid',
-				'neowiki-layout-invalid-detail',
+				'sws-layout-invalid',
+				'sws-layout-invalid-detail',
 				$validator->getErrors()
 			);
 		}
@@ -72,7 +72,7 @@ JSON
 	}
 
 	public function canBeUsedOn( Title $title ): bool {
-		return $title->getNamespace() === NeoWikiExtension::NS_LAYOUT;
+		return $title->getNamespace() === SWSExtension::NS_LAYOUT;
 	}
 
 }

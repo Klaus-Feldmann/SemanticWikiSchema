@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Domain\Mapping;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
 
 /**
- * An ontology mapping: the correspondence between the native NeoWiki Schemas and one target ontology
+ * An ontology mapping: the correspondence between the native SWS Schemas and one target ontology
  * (OntologyMapping.md). A Mapping is a first-class wiki object, one page per target ontology, the page
  * title being the target/projection name ([ADR 17](../../../docs/adr/017-names-as-identifiers.md)). The
  * page holds an entry for every mapped Schema, so a Schema is mapped by adding an entry rather than by

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetReferencingSubjects;
+namespace ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects;
 
 readonly class GetReferencingSubjectsResponse {
 

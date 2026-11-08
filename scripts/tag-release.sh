@@ -8,8 +8,8 @@
 
 set -euo pipefail
 
-BUNDLE_DIR=resources/ext.neowiki/dist
-BUNDLE_FILES=( neowiki.css neowiki.js )
+BUNDLE_DIR=resources/ext.sws/dist
+BUNDLE_FILES=( sws.css sws.js )
 IMAGE_TAG_FILE=Docker/image-tag
 ARTIFACT=frontend-bundle
 MASTER=refs/remotes/origin/master
@@ -83,7 +83,7 @@ fi
 
 build=$(git commit-tree -S "$tree" -p "$base" -m "Add the frontend bundle and the $version image tag" \
     -m "Built by $url")
-git tag -s "$version" -m "NeoWiki $version" "$build"
+git tag -s "$version" -m "SWS $version" "$build"
 
 echo "Signed $version on $build, which adds the frontend bundle and $IMAGE_TAG_FILE to $base."
 echo "Check it with 'git show --stat $version', then publish it with 'git push origin refs/tags/$version'."

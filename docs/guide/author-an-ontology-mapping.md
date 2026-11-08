@@ -34,7 +34,7 @@ Per-Subject exports, the REST endpoint, and the bulk dump are in [RDF Export](..
 ## 4. Query the projection over SPARQL
 
 Add the projection as a store entry in
-[`$wgNeoWikiSparqlStores`](../operations/installation.md#several-projections-in-one-store). After a Mapping change,
+[`$wgSWSSparqlStores`](../operations/installation.md#several-projections-in-one-store). After a Mapping change,
 such a store keeps the old vocabulary until it is rebuilt: **Special:GraphStores** flags it as
 [stale](../operations/maintenance.md#stale-stores) and offers **Rebuild**.
 

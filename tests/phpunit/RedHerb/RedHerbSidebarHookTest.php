@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use MediaWiki\Language\RawMessage;
 use MediaWiki\Message\Message;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use ProfessionalWiki\RedHerb\RedHerbSidebarHook;
 use Skin;
 
@@ -18,7 +18,7 @@ use Skin;
  * @covers \ProfessionalWiki\RedHerb\RedHerbSidebarHook
  * @group Database
  */
-class RedHerbSidebarHookTest extends NeoWikiIntegrationTestCase {
+class RedHerbSidebarHookTest extends SWSIntegrationTestCase {
 
 	use MockAuthorityTrait;
 

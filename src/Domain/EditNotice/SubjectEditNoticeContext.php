@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\EditNotice;
+namespace ProfessionalWiki\SWS\Domain\EditNotice;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 
 readonly class SubjectEditNoticeContext {
 

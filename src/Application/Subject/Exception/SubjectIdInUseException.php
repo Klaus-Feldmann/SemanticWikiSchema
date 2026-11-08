@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Subject\Exception;
+namespace ProfessionalWiki\SWS\Application\Subject\Exception;
 
 use Exception;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 class SubjectIdInUseException extends Exception {
 

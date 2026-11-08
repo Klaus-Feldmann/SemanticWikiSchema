@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Domain\Schema\Property;
 
 use InvalidArgumentException;
 

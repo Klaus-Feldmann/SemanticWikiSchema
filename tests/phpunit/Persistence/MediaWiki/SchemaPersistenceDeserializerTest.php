@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSources;
+use ProfessionalWiki\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\UnregisteredTypeProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Presentation\SchemaPresentationSerializer;
+use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Property\UnregisteredTypeProperty;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaPersistenceDeserializer
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\UnregisteredTypeProperty
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\UnregisteredTypeProperty
  */
 class SchemaPersistenceDeserializerTest extends TestCase {
 

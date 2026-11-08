@@ -2,32 +2,32 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Actions;
+namespace ProfessionalWiki\SWS\Tests\Application\Actions;
 
 use MockHttpTrait;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ImportPresenterSpy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\PageDeleterSpy;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ImportPresenterSpy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\PageDeleterSpy;
 use TestLogger;
 
 /**
  * Saves the imported pages to the database, since saving a page is what projects it into the graph stores.
  *
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
  * @group Database
  */
-class ImportPagesProjectionTest extends NeoWikiIntegrationTestCase {
+class ImportPagesProjectionTest extends SWSIntegrationTestCase {
 
 	use MockHttpTrait;
 
@@ -35,11 +35,11 @@ class ImportPagesProjectionTest extends NeoWikiIntegrationTestCase {
 
 	public function testNoProjectionFailureIsLoggedWhenAGraphStoreProjectsAnImportedMapping(): void {
 		$this->installMockHttp( $this->makeFakeHttpRequest( '', 200 ) );
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [
+		$this->overrideConfigValue( 'SWSSparqlStores', [
 			[ 'updateUrl' => 'https://sparql.example/update', 'projection' => 'EDM' ],
 		] );
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$presenter = new ImportPresenterSpy();
 
 		$this->runWithoutGraphBackend( fn () => $this->newImportAction( $presenter )->import() );

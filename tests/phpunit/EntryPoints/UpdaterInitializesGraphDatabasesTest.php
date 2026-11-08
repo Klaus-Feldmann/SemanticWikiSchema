@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Installer\DatabaseUpdater;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use TestLogger;
 
 /**
@@ -17,11 +17,11 @@ use TestLogger;
  * is not part of that routine. The Neo4j uniqueness constraints are what the projection's id lookups
  * seek on, so a wiki that never got them pays a scan per lookup.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onLoadExtensionSchemaUpdates
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::initializeGraphDatabases
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::initializeGraphDatabases
  * @group Database
  */
-class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
+class UpdaterInitializesGraphDatabasesTest extends SWSIntegrationTestCase {
 
 	/**
 	 * @var mixed[] The updates registered on the updater built by newUpdater().
@@ -41,7 +41,7 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// Some tests rebuild the singleton with an extra plugin registered; reset it so later tests get
 		// a clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	/**
@@ -54,25 +54,25 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 			[ $this->newUpdater() ]
 		);
 
-		$this->assertContains( [ [ NeoWikiHooks::class, 'initializeGraphDatabases' ] ], $this->registeredUpdates );
+		$this->assertContains( [ [ SWSHooks::class, 'initializeGraphDatabases' ] ], $this->registeredUpdates );
 	}
 
 	public function testUpdateCreatesTheDefaultConstraints(): void {
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
 		$this->assertSame( [ 'Page wiki_id id', 'Subject id' ], $this->constraintNames() );
 	}
 
 	public function testASuccessfulUpdateReportsCompletion(): void {
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
-		$this->assertSame( "Initializing NeoWiki graph databases...done.\n", $this->report );
+		$this->assertSame( "Initializing SWS graph databases...done.\n", $this->report );
 	}
 
 	public function testUpdateReportsAFailingBackendInsteadOfAborting(): void {
 		$this->registerGraphDatabasePlugins( new ThrowingGraphDatabasePlugin() );
 
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
 		$this->assertStringContainsString( ThrowingGraphDatabasePlugin::FAILURE_MESSAGE, $this->report );
 	}
@@ -83,10 +83,10 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testAFailingBackendIsAlsoLogged(): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->registerGraphDatabasePlugins( new ThrowingGraphDatabasePlugin() );
 
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
 		$buffer = $logger->getBuffer();
 		$this->assertCount( 1, $buffer );
@@ -102,10 +102,10 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testTheReportOfAFailingBackendCarriesNoCredentials( string $backendMessage, string $password ): void {
 		$logger = new TestLogger( true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$this->registerGraphDatabasePlugins( new ThrowingGraphDatabasePlugin( $backendMessage ) );
 
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
 		$this->assertStringNotContainsString( $password, $this->report );
 		$this->assertStringContainsString( 'bolt://neo:7687', $this->report );
@@ -152,7 +152,7 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 		$reason = 'Both Node(162) and Node(163) have the label `Subject` and property `id` = "abc"';
 		$this->registerGraphDatabasePlugins( new ThrowingGraphDatabasePlugin( $reason ) );
 
-		NeoWikiHooks::initializeGraphDatabases( $this->newUpdater() );
+		SWSHooks::initializeGraphDatabases( $this->newUpdater() );
 
 		$this->assertStringContainsString( $reason, $this->report );
 	}
@@ -162,7 +162,7 @@ class UpdaterInitializesGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	 *
 	 * getDB() returns the test database rather than the mock's null, because the registration test
 	 * hands this double to every extension's LoadExtensionSchemaUpdates handler, and the ones that
-	 * inspect the connection would otherwise fatal on code that has nothing to do with NeoWiki.
+	 * inspect the connection would otherwise fatal on code that has nothing to do with SWS.
 	 */
 	private function newUpdater(): DatabaseUpdater {
 		$updater = $this->createMock( DatabaseUpdater::class );

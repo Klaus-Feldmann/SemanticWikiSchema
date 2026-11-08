@@ -1,22 +1,22 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiRegistrar;
+use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
 
 final class Hooks {
-	public static function onNeoWikiRegistration( NeoWikiRegistrar $registrar ): void {
+	public static function onSWSRegistration( SWSRegistrar $registrar ): void {
 		$registrar->addPagePropertyProvider( new WikidataPagePropertyProvider() );
 	}
 	public static function onScribuntoExternalLibraries( string $engine, array &$libraries ): bool {
-		if ( $engine === 'lua' && \ProfessionalWiki\NeoWiki\NeoWikiExtension::getInstance()->isLuaEnabled() ) {
-			$libraries['mw.neowikibase'] = ScribuntoLuaLibrary::class;
+		if ( $engine === 'lua' && \ProfessionalWiki\SWS\SWSExtension::getInstance()->isLuaEnabled() ) {
+			$libraries['mw.swsbase'] = ScribuntoLuaLibrary::class;
 		}
 		return true;
 	}
 
 	public static function onBeforePageDisplay( \MediaWiki\Output\OutputPage $out ): void {
-		$out->addJsConfigVars( 'wgNeoWikiCompleteExport', true );
+		$out->addJsConfigVars( 'wgSWSCompleteExport', true );
 	}
 }

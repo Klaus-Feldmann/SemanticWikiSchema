@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use UtfNormal\Validator;
 
 /**
- * The form `neowiki_subject` matches and orders names in: Unicode case-folded and in NFC. MediaWiki's columns
+ * The form `sws_subject` matches and orders names in: Unicode case-folded and in NFC. MediaWiki's columns
  * are binary, where LIKE and LOWER() compare bytes or know ASCII only, so search terms and cursor values go
  * through this too.
  */

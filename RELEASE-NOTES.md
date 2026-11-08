@@ -1,3 +1,17 @@
+# Semantic WikiSchema 0.1.22 — 2026-11-08
+
+Semantic WikiSchema is developed independently from NeoWiki. Version 0.1.22 uses separate technical identifiers and is not a drop-in replacement for NeoWiki; existing installations require migration. The adapted 0.1.20 → 0.1.22 migration has been verified on AufEinWort, preserving existing data and page/revision references. Other upstream starting versions require individual verification.
+
+SQL columns and related index names use the SWS-specific prefixes swsr_, swss_, swssp_ and swsrr_. A separate report-first migration tool prepares table/column/index and MediaWiki slot/model metadata renames while retaining numeric IDs and content references. A completed migration has a checked inverse path. No production migration is performed by installing this source archive. See publication/MIGRATION-0.1.22.md for the coordinated existing-data transition and verification limits.
+
+# Local candidate 0.1.21 — 2026-11-08
+
+Own technical names use sws/SWS across PHP, Lua, REST/action APIs, settings, permissions, jobs, SQL table definitions, content models and frontend assets. The subject slot changes from neo to sws. SemanticWikiSchema and SchemaBaseBridge remain the public extension identities. No existing wiki data is migrated by this source package. Original upstream provenance and external dependency names remain intact.
+
+# Local candidate 0.1.20 — Durchlauf 1, 2026-11-08
+
+SMW mappings are configured through optional `$wgWikiSchemaSmwMapping` server settings. Schema field names remain the default, with configurable URL metadata names and no built-in Werk-specific exceptions. The public query module and optional templates use WikiSchema names; the redundant API wiki module is no longer needed. Internal Lua/data identifiers and Wikidata/Wikibase integrations are unchanged. This candidate is not published and awaits live installation testing.
+
 # Semantic WikiSchema releases
 
 ## 0.1.19 — 2026-11-08
@@ -32,7 +46,7 @@ Composer branch: `dev-semantic-0.1.10-test`. The earlier `semantic-0.1.9-test` s
 
 To move an install to a newer version, see [Upgrading](https://neowiki.ai/docs/operations/upgrading).
 
-## NeoWiki 0.1.0
+## SWS 0.1.0
 
 The first release, a beta. Highlights:
 
@@ -43,11 +57,11 @@ The first release, a beta. Highlights:
 * Cypher queries on Neo4j, SPARQL queries on SPARQL 1.1 stores, and RDF export, with Subjects mapped to ontologies such
   as EDM and CIDOC-CRM
 * Parser functions, a Lua library, a REST API, and extension points for new Property Types, View Types and graph stores
-* A Docker stack with demo data, to try NeoWiki in one command
+* A Docker stack with demo data, to try SWS in one command
 
-Try NeoWiki at [neowiki.dev](https://neowiki.dev), or start with
+Try SWS at [sws.dev](https://neowiki.dev), or start with
 [Installation](https://neowiki.ai/docs/operations/installation). [Capabilities](https://neowiki.ai/capabilities) tours
-NeoWiki in depth.
+SWS in depth.
 
 ### Docker stacks from before 0.1.0
 

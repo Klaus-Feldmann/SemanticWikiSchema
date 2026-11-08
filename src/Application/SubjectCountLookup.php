@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 /**
  * How many Subjects each Schema has on this wiki. Subjects on pages the caller may not read count too.

@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRule;
-use ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRules;
-use ProfessionalWiki\NeoWiki\Domain\Layout\Layout;
-use ProfessionalWiki\NeoWiki\Domain\Layout\LayoutName;
-use ProfessionalWiki\NeoWiki\Presentation\LayoutPresentationSerializer;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Layout\DisplayRule;
+use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
+use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\LayoutPresentationSerializer
+ * @covers \ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer
  */
 class LayoutPresentationSerializerTest extends TestCase {
 

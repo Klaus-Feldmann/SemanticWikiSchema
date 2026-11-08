@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetLayout;
+namespace ProfessionalWiki\SWS\Application\Queries\GetLayout;
 
 interface GetLayoutPresenter {
 

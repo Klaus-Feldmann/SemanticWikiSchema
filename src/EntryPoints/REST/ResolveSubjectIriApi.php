@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
- * Dereferences a Subject's concept URI — `$wgNeoWikiRdfBaseUri/entity/{subjectId}`, the `neo-subj:`
+ * Dereferences a Subject's concept URI — `$wgSWSRdfBaseUri/entity/{subjectId}`, the `neo-subj:`
  * IRI every RDF export mints — by content negotiation, replying 303 See Other with an absolute
  * Location:
  *
@@ -37,7 +37,7 @@ class ResolveSubjectIriApi extends SimpleHandler {
 	use ReadOnlyEndpoint;
 
 	public function run( string $subjectId ): Response {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$id = $extension->getSubjectIdParser()->parse( $subjectId );
 
 		if ( $id === null ) {
@@ -90,7 +90,7 @@ class ResolveSubjectIriApi extends SimpleHandler {
 
 	private function subjectRdfUrl( string $subjectId, string $format ): string {
 		return $this->getRouter()->getRouteUrl(
-			'/neowiki/v0/subject/{subjectId}/rdf',
+			'/sws/v0/subject/{subjectId}/rdf',
 			[ 'subjectId' => $subjectId ],
 			[ 'format' => $format ]
 		);
@@ -124,14 +124,14 @@ class ResolveSubjectIriApi extends SimpleHandler {
 	}
 
 	private function isSubjectFirst(): bool {
-		// The effective flag combines the MediaWiki:NeoWiki page with $wgNeoWikiSubjectFirst (the page
+		// The effective flag combines the MediaWiki:SWS page with $wgSWSSubjectFirst (the page
 		// wins when it sets a valid boolean; an invalid page value has already fallen back).
-		return NeoWikiExtension::getInstance()->isSubjectFirst();
+		return SWSExtension::getInstance()->isSubjectFirst();
 	}
 
 	private function noDataResponse( string $subjectId ): Response {
 		return $this->getResponseFactory()->createHttpError( 404, [
-			'message' => 'No NeoWiki data found for subject: ' . $subjectId,
+			'message' => 'No SWS data found for subject: ' . $subjectId,
 		] );
 	}
 

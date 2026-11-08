@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetLayoutSummariesApi;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetLayoutSummariesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi
  * @group Database
  */
-class GetLayoutSummariesApiTest extends NeoWikiIntegrationTestCase {
+class GetLayoutSummariesApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
 
 	public function testReturnsEmptyResultWhenNoLayouts(): void {

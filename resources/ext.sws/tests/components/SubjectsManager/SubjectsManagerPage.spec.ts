@@ -1,0 +1,1101 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ref } from 'vue';
+import { createPinia, setActivePinia } from 'pinia';
+import { enableAutoUnmount, mount, shallowMount, VueWrapper, flushPromises } from '@vue/test-utils';
+import { CdxMenuButton } from '@wikimedia/codex';
+import SubjectsManagerPage from '@/components/SubjectsManager/SubjectsManagerPage.vue';
+import { CdxDialogStub, createI18nMock, setupMwMock } from '../../VueTestHelpers.ts';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { Subject } from '@/domain/Subject.ts';
+import { SubjectId } from '@/domain/SubjectId.ts';
+import { PageSubjects } from '@/domain/PageSubjects.ts';
+import { PageIdentifiers } from '@/domain/PageIdentifiers.ts';
+import { subjectRowDomId } from '@/presentation/subjectRowAnchor.ts';
+import SummaryAction from '@/components/common/SummaryAction.vue';
+import SubjectEditorDialog from '@/components/SubjectEditor/SubjectEditorDialog.vue';
+import MoveSubjectDialog from '@/components/SubjectsManager/MoveSubjectDialog.vue';
+import SchemaNameDisplay from '@/components/common/SchemaNameDisplay.vue';
+import SubjectCreatorDialog from '@/components/SubjectCreator/SubjectCreatorDialog.vue';
+import DataExportButtons from '@/components/SubjectsManager/DataExportButtons.vue';
+import { Service } from '@/SWSServices.ts';
+import { newRelationStatements, newSchema, newSubject } from '@/TestHelpers.ts';
+import type { Schema } from '@/domain/Schema.ts';
+import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList.ts';
+import { newRelationProperty } from '@/domain/propertyTypes/Relation.ts';
+
+enableAutoUnmount( afterEach );
+
+// Two subject-id-shaped ids (s + 14 base58 chars), so the deep-link fragment parser accepts them.
+const ID_A = 's1aaaaaaaaaaaa1';
+const ID_B = 's1bbbbbbbbbbbb1';
+const PAGE_ID = 42;
+
+function subject( id: string ): Subject {
+	return newSubject( { id, label: 'Label ' + id, schemaName: 'Person' } );
+}
+
+function labellessSubject( id: string, displayName: string, generated: boolean ): Subject {
+	return newSubject( { id, label: null, displayName, displayNameIsGenerated: generated, schemaName: 'Person' } );
+}
+
+const loadPageSubjectsMock = vi.fn().mockResolvedValue( undefined );
+const getPageSubjectsRepoMock = vi.fn();
+const deleteSubjectMock = vi.fn().mockResolvedValue( undefined );
+const setPageMainSubjectMock = vi.fn().mockResolvedValue( undefined );
+let storeSubjects: Subject[] = [];
+let mappings: { name: string; schemas: string[] }[] = [];
+let mainSubjectId: SubjectId | null = null;
+
+// Every describe below except 'delete flow' runs against this plain-object stub: fast,
+// hand-controlled listing/main-subject state via storeSubjects/mainSubjectId. The delete-flow
+// describe instead flips useRealSubjectStore on and drives a real Pinia-backed store through a
+// mocked SWSExtension, so it actually exercises SubjectStore's registry semantics (the
+// pageSubjects/subjects consistency invariant from ADR 30) rather than a stub that cannot violate
+// them — see SubjectStore.spec.ts's own deleteSubject tests for the store-level coverage this
+// mirrors at the component level.
+let useRealSubjectStore = false;
+let subjectCreatorOpen = false;
+
+vi.mock( '@/stores/SubjectStore.ts', async ( importOriginal ) => {
+	const actual = await importOriginal<typeof import( '@/stores/SubjectStore.ts' )>();
+	return {
+		useSubjectStore: () => {
+			if ( useRealSubjectStore ) {
+				return actual.useSubjectStore();
+			}
+			return {
+				loadPageSubjects: loadPageSubjectsMock,
+				deleteSubject: deleteSubjectMock,
+				setPageMainSubject: setPageMainSubjectMock,
+				getSubject: ( id: SubjectId ) => storeSubjects.find( ( s ) => s.getId().text === id.text ),
+				openSubjectCreator: vi.fn(),
+				get subjectCreatorOpen() {
+					return subjectCreatorOpen;
+				},
+				set subjectCreatorOpen( value: boolean ) {
+					subjectCreatorOpen = value;
+				},
+				get pageSubjects() {
+					return {
+						getSubjects: () => storeSubjects,
+						getMainSubjectId: () => mainSubjectId,
+					};
+				},
+			};
+		},
+	};
+} );
+
+// The Schemas the rows render their statements by; only the red-link describe fills it.
+const schemaStoreSchemas = new Map<string, Schema>();
+
+vi.mock( '@/stores/SchemaStore.ts', () => ( {
+	useSchemaStore: () => ( {
+		saveSchema: vi.fn(),
+		getSchema: vi.fn(),
+		schemas: schemaStoreSchemas,
+	} ),
+} ) );
+
+// Module-level refs (rather than ones freshly created per useSubjectPermissions() call) so the
+// edit- and delete-flow tests below can flip them on; every other describe leaves them off.
+const canDeleteSubjectRef = ref( false );
+const canEditSubjectRef = ref( false );
+const canCreateOtherSubjectRef = ref( false );
+
+// openEditor reads through the injected repositories; the edit-flow describe below arms these.
+const getSubjectForEditingRepoMock = vi.fn();
+const getSchemaRepoMock = vi.fn();
+
+vi.mock( '@/composables/useSubjectPermissions.ts', () => ( {
+	useSubjectPermissions: () => ( {
+		canCreateMainSubject: ref( false ),
+		canCreateOtherSubject: canCreateOtherSubjectRef,
+		canEditSubject: canEditSubjectRef,
+		canDeleteSubject: canDeleteSubjectRef,
+		checkPermissions: vi.fn().mockResolvedValue( undefined ),
+	} ),
+} ) );
+
+// The drag wiring boots SortableJS against real DOM, which is irrelevant here and awkward in jsdom.
+vi.mock( '@/composables/useSubjectDrag.ts', () => ( {
+	useSubjectDrag: vi.fn(),
+} ) );
+
+const HIGHLIGHT_CLASS = 'ext-sws-subject-row--highlighted';
+const EXPANDED_CLASS = 'ext-sws-subject-row--expanded';
+
+function rowFor( wrapper: VueWrapper, id: string ): VueWrapper {
+	return wrapper.find( '#' + subjectRowDomId( id ) ) as unknown as VueWrapper;
+}
+
+// Taken before any test stands in for the extension singleton.
+const componentRegistry = SWSExtension.getInstance().getTypeSpecificComponentRegistry();
+
+/**
+ * With renderValues, the page is mounted whole, so a relation shows as a reader sees it.
+ */
+async function mountPage( subjectFirst = false, renderValues = false ): Promise<VueWrapper> {
+	setupMwMock( {
+		functions: [ 'config', 'msg', 'message', 'notify', 'util' ],
+		config: {
+			wgSWSManageSubjectsPageId: PAGE_ID,
+			wgSWSMappings: mappings,
+			wgSWSSubjectIriBase: '',
+			wgSWSSubjectFirst: subjectFirst,
+			// Every real view of this tab carries it, and the page it names is the one a deletion
+			// that empties it would take with it.
+			wgPageName: 'Test_Page',
+		},
+	} );
+
+	// A fresh Pinia per mount, always installed. Harmless when useRealSubjectStore is off (the
+	// stub factory above never touches it), and required when it is on (the delete-flow describe).
+	const pinia = createPinia();
+	setActivePinia( pinia );
+
+	const wrapper = ( renderValues ? mount : shallowMount )( SubjectsManagerPage, {
+		attachTo: document.body,
+		global: {
+			plugins: [ pinia ],
+			mocks: { $i18n: createI18nMock() },
+			provide: {
+				[ Service.SubjectRepository ]: {
+					getSubjectForEditing: getSubjectForEditingRepoMock,
+					// What the delete routing reads to see whether the page is down to its last Subject.
+					getPageSubjects: getPageSubjectsRepoMock,
+				},
+				[ Service.SchemaRepository ]: { getSchema: getSchemaRepoMock },
+				[ Service.ComponentRegistry ]: componentRegistry,
+			},
+			// The row and the delete dialog are this page's own building blocks rather than collaborators
+			// to stand in for: the assertions below are about what they render and offer.
+			stubs: {
+				CdxIcon: true,
+				CdxDialog: CdxDialogStub,
+				SubjectRow: false,
+				SubjectDeleteDialog: false,
+				SubjectCreatorDialog: true,
+				SubjectEditorDialog: true,
+			},
+		},
+	} );
+
+	// onMounted awaits checkPermissions + loadSubjects; then applyHash schedules the scroll on nextTick.
+	await flushPromises();
+	await flushPromises();
+
+	return wrapper;
+}
+
+describe( 'SubjectsManagerPage deep-link / hash wiring', () => {
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = null;
+		loadPageSubjectsMock.mockClear();
+		window.location.hash = '';
+		// jsdom implements neither of these; the component calls both while landing on a row.
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		vi.restoreAllMocks();
+	} );
+
+	it( 'expands, highlights, and scrolls to the row named by a subject-id fragment', async () => {
+		window.location.hash = '#' + ID_A;
+
+		const wrapper = await mountPage();
+
+		const row = rowFor( wrapper, ID_A );
+		expect( row.exists() ).toBe( true );
+		expect( row.classes() ).toContain( HIGHLIGHT_CLASS );
+		expect( ( row.find( 'details' ).element as HTMLDetailsElement ).open ).toBe( true );
+		// The scrolled element is the target row itself. Asserting the context rather than a call count
+		// keeps this independent of how many hashchange events jsdom synthesizes for the programmatic
+		// location.hash assignment above (a real page load sets the hash once, with no hashchange).
+		const scroll = vi.mocked( Element.prototype.scrollIntoView );
+		expect( scroll ).toHaveBeenCalled();
+		expect( scroll.mock.contexts ).toContain( row.element );
+
+		// The other row is untouched.
+		expect( rowFor( wrapper, ID_B ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+	} );
+
+	it( 'leaves every row untouched for a fragment that is not a subject id', async () => {
+		window.location.hash = '#section-heading';
+
+		const wrapper = await mountPage();
+
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+		expect( rowFor( wrapper, ID_B ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+		expect( Element.prototype.scrollIntoView ).not.toHaveBeenCalled();
+	} );
+
+	it( 'writes the bare subject id to the address bar via replaceState when a row is expanded', async () => {
+		const replaceState = vi.spyOn( window.history, 'replaceState' );
+
+		const wrapper = await mountPage();
+		await rowFor( wrapper, ID_A ).find( 'summary' ).trigger( 'click' );
+
+		expect( replaceState ).toHaveBeenCalledWith( null, '', '#' + ID_A );
+		expect( ( rowFor( wrapper, ID_A ).find( 'details' ).element as HTMLDetailsElement ).open ).toBe( true );
+		// replaceState fires no hashchange, so applyHash never re-runs and never highlights the row.
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+	} );
+
+	it( 'carries the --expanded modifier class only while the row is open', async () => {
+		const wrapper = await mountPage();
+
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( EXPANDED_CLASS );
+
+		await rowFor( wrapper, ID_A ).find( 'summary' ).trigger( 'click' );
+		expect( rowFor( wrapper, ID_A ).classes() ).toContain( EXPANDED_CLASS );
+
+		await rowFor( wrapper, ID_A ).find( 'summary' ).trigger( 'click' );
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( EXPANDED_CLASS );
+	} );
+
+	it( 'dismisses the arrival highlight on the first manual expand of a different row', async () => {
+		window.location.hash = '#' + ID_A;
+
+		const wrapper = await mountPage();
+		expect( rowFor( wrapper, ID_A ).classes() ).toContain( HIGHLIGHT_CLASS );
+
+		await rowFor( wrapper, ID_B ).find( 'summary' ).trigger( 'click' );
+
+		// The highlight no longer clings to A while the fragment (now #ID_B) has moved on.
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+		expect( rowFor( wrapper, ID_B ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+	} );
+
+	it( 'stops responding to hashchange after unmount', async () => {
+		const removeListener = vi.spyOn( window, 'removeEventListener' );
+
+		const wrapper = await mountPage();
+		wrapper.unmount();
+
+		expect( removeListener ).toHaveBeenCalledWith( 'hashchange', expect.any( Function ) );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage rows without a stored label', () => {
+
+	beforeEach( () => {
+		storeSubjects = [
+			labellessSubject( ID_A, 'Host Page', false ),
+			labellessSubject( ID_B, 'Person', true ),
+		];
+		mainSubjectId = new SubjectId( ID_A );
+		loadPageSubjectsMock.mockClear();
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		vi.restoreAllMocks();
+	} );
+
+	// The main row took its page's title, which someone chose; only the other row is named after
+	// something nobody picked, and it says so.
+	it( 'names the main row after the page and marks the other row as unnamed', async () => {
+		const wrapper = await mountPage();
+
+		const names = wrapper.findAll( '.ext-sws-subject-row__label' ).map( ( el ) => el.text() );
+		expect( names ).toEqual( [ 'Host Page', `(${ ID_B })` ] );
+	} );
+
+	// An id says nothing about what the Subject is, so the badge is what does.
+	it( 'shows the schema beside the row nobody named', async () => {
+		const wrapper = await mountPage();
+
+		expect( rowFor( wrapper, ID_B ).findComponent( SchemaNameDisplay ).exists() ).toBe( true );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage rows and the Subject pages behind them', () => {
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = new SubjectId( ID_A );
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		vi.restoreAllMocks();
+	} );
+
+	it( 'links every row to that Subject itself', async () => {
+		const wrapper = await mountPage();
+
+		expect( wrapper.findAll( 'a.ext-sws-subject-row__name' )
+			.map( ( link ) => link.attributes( 'href' ) ) )
+			.toEqual( [ '/wiki/Special:Subject/' + ID_A, '/wiki/Special:Subject/' + ID_B ] );
+	} );
+
+	// Every row is on the page the reader already has open, so naming it in each footer says nothing.
+	it( 'names no page in any row\'s footer', async () => {
+		const wrapper = await mountPage();
+
+		expect( wrapper.find( '.ext-sws-subject-row__page' ).exists() ).toBe( false );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage export of all Subjects', () => {
+
+	beforeEach( () => {
+		storeSubjects = [
+			newSubject( { id: ID_A, label: 'Rijksmuseum', schemaName: 'Museum' } ),
+			newSubject( { id: ID_B, label: 'Rembrandt', schemaName: 'Person' } ),
+		];
+		mappings = [
+			{ name: 'EDM', schemas: [ 'Artwork' ] },
+			{ name: 'CIDOC-CRM', schemas: [ 'Museum' ] },
+			{ name: 'Linked Art', schemas: [ 'Person', 'Place' ] },
+		];
+		mainSubjectId = new SubjectId( ID_A );
+	} );
+
+	afterEach( () => {
+		mappings = [];
+		document.body.innerHTML = '';
+	} );
+
+	it( 'offers RDF in the projections whose Mapping maps the Schema of any Subject on the page', async () => {
+		const wrapper = await mountPage();
+
+		expect( wrapper.get( '.ext-sws-subjects-manager__controls' ).findComponent( DataExportButtons )
+			.props( 'projections' ) ).toEqual( [ 'native', 'CIDOC-CRM', 'Linked Art' ] );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage row copy-link action', () => {
+	let writeText: ReturnType<typeof vi.fn>;
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ) ];
+		mainSubjectId = null;
+		loadPageSubjectsMock.mockClear();
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+
+		writeText = vi.fn().mockResolvedValue( undefined );
+		Object.defineProperty( navigator, 'clipboard', {
+			value: { writeText },
+			configurable: true,
+		} );
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		vi.restoreAllMocks();
+	} );
+
+	it( 'offers the ungated actions in the overflow menu to a read-only user on every row', async () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = new SubjectId( ID_A );
+
+		const wrapper = await mountPage();
+
+		const menus = wrapper.findAllComponents( CdxMenuButton );
+		expect( menus ).toHaveLength( 2 );
+		for ( const menu of menus ) {
+			expect( menu.props( 'menuItems' ).map( ( item ) => item.value ) ).toEqual( [ 'open', 'copy-link' ] );
+		}
+	} );
+
+	it( 'copies a URL whose fragment is the subject id and shows the success toast', async () => {
+		const replaceState = vi.spyOn( window.history, 'replaceState' );
+
+		const wrapper = await mountPage();
+		wrapper.findComponent( CdxMenuButton ).vm.$emit( 'update:selected', 'copy-link' );
+		await flushPromises();
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		const copiedUrl = writeText.mock.calls[ 0 ][ 0 ] as string;
+		expect( new URL( copiedUrl ).hash ).toBe( '#' + ID_A );
+
+		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-link-copied', { type: 'success' } );
+
+		// Copying reads the address bar but must not mutate it, expand the row, or highlight it.
+		expect( replaceState ).not.toHaveBeenCalled();
+		expect( window.location.hash ).toBe( '' );
+		expect( ( rowFor( wrapper, ID_A ).find( 'details' ).element as HTMLDetailsElement ).open ).toBe( false );
+		expect( rowFor( wrapper, ID_A ).classes() ).not.toContain( HIGHLIGHT_CLASS );
+	} );
+
+	it( 'shows the error toast when the clipboard write is rejected', async () => {
+		writeText.mockRejectedValue( new Error( 'clipboard denied' ) );
+		const consoleError = vi.spyOn( console, 'error' ).mockImplementation( () => undefined );
+
+		const wrapper = await mountPage();
+		wrapper.findComponent( CdxMenuButton ).vm.$emit( 'update:selected', 'copy-link' );
+		await flushPromises();
+
+		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-link-copy-error', { type: 'error' } );
+		expect( consoleError ).toHaveBeenCalled();
+	} );
+
+	it( 'renders an inline copy-link button on both rows for a read-only user', async () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = new SubjectId( ID_A );
+
+		const wrapper = await mountPage();
+
+		// One on the main-subject row, one on the single other row. For a read-only user the rest of the
+		// inline action cluster (promote/edit/delete/drag) is gated away, so this is its only affordance —
+		// and it lives where the ⋯ menu is hidden (desktop widths).
+		const buttons = wrapper.findAll( '[aria-label="sws-managesubjects-row-copy-link"]' );
+		expect( buttons ).toHaveLength( 2 );
+	} );
+
+	it( 'copies the deep-link URL and shows the success toast when the inline button is clicked', async () => {
+		const wrapper = await mountPage();
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-copy-link"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( writeText ).toHaveBeenCalledTimes( 1 );
+		expect( new URL( writeText.mock.calls[ 0 ][ 0 ] as string ).hash ).toBe( '#' + ID_A );
+		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-link-copied', { type: 'success' } );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage edit flow', () => {
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ) ];
+		mainSubjectId = null;
+		canEditSubjectRef.value = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+
+		getSubjectForEditingRepoMock.mockReset();
+		getSchemaRepoMock.mockReset();
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		canEditSubjectRef.value = false;
+		vi.restoreAllMocks();
+	} );
+
+	it( 'opens the editor on the subject and schema fetched from the repositories', async () => {
+		// Values the store stub does not hold, so the assertions can only pass if the dialog was
+		// handed the repositories' data rather than a registry read.
+		const freshSubject = newSubject( { id: ID_A, label: 'Fetched label', schemaName: 'Person' } );
+		const freshSchema = newSchema( { title: 'Person' } );
+		getSubjectForEditingRepoMock.mockResolvedValue( freshSubject );
+		getSchemaRepoMock.mockResolvedValue( freshSchema );
+
+		const wrapper = await mountPage();
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-edit"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( getSubjectForEditingRepoMock ).toHaveBeenCalledWith( expect.objectContaining( { text: ID_A } ) );
+		expect( getSchemaRepoMock ).toHaveBeenCalledWith( 'Person' );
+		const dialog = wrapper.findComponent( SubjectEditorDialog );
+		expect( dialog.props( 'open' ) ).toBe( true );
+		expect( dialog.props( 'subject' ) ).toStrictEqual( freshSubject );
+		expect( dialog.props( 'schema' ) ).toStrictEqual( freshSchema );
+	} );
+
+	it( 'reports a failed fetch instead of opening the editor', async () => {
+		getSubjectForEditingRepoMock.mockRejectedValue( new Error( 'Unknown subject' ) );
+		getSchemaRepoMock.mockResolvedValue( newSchema( { title: 'Person' } ) );
+
+		const wrapper = await mountPage();
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-edit"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( wrapper.findComponent( SubjectEditorDialog ).exists() ).toBe( false );
+		expect( mw.notify ).toHaveBeenCalledWith( 'Unknown subject', { type: 'error' } );
+	} );
+} );
+
+describe( 'SubjectsManagerPage main subject controls', () => {
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = new SubjectId( ID_A );
+		canEditSubjectRef.value = true;
+		setPageMainSubjectMock.mockClear();
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		canEditSubjectRef.value = false;
+		vi.restoreAllMocks();
+	} );
+
+	// Which pin a row carries is the page's to decide, not the row's: only the main slot's row can be
+	// demoted, and only a row outside it can be promoted.
+	it( 'pins the main row for demotion and every other row for promotion', async () => {
+		const wrapper = await mountPage();
+
+		expect( rowFor( wrapper, ID_A ).find( '[aria-label="sws-managesubjects-row-demote"]' ).exists() ).toBe( true );
+		expect( rowFor( wrapper, ID_A ).find( '[aria-label="sws-managesubjects-row-promote"]' ).exists() ).toBe( false );
+		expect( rowFor( wrapper, ID_B ).find( '[aria-label="sws-managesubjects-row-demote"]' ).exists() ).toBe( false );
+		expect( rowFor( wrapper, ID_B ).find( '[aria-label="sws-managesubjects-row-promote"]' ).exists() ).toBe( true );
+	} );
+
+	it( 'clears the page\'s Main Subject from the main row\'s pin', async () => {
+		const wrapper = await mountPage();
+
+		await rowFor( wrapper, ID_A ).find( '[aria-label="sws-managesubjects-row-demote"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( setPageMainSubjectMock ).toHaveBeenCalledWith( PAGE_ID, null );
+	} );
+
+	it( 'makes another row\'s Subject the page\'s Main Subject from its pin', async () => {
+		const wrapper = await mountPage();
+
+		await rowFor( wrapper, ID_B ).find( '[aria-label="sws-managesubjects-row-promote"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( setPageMainSubjectMock ).toHaveBeenCalledWith( PAGE_ID, expect.objectContaining( { text: ID_B } ) );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage rows of Dependent Subjects', () => {
+
+	beforeEach( () => {
+		storeSubjects = [
+			subject( ID_A ),
+			newSubject( { id: ID_B, label: null, displayNameIsGenerated: true, schemaName: 'Birth' } ),
+		];
+		mainSubjectId = new SubjectId( ID_A );
+		schemaStoreSchemas.set( 'Birth', newSchema( { title: 'Birth', subjectsAreDependent: true } ) );
+		canEditSubjectRef.value = true;
+		canDeleteSubjectRef.value = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		schemaStoreSchemas.delete( 'Birth' );
+		canEditSubjectRef.value = false;
+		canDeleteSubjectRef.value = false;
+		vi.restoreAllMocks();
+	} );
+
+	it( 'offers no promotion and no move, only editing, copying a link and deleting', async () => {
+		const wrapper = await mountPage();
+
+		expect(
+			rowFor( wrapper, ID_B ).findAll( '.ext-sws-subject-row__actions [aria-label]' )
+				.map( ( element ) => element.attributes( 'aria-label' ) ),
+		).toEqual( [
+			'sws-managesubjects-row-edit',
+			'sws-managesubjects-row-copy-link',
+			'sws-managesubjects-row-delete',
+		] );
+	} );
+
+	it( 'offers no handle to drag it to the Main Subject\'s place', async () => {
+		const wrapper = await mountPage();
+
+		expect( rowFor( wrapper, ID_B ).find( '.ext-sws-subject-row__drag-handle' ).exists() ).toBe( false );
+		expect( rowFor( wrapper, ID_A ).find( '.ext-sws-subject-row__drag-handle' ).exists() ).toBe( true );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage move action', () => {
+
+	beforeEach( () => {
+		storeSubjects = [ subject( ID_A ), subject( ID_B ) ];
+		mainSubjectId = new SubjectId( ID_A );
+		canEditSubjectRef.value = true;
+		canDeleteSubjectRef.value = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		canEditSubjectRef.value = false;
+		canDeleteSubjectRef.value = false;
+		vi.restoreAllMocks();
+	} );
+
+	it( 'offers the move on both the main row and the other rows', async () => {
+		const wrapper = await mountPage();
+
+		// One per row: the main subject and the other subject. Offering it on the main row is deliberate -
+		// moving a page's topic elsewhere is allowed, and the dialog warns what the page loses.
+		expect( wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' ) ).toHaveLength( 2 );
+	} );
+
+	// The main row's pin is its indicator, outside the strip.
+	it( 'orders each row\'s inline actions edit, copy-link, promote, move, delete', async () => {
+		const wrapper = await mountPage();
+
+		const strips = wrapper.findAll( '.ext-sws-subject-row__actions' )
+			.map( ( strip ) => strip.findAll( '[aria-label]' ).map( ( element ) => element.attributes( 'aria-label' ) ) );
+
+		expect( strips ).toEqual( [
+			[
+				'sws-managesubjects-row-edit',
+				'sws-managesubjects-row-copy-link',
+				'sws-managesubjects-row-move',
+				'sws-managesubjects-row-delete',
+			],
+			[
+				'sws-managesubjects-row-edit',
+				'sws-managesubjects-row-copy-link',
+				'sws-managesubjects-row-promote',
+				'sws-managesubjects-row-move',
+				'sws-managesubjects-row-delete',
+			],
+		] );
+	} );
+
+	it( 'orders the overflow menu like the inline actions, after opening the Subject', async () => {
+		const wrapper = await mountPage();
+
+		const menus = wrapper.findAllComponents( CdxMenuButton )
+			.map( ( menu ) => menu.props( 'menuItems' ).map( ( item ) => item.value ) );
+
+		expect( menus ).toEqual( [
+			[ 'open', 'edit', 'copy-link', 'move', 'delete' ],
+			[ 'open', 'edit', 'copy-link', 'promote', 'move', 'delete' ],
+		] );
+	} );
+
+	it( 'offers no move to a user who cannot edit', async () => {
+		canEditSubjectRef.value = false;
+		canDeleteSubjectRef.value = false;
+
+		const wrapper = await mountPage();
+
+		expect( wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' ) ).toHaveLength( 0 );
+		expect( wrapper.findAllComponents( CdxMenuButton )
+			.flatMap( ( menu ) => menu.props( 'menuItems' ).map( ( item ) => item.value ) ) )
+			.not.toContain( 'move' );
+	} );
+
+	// A subject-first wiki gives every Subject a page of its own, so moving one between pages would
+	// advertise a page model the wiki denies (ADR 33).
+	it( 'offers no move on a subject-first wiki, to anyone', async () => {
+		const wrapper = await mountPage( true );
+
+		expect( wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' ) ).toHaveLength( 0 );
+		expect( wrapper.findAllComponents( CdxMenuButton )
+			.flatMap( ( menu ) => menu.props( 'menuItems' ).map( ( item ) => item.value ) ) )
+			.not.toContain( 'move' );
+	} );
+
+	it( 'opens the move dialog on the row that asked for it', async () => {
+		const wrapper = await mountPage();
+
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 1 ].trigger( 'click' );
+		await flushPromises();
+
+		const dialog = wrapper.findComponent( MoveSubjectDialog );
+		expect( dialog.props( 'open' ) ).toBe( true );
+		expect( dialog.props( 'subjectId' ) ).toBe( ID_B );
+		expect( dialog.props( 'currentPageId' ) ).toBe( PAGE_ID );
+	} );
+
+	it( 'tells the dialog when the subject being moved is the page\'s main subject', async () => {
+		const wrapper = await mountPage();
+
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 0 ].trigger( 'click' );
+		await flushPromises();
+
+		expect( wrapper.findComponent( MoveSubjectDialog ).props( 'subjectIsMainSubject' ) ).toBe( true );
+	} );
+
+	it( 'tells the dialog when one of the other subjects is being moved', async () => {
+		const wrapper = await mountPage();
+
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 1 ].trigger( 'click' );
+		await flushPromises();
+
+		expect( wrapper.findComponent( MoveSubjectDialog ).props( 'subjectIsMainSubject' ) ).toBe( false );
+	} );
+
+	it( 'opens the move dialog from the overflow menu as well', async () => {
+		const wrapper = await mountPage();
+
+		wrapper.findComponent( CdxMenuButton ).vm.$emit( 'update:selected', 'move' );
+		await flushPromises();
+
+		expect( wrapper.findComponent( MoveSubjectDialog ).props( 'open' ) ).toBe( true );
+	} );
+
+	it( 'reports the move once the dialog says it landed, naming the subject and linking its new page', async () => {
+		const wrapper = await mountPage();
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 1 ].trigger( 'click' );
+		await flushPromises();
+		loadPageSubjectsMock.mockClear();
+
+		wrapper.findComponent( MoveSubjectDialog ).vm.$emit( 'moved', 'Rembrandt van Rijn' );
+		await flushPromises();
+
+		const [ content, options ] = ( mw.notify as ReturnType<typeof vi.fn> ).mock.calls[ 0 ];
+		const link = ( content as HTMLElement ).querySelector( 'a' );
+		expect( ( content as HTMLElement ).textContent ).toContain( 'sws-managesubjects-move-success' );
+		expect( link?.getAttribute( 'href' ) ).toBe( '/wiki/Rembrandt van Rijn?action=subjects' );
+		expect( link?.textContent ).toBe( 'Rembrandt van Rijn' );
+		expect( options ).toEqual( { type: 'success' } );
+
+		// The listing refresh belongs to the store's move action; refreshing here too would fetch
+		// the same page twice for one move.
+		expect( loadPageSubjectsMock ).not.toHaveBeenCalled();
+	} );
+
+	it( 'names the subject nobody named by its id when it has moved', async () => {
+		storeSubjects = [ subject( ID_A ), labellessSubject( ID_B, 'Person', true ) ];
+		const wrapper = await mountPage();
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 1 ].trigger( 'click' );
+		await flushPromises();
+
+		wrapper.findComponent( MoveSubjectDialog ).vm.$emit( 'moved', 'Rembrandt van Rijn' );
+		await flushPromises();
+
+		const [ content ] = ( mw.notify as ReturnType<typeof vi.fn> ).mock.calls[ 0 ];
+		expect( ( content as HTMLElement ).textContent ).toContain( `(${ ID_B })` );
+	} );
+
+	// The dialog names it in the error it shows when the move fails.
+	it( 'hands the move dialog the id of the subject nobody named', async () => {
+		storeSubjects = [ subject( ID_A ), labellessSubject( ID_B, 'Person', true ) ];
+		const wrapper = await mountPage();
+		await wrapper.findAll( '[aria-label="sws-managesubjects-row-move"]' )[ 1 ].trigger( 'click' );
+		await flushPromises();
+
+		expect( wrapper.findComponent( MoveSubjectDialog ).props( 'subjectName' ) ).toBe( `(${ ID_B })` );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage subject creator', () => {
+
+	beforeEach( () => {
+		useRealSubjectStore = false;
+		canCreateOtherSubjectRef.value = true;
+		subjectCreatorOpen = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+	} );
+
+	afterEach( () => {
+		canCreateOtherSubjectRef.value = false;
+		subjectCreatorOpen = false;
+		document.body.innerHTML = '';
+		vi.restoreAllMocks();
+	} );
+
+	it( 'shows the creator open while the store says so', async () => {
+		const wrapper = await mountPage();
+
+		expect( wrapper.findComponent( SubjectCreatorDialog ).props( 'open' ) ).toBe( true );
+	} );
+
+	it( 'closes the creator in the store when the dialog closes', async () => {
+		const wrapper = await mountPage();
+
+		wrapper.findComponent( SubjectCreatorDialog ).vm.$emit( 'update:open', false );
+
+		expect( subjectCreatorOpen ).toBe( false );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage red links', () => {
+
+	const MISSING_ID = 's1cccccccccccc1';
+
+	beforeEach( () => {
+		useRealSubjectStore = true;
+		canCreateOtherSubjectRef.value = true;
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+		schemaStoreSchemas.set( 'Person', newSchema( {
+			title: 'Person',
+			properties: new PropertyDefinitionList( [
+				newRelationProperty( { name: 'Birth place', targetSchemas: [ 'City', 'Place' ] } ),
+			] ),
+		} ) );
+		getPageSubjectsRepoMock.mockReset().mockResolvedValue( {
+			pageSubjects: new PageSubjects( PAGE_ID, null, [ newSubject( {
+				id: ID_A,
+				schemaName: 'Person',
+				statements: newRelationStatements( 'Birth place', MISSING_ID ),
+			} ) ] ),
+			referencedSubjects: [],
+			notFoundTargetIds: [ new SubjectId( MISSING_ID ) ],
+			schemas: [],
+		} );
+		vi.spyOn( SWSExtension, 'getInstance' ).mockReturnValue( {
+			getSubjectRepository: () => ( { getPageSubjects: getPageSubjectsRepoMock } ),
+		} as unknown as SWSExtension );
+	} );
+
+	afterEach( () => {
+		useRealSubjectStore = false;
+		canCreateOtherSubjectRef.value = false;
+		schemaStoreSchemas.clear();
+		document.body.innerHTML = '';
+		vi.restoreAllMocks();
+	} );
+
+	it( 'opens the creator on the target of a red link', async () => {
+		const wrapper = await mountPage( false, true );
+
+		await wrapper.find( `#${ subjectRowDomId( ID_A ) } a.new` ).trigger( 'click' );
+
+		const creator = wrapper.findComponent( SubjectCreatorDialog );
+		expect( creator.props( 'open' ) ).toBe( true );
+		expect( creator.props( 'relationTarget' ) )
+			.toEqual( { subjectId: new SubjectId( MISSING_ID ), schemaNames: [ 'City', 'Place' ] } );
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage saves from the editor', () => {
+
+	const onPage = new PageIdentifiers( PAGE_ID, 'Test Page' );
+	const host = newSubject( { id: ID_A, label: 'Pablo Picasso', schemaName: 'Person', pageIdentifiers: onPage } );
+	const birth = newSubject( { id: ID_B, label: null, schemaName: 'Birth', pageIdentifiers: onPage } );
+
+	beforeEach( () => {
+		useRealSubjectStore = true;
+		canEditSubjectRef.value = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+
+		getSubjectForEditingRepoMock.mockReset().mockResolvedValue( host );
+		getSchemaRepoMock.mockReset().mockResolvedValue( newSchema( { title: 'Person' } ) );
+		getPageSubjectsRepoMock.mockReset().mockResolvedValue( {
+			pageSubjects: new PageSubjects( PAGE_ID, host.getId(), [ host, birth ] ),
+			referencedSubjects: [],
+			notFoundTargetIds: [],
+			schemas: [],
+		} );
+		vi.spyOn( SWSExtension, 'getInstance' ).mockReturnValue( {
+			getSubjectRepository: () => ( {
+				getPageSubjects: getPageSubjectsRepoMock,
+				updateSubject: vi.fn().mockResolvedValue( { subjectId: host.getId(), subject: host, schema: null } ),
+			} ),
+		} as unknown as SWSExtension );
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		canEditSubjectRef.value = false;
+		useRealSubjectStore = false;
+		vi.restoreAllMocks();
+	} );
+
+	it( 'reads the page once after a save from the editor', async () => {
+		const wrapper = await mountPage();
+		await wrapper.find( '[aria-label="sws-managesubjects-row-edit"]' ).trigger( 'click' );
+		await flushPromises();
+		getPageSubjectsRepoMock.mockClear();
+
+		await wrapper.findComponent( SubjectEditorDialog ).props( 'onSave' )( host, [], 'why' );
+		await flushPromises();
+
+		expect( getPageSubjectsRepoMock ).toHaveBeenCalledOnce();
+	} );
+
+} );
+
+describe( 'SubjectsManagerPage delete flow', () => {
+	let reloadMock: ReturnType<typeof vi.fn>;
+	let deleteSubjectRepoMock: ReturnType<typeof vi.fn>;
+
+	beforeEach( () => {
+		// Real Pinia-backed SubjectStore for this describe (see the useRealSubjectStore comment
+		// above): the deletion race this describe exercises lives in the store's own registry
+		// semantics, which the plain-object mock the other describes use cannot reproduce.
+		useRealSubjectStore = true;
+		canDeleteSubjectRef.value = true;
+		window.location.hash = '';
+		Element.prototype.scrollIntoView = vi.fn();
+		window.matchMedia = vi.fn().mockReturnValue( { matches: false } ) as unknown as typeof window.matchMedia;
+
+		deleteSubjectRepoMock = vi.fn().mockResolvedValue( true );
+		// Serves the mount's own loadSubjects() call. Tests that need to inspect the post-delete
+		// re-sync window queue a one-time override (mockReturnValueOnce) for the second call
+		// *after* mounting, so this default only ever serves the first (mount) call.
+		getPageSubjectsRepoMock.mockReset().mockResolvedValue( {
+			pageSubjects: new PageSubjects( PAGE_ID, null, [ subject( ID_A ) ] ),
+			referencedSubjects: [],
+			notFoundTargetIds: [],
+			schemas: [],
+		} );
+
+		vi.spyOn( SWSExtension, 'getInstance' ).mockReturnValue( {
+			getSubjectRepository: () => ( {
+				deleteSubject: deleteSubjectRepoMock,
+				getPageSubjects: getPageSubjectsRepoMock,
+			} ),
+		} as unknown as SWSExtension );
+
+		// Proves executeDelete never falls back to a full-page reload; see the SubjectCreatorDialog
+		// spec for the same stubbing idiom against the create flow's (intentionally kept) reload.
+		//
+		// vi.restoreAllMocks() does not cover vi.stubGlobal, so this stub outlives every test and
+		// (unlike vi.mock's `mw` stub, which every mountPage() call re-establishes) nothing
+		// re-stubs `location` back to the real window.location afterwards. A tried fix —
+		// vi.unstubAllGlobals() in afterEach — makes things worse: it also strips the `mw` stub
+		// out from under any earlier test's Vue component that is still reactively subscribed to
+		// its Pinia store (this file never calls wrapper.unmount()), causing a `mw is not defined`
+		// crash on a later scheduled re-render that corrupts an unrelated, later test. So this
+		// describe must stay the LAST one in the file instead: nothing here runs after it that a
+		// stubbed `location` (frozen at this describe's first beforeEach) could break.
+		reloadMock = vi.fn();
+		vi.stubGlobal( 'location', { ...window.location, reload: reloadMock } );
+	} );
+
+	afterEach( () => {
+		document.body.innerHTML = '';
+		window.location.hash = '';
+		canDeleteSubjectRef.value = false;
+		useRealSubjectStore = false;
+		vi.restoreAllMocks();
+	} );
+
+	it( 'deletes the subject, notifies success, and never reloads', async () => {
+		const wrapper = await mountPage();
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-delete"]' ).trigger( 'click' );
+		wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'cleanup' );
+		await flushPromises();
+
+		expect( deleteSubjectRepoMock ).toHaveBeenCalledWith(
+			expect.objectContaining( { text: ID_A } ),
+			'cleanup',
+		);
+		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-delete-success', { type: 'success' } );
+		expect( reloadMock ).not.toHaveBeenCalled();
+	} );
+
+	// A subject-first wiki's page exists to hold its Subject, so the last one leaving takes the page
+	// with it — and MediaWiki's own form is what confirms that and checks the right.
+	it( 'leaves for the page\'s delete form when the Subject is the only one on it', async () => {
+		const wrapper = await mountPage( true );
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-delete"]' ).trigger( 'click' );
+		await flushPromises();
+
+		expect( location.href ).toBe( '/wiki/Test Page?action=delete' );
+		expect( wrapper.findComponent( SummaryAction ).exists() ).toBe( false );
+		expect( deleteSubjectRepoMock ).not.toHaveBeenCalled();
+	} );
+
+	it( 'deletes the Subject alone where its page holds others, which outlive it', async () => {
+		getPageSubjectsRepoMock.mockResolvedValue( {
+			pageSubjects: new PageSubjects( PAGE_ID, null, [ subject( ID_A ), subject( ID_B ) ] ),
+			referencedSubjects: [],
+			notFoundTargetIds: [],
+			schemas: [],
+		} );
+		const wrapper = await mountPage( true );
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-delete"]' ).trigger( 'click' );
+		wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'cleanup' );
+		await flushPromises();
+
+		expect( deleteSubjectRepoMock ).toHaveBeenCalledWith(
+			expect.objectContaining( { text: ID_A } ),
+			'cleanup',
+		);
+	} );
+
+	it( 'renders the row without the Unknown-subject throw while the post-delete re-sync is in flight, then removes it', async () => {
+		const wrapper = await mountPage();
+
+		// This is the live Critical bug (C1): the deleted subject's registry entry must not be
+		// dropped until pageSubjects itself stops naming it, or SubjectsManagerPage's `subjects`
+		// computed throws mid-render. Queue the deferred for the delete-triggered re-sync call
+		// (the mount's own getPageSubjects call already resolved via the beforeEach default above).
+		let resolveResync!: ( value: unknown ) => void;
+		const resyncPending = new Promise( ( resolve ) => {
+			resolveResync = resolve;
+		} );
+		getPageSubjectsRepoMock.mockReturnValueOnce( resyncPending );
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-delete"]' ).trigger( 'click' );
+		wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'cleanup' );
+		await flushPromises();
+
+		// Mid-window: the DELETE is acknowledged server-side but the re-sync has not landed yet.
+		// The row must still render — finding it at all is the assertion, since the live bug threw
+		// here instead. The success notification (which fires after deleteSubject resolves) has
+		// not appeared yet either, confirming this really is the in-flight window.
+		expect( rowFor( wrapper, ID_A ).exists() ).toBe( true );
+		expect( mw.notify ).not.toHaveBeenCalledWith( 'sws-managesubjects-delete-success', { type: 'success' } );
+
+		resolveResync( {
+			pageSubjects: new PageSubjects( PAGE_ID, null, [] ),
+			referencedSubjects: [],
+			notFoundTargetIds: [],
+			schemas: [],
+		} );
+		await flushPromises();
+
+		expect( rowFor( wrapper, ID_A ).exists() ).toBe( false );
+		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-delete-success', { type: 'success' } );
+		expect( reloadMock ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows an error toast and keeps the row when the delete fails', async () => {
+		deleteSubjectRepoMock.mockRejectedValue( new Error( 'boom' ) );
+		const consoleError = vi.spyOn( console, 'error' ).mockImplementation( () => undefined );
+
+		const wrapper = await mountPage();
+
+		await wrapper.find( '[aria-label="sws-managesubjects-row-delete"]' ).trigger( 'click' );
+		wrapper.findComponent( SummaryAction ).vm.$emit( 'save', '' );
+		await flushPromises();
+
+		expect( mw.notify ).toHaveBeenCalledWith(
+			`sws-managesubjects-delete-errorLabel ${ ID_A }`,
+			{ type: 'error' },
+		);
+		expect( consoleError ).toHaveBeenCalled();
+		expect( reloadMock ).not.toHaveBeenCalled();
+		expect( rowFor( wrapper, ID_A ).exists() ).toBe( true );
+	} );
+
+} );

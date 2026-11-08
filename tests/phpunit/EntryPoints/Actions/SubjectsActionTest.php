@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Actions;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Actions;
 
 use Article;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Actions\SubjectsAction;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\Actions\SubjectsAction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction
  * @group Database
  */
-class SubjectsActionTest extends NeoWikiIntegrationTestCase {
+class SubjectsActionTest extends SWSIntegrationTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	public function testNullTitleIsNotEligible(): void {
 		$this->assertFalse( SubjectsAction::isEligibleTitle( null ) );
@@ -55,7 +55,7 @@ class SubjectsActionTest extends NeoWikiIntegrationTestCase {
 	public function testExposesThatTheViewerMayEditTheSubjects(): void {
 		$out = $this->runOnView( 'SubjectsActionTest editable', $this->getTestSysop()->getAuthority() );
 
-		$this->assertTrue( $out->getJsConfigVars()['wgNeoWikiCanEditPageSubjects'] );
+		$this->assertTrue( $out->getJsConfigVars()['wgSWSCanEditPageSubjects'] );
 	}
 
 	public function testExposesThatAViewerWhoMayNotEditThePageMayNotEditItsSubjects(): void {
@@ -67,24 +67,24 @@ class SubjectsActionTest extends NeoWikiIntegrationTestCase {
 		);
 
 		$this->assertFalse(
-			$out->getJsConfigVars()['wgNeoWikiCanEditPageSubjects'],
+			$out->getJsConfigVars()['wgSWSCanEditPageSubjects'],
 			'The decision must be the one made for the page whose Subjects are managed.'
 		);
 	}
 
 	public function testExposesTheSubjectIriBaseAsConfigVar(): void {
-		$this->overrideConfigValue( 'NeoWikiRdfBaseUri', 'https://data.example.org' );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSRdfBaseUri', 'https://data.example.org' );
+		SWSExtension::resetInstance();
 
 		try {
 			$out = $this->runOnView( 'SubjectsActionTest iri base', $this->getTestSysop()->getAuthority() );
 
 			$this->assertSame(
 				'https://data.example.org/entity/',
-				$out->getJsConfigVars()['wgNeoWikiSubjectIriBase']
+				$out->getJsConfigVars()['wgSWSSubjectIriBase']
 			);
 		} finally {
-			NeoWikiExtension::resetInstance();
+			SWSExtension::resetInstance();
 		}
 	}
 

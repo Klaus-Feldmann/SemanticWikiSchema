@@ -1,0 +1,14 @@
+<includeonly>{{#invoke:WikiSchema|annotieren}}</includeonly><noinclude>
+Die automatische SMW-Übernahme erfolgt durch Semantic WikiSchema. Diese Vorlage ist weder im Artikel noch im Schema erforderlich. Ihr Aufruf erzeugt keine zusätzlichen Annotationen.
+
+Einzelabfragen erfolgen über [[Modul:WikiSchema]]:
+* <code><nowiki>{{#invoke:WikiSchema|wert|Feldname}}</nowiki></code>
+* <code><nowiki>{{#invoke:WikiSchema|werte|Feldname}}</nowiki></code>
+* <code><nowiki>{{#invoke:WikiSchema|label|Feldname}}</nowiki></code>
+
+Seite, Subjekt, Sprache, Herkunft, Index und Trenner bleiben entsprechend dem Aufruf verwendbar.
+Quellenzeilen können über [[Vorlage:WikiSchema/URL-Zeile]] ausgegeben werden.
+
+Optionale SMW-Namenszuordnungen stehen in <code>$wgWikiSchemaSmwMapping</code> in LocalSettings.php. Ein API- oder config-Wikimodul wird nicht benötigt. Die SMW-Eigenschaftsseiten bestimmen den gespeicherten Datentyp.
+Bestehende Q-ID-Registrierung und andere ausführbare Schemafelder bleiben erforderlich, soweit sie für den jeweiligen Anwendungsfall eingerichtet sind.
+</noinclude>

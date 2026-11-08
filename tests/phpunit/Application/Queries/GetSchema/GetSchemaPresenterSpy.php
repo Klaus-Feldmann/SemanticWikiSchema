@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Queries\GetSchema;
+namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSchema;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSchema\GetSchemaPresenter;
+use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
 
 class GetSchemaPresenterSpy implements GetSchemaPresenter {
 

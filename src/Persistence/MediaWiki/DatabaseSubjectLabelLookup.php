@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Application\SubjectLabelLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectLabelLookupResult;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\SubjectLabelLookup;
+use ProfessionalWiki\SWS\Application\SubjectLabelLookupResult;
 use stdClass;
 use Wikimedia\Rdbms\IExpression;
 use Wikimedia\Rdbms\IConnectionProvider;
@@ -55,8 +55,8 @@ class DatabaseSubjectLabelLookup implements SubjectLabelLookup {
 
 			if ( $readablePages[(int)$row->page_id] ) {
 				$results[] = new SubjectLabelLookupResult(
-					id: (string)$row->nws_subject_id,
-					label: (string)$row->nws_display_name,
+					id: (string)$row->swss_subject_id,
+					label: (string)$row->swss_display_name,
 					pageTitle: $title->getPrefixedText(),
 				);
 			}
@@ -75,22 +75,22 @@ class DatabaseSubjectLabelLookup implements SubjectLabelLookup {
 		$db = $this->connectionProvider->getReplicaDatabase();
 
 		$query = $db->newSelectQueryBuilder()
-			->select( [ 'nws_subject_id', 'nws_display_name', 'page_id', 'page_namespace', 'page_title' ] )
+			->select( [ 'swss_subject_id', 'swss_display_name', 'page_id', 'page_namespace', 'page_title' ] )
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE, 'subject' )
-			->join( 'page', null, 'page_id = subject.nws_page_id' )
+			->join( 'page', null, 'page_id = subject.swss_page_id' )
 			->where( $db->expr(
-				'subject.nws_display_name_key',
+				'subject.swss_display_name_key',
 				IExpression::LIKE,
 				new LikeValue( CaseInsensitiveKey::of( $search ), $db->anyString() )
 			) )
-			->andWhere( [ 'subject.nws_dependent' => 0 ] )
+			->andWhere( [ 'subject.swss_dependent' => 0 ] )
 			->andWhere( LowestPageRows::condition( $db, 'subject' ) )
-			->orderBy( [ 'subject.nws_display_name_key', 'subject.nws_subject_id' ] )
+			->orderBy( [ 'subject.swss_display_name_key', 'subject.swss_subject_id' ] )
 			->limit( $limit )
 			->caller( __METHOD__ );
 
 		if ( $schemaNames !== null ) {
-			$query->andWhere( [ 'subject.nws_schema' => array_values( $schemaNames ) ] );
+			$query->andWhere( [ 'subject.swss_schema' => array_values( $schemaNames ) ] );
 		}
 
 		return $query->fetchResultSet();

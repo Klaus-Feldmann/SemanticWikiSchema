@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql;
 
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The REST route's presence is covered by SparqlRouteRegistrationTest and OnExtensionRegistrationTest.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\SparqlPlugin
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::getFirstSparqlPlugin
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onParserFirstCallInit
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \ProfessionalWiki\SWS\SWSExtension::getFirstSparqlPlugin
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
  * @group Database
  */
-class SparqlSurfaceRegistrationTest extends NeoWikiIntegrationTestCase {
+class SparqlSurfaceRegistrationTest extends SWSIntegrationTestCase {
 
 	protected function tearDown(): void {
 		// The singleton bakes the store config; reset it so the next test rebuilds from restored config.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		parent::tearDown();
 	}
 
@@ -32,13 +32,13 @@ class SparqlSurfaceRegistrationTest extends NeoWikiIntegrationTestCase {
 			$this->parserOptionsShowingMessageKeys()
 		);
 
-		$this->assertStringContainsString( '(neowiki-sparql-raw-error-not-configured)', $html );
+		$this->assertStringContainsString( '(sws-sparql-raw-error-not-configured)', $html );
 	}
 
 	public function testLuaFunctionOfferedWhenStoreConfigured(): void {
 		$this->configureSparqlStore();
 
-		$names = NeoWikiExtension::getInstance()->getFirstSparqlPlugin()?->getLuaLibraryFunctionNames() ?? [];
+		$names = SWSExtension::getInstance()->getFirstSparqlPlugin()?->getLuaLibraryFunctionNames() ?? [];
 
 		$this->assertContains( 'sparqlQuery', $names );
 	}
@@ -46,17 +46,17 @@ class SparqlSurfaceRegistrationTest extends NeoWikiIntegrationTestCase {
 	public function testLuaFunctionNotOfferedWithoutStore(): void {
 		$this->clearSparqlStores();
 
-		$this->assertNull( NeoWikiExtension::getInstance()->getFirstSparqlPlugin() );
+		$this->assertNull( SWSExtension::getInstance()->getFirstSparqlPlugin() );
 	}
 
 	private function configureSparqlStore(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [ [ 'updateUrl' => 'https://qlever.example/api' ] ] );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSSparqlStores', [ [ 'updateUrl' => 'https://qlever.example/api' ] ] );
+		SWSExtension::resetInstance();
 	}
 
 	private function clearSparqlStores(): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', [] );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSSparqlStores', [] );
+		SWSExtension::resetInstance();
 	}
 
 }

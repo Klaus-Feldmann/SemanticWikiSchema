@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure;
 
 use MediaWiki\Context\RequestContext;
-use ProfessionalWiki\NeoWiki\Infrastructure\MediaWikiEditNoticeMessageRenderer;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\MediaWikiEditNoticeMessageRenderer
+ * @covers \ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer
  * @group Database
  */
-class MediaWikiEditNoticeMessageRendererTest extends NeoWikiIntegrationTestCase {
+class MediaWikiEditNoticeMessageRendererTest extends SWSIntegrationTestCase {
 
-	private const string MESSAGE_KEY = 'neowiki-editnotice-0';
+	private const string MESSAGE_KEY = 'sws-editnotice-0';
 
 	private const string PAGE_DB_KEY = 'Berlin';
 

@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetSchema;
+namespace ProfessionalWiki\SWS\Application\Queries\GetSchema;
 
 interface GetSchemaPresenter {
 

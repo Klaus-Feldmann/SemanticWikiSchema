@@ -11,13 +11,13 @@ import type { ExtensionPack } from '../../../src/tools/extensions/types.ts';
 import type { Tool } from '../../../src/runtime/tool.ts';
 
 describe('extensionPacks', () => {
-	it('contains smw, bucket, cargo, neowiki, and wikibase in registration order', () => {
+	it('contains smw, bucket, cargo, sws, and wikibase in registration order', () => {
 		expect(extensionPacks.map((p) => p.id)).toEqual([
 			'smw',
 			'bucket',
 			'cargo',
-			'neowiki',
-			'neowikibase',
+			'sws',
+			'swsbase',
 			'wikibase',
 		]);
 	});
@@ -38,19 +38,19 @@ describe('extensionPacks', () => {
 		]);
 	});
 
-	it('accepts original NeoWiki and the independent SemanticNeoWiki fork', () => {
-		const neowiki = extensionPacks.find((p) => p.id === 'neowiki');
-		expect(neowiki?.extensionNames).toEqual(['NeoWiki', 'SemanticNeoWiki', 'SemanticWikiSchema']);
+	it('accepts original SWS and the independent SemanticSWS fork', () => {
+		const sws = extensionPacks.find((p) => p.id === 'sws');
+		expect(sws?.extensionNames).toEqual(['SWS', 'SemanticSWS', 'SemanticWikiSchema']);
 	});
 
-	it('allows the unchanged NeoWiki tool surface for SemanticNeoWiki', () => {
-		const pack = extensionPacks.find((p) => p.id === 'neowiki');
-		if (!pack) throw new Error('Missing NeoWiki pack');
+	it('allows the unchanged SWS tool surface for SemanticSWS', () => {
+		const pack = extensionPacks.find((p) => p.id === 'sws');
+		if (!pack) throw new Error('Missing SWS pack');
 		const identity: WikiInspection = {
 			extensions: new Set(['SemanticWikiSchema']),
 			reachable: true,
 		};
-		expect(packToolRefusal(pack, 'neowiki-get-subject', identity, 'research')).toBeUndefined();
+		expect(packToolRefusal(pack, 'sws-get-subject', identity, 'research')).toBeUndefined();
 	});
 
 	it('lists Cargo and LIBRARIAN as Cargo extension names', () => {
@@ -68,21 +68,21 @@ describe('extensionPacks', () => {
 		expect(bucket?.extensionNames).toEqual(['Bucket']);
 	});
 
-	it('exposes the twelve NeoWiki tools including the write tools', () => {
-		const neowiki = extensionPacks.find((p) => p.id === 'neowiki');
-		expect(neowiki?.tools.map((t) => t.name)).toEqual([
-			'neowiki-list-schemas',
-			'neowiki-get-schema',
-			'neowiki-cypher-query',
-			'neowiki-search-subjects',
-			'neowiki-get-subject',
-			'neowiki-get-page-subjects',
-			'neowiki-create-subject',
-			'neowiki-update-subject',
-			'neowiki-delete-subject',
-			'neowiki-set-main-subject',
-			'neowiki-validate-subject',
-			'neowiki-mint-subject-ids',
+	it('exposes the twelve SWS tools including the write tools', () => {
+		const sws = extensionPacks.find((p) => p.id === 'sws');
+		expect(sws?.tools.map((t) => t.name)).toEqual([
+			'sws-list-schemas',
+			'sws-get-schema',
+			'sws-cypher-query',
+			'sws-search-subjects',
+			'sws-get-subject',
+			'sws-get-page-subjects',
+			'sws-create-subject',
+			'sws-update-subject',
+			'sws-delete-subject',
+			'sws-set-main-subject',
+			'sws-validate-subject',
+			'sws-mint-subject-ids',
 		]);
 	});
 

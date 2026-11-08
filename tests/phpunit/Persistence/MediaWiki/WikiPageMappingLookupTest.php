@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\WikiPageMappingLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyPageContentFetcher;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPageReadAuthorizer;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\ObjectCache\HashBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\WikiPageMappingLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup
  */
 class WikiPageMappingLookupTest extends TestCase {
 
@@ -91,7 +91,7 @@ class WikiPageMappingLookupTest extends TestCase {
 				new WANObjectCache( [ 'cache' => new HashBagOStuff() ] )
 			),
 			mappingDeserializer: new MappingPersistenceDeserializer(),
-			titleFactory: $titleFactory ?? $this->newTitleFactory( NeoWikiExtension::NS_MAPPING ),
+			titleFactory: $titleFactory ?? $this->newTitleFactory( SWSExtension::NS_MAPPING ),
 			readAuthorizer: $readAuthorizer ?? new StubPageReadAuthorizer( allowed: true ),
 		);
 	}

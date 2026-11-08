@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSetting
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting
  */
 class ConfigSchemaTest extends TestCase {
 
@@ -17,28 +17,28 @@ class ConfigSchemaTest extends TestCase {
 		$setting = ( new ConfigSchema() )->getSetting( 'subjectFirst' );
 
 		$this->assertNotNull( $setting );
-		$this->assertSame( 'NeoWikiSubjectFirst', $setting->settingName );
+		$this->assertSame( 'SWSSubjectFirst', $setting->settingName );
 	}
 
 	public function testExposesTheAutoRenderSetting(): void {
 		$setting = ( new ConfigSchema() )->getSetting( 'autoRenderMainSubject' );
 
 		$this->assertNotNull( $setting );
-		$this->assertSame( 'NeoWikiAutoRenderMainSubject', $setting->settingName );
+		$this->assertSame( 'SWSAutoRenderMainSubject', $setting->settingName );
 	}
 
 	public function testExposesTheDataLanguagesSetting(): void {
 		$setting = ( new ConfigSchema() )->getSetting( 'dataLanguages' );
 
 		$this->assertNotNull( $setting );
-		$this->assertSame( 'NeoWikiDataLanguages', $setting->settingName );
+		$this->assertSame( 'SWSDataLanguages', $setting->settingName );
 	}
 
 	public function testExposesTheEnforceValidationSetting(): void {
 		$setting = ( new ConfigSchema() )->getSetting( 'enforceValidation' );
 
 		$this->assertNotNull( $setting );
-		$this->assertSame( 'NeoWikiEnforceValidation', $setting->settingName );
+		$this->assertSame( 'SWSEnforceValidation', $setting->settingName );
 	}
 
 	public function testExposesExactlyTheAllowlistedSettings(): void {
@@ -51,7 +51,7 @@ class ConfigSchemaTest extends TestCase {
 	}
 
 	public function testUnknownKeyHasNoSetting(): void {
-		$this->assertNull( ( new ConfigSchema() )->getSetting( 'NeoWikiSparqlStores' ) );
+		$this->assertNull( ( new ConfigSchema() )->getSetting( 'SWSSparqlStores' ) );
 	}
 
 }

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Mapping;
+namespace ProfessionalWiki\SWS\Tests\Domain\Mapping;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName
+ * @covers \ProfessionalWiki\SWS\Domain\Mapping\MappingName
  */
 class MappingNameTest extends TestCase {
 

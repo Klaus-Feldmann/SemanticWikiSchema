@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\PropertyType;
+namespace ProfessionalWiki\SWS\Domain\PropertyType;
 
 interface PropertyTypeLookup {
 

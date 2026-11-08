@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Contracts\TransactionInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -175,7 +175,7 @@ class Neo4jSubjectUpdater {
 		foreach ( $statements->asArray() as $statement ) {
 			$propertyTypeName = $statement->getPropertyType();
 			$value = $statement->getValue();
-			if ( $value instanceof \ProfessionalWiki\NeoWiki\Domain\Value\UrlValue
+			if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue
 				&& array_filter( $value->parts, static fn ( array $entry ): bool => count( $entry ) > 1 ) !== [] ) {
 				$urlEntries[$statement->getPropertyName()->text] = $value->parts;
 			}
@@ -195,7 +195,7 @@ class Neo4jSubjectUpdater {
 		// '#' is forbidden in authored property names; this technical key cannot collide
 		// with a newly defined schema field. Direct URL properties stay unchanged.
 		if ( $urlEntries !== [] ) {
-			$nodeProps['#neowiki:urlEntries'] = json_encode( $urlEntries, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR );
+			$nodeProps['#sws:urlEntries'] = json_encode( $urlEntries, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR );
 		}
 		return $nodeProps;
 	}

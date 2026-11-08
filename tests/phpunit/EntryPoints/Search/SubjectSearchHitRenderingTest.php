@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\Search;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Context\RequestContext;
@@ -12,33 +12,33 @@ use MediaWiki\Request\FauxRequest;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Specials\SpecialSearch;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
 use SearchResult;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 use SpecialPageExecutor;
 
 /**
  * What a reader of Special:Search sees of the Subjects behind a hit, against a real full-text index.
  * Needs a database that has one, which is MySQL, and SQLite when PHP's SQLite was built with FTS3.
  *
- * Rendered in qqx, so what is asserted of NeoWiki's own strings is which message carries them.
+ * Rendered in qqx, so what is asserted of SWS's own strings is which message carries them.
  *
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onShowSearchHit
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onShowSearchHitTitle
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onSearchGetNearMatchComplete
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search\SubjectSearchHitLookup
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectSearchHitHtmlBuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onShowSearchHit
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onShowSearchHitTitle
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchGetNearMatchComplete
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder
  */
 class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string MAIN_ID = 's1search8aaaaaa';
 	private const string OTHER_ID = 's1search8bbbbbb';
@@ -49,7 +49,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 		$html = $this->searchResultsFor( 'Amsterdam' );
 
 		$this->assertStringContainsString( 'City(colon-separator)<span class="searchmatch">Amsterdam</span>', $html );
-		$this->assertStringNotContainsString( '(neowiki-search-hit-subject:', $html, 'The page title already names the Subject' );
+		$this->assertStringNotContainsString( '(sws-search-hit-subject:', $html, 'The page title already names the Subject' );
 	}
 
 	public function testAMatchedLabelIsNotNamedAgainAboveItself(): void {
@@ -58,7 +58,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 		$html = $this->searchResultsFor( 'Rijksmuseum' );
 
 		$this->assertStringContainsString( '<span class="searchmatch">Rijksmuseum</span>', $html );
-		$this->assertStringNotContainsString( '(neowiki-search-hit-subject:', $html );
+		$this->assertStringNotContainsString( '(sws-search-hit-subject:', $html );
 	}
 
 	public function testAValueMatchOnAPageWithProseStillLeadsToThePage(): void {
@@ -81,7 +81,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 
 		$this->assertStringContainsString( '>Rijksmuseum</a>', $html );
 		$this->assertStringNotContainsString( 'Special:Subject/', $html );
-		$this->assertStringContainsString( '(neowiki-search-hit-subject: Gemaldegalerie, Museum)', $html );
+		$this->assertStringContainsString( '(sws-search-hit-subject: Gemaldegalerie, Museum)', $html );
 	}
 
 	public function testAPageThatExistsOnlyToHoldItsMainSubjectLeadsToTheSubject(): void {
@@ -91,7 +91,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 
 		$this->assertStringContainsString( 'Special:Subject/' . self::MAIN_ID, $html );
 		$this->assertStringContainsString( '>Rijksmuseum</a>', $html );
-		$this->assertStringNotContainsString( '(neowiki-search-hit-subject:', $html, 'The link already names the Subject' );
+		$this->assertStringNotContainsString( '(sws-search-hit-subject:', $html, 'The link already names the Subject' );
 	}
 
 	public function testALabellessSubjectIsShownUnderItsIdMarkedAsAStandIn(): void {
@@ -103,7 +103,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 		) );
 
 		$this->assertStringContainsString(
-			'>(neowiki-subject-generated-name: ' . self::MAIN_ID . ')</a>',
+			'>(sws-subject-generated-name: ' . self::MAIN_ID . ')</a>',
 			$this->searchResultsFor( 'Deventer' )
 		);
 	}
@@ -171,7 +171,7 @@ class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 		$link = $redirect = $section = $extract = $score = $size = $date = $related = '';
 		$html = null;
 
-		NeoWikiHooks::onShowSearchHit(
+		SWSHooks::onShowSearchHit(
 			$this->searchPageAskedFor( 'Amsterdam' ),
 			SearchResult::newFromTitle( Title::newFromTextThrow( 'Rijksmuseum' ) ),
 			[],

@@ -1,29 +1,30 @@
 # Optional schema-driven Semantic MediaWiki annotations
 
-Requires the accompanying SemanticWikiSchema/NeoWikiBaseBridge, Scribunto and Semantic MediaWiki. Semantic Scribunto may remain installed but is not the annotation trigger. The shipped Lua modules/template names and documentation use German wiki namespace names (`Modul`, `Vorlage`) as in the tested wiki. An English-only installation must adapt module require names and page titles consistently; automated namespace localization is not claimed.
+This local candidate uses Semantic WikiSchema with SchemaBaseBridge, Scribunto and optionally Semantic MediaWiki. No annotation template call is required in articles or schemas.
 
-## Import wiki pages
+## Wiki pages
 
-`WIKISEITEN.json` maps each file under `Wikiseiten/` to its target page title and records the retrieved revision. These are current source snapshots, not a dump of research articles. On a new installation create the listed pages. When updating, replace the two query modules and optionally the template documentation; preserve the existing config:
+The files in `Wikiseiten/` provide `Modul:WikiSchema`, `Vorlage:WikiSchema` and `Vorlage:WikiSchema/URL-Zeile`. `WIKISEITEN.json` identifies the pages. The query module calls the existing PHP resolver directly through `mw.sws.collectFields`; no separate API or config wiki module is needed. The module now uses mw.sws; replace the previously installed query module when activating the renamed extension. Wikidata and Wikibase modules are unchanged.
 
-- Modul:NeoWiki
-- Modul:NeoWiki/API
-- Modul:NeoWiki/config
-- Vorlage:NeoWiki
-- Vorlage:NeoWiki/URL-Zeile
+Move the former main module and templates, preserving their histories, and replace their source with the supplied files. Keep temporary redirects for existing calls, then update active callers. Do not edit historical conversation transcripts. Verify individual queries, URL rows and saved automatic annotations on the actual wiki before removing obsolete API/config pages.
 
-The local config maps ordinary fields directly to SMW property names and includes examples for Werk (Leserschaft, Leserschaftziel, Werkausgabe). Review these local research naming choices. Captioned URL entries may select their caption as the property name and also emit associated subobjects.
+## Server configuration
 
-Annotations are prepared automatically by the extension and passed to the regular MediaWiki/SMW updates. No article or schema `{{NeoWiki}}` call is required. Old calls are harmless with the current module. The page still needs its existing Q-registration mechanism for automatic external values.
+No override is necessary. Schema field names become SMW property names. The old Werk exceptions are not supplied. Optional overrides in LocalSettings.php:
 
-## SMW property definitions
+~~~php
+$wgWikiSchemaSmwMapping = [
+    'properties' => [ 'Person' => [ 'Schemafeld' => 'SMW-Eigenschaft' ] ],
+    'urlEntries' => [ 'subject' => 'Subjektkennung' ],
+];
+~~~
 
-Reuse existing property pages/types. Define missing ones deliberately: Geburtsort/Sterbeort as Page, Quellenangabe or a source-specific caption property as URL, historical birth/death dates as Date. URL subobject property names come from the config. `property-examples.json` provides editable examples, not automatic changes to your wiki; `Vermerk` is AufEinWort's property namespace and is not assumed elsewhere. The configuration's field-name mapping does not choose an SMW datatype for you.
+Omitted URL keys retain these defaults: `url` -> Quellen-URL, `label` -> Quellentitel, `caption` -> Quellenbezeichnung, `captionPage` -> Quellenbezeichnungsseite, `field` -> WikiSchema-Feld, `subject` -> WikiSchema-Subjekt. All six property names remain configurable. Captioned URL entries retain their caption-based property selection and grouped metadata.
 
-Own values precede external values, multi-values are retained and equal values deduplicated. Supported scalar/date values are prepared before structured SMW handlers run. Image fields are skipped. Populated relation/multilingual/unknown structures report an unsupported-field error instead of inventing simplified annotations. Date uncertainty may require a local research value.
+Changing server settings requires affected pages to be reprocessed. There is no automatic page dependency on LocalSettings.php. In contrast, subject/schema changes keep their existing refresh behavior. Existing SMW property types are not modified. Define WikiSchema-Feld and WikiSchema-Subjekt as Text properties in the actual localized property namespace when using the new defaults; adapt tables that query the old names. Old annotations are replaced on normal full-page processing, not by a database migration.
 
-URL display text belongs to table/output formatting; storing a URL property does not make SMW's semantic browser display its separate label. The URL-Zeile template can render associated subobject attributes.
+Main subjects and linked dependent subjects on the same page contribute supported scalar/date annotations. Images and executable Wikitext are not mirrored as scalar annotations; standalone secondary subjects do not contribute. Preserve the running job worker and the existing Q-ID registration workflow. True source failures retain the existing safeguards.
 
-Subject saves and schema changes trigger/queue hosting-page processing through this extension. Keep the MediaWiki job runner operational. A plain browser reload does not guarantee a new parse or semantic-store update. External-source changes require affected-page processing under your local policy.
+## Tests
 
-The local regression harness retains historical Lua reference checks and checks the current read adapter separately. It is not a replacement for checking a real saved subject and its semantic browsing result.
+The PHP mapping tests check defaults, partial overrides, schema mappings, invalid settings and the absence of abandoned Werk exceptions. Historical Lua tests remain reference fixtures; the current module is separately checked without a separate API module. These isolated checks do not replace live save/job/SMW validation.

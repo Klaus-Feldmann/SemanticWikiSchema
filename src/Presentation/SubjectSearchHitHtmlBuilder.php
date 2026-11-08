@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Language\Language;
 use MessageLocalizer;
-use ProfessionalWiki\NeoWiki\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\NeoWiki\Application\Search\SubjectSearchMatch;
+use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
+use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
 
 /**
  * The Subject block of a search result row, with matches marked up like MediaWiki's own.
@@ -29,19 +29,19 @@ readonly class SubjectSearchHitHtmlBuilder {
 	public function buildExtract( SubjectSearchMatch $match ): string {
 		$blocks = [ Html::element(
 			'div',
-			[ 'class' => 'ext-neowiki-searchresult-subject' ],
+			[ 'class' => 'ext-sws-searchresult-subject' ],
 			$this->heading( $match )
 		) ];
 
 		foreach ( $match->lines as $line ) {
 			$blocks[] = Html::rawElement(
 				'div',
-				[ 'class' => 'ext-neowiki-searchresult-statement' ],
+				[ 'class' => 'ext-sws-searchresult-statement' ],
 				$this->lineHtml( $line )
 			);
 		}
 
-		return Html::rawElement( 'div', [ 'class' => 'ext-neowiki-searchresult' ], implode( '', $blocks ) );
+		return Html::rawElement( 'div', [ 'class' => 'ext-sws-searchresult' ], implode( '', $blocks ) );
 	}
 
 	private function heading( SubjectSearchMatch $match ): string {
@@ -49,7 +49,7 @@ readonly class SubjectSearchHitHtmlBuilder {
 			return $match->schemaName;
 		}
 
-		return $this->messageLocalizer->msg( 'neowiki-search-hit-subject' )
+		return $this->messageLocalizer->msg( 'sws-search-hit-subject' )
 			->plaintextParams( $match->subjectName, $match->schemaName )->text();
 	}
 
@@ -84,7 +84,7 @@ readonly class SubjectSearchHitHtmlBuilder {
 		$path = array_shift( $propertyNames );
 
 		foreach ( $propertyNames as $propertyName ) {
-			$path = $this->messageLocalizer->msg( 'neowiki-search-hit-property-path' )
+			$path = $this->messageLocalizer->msg( 'sws-search-hit-property-path' )
 				->plaintextParams( $path, $propertyName )->text();
 		}
 

@@ -4,8 +4,8 @@ order: 5
 ---
 # Revision policy
 
-Choose which revision of a page NeoWiki publishes: to the graph stores; the RDF export; the Subject reads
-`GET /neowiki/v0/subject/{subjectId}`, `.../referencingSubjects` and `GET /neowiki/v0/recently-edited-subjects`; the
+Choose which revision of a page SWS publishes: to the graph stores; the RDF export; the Subject reads
+`GET /sws/v0/subject/{subjectId}`, `.../referencingSubjects` and `GET /sws/v0/recently-edited-subjects`; the
 Subject list, relation-target suggestions and Subject counts; and its own Schema, Layout, Mapping and configuration
 reads. Without a policy every page publishes its latest revision.
 
@@ -23,13 +23,13 @@ class ApprovalRevisionPolicy implements RevisionPolicy {
 }
 ```
 
-Register with `NeoWikiRegistrar::setRevisionPolicy()`; a second policy is refused with a warning on the [`NeoWiki` log
+Register with `SWSRegistrar::setRevisionPolicy()`; a second policy is refused with a warning on the [`SWS` log
 channel](../operations/installation.md#logging).
 
 - `publishedRevision()` receives the page's current revision and returns the one to publish, of the same page, or
   `null`, which deletes the page's Page node and Subjects from the graph stores, makes the RDF export and the Subject
   reads answer not-found for it, and leaves its Subjects out of every referencing list, the Subject list, suggestions,
-  counts and `GET /neowiki/v0/recently-edited-subjects`. A policy that throws counts as returning `null`, with the
+  counts and `GET /sws/v0/recently-edited-subjects`. A policy that throws counts as returning `null`, with the
   error logged. It runs on every page save and rebuild and on every read above, so keep it cheap.
 - `revisionIsReadableBy()` is asked when a REST caller names a `revisionId` or asks for `latest`
   ([REST API](../api/rest-api.md)); a refusal answers exactly like a revision that does not exist.
@@ -45,7 +45,7 @@ already read. A change to which revision of a Mapping is published does not rebu
 projection; pages reach it as they are next saved or rebuilt
 ([#1392](https://github.com/ProfessionalWiki/NeoWiki/issues/1392)).
 
-Editing reads the latest revision. So do `?action=subjects`, `GET /neowiki/v0/page/{pageId}/subjects`,
-`GET /neowiki/v0/page/{pageId}/mainSubject`, the referenced Subjects on a `revisionId` read
+Editing reads the latest revision. So do `?action=subjects`, `GET /sws/v0/page/{pageId}/subjects`,
+`GET /sws/v0/page/{pageId}/mainSubject`, the referenced Subjects on a `revisionId` read
 ([#1390](https://github.com/ProfessionalWiki/NeoWiki/issues/1390)), the parse-time accessors, and the wiki's search
 index, which holds a page's Subjects the way MediaWiki holds its wikitext.

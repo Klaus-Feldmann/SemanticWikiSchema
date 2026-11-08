@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use InvalidArgumentException;
 use MediaWiki\Language\RawMessage;
@@ -10,19 +10,19 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Application\SubjectRepository;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\MainSubjectParserFunction;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectRepository;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Application\SubjectRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 use Throwable;
 use TypeError;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\MainSubjectParserFunction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
  */
 class MainSubjectParserFunctionTest extends TestCase {
 
@@ -39,7 +39,7 @@ class MainSubjectParserFunctionTest extends TestCase {
 
 		$this->assertIsString( $result );
 		$this->assertStringContainsString( 'class="error"', $result );
-		$this->assertStringContainsString( 'neowiki-main-subject-error-argument', $result );
+		$this->assertStringContainsString( 'sws-main-subject-error-argument', $result );
 		$this->assertStringContainsString( 'layout=Finances', $result );
 	}
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Installer\DatabaseUpdater;
@@ -10,21 +10,21 @@ use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicy;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Maintenance\RebuildPublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Maintenance\RebuildPublishedSubjectIndex;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
@@ -33,13 +33,13 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
 /**
  * Needs the database for the tables it rebuilds and the pages it reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectsToPublish
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\RebuildPublishedSubjectIndex
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onLoadExtensionSchemaUpdates
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
+ * @covers \ProfessionalWiki\SWS\Maintenance\RebuildPublishedSubjectIndex
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
  * @group Database
  */
-class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
+class PublishedSubjectIndexRebuildTest extends SWSIntegrationTestCase {
 
 	use ReadsPublishedSubjectIndex;
 
@@ -52,7 +52,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 	private const string TUESDAY = '20300108090000';
 
 	public function testRebuildingIndexesAPageWrittenWithoutTheHookUnderItsFullName(): void {
-		$pageId = $this->createPageWithoutTellingNeoWiki( 'Help:Ada Lovelace', $this->slotJson( self::ADA, null ) );
+		$pageId = $this->createPageWithoutTellingSWS( 'Help:Ada Lovelace', $this->slotJson( self::ADA, null ) );
 
 		$this->rebuild();
 
@@ -83,7 +83,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 
 	public function testRebuildingRemovesTheRowsOfAPageThatLostItsSubjectSlotWithoutTheHook(): void {
 		$pageId = $this->createPage( 'Ada Lovelace', self::ADA, 'Ada' );
-		$this->removeSubjectSlotWithoutTellingNeoWiki( 'Ada Lovelace' );
+		$this->removeSubjectSlotWithoutTellingSWS( 'Ada Lovelace' );
 
 		$this->rebuild();
 
@@ -91,9 +91,9 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testRebuildingReachesEveryPageAcrossBatches(): void {
-		$adaPageId = $this->createPageWithoutTellingNeoWiki( 'Ada Lovelace', $this->slotJson( self::ADA, 'Ada' ) );
-		$gracePageId = $this->createPageWithoutTellingNeoWiki( 'Grace Hopper', $this->slotJson( self::GRACE, 'Grace' ) );
-		$turingPageId = $this->createPageWithoutTellingNeoWiki( 'Alan Turing', $this->slotJson( self::TURING, 'Alan' ) );
+		$adaPageId = $this->createPageWithoutTellingSWS( 'Ada Lovelace', $this->slotJson( self::ADA, 'Ada' ) );
+		$gracePageId = $this->createPageWithoutTellingSWS( 'Grace Hopper', $this->slotJson( self::GRACE, 'Grace' ) );
+		$turingPageId = $this->createPageWithoutTellingSWS( 'Alan Turing', $this->slotJson( self::TURING, 'Alan' ) );
 
 		$this->rebuild( batchSize: 1 );
 
@@ -120,7 +120,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testRebuildingLeavesAPageWhoseSubjectsDoNotDeserializeAsItWas( string $subjectJson ): void {
 		$pageId = $this->createPage( 'Ada Lovelace', self::ADA, 'Ada' );
-		$this->createPageWithoutTellingNeoWiki( 'Ada Lovelace', $subjectJson );
+		$this->createPageWithoutTellingSWS( 'Ada Lovelace', $subjectJson );
 		$logger = new TestLogger();
 
 		$this->rebuild( logger: $logger );
@@ -147,7 +147,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 
 	public function testRebuildingLeavesAPageWhoseContentCannotBeLoadedAsItWasAndGoesOn(): void {
 		$unloadablePageId = $this->createPage( 'Ada Lovelace', self::ADA, 'Ada' );
-		$gracePageId = $this->createPageWithoutTellingNeoWiki( 'Grace Hopper', $this->slotJson( self::GRACE, 'Grace' ) );
+		$gracePageId = $this->createPageWithoutTellingSWS( 'Grace Hopper', $this->slotJson( self::GRACE, 'Grace' ) );
 		$logger = new TestLogger();
 
 		$leftAsTheyWere = $this->rebuild(
@@ -190,7 +190,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 	 */
 	public function testTheUpdateScriptMarksDependentSubjectsOnAWikiOnlyMembersMayRead(): void {
 		$this->createSchema( 'Birth', '{"subjectsAreDependent":true,"propertyDefinitions":{}}' );
-		$pageId = $this->createPageWithoutTellingNeoWiki( 'Ada Lovelace', $this->slotJsonOfAdaAndHerBirth() );
+		$pageId = $this->createPageWithoutTellingSWS( 'Ada Lovelace', $this->slotJsonOfAdaAndHerBirth() );
 		$this->setGroupPermissions( '*', 'read', false );
 
 		$this->runUpdateScript();
@@ -275,7 +275,7 @@ class PublishedSubjectIndexRebuildTest extends NeoWikiIntegrationTestCase {
 			revisionLookup: $revisionLookup ?? $this->getServiceContainer()->getRevisionLookup(),
 			revisionPolicy: $revisionPolicy,
 			titleFormatter: $this->getServiceContainer()->getTitleFormatter(),
-			dependentSubjectRules: NeoWikiExtension::getInstance()->newUnrestrictedDependentSubjectRules(),
+			dependentSubjectRules: SWSExtension::getInstance()->newUnrestrictedDependentSubjectRules(),
 			logger: $logger,
 			batchSize: $batchSize,
 		);

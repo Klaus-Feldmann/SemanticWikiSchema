@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
-use ProfessionalWiki\NeoWiki\Presentation\ViolationSerializer;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Presentation\ViolationSerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class ValidateSubjectUpdateApi extends SimpleHandler {
 
 	public function run( string $subjectId ): Response {
-		$query = NeoWikiExtension::getInstance()->newValidateSubjectUpdateQuery( $this->getAuthority() );
+		$query = SWSExtension::getInstance()->newValidateSubjectUpdateQuery( $this->getAuthority() );
 		$body = $this->getValidatedBody();
 
 		try {

@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Importing a page projects its Subjects into the graph. Imported revisions bypass the edit path, so
  * RevisionFromEditComplete never fires for them. AfterImportPage is fired by WikiImporter itself and so
  * covers every import path, including importDump.php, which no reporter wraps.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onAfterImportPage
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAfterImportPage
  * @group Database
  */
-class ImportGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class ImportGraphProjectionTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();

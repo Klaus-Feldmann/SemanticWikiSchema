@@ -1,11 +1,11 @@
-# NeoWiki Documentation
+# SWS Documentation
 
-New to NeoWiki? Try the live sandbox at [neowiki.dev](https://neowiki.dev), or
+New to SWS? Try the live sandbox at [sws.dev](https://neowiki.dev), or
 [install it locally](operations/installation.md).
 
 ## User guide
 
-For people working in a wiki that runs NeoWiki.
+For people working in a wiki that runs SWS.
 
 * [Getting started](guide/getting-started.md) — your first Schema, Subject, View, and query
 * [Author an ontology mapping](guide/author-an-ontology-mapping.md) — publish Subjects in EDM, CIDOC-CRM, or another
@@ -18,7 +18,7 @@ Concepts:
 * [Glossary](glossary.md) — the concepts (Subject, Schema, Statement, View, Layout, Page Property) used
   across the UI, the code, and these docs. Start here.
 * [Subject-first wikis](subject-first-wikis.md) — how they differ from page-first wikis, to pick one for your wiki
-* [Qualifiers and References](qualifiers-and-references.md) — how NeoWiki models qualifiers, references,
+* [Qualifiers and References](qualifiers-and-references.md) — how SWS models qualifiers, references,
   and rank (for people coming from Wikibase)
 * [Architecture](architecture.md) — how the parts fit together, followed by the numbered list of Architecture
   Decision Records
@@ -27,18 +27,18 @@ Concepts:
 
 Reference for wikitext and Lua authors:
 
-* [Parser Functions](authoring/parser-functions.md) — `{{#view}}`, `{{#neowiki_value}}`, `{{#create_subject}}`,
+* [Parser Functions](authoring/parser-functions.md) — `{{#view}}`, `{{#sws_value}}`, `{{#create_subject}}`,
   `{{#sparql_raw}}` and `{{#cypher_raw}}`
-* [Lua API](authoring/lua-api.md) — the `mw.neowiki` Scribunto library, including SPARQL and Cypher queries
+* [Lua API](authoring/lua-api.md) — the `mw.sws` Scribunto library, including SPARQL and Cypher queries
 * [Mapping Format](authoring/mapping-format.md) — the JSON of a Mapping page: projecting Schemas into EDM,
   CIDOC-CRM, or another vocabulary
 * [Edit Notices](authoring/edit-notices.md) — messages shown in the Subject editor and the Subject creator
 
 ## API
 
-For developers building on NeoWiki from outside the wiki.
+For developers building on SWS from outside the wiki.
 
-* [REST API](api/rest-api.md) — the `/neowiki/v0/*` endpoints, plus the generated OpenAPI spec
+* [REST API](api/rest-api.md) — the `/sws/v0/*` endpoints, plus the generated OpenAPI spec
 * [Schema Format](api/schema-format.md) — JSON format for Schema definitions
 * [Subject Format](api/subject-format.md) — JSON format for Subject data
 * [Validation Codes](api/validation-codes.md) — stable `code` strings returned by backend validation
@@ -51,29 +51,29 @@ For developers building on NeoWiki from outside the wiki.
 
 ## Extending
 
-For developers of MediaWiki extensions that build on NeoWiki.
+For developers of MediaWiki extensions that build on SWS.
 
-* [Extending NeoWiki](extending/extending.md) — the extension points, how to hook in, and the RedHerb example
+* [Extending SWS](extending/extending.md) — the extension points, how to hook in, and the RedHerb example
   extension to start from
 * [Property Types](extending/property-types.md) — a new kind of value, from PHP validation to Vue components
 * [View Types](extending/view-types.md) — a new visual format for rendering a Subject
 * [Page Property Providers](extending/page-properties.md) — page metadata in the graph, and refreshing it without
   an edit
-* [Revision policy](extending/revision-policy.md) — which revision NeoWiki publishes, for approval extensions
+* [Revision policy](extending/revision-policy.md) — which revision SWS publishes, for approval extensions
 * [Edit notices](extending/edit-notices.md) — a message before a user edits a Subject
 * [Subject Sources](extending/subject-sources.md) — Subjects and Schemas supplied from outside this wiki's
   revision slots
-* [Graph Database Backends](extending/graph-database-backends.md) — a store of your own that NeoWiki keeps in sync
-* [Using NeoWiki from PHP](extending/php.md) — read Subjects and run Cypher from hooks and special pages
-* [Using NeoWiki from JavaScript](extending/javascript.md) — the public JS API, displaying values, mounting Vue
+* [Graph Database Backends](extending/graph-database-backends.md) — a store of your own that SWS keeps in sync
+* [Using SWS from PHP](extending/php.md) — read Subjects and run Cypher from hooks and special pages
+* [Using SWS from JavaScript](extending/javascript.md) — the public JS API, displaying values, mounting Vue
   features
 
 ## Install & run
 
 For the people who operate the server.
 
-* [Installation](operations/installation.md) — the Docker demo, or adding NeoWiki to an existing MediaWiki
-* [Upgrading](operations/upgrading.md) — moving your wiki to a newer NeoWiki
+* [Installation](operations/installation.md) — the Docker demo, or adding SWS to an existing MediaWiki
+* [Upgrading](operations/upgrading.md) — moving your wiki to a newer SWS
 * [Maintenance](operations/maintenance.md) — rebuilding the graph and search index, Neo4j outage behavior, and backups
 * [Performance](operations/performance.md) — measured write throughput
 * [Restricted content](operations/restricted-content.md) — wikis where some content is readable only by certain

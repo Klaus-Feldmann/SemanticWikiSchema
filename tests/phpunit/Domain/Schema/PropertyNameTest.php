@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\PropertyName
  */
 class PropertyNameTest extends TestCase {
 

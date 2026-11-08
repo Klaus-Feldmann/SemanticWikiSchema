@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Application\WikiConfig;
 
-use ProfessionalWiki\NeoWiki\Domain\LanguageTag;
+use ProfessionalWiki\SWS\Domain\LanguageTag;
 
 /**
  * The shape of value an exposed setting takes: which values are valid, and how the on-page
@@ -40,8 +40,8 @@ enum ConfigValueType {
 	 */
 	public function describe(): array {
 		return match ( $this ) {
-			self::Boolean => [ 'neowiki-config-type-boolean' ],
-			self::LanguageList => [ 'neowiki-config-type-language-list' ],
+			self::Boolean => [ 'sws-config-type-boolean' ],
+			self::LanguageList => [ 'sws-config-type-language-list' ],
 		};
 	}
 
@@ -52,8 +52,8 @@ enum ConfigValueType {
 	 */
 	public function invalidValueError( string $pageKey ): array {
 		return match ( $this ) {
-			self::Boolean => [ 'neowiki-config-error-invalid-boolean', $pageKey ],
-			self::LanguageList => [ 'neowiki-config-error-invalid-language-list', $pageKey ],
+			self::Boolean => [ 'sws-config-error-invalid-boolean', $pageKey ],
+			self::LanguageList => [ 'sws-config-error-invalid-language-list', $pageKey ],
 		};
 	}
 

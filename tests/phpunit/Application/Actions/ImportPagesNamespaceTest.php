@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Actions;
+namespace ProfessionalWiki\SWS\Tests\Application\Actions;
 
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\NeoWiki\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Persistence\PageDeleter;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ImportPresenterSpy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\PageContentSaverStub;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\PageDeleter;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ImportPresenterSpy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\PageContentSaverStub;
 
 /**
  * Covers the title and content model each demo data source directory imports into. The saver is a
  * stub, so what the action derives from the file names can be checked without touching the database.
  *
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
  */
 class ImportPagesNamespaceTest extends MediaWikiIntegrationTestCase {
 

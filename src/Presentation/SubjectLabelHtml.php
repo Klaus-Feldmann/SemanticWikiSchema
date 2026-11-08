@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Output\OutputPage;
 use MessageLocalizer;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /**
  * A Subject's label with its id beside it, where the label stands in for a title: the heading of a page
@@ -16,7 +16,7 @@ use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
  */
 class SubjectLabelHtml {
 
-	public const string STYLE_MODULE = 'ext.neowiki.subjectLabel.styles';
+	public const string STYLE_MODULE = 'ext.sws.subjectLabel.styles';
 
 	/**
 	 * The browser tab gets the label alone, or the bracketed id of a Subject without one: a tab reading
@@ -38,7 +38,7 @@ class SubjectLabelHtml {
 	public static function withId( MessageLocalizer $localizer, ?string $label, string $subjectId ): string {
 		return self::label( $localizer, $label ) . $localizer->msg( 'word-separator' )->escaped() . Html::rawElement(
 			'span',
-			[ 'class' => 'ext-neowiki-subject-label-id' ],
+			[ 'class' => 'ext-sws-subject-label-id' ],
 			$localizer->msg( 'parentheses' )->rawParams( Html::element( 'bdi', [], $subjectId ) )->escaped()
 		);
 	}
@@ -47,8 +47,8 @@ class SubjectLabelHtml {
 		if ( $label === null ) {
 			return Html::element(
 				'span',
-				[ 'class' => 'ext-neowiki-subject-label-none' ],
-				$localizer->msg( 'neowiki-subject-no-label' )->text()
+				[ 'class' => 'ext-sws-subject-label-none' ],
+				$localizer->msg( 'sws-subject-no-label' )->text()
 			);
 		}
 

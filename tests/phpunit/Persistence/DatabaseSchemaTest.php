@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence;
+namespace ProfessionalWiki\SWS\Tests\Persistence;
 
 use GenerateSchemaChangeSql;
 use GenerateSchemaSql;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphStoreName;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphStoreName;
 
 /**
  * The per-DBMS SQL that update.php applies is generated from the abstract schema and committed
@@ -27,7 +27,7 @@ class DatabaseSchemaTest extends MediaWikiIntegrationTestCase {
 	 */
 	public function testTheStoreNameLimitIsTheWidthOfTheColumnItIsFiledUnder(): void {
 		$schema = json_decode(
-			(string)file_get_contents( dirname( __DIR__, 3 ) . '/sql/neowiki_rebuild_runs.json' ),
+			(string)file_get_contents( dirname( __DIR__, 3 ) . '/sql/sws_rebuild_runs.json' ),
 			true
 		);
 
@@ -35,8 +35,8 @@ class DatabaseSchemaTest extends MediaWikiIntegrationTestCase {
 
 		$this->assertSame(
 			GraphStoreName::MAX_LENGTH,
-			$columns['nwrr_store']['type'] === 'binary' ? $columns['nwrr_store']['options']['length'] : null,
-			'GraphStoreName::MAX_LENGTH and the nwrr_store column width have to agree'
+			$columns['swsrr_store']['type'] === 'binary' ? $columns['swsrr_store']['options']['length'] : null,
+			'GraphStoreName::MAX_LENGTH and the swsrr_store column width have to agree'
 		);
 	}
 
@@ -77,7 +77,7 @@ class DatabaseSchemaTest extends MediaWikiIntegrationTestCase {
 
 		$script = new GenerateSchemaChangeSql();
 		$script->loadWithArgv( [
-			'--json=' . $extensionPath . '/sql/abstractSchemaChanges/patch-neowiki_rebuild_runs-nwrr_phase.json',
+			'--json=' . $extensionPath . '/sql/abstractSchemaChanges/patch-sws_rebuild_runs-swsrr_phase.json',
 			'--sql=' . $generatedPath,
 			'--type=' . $databaseType,
 			'--quiet',
@@ -86,7 +86,7 @@ class DatabaseSchemaTest extends MediaWikiIntegrationTestCase {
 
 		$this->assertSame(
 			self::withoutSourcePath( (string)file_get_contents(
-				$extensionPath . '/sql/' . $databaseType . '/patch-neowiki_rebuild_runs-nwrr_phase.sql'
+				$extensionPath . '/sql/' . $databaseType . '/patch-sws_rebuild_runs-swsrr_phase.sql'
 			) ),
 			self::withoutSourcePath( (string)file_get_contents( $generatedPath ) ),
 			'run `make dbschema` to regenerate the ' . $databaseType . ' schema change'
@@ -94,18 +94,18 @@ class DatabaseSchemaTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function tableProvider(): iterable {
-		yield 'rebuild runs, mysql' => [ 'neowiki_rebuild_runs', 'mysql' ];
-		yield 'rebuild runs, sqlite' => [ 'neowiki_rebuild_runs', 'sqlite' ];
-		yield 'rebuild runs, postgres' => [ 'neowiki_rebuild_runs', 'postgres' ];
-		yield 'subject page, mysql' => [ 'neowiki_subject_page', 'mysql' ];
-		yield 'subject page, sqlite' => [ 'neowiki_subject_page', 'sqlite' ];
-		yield 'subject page, postgres' => [ 'neowiki_subject_page', 'postgres' ];
-		yield 'subject, mysql' => [ 'neowiki_subject', 'mysql' ];
-		yield 'subject, sqlite' => [ 'neowiki_subject', 'sqlite' ];
-		yield 'subject, postgres' => [ 'neowiki_subject', 'postgres' ];
-		yield 'relation, mysql' => [ 'neowiki_relation', 'mysql' ];
-		yield 'relation, sqlite' => [ 'neowiki_relation', 'sqlite' ];
-		yield 'relation, postgres' => [ 'neowiki_relation', 'postgres' ];
+		yield 'rebuild runs, mysql' => [ 'sws_rebuild_runs', 'mysql' ];
+		yield 'rebuild runs, sqlite' => [ 'sws_rebuild_runs', 'sqlite' ];
+		yield 'rebuild runs, postgres' => [ 'sws_rebuild_runs', 'postgres' ];
+		yield 'subject page, mysql' => [ 'sws_subject_page', 'mysql' ];
+		yield 'subject page, sqlite' => [ 'sws_subject_page', 'sqlite' ];
+		yield 'subject page, postgres' => [ 'sws_subject_page', 'postgres' ];
+		yield 'subject, mysql' => [ 'sws_subject', 'mysql' ];
+		yield 'subject, sqlite' => [ 'sws_subject', 'sqlite' ];
+		yield 'subject, postgres' => [ 'sws_subject', 'postgres' ];
+		yield 'relation, mysql' => [ 'sws_relation', 'mysql' ];
+		yield 'relation, sqlite' => [ 'sws_relation', 'sqlite' ];
+		yield 'relation, postgres' => [ 'sws_relation', 'postgres' ];
 	}
 
 	public function databaseTypeProvider(): iterable {

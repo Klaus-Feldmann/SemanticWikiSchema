@@ -2,37 +2,37 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
  * Needs the database for the pages the Subjects are on.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectSummariesApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetRecentlyEditedSubjectsApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetReferencingSubjectsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi
  * @group Database
  */
-class DependentSubjectRestReadsTest extends NeoWikiIntegrationTestCase {
+class DependentSubjectRestReadsTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
 
@@ -109,14 +109,14 @@ class DependentSubjectRestReadsTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testTheSubjectListOfASchemaOfDependentSubjectsNamesThemAfterTheirHostSubjects(): void {
-		$body = $this->get( NeoWikiExtension::newGetSubjectSummariesApi(), queryParams: [ 'schema' => 'Birth' ] );
+		$body = $this->get( SWSExtension::newGetSubjectSummariesApi(), queryParams: [ 'schema' => 'Birth' ] );
 
 		$this->assertSame( self::BIRTH, $body['subjects'][0]['id'] );
 		$this->assertSame( self::PICASSO, $body['subjects'][0]['hostSubject'] );
 	}
 
 	public function testTheRecentlyEditedSubjectsNameADependentSubjectAfterItsHostSubject(): void {
-		$body = $this->get( NeoWikiExtension::newGetRecentlyEditedSubjectsApi() );
+		$body = $this->get( SWSExtension::newGetRecentlyEditedSubjectsApi() );
 
 		$this->assertSame(
 			self::PICASSO,
@@ -147,7 +147,7 @@ class DependentSubjectRestReadsTest extends NeoWikiIntegrationTestCase {
 	public function testTheSubjectListNamesTheHostSubjectAsThePublishedRevisionDoes(): void {
 		$this->renamePicassoAfterPublishingTheFirstRevision();
 
-		$body = $this->get( NeoWikiExtension::newGetSubjectSummariesApi(), queryParams: [ 'schema' => 'Birth' ] );
+		$body = $this->get( SWSExtension::newGetSubjectSummariesApi(), queryParams: [ 'schema' => 'Birth' ] );
 
 		$this->assertSame( self::PICASSO, $body['subjects'][0]['hostSubject'] );
 	}
@@ -155,7 +155,7 @@ class DependentSubjectRestReadsTest extends NeoWikiIntegrationTestCase {
 	public function testTheReferencingSubjectsNameTheHostSubjectAsThePublishedRevisionDoes(): void {
 		$this->renamePicassoAfterPublishingTheFirstRevision();
 
-		$body = $this->get( NeoWikiExtension::newGetReferencingSubjectsApi(), pathParams: [ 'subjectId' => self::PLACE ] );
+		$body = $this->get( SWSExtension::newGetReferencingSubjectsApi(), pathParams: [ 'subjectId' => self::PLACE ] );
 
 		$this->assertSame( self::PICASSO, $body['referencingSubjects'][0]['subject']['hostSubject'] );
 	}
@@ -166,7 +166,7 @@ class DependentSubjectRestReadsTest extends NeoWikiIntegrationTestCase {
 		$this->createPageWithSubjects( 'Records', otherSubjects: new SubjectMap( ...$this->chainOfRecords( 520 ) ) );
 
 		$response = $this->executeHandler(
-			NeoWikiExtension::newGetRecentlyEditedSubjectsApi(),
+			SWSExtension::newGetRecentlyEditedSubjectsApi(),
 			new RequestData( [ 'method' => 'GET' ] )
 		);
 

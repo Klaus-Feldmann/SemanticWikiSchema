@@ -2,38 +2,38 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\WikiMap\WikiMap;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\CreateSubject\CreateSubjectAction
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi
+ * @covers \ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction
  * @group Database
  */
-class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
+class CreateSubjectApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	// A page id far above anything a fresh test database mints, so it resolves to no page.
 	private const int NONEXISTENT_PAGE_ID = 999999;
@@ -53,7 +53,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 		$this->assertArrayHasKey( 'violations', $responseData );
 		$this->assertSame( [], $responseData['violations'] );
 
-		$subject = NeoWikiExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $responseData['subjectId'] ) );
+		$subject = SWSExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $responseData['subjectId'] ) );
 
 		$this->assertSame( 'Test subject', $subject->label->text );
 		$this->assertSame( 'Employee', $subject->getSchemaName()->getText() );
@@ -400,7 +400,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function getStoredSubject( string $subjectId ): Subject {
-		$subject = NeoWikiExtension::getInstance()
+		$subject = SWSExtension::getInstance()
 			->newSubjectRepository()
 			->getSubject( new SubjectId( $subjectId ) );
 
@@ -409,7 +409,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testEnforcementBlockedReturns422(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 
 		$this->createSchema(
 			'EnforcementSchema',
@@ -436,7 +436,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testEnforcementAllowsUnannotatedConstraintViolation(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 
 		$this->createSchema(
 			'UnannotatedSchema',
@@ -474,7 +474,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 		$this->assertSame( 201, $response->getStatusCode() );
 		$this->assertSame( $suppliedId, $responseData['subjectId'] );
 
-		$subject = NeoWikiExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $suppliedId ) );
+		$subject = SWSExtension::getInstance()->newSubjectRepository()->getSubject( new SubjectId( $suppliedId ) );
 		$this->assertSame( $suppliedId, $subject->getId()->text );
 	}
 
@@ -627,7 +627,7 @@ class CreateSubjectApiTest extends NeoWikiIntegrationTestCase {
 		], isMainSubject: false );
 		$this->assertSame( 201, $responseA->getStatusCode() );
 
-		$repository = NeoWikiExtension::getInstance()->newSubjectRepository();
+		$repository = SWSExtension::getInstance()->newSubjectRepository();
 		$this->assertSame( $idA, $repository->getSubject( new SubjectId( $idA ) )->getId()->text );
 		$this->assertSame( $idB, $repository->getSubject( new SubjectId( $idB ) )->getId()->text );
 	}

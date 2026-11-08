@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Relation;
+namespace ProfessionalWiki\SWS\Domain\Relation;
 
 readonly class TypedRelationList {
 

@@ -6,7 +6,7 @@ Status: Draft
 
 ## Context
 
-NeoWiki has a simple data model: Subjects contain Statements, each holding one Value. A value that needs context,
+SWS has a simple data model: Subjects contain Statements, each holding one Value. A value that needs context,
 such as a date with its source, becomes a Subject of its own, referenced via a Relation from the Subject it describes
 ([Qualifiers and References](../qualifiers-and-references.md)).
 
@@ -14,10 +14,10 @@ Wikis that use CIDOC-CRM as their in-wiki model need many more small Subjects li
 births, each hanging off a bigger Subject such as a Person. One partner's model has 12 Schemas for things like people
 and objects, and 24 for such small Subjects.
 
-The data model supports both, but nothing in it says that a Birth should be handled together with its Person. So NeoWiki
+The data model supports both, but nothing in it says that a Birth should be handled together with its Person. So SWS
 treats every Subject as a thing of its own: the Person's editor makes you pick from all Births in the wiki rather than
 fill in a date and place, a subject-first wiki gives each new Birth a page of its own, and deleting a Person leaves its
-Births behind. NeoWiki needs to know which Subjects to handle together with another.
+Births behind. SWS needs to know which Subjects to handle together with another.
 
 ## Decision
 

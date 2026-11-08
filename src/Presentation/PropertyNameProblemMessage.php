@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyNameProblem;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyNameRule;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyNameProblem;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRule;
 use Wikimedia\Message\ListParam;
 use Wikimedia\Message\ListType;
 use Wikimedia\Message\MessageValue;
@@ -23,14 +23,14 @@ class PropertyNameProblemMessage {
 
 		return match ( $problem->rule ) {
 			PropertyNameRule::CanonicalForm => self::canonicalFormMessage( $name, $details ),
-			PropertyNameRule::Empty => self::message( 'neowiki-property-name-empty' ),
-			PropertyNameRule::Characters => self::message( 'neowiki-property-name-characters', $name )
+			PropertyNameRule::Empty => self::message( 'sws-property-name-empty' ),
+			PropertyNameRule::Characters => self::message( 'sws-property-name-characters', $name )
 				->params( self::plaintextList( $details ) ),
-			PropertyNameRule::Integer => self::message( 'neowiki-property-name-integer', $name ),
-			PropertyNameRule::DotSegment => self::message( 'neowiki-property-name-dot-segment' ),
-			PropertyNameRule::Length => self::message( 'neowiki-property-name-too-long', $name ),
-			PropertyNameRule::Reserved => self::message( 'neowiki-property-name-reserved', $name ),
-			PropertyNameRule::NearDuplicate => self::message( 'neowiki-property-name-near-duplicate', $name, $details[0] ),
+			PropertyNameRule::Integer => self::message( 'sws-property-name-integer', $name ),
+			PropertyNameRule::DotSegment => self::message( 'sws-property-name-dot-segment' ),
+			PropertyNameRule::Length => self::message( 'sws-property-name-too-long', $name ),
+			PropertyNameRule::Reserved => self::message( 'sws-property-name-reserved', $name ),
+			PropertyNameRule::NearDuplicate => self::message( 'sws-property-name-near-duplicate', $name, $details[0] ),
 		};
 	}
 
@@ -42,10 +42,10 @@ class PropertyNameProblemMessage {
 		$hiddenCharacters = array_slice( $details, 1 );
 
 		if ( $hiddenCharacters === [] ) {
-			return self::message( 'neowiki-property-name-not-canonical', $name, $canonicalForm );
+			return self::message( 'sws-property-name-not-canonical', $name, $canonicalForm );
 		}
 
-		return self::message( 'neowiki-property-name-not-canonical-invisible', $name, $canonicalForm )
+		return self::message( 'sws-property-name-not-canonical-invisible', $name, $canonicalForm )
 			->params( self::plaintextList( $hiddenCharacters ) );
 	}
 

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\PropertyType\Types;
+namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\UrlProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Domain\Validation\Severity;
-use ProfessionalWiki\NeoWiki\Domain\Value\NumberValue;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\UrlType
+ * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType
  */
 class UrlTypeValidateTest extends TestCase {
 

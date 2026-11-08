@@ -3,7 +3,7 @@
 
 	const Vue = require( 'vue' );
 	const codex = require( './codex.js' );
-	const nw = require( 'ext.neowiki' );
+	const nw = require( 'ext.sws' );
 	const SubjectFinderPanel = require( './SubjectFinderPanel.vue' );
 
 	function mount() {
@@ -12,11 +12,11 @@
 			return;
 		}
 
-		const pinia = nw.NeoWikiExtension.getInstance().getPinia();
+		const pinia = nw.SWSExtension.getInstance().getPinia();
 		const app = Vue.createMwApp( SubjectFinderPanel )
 			.directive( 'tooltip', codex.CdxTooltip );
 		app.use( pinia );
-		nw.NeoWikiServices.registerServices( app );
+		nw.SWSServices.registerServices( app );
 		app.mount( mountPoint );
 	}
 

@@ -19,7 +19,7 @@ We keep using Schema and Property names as both labels and identifiers.
 Schema names are not editable by users after creating the Schema, while Property Definition names remain editable.
 
 This decision is made with the understanding that we can make Schema names editable and introduce dedicated internal
-identifiers decoupled from the name used as UI label when NeoWiki reaches greater maturity. See "Alternatives Considered"
+identifiers decoupled from the name used as UI label when SWS reaches greater maturity. See "Alternatives Considered"
 for more details.
 
 We treat the Page name of a Schema as the name of a Schema, to keep lookups simple.

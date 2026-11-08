@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration
  */
 class Neo4jRouteRegistrationTest extends TestCase {
 
@@ -32,10 +32,10 @@ class Neo4jRouteRegistrationTest extends TestCase {
 	public function testRouteFileDeclaresCypherRoute(): void {
 		$routes = json_decode( file_get_contents( Neo4jRouteRegistration::routeFiles( 'r', 'w' )[0] ), true );
 
-		$this->assertSame( '/neowiki/v0/query/cypher', $routes[0]['path'] );
+		$this->assertSame( '/sws/v0/query/cypher', $routes[0]['path'] );
 		$this->assertSame( [ 'POST' ], $routes[0]['method'] );
 		$this->assertSame(
-			'ProfessionalWiki\\NeoWiki\\NeoWikiExtension::newCypherQueryApi',
+			'ProfessionalWiki\\SWS\\SWSExtension::newCypherQueryApi',
 			$routes[0]['factory']
 		);
 	}

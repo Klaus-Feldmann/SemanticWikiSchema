@@ -3,19 +3,19 @@ title: Maintenance
 order: 3
 ---
 
-# Maintaining NeoWiki
+# Maintaining SWS
 
-Upkeep tasks for an evaluation NeoWiki instance. For first-time setup, see [installation](installation.md); for
+Upkeep tasks for an evaluation SWS instance. For first-time setup, see [installation](installation.md); for
 moving to a newer version, see [upgrading](upgrading.md).
 
 ## Rebuilding the graph
 
-NeoWiki stores its canonical data in MediaWiki revision slots and keeps a regenerable copy in each configured graph
+SWS stores its canonical data in MediaWiki revision slots and keeps a regenerable copy in each configured graph
 store — Neo4j and any SPARQL store — for querying. You can wipe and rebuild that copy from the canonical slots at any
 time, from the shell or [from the wiki](#background-rebuilds). From the MediaWiki root:
 
 ```sh
-php maintenance/run.php NeoWiki:RebuildGraphDatabases
+php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases
 ```
 
 It re-projects every page on the wiki from its latest revision, or from the one a registered
@@ -38,7 +38,7 @@ Every graph store has a name: `neo4j` for Neo4j, a SPARQL store's configured `na
 and for a backend from another extension, whatever that extension registered it under. Rebuild one on its own with:
 
 ```sh
-php maintenance/run.php NeoWiki:RebuildGraphDatabases --store EDM
+php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases --store EDM
 ```
 
 Rebuilding every store is one such run per store, so an unreachable store costs only its own rebuild.
@@ -49,14 +49,14 @@ The rebuild walks the wiki in batches, recording after each one how far it got. 
 the whole wiki, continue it from where it stopped rather than starting over:
 
 ```sh
-php maintenance/run.php NeoWiki:RebuildGraphDatabases --store EDM --resume
+php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases --store EDM --resume
 ```
 
 A run that finished but left individual pages behind has nothing to continue: rebuild that store instead.
 
 Pass `--batch-size` to change how many pages are projected between recordings; it defaults to 200.
 
-A page the store rejects is counted and the rebuild carries on; the [`NeoWiki` log channel](installation.md#logging)
+A page the store rejects is counted and the rebuild carries on; the [`SWS` log channel](installation.md#logging)
 says which pages failed and why. A store that stops answering partway is another matter: when a whole batch fails the
 rebuild reopens the store, and ends the run for `--resume` to retry that batch only if it cannot. A store that still
 opens means its pages were at fault, so they are counted and the walk goes on past them. The script exits non-zero
@@ -71,8 +71,8 @@ just as hard. Release it by cancelling it on
 reach, record the run as cancelled directly:
 
 ```sql
-UPDATE neowiki_rebuild_runs SET nwrr_status = 'cancelled'
-WHERE nwrr_store = '<name>' AND nwrr_status IN ( 'running', 'queued' );
+UPDATE sws_rebuild_runs SET swsrr_status = 'cancelled'
+WHERE swsrr_store = '<name>' AND swsrr_status IN ( 'running', 'queued' );
 ```
 
 ## Background rebuilds
@@ -80,7 +80,7 @@ WHERE nwrr_store = '<name>' AND nwrr_status IN ( 'running', 'queued' );
 You can also start rebuilds from the wiki, without shell access. **Special:GraphStores** shows each configured
 store's state and lets you rebuild it or cancel the rebuild it has queued or running. The
 [REST API](../api/rest-api.md#graph-stores) does the same for scripting. Both need the
-[`neowiki-admin`](installation.md#user-rights) right.
+[`sws-admin`](installation.md#user-rights) right.
 
 A rebuild started this way runs on MediaWiki's job queue, a batch of pages per job.
 
@@ -98,14 +98,14 @@ store's last successful rebuild started: the store still describes every page pr
 vocabulary. Rebuilding it is the fix. Restoring counts because a store rebuilt while the page was gone was built with
 no projection for it at all.
 
-Set `$wgNeoWikiAutoRebuildOnMappingChange = true;` to have saving, deleting or restoring a Mapping page rebuild every
+Set `$wgSWSAutoRebuildOnMappingChange = true;` to have saving, deleting or restoring a Mapping page rebuild every
 store holding that projection in the background. It is off by default: such a rebuild reprojects every page on the
-wiki, and it lets anyone who may edit Mapping pages set that going — work `neowiki-admin` otherwise gates. A
+wiki, and it lets anyone who may edit Mapping pages set that going — work `sws-admin` otherwise gates. A
 rebuild somebody started by hand is left to finish rather than restarted; the store shows up stale once it ends.
 
 ## Rebuilding the subject indexes
 
-NeoWiki keeps two indexes of the wiki's Subjects: which page holds each one, and what each page publishes for
+SWS keeps two indexes of the wiki's Subjects: which page holds each one, and what each page publishes for
 Special:Subjects, relation-target suggestions, "Referenced by" and the Subject counts. Editing, deletion, undeletion
 and import all keep them current and `update.php` fills them, so this is rarely needed. Rebuild both when Subjects are
 not found on the pages holding them, or those lists are wrong — after merging page histories, after adding or removing
@@ -113,8 +113,8 @@ a [revision policy](../extending/revision-policy.md), after creating, deleting, 
 Subjects already use, or after upgrading through MediaWiki's web updater, which does not fill them:
 
 ```sh
-php maintenance/run.php NeoWiki:RebuildSubjectPageIndex --force
-php maintenance/run.php NeoWiki:RebuildPublishedSubjectIndex --force
+php maintenance/run.php SemanticWikiSchema:RebuildSubjectPageIndex --force
+php maintenance/run.php SemanticWikiSchema:RebuildPublishedSubjectIndex --force
 ```
 
 `--force` re-runs them after `update.php` has recorded them as done.
@@ -127,10 +127,10 @@ Subjects created before the label became optional ([ADR 31](../adr/031-optional-
 label, whether or not anyone chose it. Run this once, on a wiki whose Subjects predate that change:
 
 ```sh
-php maintenance/run.php NeoWiki:ClearDefaultSubjectLabels
+php maintenance/run.php SemanticWikiSchema:ClearDefaultSubjectLabels
 ```
 
-It clears labels that only repeat the name NeoWiki now computes, and leaves every other label alone. A label somebody
+It clears labels that only repeat the name SWS now computes, and leaves every other label alone. A label somebody
 deliberately typed to that same value is cleared too, so pass `--dry-run` first: it reports what would go without
 saving anything, and reporting nothing means there is nothing to do. It walks the
 [index of which page holds each Subject](#rebuilding-the-subject-indexes), so on a wiki where that is empty, rebuild it
@@ -152,7 +152,7 @@ Search finds nothing while it runs, which on a large wiki is hours. Run it when 
 
 On PostgreSQL the built-in database search does not index Subject values; use CirrusSearch.
 
-With CirrusSearch, run this after installing or upgrading NeoWiki:
+With CirrusSearch, run this after installing or upgrading SWS:
 
 ```sh
 php maintenance/run.php CirrusSearch:UpdateSearchIndexConfig
@@ -168,8 +168,8 @@ php maintenance/run.php CirrusSearch:ForceSearchIndex
 
 ## What happens during a graph store outage
 
-- **Editing pages works.** Edits, deletions and undeletions all commit. NeoWiki logs the projection failure on the
-  [`NeoWiki` channel](installation.md#logging).
+- **Editing pages works.** Edits, deletions and undeletions all commit. SWS logs the projection failure on the
+  [`SWS` channel](installation.md#logging).
 - **Editing and displaying Subjects works.**
 - **Queries against that store fail.**
 

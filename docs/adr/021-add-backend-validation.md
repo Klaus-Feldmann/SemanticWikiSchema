@@ -16,9 +16,9 @@ We want good support for agentic AI workflows. AI agents interact with the API a
 validation. It's important for them to get feedback and to enable optional guardrails that wiki admins can put in place.
 
 We assume we will have these:
-* REST APIs to read and write Subjects and Schemas identified by id. Both use NeoWiki-specific JSON formats
+* REST APIs to read and write Subjects and Schemas identified by id. Both use SWS-specific JSON formats
 * REST API to get a Schema in JSON-schema format
-* TypeScript library with a validation service that takes a Subject and a Schema that can be used outside NeoWiki/MediaWiki
+* TypeScript library with a validation service that takes a Subject and a Schema that can be used outside SWS/MediaWiki
 * UIs that support display and editing of "invalid" Subjects. These are Subjects that do not meet all constraints in their linked Schema.
 * Ability to write "invalid" Subjects to the backend. (Needed by the UI, and plausibly by various CH use cases)
 

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\RestGetSubjectEditNoticesPresenter;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\RestGetSubjectEditNoticesPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetSubjectEditNoticesApi extends SimpleHandler {
@@ -18,7 +18,7 @@ class GetSubjectEditNoticesApi extends SimpleHandler {
 	public function run( int $pageId ): Response {
 		$presenter = new RestGetSubjectEditNoticesPresenter();
 
-		NeoWikiExtension::getInstance()->newGetSubjectEditNoticesQuery( $presenter, $this->getAuthority() )->execute(
+		SWSExtension::getInstance()->newGetSubjectEditNoticesQuery( $presenter, $this->getAuthority() )->execute(
 			pageId: $pageId,
 			schemaName: $this->getValidatedParams()['schema'],
 		);

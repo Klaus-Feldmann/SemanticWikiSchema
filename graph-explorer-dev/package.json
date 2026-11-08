@@ -1,5 +1,5 @@
 {
-  "name": "neowikibase-graph-test-build",
+  "name": "swsbase-graph-test-build",
   "private": true,
   "type": "module",
   "scripts": {

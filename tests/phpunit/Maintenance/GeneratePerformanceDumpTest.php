@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Maintenance;
+namespace ProfessionalWiki\SWS\Tests\Maintenance;
 
 use ImportStringSource;
 use MediaWiki\Content\Content;
@@ -10,15 +10,15 @@ use MediaWiki\Content\JsonContent;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Maintenance\GeneratePerformanceDump;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Maintenance\GeneratePerformanceDump;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 use SimpleXMLElement;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
@@ -26,7 +26,7 @@ use SimpleXMLElement;
 require_once __DIR__ . '/../../../maintenance/GeneratePerformanceDump.php';
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\GeneratePerformanceDump
+ * @covers \ProfessionalWiki\SWS\Maintenance\GeneratePerformanceDump
  * @group Database
  */
 class GeneratePerformanceDumpTest extends MaintenanceBaseTestCase {
@@ -54,7 +54,7 @@ class GeneratePerformanceDumpTest extends MaintenanceBaseTestCase {
 
 	public function testEveryGeneratedPropertyDefinitionUsesARegisteredPropertyType(): void {
 		$types = array_column( $this->schema( $this->generate( pages: 1 ) )['propertyDefinitions'], 'type' );
-		$lookup = NeoWikiExtension::getInstance()->getPropertyTypeLookup();
+		$lookup = SWSExtension::getInstance()->getPropertyTypeLookup();
 
 		$this->assertSame(
 			[],
@@ -89,7 +89,7 @@ class GeneratePerformanceDumpTest extends MaintenanceBaseTestCase {
 		$dump = $this->generate( pages: 2, subjectsPerPage: 3 );
 
 		$this->assertSame(
-			'  <!-- neowiki-perf pages="2" total-subjects="6" subjects-per-page="3" seed="1" -->',
+			'  <!-- sws-perf pages="2" total-subjects="6" subjects-per-page="3" seed="1" -->',
 			explode( "\n", $dump )[1]
 		);
 	}
@@ -122,7 +122,7 @@ class GeneratePerformanceDumpTest extends MaintenanceBaseTestCase {
 
 	/**
 	 * Loading the slot through production code proves the generated ids and value shapes are the
-	 * ones NeoWiki accepts: SubjectId and RelationId reject anything malformed.
+	 * ones SWS accepts: SubjectId and RelationId reject anything malformed.
 	 */
 	public function testTheSubjectSlotLoadsIntoTwelveStatementsPerSubject(): void {
 		$dump = $this->generate( pages: 2 );

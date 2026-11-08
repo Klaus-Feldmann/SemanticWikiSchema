@@ -1,12 +1,12 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 use RuntimeException;
 use Throwable;
 
@@ -19,7 +19,7 @@ final class DataViewLookup {
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $language ) !== 1 ) {
 			throw new RuntimeException( 'Data view unavailable' );
 		}
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$page = $extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $title->getArticleID() ) );
 		$subjects = $page->getAllSubjects()->asArray();
 		if ( $subjectId !== null ) {

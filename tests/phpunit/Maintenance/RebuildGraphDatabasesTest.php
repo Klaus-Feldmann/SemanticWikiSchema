@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Maintenance;
+namespace ProfessionalWiki\SWS\Tests\Maintenance;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
-use ProfessionalWiki\NeoWiki\Maintenance\RebuildGraphDatabases;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use ProfessionalWiki\SWS\Maintenance\RebuildGraphDatabases;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
 // Its RUN_MAINTENANCE_IF_MAIN guard is a no-op under PHPUnit, so this does not execute the script.
 require_once __DIR__ . '/../../../maintenance/RebuildGraphDatabases.php';
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\RebuildGraphDatabases
+ * @covers \ProfessionalWiki\SWS\Maintenance\RebuildGraphDatabases
  * @group Database
  */
-class RebuildGraphDatabasesTest extends NeoWikiIntegrationTestCase {
+class RebuildGraphDatabasesTest extends SWSIntegrationTestCase {
 
 	private string $scriptOutput = '';
 
@@ -40,11 +40,11 @@ class RebuildGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// The test rebuilds the singleton with a spy plugin registered; reset it so later tests get a
 		// clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testRebuildSucceedsOnAWikiThatHasNeverStoredASubject(): void {
-		// A wiki with no Subjects has never registered the 'neo' slot role, so the role-id lookup
+		// A wiki with no Subjects has never registered the 'sws' slot role, so the role-id lookup
 		// throws NameTableAccessException. Forcing that state (empty table + a store without a warmed
 		// cache) proves the rebuild treats it as an empty run instead of crashing.
 		$this->truncateTable( 'slot_roles' );
@@ -79,7 +79,7 @@ class RebuildGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore::initialize
+	 * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore::initialize
 	 */
 	public function testRebuildCreatesGraphUniquenessConstraints(): void {
 		// setUpNeo4j() dropped any pre-existing constraints, so the graph starts without them. A subject
@@ -104,7 +104,7 @@ class RebuildGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	 * Maintenance scripts run as an anonymous user, who on a wiki only members may read can read no Schema.
 	 */
 	public function testTheRebuildPutsEachSubjectOnItsPageInNeo4jOnAWikiOnlyMembersMayRead(): void {
-		$pageId = $this->createPageWithoutTellingNeoWiki(
+		$pageId = $this->createPageWithoutTellingSWS(
 			'Members-only page',
 			SubjectContent::newFromData( new PageSubjects( TestSubject::build(), new SubjectMap() ) )->getText()
 		);
@@ -119,11 +119,11 @@ class RebuildGraphDatabasesTest extends NeoWikiIntegrationTestCase {
 	 * The rebuild runs on wikis with no graph backend configured (e.g. a SPARQL-only install with no
 	 * store), so its initialization step must be a no-op there rather than throwing.
 	 *
-	 * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\CompositeGraphDatabasePlugin::initialize
+	 * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin::initialize
 	 */
 	public function testInitializingGraphDatabasesDoesNotThrowWithoutABackend(): void {
 		$this->runWithoutGraphBackend( function (): void {
-			$extension = NeoWikiExtension::getInstance();
+			$extension = SWSExtension::getInstance();
 			$this->assertNull( $extension->getNeo4jPlugin(), 'precondition: no Neo4j backend is configured' );
 
 			// The rebuild's initialization step, resolved through the facade exactly as the script does.

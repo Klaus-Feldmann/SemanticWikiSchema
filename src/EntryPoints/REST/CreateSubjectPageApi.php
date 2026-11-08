@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest;
-use ProfessionalWiki\NeoWiki\Application\Actions\CreateSubjectPage\InvalidPageTitleException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
-use ProfessionalWiki\NeoWiki\Presentation\RestCreateSubjectPagePresenter;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest;
+use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\InvalidPageTitleException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Presentation\RestCreateSubjectPagePresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
  * Creates a Subject together with a page of its own, in one revision. For the endpoints that add a
- * Subject to a page that already exists, see POST /neowiki/v0/page/{pageId}/mainSubject and
+ * Subject to a page that already exists, see POST /sws/v0/page/{pageId}/mainSubject and
  * /subjects.
  */
 class CreateSubjectPageApi extends SimpleHandler {
@@ -39,7 +39,7 @@ class CreateSubjectPageApi extends SimpleHandler {
 		$presenter = new RestCreateSubjectPagePresenter();
 
 		try {
-			NeoWikiExtension::getInstance()
+			SWSExtension::getInstance()
 				->newCreateSubjectPageAction( $presenter, $this->getAuthority() )
 				->createSubjectPage( new CreateSubjectPageRequest(
 					label: $body['label'] ?? null,
@@ -120,7 +120,7 @@ class CreateSubjectPageApi extends SimpleHandler {
 				ParamValidator::PARAM_REQUIRED => false,
 				self::PARAM_DESCRIPTION => 'Optional Subject ID to assign. Must be a well-formed, unused '
 					. 'Subject ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
-					. 'mints one. Pre-mint IDs with POST /neowiki/v0/subject-ids to wire relations across a batch.',
+					. 'mints one. Pre-mint IDs with POST /sws/v0/subject-ids to wire relations across a batch.',
 			],
 		] + $this->dependentSubjectsParamSettings();
 	}

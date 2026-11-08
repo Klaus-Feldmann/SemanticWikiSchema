@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\EditPage\EditPage;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onAlternateEdit
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAlternateEdit
  * @group Database
  */
 class MappingPageEditDocsPointerTest extends MediaWikiIntegrationTestCase {
@@ -24,13 +24,13 @@ class MappingPageEditDocsPointerTest extends MediaWikiIntegrationTestCase {
 		$context->setTitle( $title );
 
 		$editPage = new EditPage( Article::newFromTitle( $title, $context ) );
-		NeoWikiHooks::onAlternateEdit( $editPage );
+		SWSHooks::onAlternateEdit( $editPage );
 
 		return $editPage;
 	}
 
 	private function mappingTitle(): Title {
-		return Title::makeTitle( NeoWikiExtension::NS_MAPPING, 'EDM' );
+		return Title::makeTitle( SWSExtension::NS_MAPPING, 'EDM' );
 	}
 
 	public function testMappingPageEditLinksTheMappingFormatDocumentation(): void {
@@ -44,8 +44,8 @@ class MappingPageEditDocsPointerTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public static function namespaceWithoutThePointerProvider(): iterable {
-		yield 'the Mapping talk namespace' => [ NS_NEOWIKI_MAPPING_TALK ];
-		yield 'the Schema namespace' => [ NeoWikiExtension::NS_SCHEMA ];
+		yield 'the Mapping talk namespace' => [ NS_SWS_MAPPING_TALK ];
+		yield 'the Schema namespace' => [ SWSExtension::NS_SCHEMA ];
 		yield 'the main namespace' => [ NS_MAIN ];
 	}
 

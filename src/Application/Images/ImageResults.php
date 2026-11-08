@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\Application\Images;
+namespace ProfessionalWiki\SWS\Application\Images;
 
-use ProfessionalWiki\NeoWiki\Domain\ImageReference;
+use ProfessionalWiki\SWS\Domain\ImageReference;
 
 /** Normalises imageinfo from the authenticated wiki API or the fixed Commons API. */
 final class ImageResults {

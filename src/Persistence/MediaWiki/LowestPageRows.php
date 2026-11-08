@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use Wikimedia\Rdbms\IReadableDatabase;
 
@@ -13,14 +13,14 @@ use Wikimedia\Rdbms\IReadableDatabase;
 class LowestPageRows {
 
 	/**
-	 * @param string $alias The alias the query gives `neowiki_subject`
+	 * @param string $alias The alias the query gives `sws_subject`
 	 */
 	public static function condition( IReadableDatabase $db, string $alias ): string {
 		$rowOnALowerPage = $db->newSelectQueryBuilder()
 			->select( '1' )
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE, 'lower_page_row' )
-			->where( "lower_page_row.nws_subject_id = $alias.nws_subject_id" )
-			->andWhere( "lower_page_row.nws_page_id < $alias.nws_page_id" )
+			->where( "lower_page_row.swss_subject_id = $alias.swss_subject_id" )
+			->andWhere( "lower_page_row.swss_page_id < $alias.swss_page_id" )
 			->getSQL();
 
 		return "NOT EXISTS ($rowOnALowerPage)";

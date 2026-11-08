@@ -4,9 +4,9 @@
 			"AufEinWort"
 		]
 	},
-	"neowikibasebridge-unavailable": "The page is not available.",
-	"neowikibasebridge-property-invalid": "Invalid property lookup.",
-	"neowikibasebridge-property-unavailable": "Property lookup is currently unavailable.",
-	"neowikibasebridge-name": "SchemaBaseBridge",
-	"neowikibasebridge-desc": "Connects Semantic WikiSchema to Wikidata and local Wikibase, providing source values, descriptions and provenance for data views, Graph Explorer, exports and structured queries."
+	"swsbasebridge-unavailable": "The page is not available.",
+	"swsbasebridge-property-invalid": "Invalid property lookup.",
+	"swsbasebridge-property-unavailable": "Property lookup is currently unavailable.",
+	"swsbasebridge-name": "SchemaBaseBridge",
+	"swsbasebridge-desc": "Connects Semantic WikiSchema to Wikidata and local Wikibase, providing source values, descriptions and provenance for data views, Graph Explorer, exports and structured queries."
 }

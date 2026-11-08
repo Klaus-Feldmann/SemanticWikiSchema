@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\TextContent;
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Page\PageRecord;
 use MediaWiki\Parser\ParserOptions;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
@@ -22,11 +22,11 @@ use Wikimedia\Rdbms\IDBAccessObject;
  * Needs the integration base and the database for what ties the two pages together: the real parser
  * and parser cache, the links a save records, and the jobs a change queues.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onRevisionFromEditComplete
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\ParserPageDependencyRecorder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
+ * @covers \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder
  * @group Database
  */
-class CrossPageSubjectReadInvalidationTest extends NeoWikiIntegrationTestCase {
+class CrossPageSubjectReadInvalidationTest extends SWSIntegrationTestCase {
 
 	private const string READ_PAGE = 'CrossPageSubjectReadInvalidationTestReadPage';
 	private const string READING_PAGE = 'CrossPageSubjectReadInvalidationTestReadingPage';
@@ -35,7 +35,7 @@ class CrossPageSubjectReadInvalidationTest extends NeoWikiIntegrationTestCase {
 		parent::setUp();
 
 		$this->createPageWithSubjects( self::READ_PAGE, $this->subjectWithMotto( 'Before the change' ) );
-		$this->editPage( self::READING_PAGE, '{{#neowiki_value: Motto | page=' . self::READ_PAGE . ' }}' );
+		$this->editPage( self::READING_PAGE, '{{#sws_value: Motto | page=' . self::READ_PAGE . ' }}' );
 		$this->runPendingUpdates();
 
 		$this->cacheTheReadingPage();

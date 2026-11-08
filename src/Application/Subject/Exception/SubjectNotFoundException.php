@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Subject\Exception;
+namespace ProfessionalWiki\SWS\Application\Subject\Exception;
 
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use RuntimeException;
 
 class SubjectNotFoundException extends RuntimeException {

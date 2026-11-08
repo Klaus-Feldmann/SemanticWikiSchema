@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
- * Rebuilds `neowiki_subject_page` from the subject slots, which are what it derives from.
+ * Rebuilds `sws_subject_page` from the subject slots, which are what it derives from.
  *
  * Convergent rather than destructive: every page is reindexed in place from what it currently holds, so
  * nothing stops resolving while it runs, and a page whose Subjects cannot be read is left exactly as it
@@ -71,7 +71,7 @@ class DatabaseSubjectPageIndexRebuilder {
 	private function removeRowsOfPagesHoldingNoSubjectSlot(): void {
 		$this->db->newDeleteQueryBuilder()
 			->deleteFrom( DatabaseSubjectPageIndex::TABLE )
-			->where( 'nwsp_page_id NOT IN (' . SubjectSlotPages::newQuery( $this->db )->getSQL() . ')' )
+			->where( 'swssp_page_id NOT IN (' . SubjectSlotPages::newQuery( $this->db )->getSQL() . ')' )
 			->caller( __METHOD__ )
 			->execute();
 	}

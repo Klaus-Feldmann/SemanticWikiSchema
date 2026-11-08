@@ -4,16 +4,16 @@ order: 5
 ---
 # Query API
 
-NeoWiki runs read-only queries against the wiki's graph stores, through one endpoint per kind of store:
+SWS runs read-only queries against the wiki's graph stores, through one endpoint per kind of store:
 
 | Endpoint | Query language | On a wiki with |
 |---|---|---|
-| [`POST /neowiki/v0/query/sparql`](#sparql-query-endpoint) | SPARQL 1.1 | a SPARQL store |
-| [`POST /neowiki/v0/query/cypher`](#cypher-query-endpoint) | Cypher | Neo4j |
+| [`POST /sws/v0/query/sparql`](#sparql-query-endpoint) | SPARQL 1.1 | a SPARQL store |
+| [`POST /sws/v0/query/cypher`](#cypher-query-endpoint) | Cypher | Neo4j |
 
 A wiki can have both. On a wiki without that kind of store, the endpoint answers `404`.
 
-Both endpoints need the [`neowiki-query`](#permissions) right but no CSRF token. To call them as a user rather than
+Both endpoints need the [`sws-query`](#permissions) right but no CSRF token. To call them as a user rather than
 anonymously, log in as for the rest of the [REST API](rest-api.md). The [Schema endpoints](rest-api.md#schemas) list
 the Schema and property names to query.
 
@@ -24,7 +24,7 @@ the message carries the store's own detail. Besides their own errors, listed bel
 | `errorType` | HTTP | When |
 |---|---|---|
 | `emptyQuery` | 400 | The query is empty or contains only whitespace. |
-| `permissionDenied` | 403 | The caller lacks the `neowiki-query` right. |
+| `permissionDenied` | 403 | The caller lacks the `sws-query` right. |
 | `rateLimitExceeded` | 429 | The caller exceeded the [rate limit](#rate-limits). |
 | `internalError` | 500 | Anything else. |
 
@@ -38,7 +38,7 @@ projection; a [Mapping](../authoring/mapping-format.md) defines the vocabulary o
 ### Request
 
 ```
-POST /rest.php/neowiki/v0/query/sparql
+POST /rest.php/sws/v0/query/sparql
 Content-Type: application/json
 ```
 
@@ -55,7 +55,7 @@ Content-Type: application/json
 ### Successful response (200)
 
 The body is the store's W3C [SPARQL results JSON](https://www.w3.org/TR/sparql11-results-json/) document, including
-any extras the store adds, such as QLever's `meta`. NeoWiki caps no rows.
+any extras the store adds, such as QLever's `meta`. SWS caps no rows.
 
 ```json
 {
@@ -78,7 +78,7 @@ any extras the store adds, such as QLever's `meta`. NeoWiki caps no rows.
 ### Request
 
 ```
-POST /rest.php/neowiki/v0/query/cypher
+POST /rest.php/sws/v0/query/cypher
 Content-Type: application/json
 ```
 
@@ -147,7 +147,7 @@ Scalar Cypher values (strings, integers, floats, booleans, `null`) pass through 
 
 ## Limits and tiers
 
-Unless `$wgNeoWikiQueryLimits` changes them, two tiers cap each query:
+Unless `$wgSWSQueryLimits` changes them, two tiers cap each query:
 
 | Tier | Who | Timeout (`timeoutSeconds`) | Cypher row cap (`maxRows`) |
 |---|---|---|---|
@@ -158,7 +158,7 @@ Queries run from wikitext or Lua always use the `default` tier.
 
 ### Rate limits
 
-Calls to either endpoint count against MediaWiki's `$wgRateLimits` key `neowiki-query`. NeoWiki's defaults:
+Calls to either endpoint count against MediaWiki's `$wgRateLimits` key `sws-query`. SWS's defaults:
 
 | Caller | Limit |
 |---|---|
@@ -171,7 +171,7 @@ Calls to either endpoint count against MediaWiki's `$wgRateLimits` key `neowiki-
 
 | Right | Default groups | Grants |
 |---|---|---|
-| `neowiki-query` | `*` (everyone, including anonymous visitors) | Calling the query endpoints, running queries from wikitext or Lua, and seeing Subject counts. A holder reads whole graph stores: results are not filtered per page. |
+| `sws-query` | `*` (everyone, including anonymous visitors) | Calling the query endpoints, running queries from wikitext or Lua, and seeing Subject counts. A holder reads whole graph stores: results are not filtered per page. |
 | `apihighlimits` | `bot`, `sysop` (core defaults) | The `expensive` tier. |
 
 ## Related
@@ -181,4 +181,4 @@ Calls to either endpoint count against MediaWiki's `$wgRateLimits` key `neowiki-
   wikitext.
 - [Lua API](../authoring/lua-api.md) — `nw.sparqlQuery()` and `nw.query()` for queries from Lua modules.
 - [ADR 19: Graph Database Architecture](../adr/019-graph-database-architecture.md) — why each store keeps its own
-  query language, with no NeoWiki query language on top.
+  query language, with no SWS query language on top.

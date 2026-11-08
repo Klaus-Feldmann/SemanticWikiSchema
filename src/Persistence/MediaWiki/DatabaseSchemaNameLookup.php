@@ -1,11 +1,11 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\SchemaNameLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\SchemaNameLookup;
 use RuntimeException;
 use SearchEngine;
 use SearchSuggestion;
@@ -73,7 +73,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 				'page',
 				[ 'page_id', 'page_title' ],
 				[
-					'page_namespace' => NeoWikiExtension::NS_SCHEMA,
+					'page_namespace' => SWSExtension::NS_SCHEMA,
 					$this->db->expr( 'page_id', '>', $lastPageId ),
 				],
 				__METHOD__,
@@ -85,7 +85,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 
 			foreach ( $res as $row ) {
 				$lastPageId = (int)$row->page_id;
-				$title = new TitleValue( NeoWikiExtension::NS_SCHEMA, $row->page_title );
+				$title = new TitleValue( SWSExtension::NS_SCHEMA, $row->page_title );
 
 				if ( $this->readAuthorizer->authorizeReadByPageTitle( $this->titleFactory->newFromLinkTarget( $title ) ) ) {
 					yield $lastPageId => $title;
@@ -95,7 +95,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 	}
 
 	private function getSearchSuggestions( string $search, int $limit, int $offset ): SearchSuggestionSet {
-		$this->searchEngine->setNamespaces( [ NeoWikiExtension::NS_SCHEMA ] );
+		$this->searchEngine->setNamespaces( [ SWSExtension::NS_SCHEMA ] );
 		$this->searchEngine->setLimitOffset( $limit, $offset );
 
 		return $this->searchEngine->completionSearch( $search );
@@ -123,7 +123,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 		$res = $this->db->select(
 			'page',
 			[ 'page_title' ],
-			[ 'page_namespace' => NeoWikiExtension::NS_SCHEMA ],
+			[ 'page_namespace' => SWSExtension::NS_SCHEMA ],
 			__METHOD__,
 			[
 				'ORDER BY' => 'page_id ASC',
@@ -142,7 +142,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 		$titles = [];
 
 		foreach ( $result as $row ) {
-			$titles[] = new TitleValue( NeoWikiExtension::NS_SCHEMA, $row->page_title );
+			$titles[] = new TitleValue( SWSExtension::NS_SCHEMA, $row->page_title );
 		}
 
 		return $titles;

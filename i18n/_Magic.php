@@ -7,6 +7,6 @@ $magicWords['en'] = [
 	'sparql_raw' => [ 0, 'sparql_raw' ],
 	'view' => [ 0, 'view' ],
 	'main_subject' => [ 0, 'main_subject' ],
-	'neowiki_value' => [ 0, 'neowiki_value' ],
+	'sws_value' => [ 0, 'sws_value' ],
 	'create_subject' => [ 0, 'create_subject' ],
 ];

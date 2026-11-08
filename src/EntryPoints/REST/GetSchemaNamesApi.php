@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetSchemaNamesApi extends SimpleHandler {
@@ -20,7 +20,7 @@ class GetSchemaNamesApi extends SimpleHandler {
 			function ( TitleValue $title ): string {
 				return $title->getText();
 			},
-			NeoWikiExtension::getInstance()->getSchemaNameLookup()->getSchemaNamesMatching( $search, 10 )
+			SWSExtension::getInstance()->getSchemaNameLookup()->getSchemaNamesMatching( $search, 10 )
 		);
 
 		$response = $this->getResponseFactory()->create();

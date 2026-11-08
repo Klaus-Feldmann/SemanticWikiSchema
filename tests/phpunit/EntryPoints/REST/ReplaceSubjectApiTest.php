@@ -2,35 +2,35 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ReplaceSubjectApi;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ReplaceSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi
  * @group Database
  */
-class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
+class ReplaceSubjectApiTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string NAMESPACED_PAGE_SUBJECT_ID = 'sTestSA11111177';
 	private const string RELATION_SUBJECT_ID = 'sTestSA11111188';
@@ -128,7 +128,7 @@ class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
 		);
 		$this->deletePage(
 			$this->getServiceContainer()->getWikiPageFactory()->newFromTitle(
-				Title::newFromText( 'GoneSchema', NeoWikiExtension::NS_SCHEMA )
+				Title::newFromText( 'GoneSchema', SWSExtension::NS_SCHEMA )
 			)
 		);
 		$this->startFreshRequest();
@@ -380,7 +380,7 @@ class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
 		);
 		$this->deletePage(
 			$this->getServiceContainer()->getWikiPageFactory()->newFromTitle(
-				Title::newFromText( 'OrphanSchema', NeoWikiExtension::NS_SCHEMA )
+				Title::newFromText( 'OrphanSchema', SWSExtension::NS_SCHEMA )
 			)
 		);
 		$this->startFreshRequest();
@@ -595,7 +595,7 @@ class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testEnforcementBlockedReturns422(): void {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 
 		$this->createSchema(
 			'EnforcementSchema',
@@ -677,7 +677,7 @@ class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
 	 * @return int The page id of the target's page
 	 */
 	private function createRelationSubjectAndItsMismatchingTarget(): int {
-		$this->setMwGlobals( 'wgNeoWikiEnforceValidation', true );
+		$this->setMwGlobals( 'wgSWSEnforceValidation', true );
 
 		$this->createSchema(
 			'RelationEnforcementSchema',
@@ -783,7 +783,7 @@ class ReplaceSubjectApiTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function getSubjectFromRepository( string $subjectId ): Subject {
-		$subject = NeoWikiExtension::getInstance()
+		$subject = SWSExtension::getInstance()
 			->newSubjectRepository()
 			->getSubject( new SubjectId( $subjectId ) );
 

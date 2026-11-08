@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure;
 
 use MediaWiki\Interwiki\ClassicInterwikiLookup;
 use MediaWiki\MainConfigNames;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Infrastructure\TitleBasedPageIdentifiersResolver;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Infrastructure\TitleBasedPageIdentifiersResolver;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\TitleBasedPageIdentifiersResolver
+ * @covers \ProfessionalWiki\SWS\Infrastructure\TitleBasedPageIdentifiersResolver
  * @group Database
  */
 class TitleBasedPageIdentifiersResolverTest extends MediaWikiIntegrationTestCase {

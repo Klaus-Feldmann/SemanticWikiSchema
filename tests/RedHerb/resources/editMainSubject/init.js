@@ -3,7 +3,7 @@
 
 	const Vue = require( 'vue' );
 	const codex = require( './codex.js' );
-	const nw = require( 'ext.neowiki' );
+	const nw = require( 'ext.sws' );
 	const EditMainSubjectDialog = require( './EditMainSubjectDialog.vue' );
 	const DIALOG_STATE_KEY = require( './constants.js' ).DIALOG_STATE_KEY;
 
@@ -22,8 +22,8 @@
 
 		const app = Vue.createMwApp( EditMainSubjectDialog )
 			.directive( 'tooltip', codex.CdxTooltip );
-		app.use( nw.NeoWikiExtension.getInstance().getPinia() );
-		nw.NeoWikiServices.registerServices( app );
+		app.use( nw.SWSExtension.getInstance().getPinia() );
+		nw.SWSServices.registerServices( app );
 		app.provide( DIALOG_STATE_KEY, dialogState );
 		app.mount( host );
 		mounted = true;
@@ -34,7 +34,7 @@
 		if ( !pageId ) {
 			return Promise.resolve( null );
 		}
-		return nw.NeoWikiExtension.getInstance().getSubjectRepository().getPageSubjects( pageId )
+		return nw.SWSExtension.getInstance().getSubjectRepository().getPageSubjects( pageId )
 			.then( ( result ) => {
 				const mainSubjectId = result.pageSubjects.getMainSubjectId();
 				return mainSubjectId === null ? null : mainSubjectId.text;

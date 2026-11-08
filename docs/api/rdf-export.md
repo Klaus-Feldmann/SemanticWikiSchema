@@ -4,10 +4,10 @@ order: 7
 ---
 # RDF Export
 
-NeoWiki projects its data to RDF in its own vocabulary — the **native projection**. Each wiki page becomes a named
+SWS projects its data to RDF in its own vocabulary — the **native projection**. Each wiki page becomes a named
 graph holding its page metadata and its Subjects (one RDF resource each) with their Statements and Relations.
 
-This page is the reference for what NeoWiki emits. Why the projection is shaped this way, and what is still open
+This page is the reference for what SWS emits. Why the projection is shaped this way, and what is still open
 about it, is in [NativeRdfProjection.md](../planning/NativeRdfProjection.md).
 
 For an end-to-end example comparing the native and ontology-mapped output, see the
@@ -17,16 +17,16 @@ For an end-to-end example comparing the native and ontology-mapped output, see t
 
 | Setting | Default | Purpose |
 |---|---|---|
-| `$wgNeoWikiRdfBaseUri` | the wiki's canonical URL (`$wgCanonicalServer`) | Base URI under which all NeoWiki IRIs are minted. |
+| `$wgSWSRdfBaseUri` | the wiki's canonical URL (`$wgCanonicalServer`) | Base URI under which all SWS IRIs are minted. |
 
 ## IRI scheme
 
-All NeoWiki IRIs live under `$base` (`$wgNeoWikiRdfBaseUri`). Standard vocabulary (`rdf:`, `rdfs:`, `xsd:`,
+All SWS IRIs live under `$base` (`$wgSWSRdfBaseUri`). Standard vocabulary (`rdf:`, `rdfs:`, `xsd:`,
 `dcterms:`) is used for standard concepts.
 
 | Prefix | Namespace | Used for |
 |---|---|---|
-| `neo:` | `$base/ontology/` | NeoWiki vocabulary terms (`neo:Page`, `neo:Relation`, `neo:hasSubject`, `neo:source`, …) |
+| `neo:` | `$base/ontology/` | SWS vocabulary terms (`neo:Page`, `neo:Relation`, `neo:hasSubject`, `neo:source`, …) |
 | `neo-subj:` | `$base/entity/` | Subject IRIs (`neo-subj:s1demo8aaaaaab5`) |
 | `neo-prop:` | `$base/prop/` | Property predicates (`neo-prop:Has_author`) |
 | `neo-schema:` | `$base/schema/` | Schema classes (`neo-schema:Person`) |
@@ -58,8 +58,8 @@ literal** per part (`"Zinema"@eu`, datatype `rdf:langString`). Extensions map th
 registered mapper — including an unregistered type — is omitted from the projection.
 
 A Subject whose Schema cannot be loaded (for example, its Schema page was deleted) is omitted from the projection; a
-warning is logged for each on the [`NeoWiki` channel](../operations/installation.md#logging). A triple is omitted
-too, with a warning on the same channel, when NeoWiki cannot write one of its IRIs faithfully: for example, the `url`
+warning is logged for each on the [`SWS` channel](../operations/installation.md#logging). A triple is omitted
+too, with a warning on the same channel, when SWS cannot write one of its IRIs faithfully: for example, the `url`
 value `rdfs:label`, whose scheme is one of the document's `@prefix` labels.
 
 ## Projected triples
@@ -109,11 +109,11 @@ extension (`42.trig`, `42.ttl`). A response that the `Accept` header selected al
 passing `format` fixes the serialization, and those responses do not vary.
 
 Both endpoints and the concept-URI negotiator answer one indistinguishable `404` when the page or Subject does
-not exist, the caller may not read it, or NeoWiki cannot describe it; a malformed Subject ID returns `400`.
+not exist, the caller may not read it, or SWS cannot describe it; a malformed Subject ID returns `400`.
 
 ### Page
 
-`GET /rest.php/neowiki/v0/page/{pageId}/rdf`
+`GET /rest.php/sws/v0/page/{pageId}/rdf`
 
 Returns the page's projection: its page metadata and every Subject on it, in the page's named graph. Under the
 native projection, a page holding no Subjects projects to its page metadata alone; an ontology projection emits
@@ -125,7 +125,7 @@ curl 'https://wiki.example/rest.php/neowiki/v0/page/42/rdf?format=turtle'
 
 ### Subject
 
-`GET /rest.php/neowiki/v0/subject/{subjectId}/rdf`
+`GET /rest.php/sws/v0/subject/{subjectId}/rdf`
 
 Returns one Subject's projection: exactly the triples the page export emits for that Subject — its description,
 including the native relation reification — with none of the page-metadata triples, in the hosting page's
@@ -168,7 +168,7 @@ its own `rest.php` path:
 RewriteRule ^/?entity/(.+)$ http://127.0.0.1/w/rest.php/neowiki/v0/entity/$1 [P,L]
 ```
 
-This applies when `$wgNeoWikiRdfBaseUri` is the wiki's own host (the default); an external or institutional base URI is
+This applies when `$wgSWSRdfBaseUri` is the wiki's own host (the default); an external or institutional base URI is
 the operator's own routing concern.
 
 ### Finding these exports
@@ -191,8 +191,8 @@ per page. Progress goes to stderr. It defaults to the native projection; `--proj
 projection by its Mapping page name (see [Ontology Mapping](../authoring/mapping-format.md)).
 
 ```sh
-php maintenance/run.php NeoWiki:DumpRdf > dump.trig
-php maintenance/run.php NeoWiki:DumpRdf --projection=EDM > dump-edm.trig
+php maintenance/run.php SemanticWikiSchema:DumpRdf > dump.trig
+php maintenance/run.php SemanticWikiSchema:DumpRdf --projection=EDM > dump-edm.trig
 ```
 
 ## Not covered here

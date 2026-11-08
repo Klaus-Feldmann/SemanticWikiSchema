@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests;
+namespace ProfessionalWiki\SWS\Tests;
 
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use TestLogger;
 
 /**
  * Every configured graph database backend is addressable by name, which is what scopes a rebuild to
  * one store.
  *
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension
+ * @covers \ProfessionalWiki\SWS\SWSExtension
  * @group Database
  */
-class NamedGraphDatabasePluginsTest extends NeoWikiIntegrationTestCase {
+class NamedGraphDatabasePluginsTest extends SWSIntegrationTestCase {
 
 	protected function tearDown(): void {
 		parent::tearDown();
 		// The tests rebuild the singleton from overridden config and temporary hooks; reset it so later
 		// tests get an instance built from the real ones.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testNeo4jIsNamedAfterItsBackend(): void {
 		$this->assertArrayHasKey(
 			Neo4jPlugin::STORE_NAME,
-			NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins()
+			SWSExtension::getInstance()->getNamedGraphDatabasePlugins()
 		);
 	}
 
@@ -42,7 +42,7 @@ class NamedGraphDatabasePluginsTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertSame(
 			[ 'neo4j', 'native', 'EDM', 'edm-archive', 'redherb' ],
-			array_keys( NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins() ),
+			array_keys( SWSExtension::getInstance()->getNamedGraphDatabasePlugins() ),
 			'the bundled backends come first, in configuration order, then the extension plugins'
 		);
 	}
@@ -51,7 +51,7 @@ class NamedGraphDatabasePluginsTest extends NeoWikiIntegrationTestCase {
 		$spy = new SpyGraphDatabasePlugin();
 		$this->registerNamedGraphDatabasePlugins( [ 'redherb' => $spy ] );
 
-		$plugins = NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins();
+		$plugins = SWSExtension::getInstance()->getNamedGraphDatabasePlugins();
 
 		$this->assertSame( $spy, $plugins['redherb'] );
 		$this->assertNotSame( $spy, $plugins[Neo4jPlugin::STORE_NAME] );
@@ -59,11 +59,11 @@ class NamedGraphDatabasePluginsTest extends NeoWikiIntegrationTestCase {
 
 	public function testAnExtensionCannotShadowABundledBackend(): void {
 		$logger = new TestLogger( true, null, true );
-		$this->setLogger( 'NeoWiki', $logger );
+		$this->setLogger( 'SWS', $logger );
 		$spy = new SpyGraphDatabasePlugin();
 		$this->registerNamedGraphDatabasePlugins( [ Neo4jPlugin::STORE_NAME => $spy ] );
 
-		$plugins = NeoWikiExtension::getInstance()->getNamedGraphDatabasePlugins();
+		$plugins = SWSExtension::getInstance()->getNamedGraphDatabasePlugins();
 		$warnings = self::warnings( $logger );
 
 		$this->assertNotSame( $spy, $plugins[Neo4jPlugin::STORE_NAME] );
@@ -89,8 +89,8 @@ class NamedGraphDatabasePluginsTest extends NeoWikiIntegrationTestCase {
 	 * @param array<int, array<string, string>> $stores
 	 */
 	private function configureSparqlStores( array $stores ): void {
-		$this->overrideConfigValue( 'NeoWikiSparqlStores', $stores );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSSparqlStores', $stores );
+		SWSExtension::resetInstance();
 	}
 
 }

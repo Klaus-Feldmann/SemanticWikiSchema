@@ -1,0 +1,489 @@
+<template>
+	<section
+		class="ext-sws-subject-edit-pane"
+		:aria-label="paneName"
+	>
+		<div
+			class="ext-sws-subject-edit-pane__header"
+			:class="{ 'ext-sws-subject-edit-pane__header--new': props.isNew }"
+		>
+			<h3
+				v-if="subjectsAreDependent"
+				class="ext-sws-subject-edit-pane__name"
+			>
+				{{ paneName }}
+			</h3>
+
+			<CdxField
+				v-else-if="props.isNew"
+				class="ext-sws-subject-edit-pane__label"
+				:optional="true"
+			>
+				<template #label>
+					{{ $i18n( 'sws-subject-editor-label' ).text() }}
+				</template>
+				<CdxTextInput
+					v-model="label"
+					@update:model-value="handleEditorChange"
+					@blur="handleEditorBlur"
+				/>
+			</CdxField>
+
+			<h3
+				v-else
+				class="ext-sws-subject-edit-pane__name"
+			>
+				<EditableText
+					ref="labelField"
+					:model-value="label"
+					:edit-button-label="$i18n( 'sws-subject-editor-rename' ).text()"
+					:input-aria-label="$i18n( 'sws-subject-editor-label-field' ).text()"
+					:placeholder="labelPlaceholder"
+					@dirty="labelDirty = $event"
+					@update:model-value="setLabel"
+				/>
+			</h3>
+
+			<div class="ext-sws-subject-edit-pane__meta">
+				<!-- The Schema the pane's Subject uses, beside the name it belongs to. A real
+					link, so it carries the badge's own interactive styling and a destination;
+					a plain click opens the Schema editor instead.
+
+					A new tab, for the reason the storage link below gives: this dialog holds
+					unsaved edits for every open pane and nothing guards a navigation away
+					from it. -->
+				<SchemaNameDisplay
+					:schema-name="schemaBadge"
+					link="new-tab"
+					@click="openSchemaEditor"
+				/>
+
+				<div
+					v-if="props.nested && pageName !== null"
+					class="ext-sws-subject-edit-pane__storage"
+				>
+					<I18nSlot message-key="sws-subject-editor-stored-on">
+						<!-- A new tab: following the link in this one discards unsaved edits. -->
+						<a
+							class="ext-sws-subject-edit-pane__page"
+							:href="pageUrl"
+							target="_blank"
+							rel="noopener"
+						>{{ pageName }}</a>
+					</I18nSlot>
+				</div>
+			</div>
+		</div>
+
+		<SubjectViolationBanners :violations="anchorlessViolations" />
+
+		<SubjectEditor
+			ref="subjectEditorRef"
+			:statements="statements"
+			:schema="props.schema"
+			:server-violations="serverViolations"
+			@change="handleEditorChange"
+			@relation-change="handleRelationChange"
+			@dependent-subject-change="handleDependentSubjectChange"
+			@focusout="handleEditorBlur"
+			@clear-server-violation="handleClearViolation"
+			@edit-relation-target="emit( 'edit-relation-target', $event )"
+		/>
+	</section>
+</template>
+
+<script lang="ts">
+export interface SubjectEditPaneExposes {
+	hasChanged: boolean;
+	label: string;
+	// Refreshed on relation changes alone, so its other statements lag: read it for the
+	// relations it holds, never to save or validate from.
+	editedSubject: Subject;
+	// The Dependent Subjects the form shows, as far behind as editedSubject.
+	editedDependentSubjects: readonly Subject[];
+	setLabel: ( value: string ) => void;
+	/** Its Subject is written as the form holds it: unchanged from here on, and its removals final. */
+	markWritten: () => void;
+	buildUpdatedSubject: () => Subject | null;
+	/**
+	 * As their fields hold them, nested ones included.
+	 */
+	buildDependentSubjects: () => Subject[];
+	setServerViolations: ( violations: readonly SubjectViolation[] ) => void;
+	saveBlocker: () => SaveBlocker | null;
+	flushValidation: () => Promise<void>;
+}
+</script>
+
+<script setup lang="ts">
+import { ref, shallowRef, computed, watch, provide } from 'vue';
+import { CdxField, CdxTextInput } from '@wikimedia/codex';
+import SubjectEditor from '@/components/SubjectEditor/SubjectEditor.vue';
+import type { SubjectEditorExposes } from '@/components/SubjectEditor/SubjectEditor.vue';
+import SubjectViolationBanners from '@/components/common/SubjectViolationBanners.vue';
+import I18nSlot from '@/components/common/I18nSlot.vue';
+import { subjectLabelPlaceholder } from '@/presentation/subjectLabelPlaceholder.ts';
+import { subjectDisplayName } from '@/presentation/subjectDisplayName.ts';
+import EditableText from '@/components/common/EditableText.vue';
+import SchemaNameDisplay from '@/components/common/SchemaNameDisplay.vue';
+import { StatementList } from '@/domain/StatementList.ts';
+import { Subject } from '@/domain/Subject.ts';
+import { enteredSubjectLabel } from '@/domain/enteredSubjectLabel.ts';
+import { SubjectId } from '@/domain/SubjectId.ts';
+import { Schema } from '@/domain/Schema.ts';
+import { useSubjectStore } from '@/stores/SubjectStore.ts';
+import { useChangeDetection } from '@/composables/useChangeDetection.ts';
+import { useSubjectValidation } from '@/composables/useSubjectValidation.ts';
+import { SWSExtension } from '@/SWSExtension.ts';
+import { ImageSubjectContext } from '@/components/Value/ImageSubjectContext';
+import { RelationTargetEditingKey } from '@/components/Value/ValueInputContract.ts';
+import { DependentSubjectViolationsKey, PaneWritesKey } from '@/components/SubjectEditor/DependentSubjectEditing.ts';
+import { withoutMissingValueViolations, withoutUnsavedTargetViolations, type SubjectViolation } from '@/domain/SubjectViolation';
+import type { SaveBlocker } from '@/components/common/SaveBlocker.ts';
+import { isPlainLeftClick } from '@/presentation/plainLeftClick.ts';
+import { isSubjectFirst } from '@/wikiMode.ts';
+
+const props = defineProps<{
+	subject: Subject;
+	schema: Schema;
+	nested?: boolean;
+	// Whether this pane's Schema may be edited, so its name can offer the editor.
+	canEditSchema?: boolean;
+	// A Subject this editing session invented, which the server has never seen. It is validated
+	// as a creation rather than as an update, and the dialog writes it with a create.
+	isNew?: boolean;
+	// Subjects the session has invented but not yet written. A relation naming one of them is
+	// sound here and unresolvable to the server, so its complaint is withheld.
+	unsavedTargetIds?: readonly string[];
+}>();
+
+const emit = defineEmits<{
+	'edit-relation-target': [ SubjectId ];
+	'edit-schema': [];
+}>();
+
+provide( RelationTargetEditingKey, true );
+provide( ImageSubjectContext, computed( () => props.isNew ? undefined : props.subject ) );
+
+const dependentSubjectViolations = shallowRef<readonly SubjectViolation[]>( [] );
+
+provide( DependentSubjectViolationsKey, dependentSubjectViolations );
+
+const subjectStore = useSubjectStore();
+
+const subjectEditorRef = ref<SubjectEditorExposes | null>( null );
+const { hasChanged: committed, markChanged, resetChanged } = useChangeDetection();
+
+const writes = ref( 0 );
+
+provide( PaneWritesKey, writes );
+
+function markWritten(): void {
+	resetChanged();
+	writes.value++;
+}
+
+// A label still being typed is already something to save, and nothing once it is discarded.
+const labelDirty = ref( false );
+
+const labelField = ref<InstanceType<typeof EditableText> | null>( null );
+
+const hasChanged = computed( (): boolean => committed.value || labelDirty.value );
+
+// Refreshed when a relation field changes and on nothing else: the dialog's draft graph is its
+// only consumer and reads only relation statements, and harvesting per keystroke would re-walk
+// that graph per character. Its other statements therefore lag; never save or validate from it.
+const editedSubject = shallowRef<Subject>( props.subject );
+const editedDependentSubjects = shallowRef<readonly Subject[]>( [] );
+
+function handleRelationChange(): void {
+	editedSubject.value = buildUpdatedSubject() ?? props.subject;
+	editedDependentSubjects.value = buildDependentSubjects();
+}
+
+const subjectsAreDependent = computed( (): boolean => props.schema.subjectsAreDependent() );
+
+const label = ref( props.subject.getLabel() ?? '' );
+
+const storedLabel = computed( (): string | null => enteredSubjectLabel( label.value ) );
+
+const paneName = computed( (): string => storedLabel.value ?? subjectDisplayName( props.subject ) );
+
+// Shown whether or not the name beside it already carries the Schema's name. Elsewhere that repeat is
+// worth suppressing, and `schemaNameToShow` does so; here the badge is the only link to the Schema
+// and the only way into its editor, so withholding it costs a way through rather than a word.
+const schemaBadge = computed( (): string => props.subject.getSchemaName() );
+
+// A Subject bound for a page the save has yet to settle carries the page it will be stored on
+// without a title for it, and a Subject whose page the API could not resolve carries none at all.
+// Either way there is nothing to point at and nothing to name. A subject-first wiki names no page
+// at all, since its users need not care which page stores a Subject.
+const pageName = computed( (): string | null => {
+	if ( isSubjectFirst() ) {
+		return null;
+	}
+
+	const name = props.subject.getPageIdentifiers().getPageName();
+
+	return name === undefined || name === '' ? null : name;
+} );
+
+const pageUrl = computed( (): string =>
+	pageName.value === null ? '' : mw.util.getUrl( pageName.value )
+);
+
+const labelPlaceholder = computed( (): string => subjectLabelPlaceholder( props.subject ) );
+
+/**
+ * Opens the Schema editor in place of following the link, for a plain left click by someone
+ * who may edit it. Anything else — a modifier, the middle button, no edit right — is left to
+ * the browser, so the Schema page stays reachable and nothing here is a dead end.
+ */
+function openSchemaEditor( event: MouseEvent ): void {
+	if ( !props.canEditSchema || !isPlainLeftClick( event ) ) {
+		return;
+	}
+
+	event.preventDefault();
+	emit( 'edit-schema' );
+}
+
+// EditableText commits once per edit, so a commit is both the change and the
+// end of the interaction: validate immediately rather than waiting for a blur.
+// A label of nothing but spaces is no label, so the field reads as empty rather than blank.
+function setLabel( value: string ): void {
+	label.value = enteredSubjectLabel( value ) === null ? '' : value;
+	handleEditorChange();
+	handleEditorBlur();
+}
+
+// Reads the prop, never editedSubject: feeding the harvested snapshot back would hand every
+// ValueInput a fresh Value on each relation pick, and an input resets its text to a Value it
+// did not emit.
+const statements = computed( (): StatementList =>
+	props.schema.statementsFrom( props.subject.getStatements() )
+);
+
+const { violations: serverViolations, revalidate, flush } = useSubjectValidation(
+	async () => {
+		if ( !subjectEditorRef.value ) {
+			return [];
+		}
+		const current = subjectEditorRef.value.getSubjectData().withNonEmptyValues();
+		try {
+			// A Subject the server has never seen has no update to dry-run against, and its
+			// empty required fields are ones the user is still on their way to filling in
+			// rather than real gaps — the same reading the subject creator takes.
+			// Unlike subject creation, editing an existing subject surfaces 'required' live: an
+			// empty required field here is a real gap, not a field the user is still on their way
+			// to filling in.
+			const violations = props.isNew ?
+				withoutMissingValueViolations( await subjectStore.validateSubject(
+					storedLabel.value,
+					props.subject.getSchemaName(),
+					current
+				) ) :
+				await subjectStore.validateSubjectUpdate(
+					props.subject.getId(),
+					storedLabel.value,
+					current
+				);
+
+			return withoutSessionOnlyViolations( violations );
+		} catch ( error ) {
+			// The dry-run runs alongside the live validators and must never
+			// break editing or saving; the authoritative result is the save's
+			// own 422 response.
+			console.error( 'Subject validation dry-run failed:', error );
+			return [];
+		}
+	},
+	{ debounceMs: SWSExtension.getInstance().getValidationDebounceMs() }
+);
+
+let dirtySinceValidation = false;
+
+function handleEditorChange(): void {
+	markChanged();
+	dirtySinceValidation = true;
+	revalidate();
+}
+
+function handleDependentSubjectChange( relationChanged: boolean ): void {
+	handleEditorChange();
+
+	if ( relationChanged ) {
+		handleRelationChange();
+	}
+}
+
+function handleEditorBlur(): void {
+	// focusout bubbles on every field-to-field move; only flush when something
+	// actually changed since the last validation, to avoid redundant requests.
+	if ( dirtySinceValidation ) {
+		dirtySinceValidation = false;
+		flush();
+	}
+}
+
+const anchorlessViolations = computed<SubjectViolation[]>( () => {
+	// SubjectEditor renders one field per entry in `statements`, which the
+	// schema materialises from its property definitions (so empty/missing
+	// properties still get a field). Anchor against THAT list, not the
+	// raw subject — otherwise a violation on a missing-but-rendered field
+	// would be wrongly banner-routed even though the field is on screen.
+	const renderedPropertyNames = new Set(
+		[ ...statements.value ].map( ( s ) => s.propertyName.toString() )
+	);
+	return serverViolations.value.filter( ( v ) => {
+		if ( v.propertyName === null ) {
+			return true;
+		}
+		return !renderedPropertyNames.has( v.propertyName );
+	} );
+} );
+
+function handleClearViolation( payload: { propertyName: string; valuePartIndex: number | null } ): void {
+	serverViolations.value = serverViolations.value.filter(
+		( v ) => !( v.propertyName === payload.propertyName && v.valuePartIndex === payload.valuePartIndex )
+	);
+}
+
+// Existing subjects are expected to be complete, so validate as soon as the editor
+// mounts, and again whenever the Schema it validates against changes: the violations
+// are a snapshot of a server response, so a Schema edit invalidates them until the
+// next run. flush() rather than revalidate(), which a zero debounce turns into a
+// no-op — blur-only wikis need the refresh too. Post-flush, so the validator reads
+// the fields the new Schema produced, not the ones it replaced.
+watch( [ subjectEditorRef, () => props.schema ], ( [ editor ] ) => {
+	if ( editor ) {
+		flush();
+	}
+}, { flush: 'post' } );
+
+// A replaced Subject starts the pane over. Drop the harvest, or a reopened pane seeds the
+// draft graph with relations the form no longer displays.
+watch( () => props.subject, ( newSubject ) => {
+	label.value = newSubject.getLabel() ?? '';
+	editedSubject.value = newSubject;
+	editedDependentSubjects.value = [];
+} );
+
+function buildUpdatedSubject(): Subject | null {
+	if ( !subjectEditorRef.value ) {
+		return null;
+	}
+	return props.subject
+		.withLabel( storedLabel.value )
+		.withStatements( props.schema.statementsAfterEdit(
+			props.subject.getStatements(),
+			subjectEditorRef.value.getSubjectData().withNonEmptyValues()
+		) );
+}
+
+function buildDependentSubjects(): Subject[] {
+	return subjectEditorRef.value?.getDependentSubjects() ?? [];
+}
+
+// The write reads the committed label, so a name still being typed is committed on the way to
+// the validation a save runs first; the Save click's own blur does the same for a pointer.
+async function flushValidation(): Promise<void> {
+	labelField.value?.commit();
+	await flush();
+}
+
+function saveBlocker(): SaveBlocker | null {
+	return subjectEditorRef.value?.saveBlocker() ?? null;
+}
+
+// Violations on a Dependent Subject the form shows go to its fields. One on a Subject the form does not
+// show would show nowhere, so it joins the banners.
+function setServerViolations( violations: readonly SubjectViolation[] ): void {
+	const ownId = props.subject.getId().text;
+	const shownIds = new Set( buildDependentSubjects().map( ( subject ) => subject.getId().text ) );
+
+	serverViolations.value = withoutSessionOnlyViolations( violations
+		.filter( ( violation ) => violation.subjectId === undefined || !shownIds.has( violation.subjectId ) )
+		.map( ( violation ) => violation.subjectId === undefined || violation.subjectId === ownId ?
+			violation :
+			{ ...violation, propertyName: null } ) );
+
+	dependentSubjectViolations.value = violations.filter(
+		( violation ) => violation.subjectId !== undefined && shownIds.has( violation.subjectId )
+	);
+}
+
+// Complaints that are only true of the wiki as it stands, not of what this session is saving.
+function withoutSessionOnlyViolations( violations: readonly SubjectViolation[] ): SubjectViolation[] {
+	return withoutUnsavedTargetViolations( violations, props.unsavedTargetIds ?? [] );
+}
+
+defineExpose( {
+	hasChanged,
+	label,
+	editedSubject,
+	editedDependentSubjects,
+	setLabel,
+	markWritten,
+	buildUpdatedSubject,
+	buildDependentSubjects,
+	setServerViolations,
+	saveBlocker,
+	flushValidation
+} );
+</script>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-subject-edit-pane {
+	/* The name at the start, the Schema and where it is stored flush to the end. Baseline
+		rather than centre, because the three differ in size. A name too long to share the row
+		pushes the other two onto the line below. */
+	&__header {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: @spacing-25 @spacing-50;
+		margin-bottom: @spacing-75;
+
+		/* The field's first baseline is its label's, above the input the meta belongs beside. */
+		&--new {
+			align-items: last baseline;
+		}
+	}
+
+	&__label {
+		flex-grow: 1;
+	}
+
+	/* A heading for screen readers and outline tools, sized like the body around it. The
+		skin gives headings block padding of their own, which would push the row open.
+		It takes the free space, which is what puts the meta at the end of the row. */
+	&__name {
+		flex-grow: 1;
+		min-width: 0;
+		margin: 0;
+		padding-block: 0;
+		font-size: @font-size-medium;
+	}
+
+	/* Shrinkable, with `min-width: 0` so it may go below its content: the badge ellipsises
+		itself, but only once its parent is allowed to be narrower than the name inside it.
+		Under `flex-shrink: 0` a long Schema name pushed the row wider than the pane and the
+		whole form picked up a horizontal scrollbar. */
+	&__meta {
+		display: flex;
+		align-items: baseline;
+		gap: @spacing-50;
+		min-width: 0;
+	}
+
+	/* A page title can run long with no space to wrap at. */
+	&__storage {
+		overflow-wrap: anywhere;
+		color: @color-subtle;
+		font-size: @font-size-small;
+	}
+}
+</style>

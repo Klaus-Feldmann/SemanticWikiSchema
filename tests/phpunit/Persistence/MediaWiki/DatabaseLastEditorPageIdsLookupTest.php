@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\User\User;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup
  * @group Database
  */
-class DatabaseLastEditorPageIdsLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseLastEditorPageIdsLookupTest extends SWSIntegrationTestCase {
 
 	public function testFindsThePagesTheUserEditedLast(): void {
 		$author = $this->getTestUser()->getUser();

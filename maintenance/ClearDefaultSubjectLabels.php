@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Maintenance;
+namespace ProfessionalWiki\SWS\Maintenance;
 
 use MediaWiki\Maintenance\Maintenance;
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 use Throwable;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
@@ -110,7 +110,7 @@ class ClearDefaultSubjectLabels extends Maintenance {
 	 */
 	private function countSubjectPages(): int {
 		return (int)$this->getReplicaDB()->newSelectQueryBuilder()
-			->select( 'COUNT(DISTINCT nwsp_page_id)' )
+			->select( 'COUNT(DISTINCT swssp_page_id)' )
 			->from( DatabaseSubjectPageIndex::TABLE )
 			->caller( __METHOD__ )
 			->fetchField();
@@ -126,11 +126,11 @@ class ClearDefaultSubjectLabels extends Maintenance {
 		$db = $this->getReplicaDB();
 
 		return array_map( 'intval', $db->newSelectQueryBuilder()
-			->select( 'nwsp_page_id' )
+			->select( 'swssp_page_id' )
 			->distinct()
 			->from( DatabaseSubjectPageIndex::TABLE )
-			->where( $db->buildComparison( '>', [ 'nwsp_page_id' => $afterPageId ] ) )
-			->orderBy( 'nwsp_page_id' )
+			->where( $db->buildComparison( '>', [ 'swssp_page_id' => $afterPageId ] ) )
+			->orderBy( 'swssp_page_id' )
 			->limit( $batchSize )
 			->caller( __METHOD__ )
 			->fetchFieldValues() );
@@ -220,7 +220,7 @@ class ClearDefaultSubjectLabels extends Maintenance {
 	}
 
 	/**
-	 * A label counts as a default when it repeats a name NeoWiki would have shown without it.
+	 * A label counts as a default when it repeats a name SWS would have shown without it.
 	 *
 	 * The page name is matched both prefixed and unprefixed because the two eras of the default read it
 	 * differently: the editor filled the field from the unprefixed title, while the page node carries the
@@ -270,7 +270,7 @@ class ClearDefaultSubjectLabels extends Maintenance {
 		$status = $this->saver->saveContent(
 			new PageId( $pageId ),
 			[ MediaWikiSubjectRepository::SLOT_NAME => $content ],
-			CommentStoreComment::newUnsavedComment( 'Clear default NeoWiki Subject labels' )
+			CommentStoreComment::newUnsavedComment( 'Clear default SWS Subject labels' )
 		);
 
 		if ( $status->status === PageContentSavingStatus::ERROR ) {
@@ -286,7 +286,7 @@ class ClearDefaultSubjectLabels extends Maintenance {
 	private function newPageContentSaver(): PageContentSaver {
 		return new PageContentSaver(
 			wikiPageFactory: MediaWikiServices::getInstance()->getWikiPageFactory(),
-			performer: User::newSystemUser( 'NeoWiki', [ 'steal' => true ] ),
+			performer: User::newSystemUser( 'SWS', [ 'steal' => true ] ),
 		);
 	}
 

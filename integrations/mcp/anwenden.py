@@ -19,7 +19,7 @@ for name,entry in manifest.items():
  if digest(source)!=entry['after']:raise SystemExit('Paket-Prüfsumme abweichend: '+name)
  actual=digest(dest)
  if actual==entry['after']:continue
- if actual!=entry['before'] and ('previousPatched' not in entry or actual!=entry['previousPatched']):raise SystemExit('Abweichender Ausgangsstand, keine Änderung: '+name)
+ if actual not in entry.get('acceptedBefore',[entry['before']]):raise SystemExit('Abweichender Ausgangsstand, keine Änderung: '+name)
  work.append(name)
 if not work:print('Datenansicht-Patch bereits installiert. Keine Änderung.');raise SystemExit(0)
 print('Ausgang und Patch geprüft. Betroffene Dateien:',len(work))

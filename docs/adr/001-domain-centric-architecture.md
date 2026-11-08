@@ -8,8 +8,8 @@ Status: Accepted
 
 We are building a non-trivial application on top of MediaWiki. We need to decide how to structure the code.
 
-We choose to create NeoWiki instead of enhancing Semantic MediaWiki in part because Semantic MediaWiki's internal
-quality is poor. It is difficult to understand and modify. We wish to avoid the same fate for NeoWiki.
+We choose to create SWS instead of enhancing Semantic MediaWiki in part because Semantic MediaWiki's internal
+quality is poor. It is difficult to understand and modify. We wish to avoid the same fate for SWS.
 
 ## Decision
 

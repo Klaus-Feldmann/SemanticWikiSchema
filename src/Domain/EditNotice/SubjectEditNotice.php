@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\EditNotice;
+namespace ProfessionalWiki\SWS\Domain\EditNotice;
 
 /**
  * A message shown to a user before they edit a Subject.

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceParser;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
 
 class SubjectContentDataDeserializer {
 
@@ -31,7 +31,7 @@ class SubjectContentDataDeserializer {
 		$jsonArray = json_decode( $json, true );
 
 		// MediaWiki's JSON content model accepts any valid JSON, so a slot can hold a scalar or a bare
-		// string that no NeoWiki write path produces. A read shows the Subjects it can rather than throw.
+		// string that no SWS write path produces. A read shows the Subjects it can rather than throw.
 		if ( !is_array( $jsonArray ) ) {
 			$jsonArray = [];
 		}
@@ -83,7 +83,7 @@ class SubjectContentDataDeserializer {
 		}
 
 		$this->logger->warning(
-			"NeoWiki: skipping $field '$id' in a Subject slot: not a Subject id of this wiki"
+			"SWS: skipping $field '$id' in a Subject slot: not a Subject id of this wiki"
 		);
 
 		return false;
@@ -120,7 +120,7 @@ class SubjectContentDataDeserializer {
 	 * still has an id. Ids no caller could ask about are left out, since nothing can be answered with
 	 * them.
 	 *
-	 * Static and dependency-free: update.php rebuilds the subject -> page index on wikis whose NeoWiki
+	 * Static and dependency-free: update.php rebuilds the subject -> page index on wikis whose SWS
 	 * configuration is not readable yet.
 	 *
 	 * @return string[]

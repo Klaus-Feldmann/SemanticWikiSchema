@@ -5,9 +5,9 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 $services->getHookContainer()->register('ParserBeforeInternalParse', static function($parser, &$text, $stripState) {
     // Deterministic stand-in for Q discovery when the schema program enters the full parse.
     if ($parser->getTitle()->getText()==='Relation fixture' && str_contains($text,'identity-fixture')) {
@@ -42,7 +42,7 @@ $data=$store->getSemanticData(SMW\DataItems\WikiPage::newFromTitle($title));
 checkTest(isset($data->getProperties()['Name']),'supported parent annotation persisted');
 checkTest(isset($data->getProperties()['Manuell']),'manual annotation preserved');
 checkTest(!isset($data->getProperties()['Forschung']) && !isset($data->getProperties()['Einordnung']),'relation and child annotations deferred explicitly');
-$actual=json_decode($services->getWikiPageFactory()->newFromTitle($title)->getRevisionRecord()->getContent('neo')->getText(),true);
+$actual=json_decode($services->getWikiPageFactory()->newFromTitle($title)->getRevisionRecord()->getContent('sws')->getText(),true);
 checkTest($actual['subjects']===$payload['subjects'],'relation identity and dependent subject stored unchanged');
 $payload['subjects']['sF1TCXCbyeFbSGK']['statements']['Name']['value']=['Geändert'];
 saveTestPage('Relation fixture',new WikitextContent('Private fixture. [[Manuell::Bleibt]]'),new SubjectContent(json_encode($payload)));

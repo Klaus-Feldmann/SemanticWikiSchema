@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Data;
+namespace ProfessionalWiki\SWS\Tests\Data;
 
 /**
  * The Property name vectors in tests/vectors/property-names.json, which the TypeScript suite reads too, so that the

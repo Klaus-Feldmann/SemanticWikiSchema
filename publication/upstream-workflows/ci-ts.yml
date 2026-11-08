@@ -1,4 +1,4 @@
-name: NeoWiki CI (TypeScript)
+name: SWS CI (TypeScript)
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./resources/ext.neowiki
+        working-directory: ./resources/ext.sws
 
     steps:
       - name: Checkout
@@ -43,7 +43,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./resources/ext.neowiki
+        working-directory: ./resources/ext.sws
 
     steps:
       - name: Checkout
@@ -67,7 +67,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./resources/ext.neowiki
+        working-directory: ./resources/ext.sws
 
     steps:
       - name: Checkout

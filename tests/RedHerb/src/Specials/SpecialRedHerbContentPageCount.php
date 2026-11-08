@@ -7,9 +7,9 @@ namespace ProfessionalWiki\RedHerb\Specials;
 use Exception;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class SpecialRedHerbContentPageCount extends SpecialPage {
 
@@ -26,7 +26,7 @@ class SpecialRedHerbContentPageCount extends SpecialPage {
 		$out = $this->getOutput();
 
 		try {
-			$result = NeoWikiExtension::getInstance()->newCypherQueryService( $this->getAuthority() )->execute( new Neo4jQueryRequest(
+			$result = SWSExtension::getInstance()->newCypherQueryService( $this->getAuthority() )->execute( new Neo4jQueryRequest(
 				cypher: 'MATCH (page:Page) WHERE page.namespaceId = $namespaceId RETURN count(page) AS pageCount',
 				parameters: [ 'namespaceId' => NS_MAIN ],
 				limits: Neo4jQueryLimits::forUser( $this->getUser() ),

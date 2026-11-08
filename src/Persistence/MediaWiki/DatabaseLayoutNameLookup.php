@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\NeoWiki\Application\PageReadAuthorizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\LayoutNameLookup;
+use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\LayoutNameLookup;
 use Wikimedia\Rdbms\IDatabase;
 
 class DatabaseLayoutNameLookup implements LayoutNameLookup {
@@ -40,7 +40,7 @@ class DatabaseLayoutNameLookup implements LayoutNameLookup {
 				'page',
 				[ 'page_id', 'page_title' ],
 				[
-					'page_namespace' => NeoWikiExtension::NS_LAYOUT,
+					'page_namespace' => SWSExtension::NS_LAYOUT,
 					$this->db->expr( 'page_id', '>', $lastPageId ),
 				],
 				__METHOD__,
@@ -52,7 +52,7 @@ class DatabaseLayoutNameLookup implements LayoutNameLookup {
 
 			foreach ( $res as $row ) {
 				$lastPageId = (int)$row->page_id;
-				$title = new TitleValue( NeoWikiExtension::NS_LAYOUT, $row->page_title );
+				$title = new TitleValue( SWSExtension::NS_LAYOUT, $row->page_title );
 
 				if ( $this->readAuthorizer->authorizeReadByPageTitle( $this->titleFactory->newFromLinkTarget( $title ) ) ) {
 					yield $lastPageId => $title;

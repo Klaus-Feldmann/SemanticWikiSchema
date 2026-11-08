@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence;
+namespace ProfessionalWiki\SWS\Persistence;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
 
 /**
- * The Subjects each page publishes and their relations, for NeoWiki's Subject lists, suggestions, referencing
+ * The Subjects each page publishes and their relations, for SWS's Subject lists, suggestions, referencing
  * lists and counts. Unlike {@see SubjectPageIndex}, which follows a page's latest revision, this follows the
  * revision its RevisionPolicy publishes.
  */

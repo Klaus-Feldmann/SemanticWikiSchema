@@ -1,11 +1,11 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\Semantic\{FieldSnapshot,FieldValues,AnnotationPlanner,SmwValueFormatter};
-use ProfessionalWiki\NeoWiki\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption};
-use ProfessionalWiki\NeoWiki\Domain\Subject\{Subject,SubjectId,StatementList};
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Value\{StringValue,NumberValue,BooleanValue,UrlValue};
+use ProfessionalWiki\SWS\Application\Semantic\{FieldSnapshot,FieldValues,AnnotationPlanner,SmwValueFormatter};
+use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
+use ProfessionalWiki\SWS\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption};
+use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue,BooleanValue,UrlValue};
 
 final class SemanticAnnotationPlanTest extends TestCase {
     private function fixture(string $name): array {

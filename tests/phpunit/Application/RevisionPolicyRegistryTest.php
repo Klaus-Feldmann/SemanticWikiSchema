@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\NullRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Application\RevisionPolicyRegistry;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
+use ProfessionalWiki\SWS\Application\RevisionPolicyRegistry;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Psr\Log\Test\TestLogger;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\RevisionPolicyRegistry
+ * @covers \ProfessionalWiki\SWS\Application\RevisionPolicyRegistry
  */
 class RevisionPolicyRegistryTest extends TestCase {
 

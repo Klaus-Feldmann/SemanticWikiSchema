@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Domain\Mapping\MappingName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
  * Needs the database for the page revisions. Registering a policy rebuilds the extension singleton but
  * keeps MediaWiki's shared object cache, as a new request would.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PublishedPageJsonLookup
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\CachingSchemaLookup
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\WikiPageMappingLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup
  * @group Database
  */
-class ConfigurationPageApprovalTest extends NeoWikiIntegrationTestCase {
+class ConfigurationPageApprovalTest extends SWSIntegrationTestCase {
 
 	public function testServesThePreviousSchemaRevisionOnceApprovalOfTheLatestIsWithdrawn(): void {
 		$previous = $this->createSchema( 'Approval', '{"description":"Previous","propertyDefinitions":{}}' );
@@ -44,13 +44,13 @@ class ConfigurationPageApprovalTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function readSchemaDescription(): ?string {
-		return NeoWikiExtension::getInstance()->getSchemaLookup()
+		return SWSExtension::getInstance()->getSchemaLookup()
 			->getSchema( new SchemaName( 'Approval' ) )
 			?->getDescription();
 	}
 
 	private function readMappedClass(): ?string {
-		return NeoWikiExtension::getInstance()->getMappingLookup()
+		return SWSExtension::getInstance()->getMappingLookup()
 			->getMapping( new MappingName( 'Approval' ) )
 			?->forSchema( new SchemaName( 'Person' ) )
 			?->subject

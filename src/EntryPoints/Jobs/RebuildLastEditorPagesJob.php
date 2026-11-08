@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Jobs;
+namespace ProfessionalWiki\SWS\EntryPoints\Jobs;
 
 use GenericParameterJob;
 use Job;
 use JobSpecification;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * Reprojects the pages one user is the last editor of, out of band, after a block hid their name or
@@ -22,7 +22,7 @@ use ProfessionalWiki\NeoWiki\NeoWikiExtension;
  */
 class RebuildLastEditorPagesJob extends Job implements GenericParameterJob {
 
-	public const string TYPE = 'neowikiRebuildLastEditorPages';
+	public const string TYPE = 'swsRebuildLastEditorPages';
 
 	public function __construct( array $params ) {
 		parent::__construct( self::TYPE, $params );
@@ -52,7 +52,7 @@ class RebuildLastEditorPagesJob extends Job implements GenericParameterJob {
 			return true;
 		}
 
-		NeoWikiExtension::getInstance()
+		SWSExtension::getInstance()
 			->newLastEditorPagesRebuilder()
 			->rebuildPagesLastEditedBy( UserIdentityValue::newRegistered( $userId, $userName ) );
 

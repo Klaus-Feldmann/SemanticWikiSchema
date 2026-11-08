@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 /**
  * {@see QuerySparqlEndToEndTestCase} against Oxigraph — the `test_oxigraph` dev-stack service, a
  * second engine and a second endpoint shape.
  *
  * It runs without `--union-default-graph`, so it is strict where QLever is lenient: an unscoped query
- * sees only the default graph, never the named graphs NeoWiki projects pages into. That is what SPARQL
+ * sees only the default graph, never the named graphs SWS projects pages into. That is what SPARQL
  * 1.1 specifies, so a query passing here passes on any conforming store.
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
 class QueryOxigraphEndToEndTest extends QuerySparqlEndToEndTestCase {

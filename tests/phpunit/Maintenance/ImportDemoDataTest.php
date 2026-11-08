@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Maintenance;
+namespace ProfessionalWiki\SWS\Tests\Maintenance;
 
 use MediaWiki\Status\Status;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
-use ProfessionalWiki\NeoWiki\Maintenance\ImportDemoData;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Maintenance\ImportDemoData;
+use ProfessionalWiki\SWS\SWSExtension;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
 // Its RUN_MAINTENANCE_IF_MAIN guard is a no-op under PHPUnit, so this does not execute the script.
 require_once __DIR__ . '/../../../maintenance/ImportDemoData.php';
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\ImportDemoData
+ * @covers \ProfessionalWiki\SWS\Maintenance\ImportDemoData
  * @group Database
  */
 class ImportDemoDataTest extends MaintenanceBaseTestCase {
@@ -24,7 +24,7 @@ class ImportDemoDataTest extends MaintenanceBaseTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		// The singleton caches Schemas by page and revision id, which repeat across tests' temp tables.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	protected function getMaintenanceClass(): string {

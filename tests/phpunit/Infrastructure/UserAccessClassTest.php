@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure;
 
 use MediaWiki\User\User;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Infrastructure\UserAccessClass;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\UserAccessClass
+ * @covers \ProfessionalWiki\SWS\Infrastructure\UserAccessClass
  * @group Database
  */
 class UserAccessClassTest extends MediaWikiIntegrationTestCase {
 
 	private function newAccessClass(): UserAccessClass {
-		return NeoWikiExtension::getInstance()->newUserAccessClass();
+		return SWSExtension::getInstance()->newUserAccessClass();
 	}
 
 	public function testAnonymousAndLoggedInReadersAreDifferentClasses(): void {
@@ -76,10 +76,10 @@ class UserAccessClassTest extends MediaWikiIntegrationTestCase {
 	}
 
 	public function testTheQueryRightSeparatesUsersInTheSameGroups(): void {
-		$this->setGroupPermissions( '*', 'neowiki-query', false );
+		$this->setGroupPermissions( '*', 'sws-query', false );
 		$granted = $this->getTestUser()->getUser();
 		$other = $this->getMutableTestUser()->getUser();
-		$this->grantRightOutsideGroups( $granted, 'neowiki-query' );
+		$this->grantRightOutsideGroups( $granted, 'sws-query' );
 
 		$accessClass = $this->newAccessClass();
 

@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
 
 /** Read-only display metadata. No SMW dependency and no copy of derived data into storage/RDF. */
 final class GraphFieldPresentation {
@@ -28,12 +28,12 @@ final class GraphFieldPresentation {
 	}
 	private static function ownUrls( Subject $subject, string $name ): array {
 		$value = $subject->getStatements()->getStatement( new PropertyName( $name ) )?->getValue();
-		if ( $value instanceof \ProfessionalWiki\NeoWiki\Domain\Value\UrlValue ) { return $value->parts; }
+		if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ) { return $value->parts; }
 		return $value instanceof StringValue ? array_map( static fn ( string $url ): array => [ 'url' => $url ], $value->strings ) : [];
 	}
 	private static function ownDateParts( Subject $subject, string $name, string $language, array $options ): array {
 		return array_map( static function ( string $raw ) use ( $language, $options ): array {
-			$date = \ProfessionalWiki\NeoWiki\Domain\HistoricalDate::parse( $raw );
+			$date = \ProfessionalWiki\SWS\Domain\HistoricalDate::parse( $raw );
 			return $date === null ? [ [ 'text' => $raw ] ] : TimePresentation::parts(
 				[ 'year' => $date->year, ...( $date->month === null ? [] : [ 'month' => $date->month ] ), ...( $date->day === null ? [] : [ 'day' => $date->day ] ) ],
 				$language, (string)( $GLOBALS['wgLanguageCode'] ?? 'de' ), $options );

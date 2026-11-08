@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReferenceNormalizer;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceNormalizer;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * Derives the name from the Schema page's title, so MediaWiki's own rules apply: the first character
@@ -20,7 +20,7 @@ class TitleBasedSchemaReferenceNormalizer implements SchemaReferenceNormalizer {
 	/**
 	 * A wiki names few Schemas while every Subject read asks after one, and parsing a title is neither
 	 * free nor cached by MediaWiki outside NS_MAIN. Kept for the life of this normalizer, which
-	 * NeoWikiExtension makes the process.
+	 * SWSExtension makes the process.
 	 *
 	 * @var array<string, SchemaName>
 	 */
@@ -55,7 +55,7 @@ class TitleBasedSchemaReferenceNormalizer implements SchemaReferenceNormalizer {
 	 * titled as no Schema may be named, is left as written for the lookup to report as missing.
 	 */
 	private function nameOfSchemaPage( SchemaName $name ): SchemaName {
-		$title = $this->titleFactory->makeTitleSafe( NeoWikiExtension::NS_SCHEMA, $name->getText() );
+		$title = $this->titleFactory->makeTitleSafe( SWSExtension::NS_SCHEMA, $name->getText() );
 
 		if ( $title === null ) {
 			return $name;

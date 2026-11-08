@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits
  * @group Database
  */
 class Neo4jQueryLimitsTest extends MediaWikiIntegrationTestCase {
@@ -46,7 +46,7 @@ class Neo4jQueryLimitsTest extends MediaWikiIntegrationTestCase {
 	}
 
 	private function overrideTiers(): void {
-		$this->overrideConfigValue( 'NeoWikiQueryLimits', [
+		$this->overrideConfigValue( 'SWSQueryLimits', [
 			'default'   => [ 'timeoutSeconds' => 5, 'maxRows' => 100 ],
 			'expensive' => [ 'timeoutSeconds' => 99, 'maxRows' => 999 ],
 		] );

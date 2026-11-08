@@ -1,11 +1,5 @@
-# SemanticWikiSchema 0.1.19
+# Semantic WikiSchema 0.1.22
 
-Schemaorientierte Datenerfassung mit Wikidata-/Wikibase-Quellen, automatischen SMW-Annotationen, Graphdarstellung und MCP-Zugriff. Die bestehende Eingabemaske und konfigurierbaren Eigenschaftszuordnungen bleiben erhalten.
+Eigenständig weiterentwickelter Fork mit eigenen technischen SWS-Kennungen. Ein direkter Austausch mit NeoWiki ist ab dieser Version nicht möglich; vorhandene Installationen benötigen eine abgestimmte Migration. Der Wechsel der angepassten 0.1.20 auf 0.1.22 wurde auf AufEinWort mit erhaltenen Daten und Seiten durchgeführt. Für andere NeoWiki-Ausgangsversionen ist zunächst deren Bestand zu prüfen.
 
-Die SMW-Übernahme benötigt keinen Vorlagenaufruf mehr. Die Wiki-Module bleiben für Einzelabfragen erhalten; `Modul:NeoWiki/config` bleibt die bearbeitbare Konfiguration. Schema-Anfangswerte werden bei neuen Subjekten übernommen. URL-Voreinstellungen dürfen im Schema ohne Adresse gespeichert werden.
-
-Installation ausschließlich über Composer: `aufeinwort/semantic-wikischema:dev-semantic-0.1.19`. Unterstützt ist die dokumentierte MediaWiki-1.47-/PHP-8.3-/SMW-7.4-Umgebung mit Legacy-Parser. Kein Docker-Angebot. Der vorhandene MCP-Patch bleibt unverändert enthalten.
-
-Der Maintainer hat den Laufzeitstand auf dem Produktionsserver bestätigt; ein Installationstest dieses vollständigen Composer-Pakets steht noch aus. Dies ist keine 1.0-Freigabe. Originalautoren und Lizenzen bleiben erhalten; Jeroen De Dauw und Professional Wiki unterstützen diesen Fork nicht eigens.
-
-[Installation](INSTALLATION.md) · [Prüfungen und Grenzen](VERIFICATION.md)
+Siehe MIGRATION-0.1.22.md und VERIFICATION-0.1.22.md. Vorhandene Seiten oder Schemata nicht löschen. Die lokale Installation und lesende MCP-Aufrufe sind bestätigt; eine neue Composer-Installation sowie erneute Exportdownloads dieser Version sind noch nicht verifiziert.

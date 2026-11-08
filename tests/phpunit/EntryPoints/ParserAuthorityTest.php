@@ -2,40 +2,40 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Extension\Scribunto\ScribuntoContent;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\ParserAuthority;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\ParseTimePermissionFixtures;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\ParserAuthority
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onParserOptionsRegister
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onParserFirstCallInit
+ * @covers \ProfessionalWiki\SWS\EntryPoints\ParserAuthority
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserOptionsRegister
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
  * @group Database
  */
-class ParserAuthorityTest extends NeoWikiIntegrationTestCase {
+class ParserAuthorityTest extends SWSIntegrationTestCase {
 
 	use ParseTimePermissionFixtures;
 
 	private const string PARSED_PAGE = 'ParserAuthorityTestPage';
 	private const string SUBJECT_PAGE = 'ParserAuthorityTestSubjectPage';
-	private const string VALUE_FUNCTION = '{{#neowiki_value: Motto | page=' . self::SUBJECT_PAGE . ' }}';
+	private const string VALUE_FUNCTION = '{{#sws_value: Motto | page=' . self::SUBJECT_PAGE . ' }}';
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -53,7 +53,7 @@ class ParserAuthorityTest extends NeoWikiIntegrationTestCase {
 	}
 
 	/**
-	 * Entries cached before NeoWiki keyed by access class carry no such key, so a gated page must not
+	 * Entries cached before SWS keyed by access class carry no such key, so a gated page must not
 	 * land on the key those entries used, not even for an anonymous reader.
 	 */
 	public function testAGatedPageDoesNotReuseAnEntryCachedWithoutTheAccessClass(): void {
@@ -117,7 +117,7 @@ class ParserAuthorityTest extends NeoWikiIntegrationTestCase {
 		$this->editPage(
 			Title::makeTitle( NS_MODULE, 'ParserAuthorityTest' ),
 			new ScribuntoContent(
-				"local nw = require( 'mw.neowiki' )\n" .
+				"local nw = require( 'mw.sws' )\n" .
 				"local p = {}\n" .
 				"function p.motto( frame ) return nw.getValue( 'Motto', { page = frame.args[1] } ) or '' end\n" .
 				"return p"
@@ -135,7 +135,7 @@ class ParserAuthorityTest extends NeoWikiIntegrationTestCase {
 
 	/**
 	 * Wikitext holding a gated read, plus a Subject slot of its own, so the render combines two slots
-	 * as every NeoWiki page does: the option the read records must survive that merge to reach the
+	 * as every SWS page does: the option the read records must survive that merge to reach the
 	 * cache key.
 	 */
 	private function cachedGatedPage( ParserOptions $parserOptions ): WikiPage {

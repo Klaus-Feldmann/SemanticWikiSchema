@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
 
 /**
  * Sends a SPARQL 1.1 Update request to a store's endpoint. Implementations throw on any failure

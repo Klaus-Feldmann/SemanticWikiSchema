@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Hiding who made a revision creates no revision of its own, so none of the hooks the projection is
@@ -19,10 +19,10 @@ use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * the Cypher endpoint is open to (#1246). Changing the visibility of a page's current revision
  * therefore has to reproject the page.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onArticleRevisionVisibilitySet
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onArticleRevisionVisibilitySet
  * @group Database
  */
-class RevisionVisibilityGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class RevisionVisibilityGraphProjectionTest extends SWSIntegrationTestCase {
 
 	private const string PAGE_NAME = 'Page whose author gets hidden';
 	private const string APPROVED_PAGE_NAME = 'Page with an approved revision and a draft';
@@ -36,7 +36,7 @@ class RevisionVisibilityGraphProjectionTest extends NeoWikiIntegrationTestCase {
 		parent::tearDown();
 		// A test that registers a revision policy rebuilds the singleton with it; reset it so later
 		// tests get a clean instance rebuilt without the temporary hook.
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	public function testHidingTheAuthorOfTheCurrentRevisionTakesTheirNameOutOfTheGraph(): void {

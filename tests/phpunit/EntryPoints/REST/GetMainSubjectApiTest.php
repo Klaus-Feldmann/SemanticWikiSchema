@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetMainSubjectApi;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
  * Runs the handler against pages saved through MediaWiki, which is where the page's title and the
  * viewer's page-level read permission come from.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetMainSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\Presentation\RestGetMainSubjectPresenter
- * @covers \ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject\GetMainSubjectQuery
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi
+ * @covers \ProfessionalWiki\SWS\Presentation\RestGetMainSubjectPresenter
+ * @covers \ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
  * @group Database
  */
-class GetMainSubjectApiTest extends NeoWikiIntegrationTestCase {
+class GetMainSubjectApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	public function setUp(): void {
 		$this->setUpNeo4j();

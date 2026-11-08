@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Source;
+namespace ProfessionalWiki\SWS\Domain\Source;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
 
 /**
  * Where a Subject comes from (ADR 23). The local revision slot is one Source; an extension may register
@@ -32,7 +32,7 @@ use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
  * though the Subject or Schema is absent, so a page degrades rather than breaking.
  *
  * **A Source vouches for what it returns.** Everything it hands back is readable by every reader of
- * this wiki: NeoWiki performs no per-user authorization on sourced Subjects, because there is no page
+ * this wiki: SWS performs no per-user authorization on sourced Subjects, because there is no page
  * of this wiki to authorize against. A Source over data with restrictions of its own — an on-wiki
  * store with restricted pages, say — must therefore serve only what is unrestricted on its side, a
  * question it can answer without knowing who is asking. Per-user granularity for sourced data is out
@@ -58,7 +58,7 @@ interface Source {
 	public function getSchema( SchemaName $name ): ?Schema;
 
 	/**
-	 * Whether this Source's Subjects can be changed through NeoWiki. The only capability the model
+	 * Whether this Source's Subjects can be changed through SWS. The only capability the model
 	 * varies: local Subjects are editable and versioned, sourced ones are read-only.
 	 */
 	public function isEditable(): bool;

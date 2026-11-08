@@ -1,4 +1,4 @@
-name: NeoWiki CI (PHP)
+name: SWS CI (PHP)
 
 on:
   workflow_dispatch:
@@ -55,7 +55,7 @@ jobs:
       # phpunit.xml.dist (PHPUnit <env> does not override an existing environment variable), so the test
       # reaches the QLever the "Start QLever" step publishes on the runner's localhost.
       QLEVER_TEST_URL: http://localhost:7019/
-      QLEVER_TEST_ACCESS_TOKEN: neowiki_test_token
+      QLEVER_TEST_ACCESS_TOKEN: sws_test_token
       # Live Oxigraph store for the same system test run against a second engine, published by the
       # "Start Oxigraph" step.
       OXIGRAPH_TEST_BASE_URL: http://localhost:7878
@@ -124,14 +124,14 @@ jobs:
       - name: Install MediaWiki
         if: steps.cache-mediawiki.outputs.cache-hit != 'true'
         working-directory: ~
-        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} NeoWiki
+        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} SWS
 
       - uses: actions/checkout@v6
         with:
-          path: mediawiki/extensions/NeoWiki
+          path: mediawiki/extensions/SWS
 
       - name: Load RedHerb test extension
-        run: echo 'wfLoadExtension( "RedHerb", "$IP/extensions/NeoWiki/tests/RedHerb/extension.json" );' >> LocalSettings.php
+        run: echo 'wfLoadExtension( "RedHerb", "$IP/extensions/SWS/tests/RedHerb/extension.json" );' >> LocalSettings.php
 
       - run: composer update
 
@@ -155,13 +155,13 @@ jobs:
       # The build is the one the Docker stacks run.
       - name: Start QLever
         run: |
-          docker run -d --name test_qlever -p 7019:7019 -e QLEVER_ACCESS_TOKEN=neowiki_test_token \
+          docker run -d --name test_qlever -p 7019:7019 -e QLEVER_ACCESS_TOKEN=sws_test_token \
             --entrypoint /bin/bash docker.io/adfreiburg/qlever@sha256:60f37fcbfb1bedc911ffc99d26ac404bf6a877ffb2413ee4fb6e41b9e426e2af -lc '
               set -e
               cd /tmp
               : > data.nt
-              qlever-index -i neowiki -F nt -f data.nt
-              exec qlever-server -i neowiki -p 7019 -a "$QLEVER_ACCESS_TOKEN" -m 1G --service-allowed-iri-prefixes -'
+              qlever-index -i sws -F nt -f data.nt
+              exec qlever-server -i sws -p 7019 -a "$QLEVER_ACCESS_TOKEN" -m 1G --service-allowed-iri-prefixes -'
 
       # Oxigraph, the second SPARQL engine the same system test runs against. Started explicitly next
       # to QLever rather than as a `services:` container, so the serve flags are stated here rather than
@@ -178,7 +178,7 @@ jobs:
             ghcr.io/oxigraph/oxigraph:0.5.13 serve --bind 0.0.0.0:7878
 
       # Apache Jena Fuseki, which the same system test runs against a third time. It is here as a
-      # conformance target, not as an engine NeoWiki ships: Jena is the most complete SPARQL 1.1
+      # conformance target, not as an engine SWS ships: Jena is the most complete SPARQL 1.1
       # implementation to check the emitted queries and updates against. The version is pinned for that
       # reason — the reference to test against should change deliberately, not with upstream releases.
       # Apache publishes no container image, so instead of trusting a third-party build this runs the
@@ -230,7 +230,7 @@ jobs:
 
       - name: Run PHPUnit
         run: composer phpunit
-        working-directory: mediawiki/extensions/NeoWiki
+        working-directory: mediawiki/extensions/SWS
 
   phpcs:
     name: "PHPCS with PHP 8.3"
@@ -311,19 +311,19 @@ jobs:
       - name: Install MediaWiki
         if: steps.cache-mediawiki.outputs.cache-hit != 'true'
         working-directory: ~
-        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} NeoWiki
+        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} SWS
 
       - uses: actions/checkout@v6
         with:
-          path: mediawiki/extensions/NeoWiki
+          path: mediawiki/extensions/SWS
 
       - run: composer update
 
       - name: Composer install
-        run: cd extensions/NeoWiki && composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+        run: cd extensions/SWS && composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 
       - name: PHPStan
-        run: cd extensions/NeoWiki && vendor/bin/phpstan analyze --configuration=phpstan.neon --memory-limit=2G
+        run: cd extensions/SWS && vendor/bin/phpstan analyze --configuration=phpstan.neon --memory-limit=2G
 
 #  Psalm:
 #    name: "Psalm: MW ${{ matrix.mw }}, PHP ${{ matrix.php }}"
@@ -373,16 +373,16 @@ jobs:
 #      - name: Install MediaWiki
 #        if: steps.cache-mediawiki.outputs.cache-hit != 'true'
 #        working-directory: ~
-#        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} NeoWiki
+#        run: bash EarlyCopy/.github/workflows/installMediaWiki.sh ${{ matrix.mw }} SWS
 #
 #      - uses: actions/checkout@v6
 #        with:
-#          path: mediawiki/extensions/NeoWiki
+#          path: mediawiki/extensions/SWS
 #
 #      - uses: actions/checkout@v6
 #        with:
 #          repository: ProfessionalWiki/Neo
-#          path: mediawiki/extensions/NeoWiki/Neo
+#          path: mediawiki/extensions/SWS/Neo
 #          token: ${{ secrets.NEO_READ_FPAT }}
 #          # Expected to expire on Sep 12 2025
 #          # https://github.com/organizations/ProfessionalWiki/settings/secrets/actions/NEO_READ_FPAT (enter new value)
@@ -391,7 +391,7 @@ jobs:
 #      - run: composer update
 #
 #      - name: Composer install
-#        run: cd extensions/NeoWiki && composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+#        run: cd extensions/SWS && composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
 #
 #      - name: Psalm
-#        run: cd extensions/NeoWiki && vendor/bin/psalm --config=psalm.xml --no-diff
+#        run: cd extensions/SWS && vendor/bin/psalm --config=psalm.xml --no-diff

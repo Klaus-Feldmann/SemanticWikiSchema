@@ -1,28 +1,28 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing;
+namespace ProfessionalWiki\SWS\EntryPoints\Processing;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /** Renders full revisions without consulting or writing ParserCache. */
 final class InternalPageProcessor {
-    public const MANAGED = 'semantic-neowiki-internal-managed';
+    public const MANAGED = 'semantic-sws-internal-managed';
 
     public static function manages( Title $title, ?RevisionRecord $revision = null ): bool {
         if ( !$title->canExist() ) { return false; }
         $services = MediaWikiServices::getInstance();
         $revision ??= $services->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
         if ( !$revision ) { return false; } // Deletions must use the regular deletion path.
-        if ( $revision->hasSlot( 'neo' ) ) { return true; }
+        if ( $revision->hasSlot( 'sws' ) ) { return true; }
         // One final complete pass after intentional removal of the subject slot.
         return (bool)( $services->getPageProps()->getProperties( $title, self::MANAGED )[$title->getArticleID()] ?? false );
     }
@@ -35,7 +35,7 @@ final class InternalPageProcessor {
         if ( !$user->authorizeRead( 'read', $title ) || !$revision->userCan( RevisionRecord::DELETED_TEXT, $user ) ) {
             throw new ProcessingIncomplete( 'SemanticWikiSchema: processing identity cannot read the current revision.', 'denied' );
         }
-        $policy = NeoWikiExtension::getInstance()->getRevisionPolicy();
+        $policy = SWSExtension::getInstance()->getRevisionPolicy();
         if ( !$policy->revisionIsReadableBy( $revision, $user ) || $policy->publishedRevision( $revision )?->getId() !== $revision->getId() ) {
             throw new ProcessingIncomplete( 'SemanticWikiSchema: current revision is not publishable under the registered revision policy.', 'pending' );
         }
@@ -45,7 +45,7 @@ final class InternalPageProcessor {
             $dependencies = [];
             $schema = null;
             $content = SubjectSlotReader::read( $revision );
-            if ( $revision->hasSlot( 'neo' ) && $content === null ) {
+            if ( $revision->hasSlot( 'sws' ) && $content === null ) {
                 throw new ProcessingIncomplete( 'SemanticWikiSchema: subject slot is not readable.' );
             }
             $raw = $content ? json_decode( $content->getText(), true, 512, JSON_THROW_ON_ERROR ) : [];
@@ -58,13 +58,13 @@ final class InternalPageProcessor {
                 throw new ProcessingIncomplete( 'SemanticWikiSchema: main subject could not be resolved.' );
             }
             $schemas = [];
-            $resolveSchema = static function ( \ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference $reference ) use ( $services, $user, &$dependencies, &$schemas ): \ProfessionalWiki\NeoWiki\Domain\Schema\Schema {
+            $resolveSchema = static function ( \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference ) use ( $services, $user, &$dependencies, &$schemas ): \ProfessionalWiki\SWS\Domain\Schema\Schema {
                 $key = $reference->getText();
                 if ( isset( $schemas[$key] ) ) {
                     return $schemas[$key];
                 }
                 if ( !$reference->isLocal() ) { throw new ProcessingIncomplete( 'SemanticWikiSchema: remote schema processing is not supported.' ); }
-                $schemaTitle = Title::makeTitleSafe( NeoWikiExtension::NS_SCHEMA, $reference->name->getText() );
+                $schemaTitle = Title::makeTitleSafe( SWSExtension::NS_SCHEMA, $reference->name->getText() );
                 if ( !$schemaTitle || !$user->authorizeRead( 'read', $schemaTitle ) ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: schema is not readable.', 'denied' );
                 }
@@ -72,14 +72,14 @@ final class InternalPageProcessor {
                 if ( !$schemaRevision || !$schemaRevision->getContent( 'main', RevisionRecord::FOR_THIS_USER, $user ) instanceof SchemaContent ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: schema is missing or unavailable.' );
                 }
-                $publishedSchema = NeoWikiExtension::getInstance()->getRevisionPolicy()->publishedRevision( $schemaRevision );
+                $publishedSchema = SWSExtension::getInstance()->getRevisionPolicy()->publishedRevision( $schemaRevision );
                 if ( $publishedSchema === null ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: schema has no published revision.', 'pending' );
                 }
                 if ( $publishedSchema->getId() !== $schemaRevision->getId() ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: current schema is not yet publishable.', 'pending' );
                 }
-                if ( ( $schema = NeoWikiExtension::getInstance()->getSchemaResolverFor( $user )->getSchema( $reference ) ) === null ) {
+                if ( ( $schema = SWSExtension::getInstance()->getSchemaResolverFor( $user )->getSchema( $reference ) ) === null ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: invalid or unavailable schema.' );
                 }
                 $dependencies[] = [ 'namespace' => $schemaTitle->getNamespace(), 'title' => $schemaTitle->getDBkey(), 'revision' => $schemaRevision->getId() ];
@@ -93,7 +93,7 @@ final class InternalPageProcessor {
                 // not turn an existing own value into an apparently empty field.
                 $probe = $services->getParserFactory()->create();
                 $probe->startExternalParse( $title, $options, \MediaWiki\Parser\Parser::OT_HTML );
-                $resolver = NeoWikiExtension::getInstance()->newSubjectResolver( $probe );
+                $resolver = SWSExtension::getInstance()->newSubjectResolver( $probe );
                 if ( $resolver->resolveMainByTitle( $title ) != $subject ) {
                     throw new ProcessingIncomplete( 'SemanticWikiSchema: page lookup does not match the subject snapshot.' );
                 }
@@ -112,7 +112,7 @@ final class InternalPageProcessor {
                 throw new ProcessingIncomplete( 'SemanticWikiSchema: parser or source resolution failed; previous derived data retained.' );
             }
             if ( $subject !== null && $schema !== null && $services->hasService( 'SMW.ParserDataFactory' ) ) {
-                ( new \ProfessionalWiki\NeoWiki\EntryPoints\Semantic\AutomaticAnnotations() )->apply(
+                ( new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations() )->apply(
                     $title, $output, $context->parser, $schema, $subjects, $subject, $user, $resolveSchema
                 );
             }
@@ -132,7 +132,7 @@ final class InternalPageProcessor {
                 'sha1' => $revision->getSha1(), 'dependencies' => $dependencies,
                 'semanticHash' => ProcessingResult::semanticHash( $data ) ] );
             $output->setExtensionData( ProcessingResult::STAMP, $stamp );
-            if ( $revision->hasSlot( 'neo' ) ) { $output->setPageProperty( self::MANAGED, '1' ); }
+            if ( $revision->hasSlot( 'sws' ) ) { $output->setPageProperty( self::MANAGED, '1' ); }
             // Even an accidental caller must not cache this privileged HTML.
             $output->updateCacheExpiry( 0 );
             if ( $data !== null ) { $data->setExtensionData( ProcessingResult::STAMP, $stamp ); }
@@ -156,14 +156,14 @@ final class InternalPageProcessor {
             // A fresh WikiPage avoids an updater already bound to the anonymous save parse.
             MediaWikiServices::getInstance()->getWikiPageFactory()->newFromTitle( $title )->doSecondaryDataUpdates( [
                 'known-revision-output' => $result->output, 'known-revision-options' => $result->options,
-                'recursive' => false, 'causeAction' => 'semantic-neowiki-internal', 'causeAgent' => ProcessingIdentity::NAME
+                'recursive' => false, 'causeAction' => 'semantic-sws-internal', 'causeAgent' => ProcessingIdentity::NAME
             ] );
         } catch ( \Throwable $e ) {
             ProcessingState::record( $title, $e instanceof ProcessingIncomplete ? $e->state : 'failed', $result->revision->getId() );
             throw $e;
         } finally { ProcessingHooks::$movedFrom = null; }
         // Preserve the original graph/index projection path and its publication policy.
-        NeoWikiExtension::getInstance()->newHookPageRebuilder()->rebuild( $title );
+        SWSExtension::getInstance()->newHookPageRebuilder()->rebuild( $title );
         if ( !MediaWikiServices::getInstance()->hasService( 'SMW.ParserDataFactory' ) ) {
             ProcessingState::record( $title, 'complete', $result->revision->getId() );
         }

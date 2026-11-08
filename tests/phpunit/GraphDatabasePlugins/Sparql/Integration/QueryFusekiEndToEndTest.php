@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 /**
  * {@see QuerySparqlEndToEndTestCase} against Apache Jena Fuseki — a conformance target, not an engine
- * NeoWiki ships or recommends. Jena is the most complete SPARQL 1.1 implementation available to point
- * the same loop at, so what passing here establishes is about the SPARQL NeoWiki emits rather than
+ * SWS ships or recommends. Jena is the most complete SPARQL 1.1 implementation available to point
+ * the same loop at, so what passing here establishes is about the SPARQL SWS emits rather than
  * about one store's tolerance of it.
  *
  * The only one of these suites that skips rather than fails when its store is unset, because it is the
@@ -17,19 +17,19 @@ namespace ProfessionalWiki\NeoWiki\Tests\GraphDatabasePlugins\Sparql\Integration
  *
  * To run it here, build Fuseki's container image — Apache publishes none, only a build kit
  * (https://jena.apache.org/documentation/fuseki2/fuseki-docker.html) — and put it on the dev stack's
- * network (`<stack project>_default`, so `neowiki-neowiki_default` for the main checkout):
+ * network (`<stack project>_default`, so `sws-sws_default` for the main checkout):
  *
- *     docker run --rm --name test_fuseki --network neowiki-neowiki_default <your-image> --mem /ds
+ *     docker run --rm --name test_fuseki --network sws-sws_default <your-image> --mem /ds
  *
  * then, from a shell in the mediawiki container (`make bash`):
  *
  *     FUSEKI_TEST_BASE_URL=http://test_fuseki:3030/ds make phpunit filter=QueryFusekiEndToEndTest
  *
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
- * @covers \ProfessionalWiki\NeoWiki\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
 class QueryFusekiEndToEndTest extends QuerySparqlEndToEndTestCase {

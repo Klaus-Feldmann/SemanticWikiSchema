@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Application\GraphRebuild;
 
 use Closure;
 use InvalidArgumentException;
-use ProfessionalWiki\NeoWiki\Application\PageRebuilder;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Application\PageRebuilder;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -184,7 +184,7 @@ class GraphRebuildCoordinator {
 			// so nothing will ever advance whatever filed this. Worth a line, because a store may be left
 			// with a run recorded as queued that only cancelling releases.
 			$this->logger->warning(
-				'NeoWiki background graph rebuild was asked to continue run ' . $runId
+				'SWS background graph rebuild was asked to continue run ' . $runId
 				. ', which the records do not have.',
 				[ 'runId' => $runId ]
 			);
@@ -203,7 +203,7 @@ class GraphRebuildCoordinator {
 			// resumes, and it is also the only caller that never queues, so a queued batch that finds its
 			// run being driven from a shell has nothing left to do.
 			$this->logger->info(
-				'NeoWiki background graph rebuild left run ' . $runId . ' of graph store "' . $run->store
+				'SWS background graph rebuild left run ' . $runId . ' of graph store "' . $run->store
 				. '" to the shell that is driving it.',
 				[ 'runId' => $runId, 'store' => $run->store ]
 			);
@@ -248,7 +248,7 @@ class GraphRebuildCoordinator {
 		$this->runs->updateRun( $run->failed( $reason === '' ? null : $reason ) );
 
 		$this->logger->error(
-			'NeoWiki background graph rebuild of store "' . $run->store . '" could not run a batch, so the '
+			'SWS background graph rebuild of store "' . $run->store . '" could not run a batch, so the '
 			. 'run was ended. Underlying error: ' . $reason,
 			[ 'exception' => $e, 'store' => $run->store ]
 		);

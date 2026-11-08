@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetMainSubject;
+namespace ProfessionalWiki\SWS\Application\Queries\GetMainSubject;
 
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 
 readonly class GetMainSubjectResponse {
 

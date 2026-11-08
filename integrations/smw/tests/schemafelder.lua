@@ -11,7 +11,7 @@ mw = {
     text = {trim=function(s)return s:match('^%s*(.-)%s*$')end,
         nowiki=function(s)return s:gsub('&','&amp;'):gsub('<','&lt;'):gsub('>','&gt;'):gsub('%[','&#91;'):gsub('%]','&#93;'):gsub('|','&#124;')end}
 }
-package.preload['mw.neowiki'] = function() return {
+package.preload['mw.sws'] = function() return {
     getMainSubject=function(page) return exists and {id='sTest',schema=schemaName,statements=storedStatements} or nil end,
     getSubject=function(id) return exists and {id='sTest',schema=schemaName,statements=storedStatements} or nil end,
     getSchema=function() return {name=schemaName,properties=definitions} end,
@@ -33,12 +33,12 @@ package.preload['mw.neowiki'] = function() return {
         return result
     end
 } end
-package.preload['mw.neowikibase'] = function() return {getFields=function()
+package.preload['mw.swsbase'] = function() return {getFields=function()
     calls=calls+1
     return {version=1,scope='current',mainSubjectId='sTest',fields=remote}
 end} end
-local api, module = require('Modul:NeoWiki/API'), require('Modul:NeoWiki')
-local config = require('Modul:NeoWiki/config')
+local api, module = require('Modul:SWS/API'), require('Modul:SWS')
+local config = require('Modul:SWS/config')
 local frame={args={},callParserFunction=function(self, options)
     check(options.name=='#set' and #options.args==1,'One structured #set argument per value')
     writes[#writes+1]=options.args[1]
@@ -180,7 +180,7 @@ check(has('Bezug=Werk:De mathematica perfectione')==1,'Page namespace survives S
 check(calls==0,'Local page fields do not need an external request')
 reset('Person',{{name='Geburtsort',type='page'}},{Geburtsort={}})
 module.annotieren(frame);check(#writes==0,'Cleared page field emits no annotation')
-reset('Person',{{name='Verarbeitung',type='wikitext',execute=true,wikitext='{{NeoWiki}}'},{name='Wikitextnotiz',type='wikitext'},{name='Ort',type='page'}},{Verarbeitung={'{{NichtAusfuehren}}'},Wikitextnotiz={'{{AuchNicht}}'},Ort={'Athen'}})
+reset('Person',{{name='Verarbeitung',type='wikitext',execute=true,wikitext='{{SWS}}'},{name='Wikitextnotiz',type='wikitext'},{name='Ort',type='page'}},{Verarbeitung={'{{NichtAusfuehren}}'},Wikitextnotiz={'{{AuchNicht}}'},Ort={'Athen'}})
 module.annotieren(frame)
 check(#writes==1 and has('Ort=Athen')==1,'Wikitext source and schema code are not SMW metadata')
 print(n..' schema-field checks passed.')

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Infrastructure;
+namespace ProfessionalWiki\SWS\Infrastructure;
 
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\NeoWiki\Application\RawQueryAuthorizer;
+use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
 
 class AuthorityBasedRawQueryAuthorizer implements RawQueryAuthorizer {
 
-	public const string RIGHT = 'neowiki-query';
+	public const string RIGHT = 'sws-query';
 
 	public function __construct(
 		private readonly Authority $authority,

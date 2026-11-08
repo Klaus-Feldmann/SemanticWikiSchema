@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Rdf;
+namespace ProfessionalWiki\SWS\Domain\Rdf;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Relation\RelationId;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 
 /**
  * The IRI and prefix scheme for the native RDF projection (NativeRdfProjection.md § Namespaces).
  *
- * Every NeoWiki IRI lives under a per-wiki base URI so that sibling projections (native and
+ * Every SWS IRI lives under a per-wiki base URI so that sibling projections (native and
  * ontology-mapped) mint identical entity IRIs. Standard vocabulary (rdf, rdfs, xsd, dcterms) is
  * fixed and independent of the base.
  */
@@ -23,7 +23,7 @@ readonly class RdfNamespaces {
 	public const string XSD = 'http://www.w3.org/2001/XMLSchema#';
 	public const string DCTERMS = 'http://purl.org/dc/terms/';
 
-	// Local names of NeoWiki vocabulary terms under the `neo:` namespace.
+	// Local names of SWS vocabulary terms under the `neo:` namespace.
 	public const string CLASS_PAGE = 'Page';
 	public const string CLASS_RELATION = 'Relation';
 	public const string TERM_PAGE_NAME = 'pageName';

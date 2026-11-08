@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Rdf;
+namespace ProfessionalWiki\SWS\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfSerializer;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
 
 /**
  * A selected projection: the {@see PageProjector} that produces its quads and the {@see RdfSerializer}

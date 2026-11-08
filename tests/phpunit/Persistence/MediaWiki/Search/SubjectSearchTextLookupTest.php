@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Search;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Search;
 
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * @group Database
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Search\SubjectSearchTextLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup
  */
-class SubjectSearchTextLookupTest extends NeoWikiIntegrationTestCase {
+class SubjectSearchTextLookupTest extends SWSIntegrationTestCase {
 
 	public function testReturnsLabelAndValuesOfThePagesSubjects(): void {
 		$revision = $this->createPageWithSubjects( 'Rijksmuseum', $this->museumSubject( 'Amsterdam' ) );
@@ -68,7 +68,7 @@ class SubjectSearchTextLookupTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function newLookup(): SubjectSearchTextLookup {
-		return NeoWikiExtension::getInstance()->newSubjectSearchTextLookup();
+		return SWSExtension::getInstance()->newSubjectSearchTextLookup();
 	}
 
 }

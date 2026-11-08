@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 use ProfessionalWiki\RedHerb\RedHerbGraphDatabasePlugin;
 
 /**
  * Proves that the graph-database plugin registry actually dispatches page events to
  * extension-registered plugins, not just that they get added to the registry. RedHerb
- * registers a real GraphDatabasePlugin via the NeoWikiRegistration hook; this test reads
+ * registers a real GraphDatabasePlugin via the SWSRegistration hook; this test reads
  * the live registered instance back out of the registry and confirms it recorded the
  * save/delete events that the hook-facing wiring fanned out to it, passing cleanly through
  * the per-plugin failure isolation.
  *
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\CompositeGraphDatabasePlugin
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
- * @covers \ProfessionalWiki\NeoWiki\Domain\GraphDatabase\GraphDatabasePluginRegistry
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+ * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry
  * @group Database
  */
-class ExtensionGraphDatabasePluginDispatchTest extends NeoWikiIntegrationTestCase {
+class ExtensionGraphDatabasePluginDispatchTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();
@@ -65,7 +65,7 @@ class ExtensionGraphDatabasePluginDispatchTest extends NeoWikiIntegrationTestCas
 	}
 
 	private function getRegisteredRedHerbPlugin(): RedHerbGraphDatabasePlugin {
-		$plugins = NeoWikiExtension::getInstance()->getGraphDatabasePluginRegistry()->getPlugins();
+		$plugins = SWSExtension::getInstance()->getGraphDatabasePluginRegistry()->getPlugins();
 
 		foreach ( $plugins as $plugin ) {
 			if ( $plugin instanceof RedHerbGraphDatabasePlugin ) {

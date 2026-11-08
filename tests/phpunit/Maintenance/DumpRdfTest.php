@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Maintenance;
+namespace ProfessionalWiki\SWS\Tests\Maintenance;
 
 use Exception;
 use MediaWiki\CommentStore\CommentStoreComment;
@@ -11,16 +11,16 @@ use MediaWiki\Maintenance\MaintenanceFatalError;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiRegistrar;
-use ProfessionalWiki\NeoWiki\Maintenance\DumpRdf;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\ThrowingPagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
+use ProfessionalWiki\SWS\Maintenance\DumpRdf;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingPagePropertyProvider;
 use RuntimeException;
 use Wikimedia\Rdbms\DBUnexpectedError;
 
@@ -29,7 +29,7 @@ use Wikimedia\Rdbms\DBUnexpectedError;
 require_once __DIR__ . '/../../../maintenance/DumpRdf.php';
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Maintenance\DumpRdf
+ * @covers \ProfessionalWiki\SWS\Maintenance\DumpRdf
  * @group Database
  */
 class DumpRdfTest extends MaintenanceBaseTestCase {
@@ -137,7 +137,7 @@ class DumpRdfTest extends MaintenanceBaseTestCase {
 
 	private function insertPageWithASubjectAndItsSchema( string $pageName ): void {
 		$this->editPage(
-			Title::makeTitle( NeoWikiExtension::NS_SCHEMA, TestSubject::DEFAULT_SCHEMA_ID ),
+			Title::makeTitle( SWSExtension::NS_SCHEMA, TestSubject::DEFAULT_SCHEMA_ID ),
 			new SchemaContent( '{"title":"' . TestSubject::DEFAULT_SCHEMA_ID . '","propertyDefinitions":{}}' )
 		);
 
@@ -154,19 +154,19 @@ class DumpRdfTest extends MaintenanceBaseTestCase {
 
 	private function failPagePropertiesFor( string $pageTitle, Exception $failure ): void {
 		$this->setTemporaryHook(
-			'NeoWikiRegistration',
-			static function ( NeoWikiRegistrar $registrar ) use ( $pageTitle, $failure ): void {
+			'SWSRegistration',
+			static function ( SWSRegistrar $registrar ) use ( $pageTitle, $failure ): void {
 				$registrar->addPagePropertyProvider(
 					new ThrowingPagePropertyProvider( $pageTitle, $failure )
 				);
 			}
 		);
 
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 	}
 
 	protected function tearDown(): void {
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 		parent::tearDown();
 	}
 

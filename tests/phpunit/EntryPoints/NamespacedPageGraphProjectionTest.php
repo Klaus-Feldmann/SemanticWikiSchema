@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The page node name must carry the full title including the namespace prefix, so that
  * consumers such as the relation value link can build a correct URL for subjects stored
  * on pages outside the main namespace.
  *
- * @covers \ProfessionalWiki\NeoWiki\PagePropertiesBuilder
- * @covers \ProfessionalWiki\NeoWiki\Persistence\CorePagePropertyProvider
+ * @covers \ProfessionalWiki\SWS\PagePropertiesBuilder
+ * @covers \ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider
  * @group Database
  */
-class NamespacedPageGraphProjectionTest extends NeoWikiIntegrationTestCase {
+class NamespacedPageGraphProjectionTest extends SWSIntegrationTestCase {
 
 	private const PAGE_NAME = 'Help:Namespaced subject page';
 

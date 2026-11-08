@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseRebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseRebuildRunRepository
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository
  * @group Database
  */
 class DatabaseRebuildRunRepositoryTest extends MediaWikiIntegrationTestCase {
@@ -364,17 +364,17 @@ class DatabaseRebuildRunRepositoryTest extends MediaWikiIntegrationTestCase {
 
 	private function deleteRunRow( RebuildRun $run ): void {
 		$this->getDb()->newDeleteQueryBuilder()
-			->deleteFrom( 'neowiki_rebuild_runs' )
-			->where( [ 'nwrr_id' => $run->id ] )
+			->deleteFrom( 'sws_rebuild_runs' )
+			->where( [ 'swsrr_id' => $run->id ] )
 			->caller( __METHOD__ )
 			->execute();
 	}
 
 	private function readFinishedTime( RebuildRun $run ): ?string {
 		$finished = $this->getDb()->newSelectQueryBuilder()
-			->select( 'nwrr_finished' )
-			->from( 'neowiki_rebuild_runs' )
-			->where( [ 'nwrr_id' => $run->id ] )
+			->select( 'swsrr_finished' )
+			->from( 'sws_rebuild_runs' )
+			->where( [ 'swsrr_id' => $run->id ] )
 			->caller( __METHOD__ )
 			->fetchField();
 

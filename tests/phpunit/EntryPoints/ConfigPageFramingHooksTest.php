@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\EditPage\EditPage;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onAlternateEdit
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAlternateEdit
  * @group Database
  */
 class ConfigPageFramingHooksTest extends MediaWikiIntegrationTestCase {
 
 	private function configTitle(): Title {
-		return Title::makeTitle( NS_MEDIAWIKI, 'NeoWiki' );
+		return Title::makeTitle( NS_MEDIAWIKI, 'SWS' );
 	}
 
 	private function englishContext( Title $title ): RequestContext {
@@ -31,7 +31,7 @@ class ConfigPageFramingHooksTest extends MediaWikiIntegrationTestCase {
 
 	private function runAlternateEdit( Title $title ): EditPage {
 		$editPage = new EditPage( Article::newFromTitle( $title, $this->englishContext( $title ) ) );
-		NeoWikiHooks::onAlternateEdit( $editPage );
+		SWSHooks::onAlternateEdit( $editPage );
 
 		return $editPage;
 	}
@@ -40,19 +40,19 @@ class ConfigPageFramingHooksTest extends MediaWikiIntegrationTestCase {
 		$editPage = $this->runAlternateEdit( $this->configTitle() );
 
 		$this->assertTrue( $editPage->suppressIntro );
-		$this->assertStringContainsString( 'neowiki.ai', $editPage->editFormTextTop );
-		$this->assertStringContainsString( '$wgNeoWikiSubjectFirst', $editPage->editFormTextBottom );
+		$this->assertStringContainsString( 'sws.ai', $editPage->editFormTextTop );
+		$this->assertStringContainsString( '$wgSWSSubjectFirst', $editPage->editFormTextBottom );
 	}
 
 	public function testOtherMediaWikiPageEditIsNotFramed(): void {
-		$editPage = $this->runAlternateEdit( Title::makeTitle( NS_MEDIAWIKI, 'NotNeoWiki' ) );
+		$editPage = $this->runAlternateEdit( Title::makeTitle( NS_MEDIAWIKI, 'NotSWS' ) );
 
 		$this->assertFalse( $editPage->suppressIntro );
 		$this->assertSame( '', $editPage->editFormTextBottom );
 	}
 
 	public function testConfigPageEditIsNotFramedWhenInWikiConfigDisabled(): void {
-		$this->overrideConfigValue( 'NeoWikiEnableInWikiConfig', false );
+		$this->overrideConfigValue( 'SWSEnableInWikiConfig', false );
 
 		$editPage = $this->runAlternateEdit( $this->configTitle() );
 

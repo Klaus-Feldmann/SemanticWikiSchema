@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectCountLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages whose saves fill the table the lookup reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectCountLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup
  * @group Database
  */
-class DatabaseSubjectCountLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseSubjectCountLookupTest extends SWSIntegrationTestCase {
 
 	public function testCountsTheSubjectsOfEachSchemaThatHasSome(): void {
 		$this->createPageWithoutMainSubject(

@@ -1,10 +1,10 @@
-import { smwPack } from './smw/index.js';
-import { bucketPack } from './bucket/index.js';
-import { cargoPack } from './cargo/index.js';
-import { neowikiPack } from './neowiki/index.js';
-import { neowikiBasePack } from './neowikibase/index.js';
-import { wikibasePack } from './wikibase/index.js';
-import { coreErrorCodes } from '../../errors/classifyError.js';
+import { smwPack } from "./smw/index.js";
+import { bucketPack } from "./bucket/index.js";
+import { cargoPack } from "./cargo/index.js";
+import { swsPack } from "./sws/index.js";
+import { swsBasePack } from "./swsbase/index.js";
+import { wikibasePack } from "./wikibase/index.js";
+import { coreErrorCodes } from "../../errors/classifyError.js";
 /**
  * A wiki gate names the pack tools it applies to, and reconcile and the per-call
  * guard both work from those names. A name the pack does not provide would gate
@@ -72,8 +72,8 @@ export const extensionPacks = [
     smwPack,
     bucketPack,
     cargoPack,
-    neowikiPack,
-    neowikiBasePack,
+    swsPack,
+    swsBasePack,
     wikibasePack,
 ];
 assertWikiGatesNameOwnTools(extensionPacks);

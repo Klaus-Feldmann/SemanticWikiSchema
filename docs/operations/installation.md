@@ -3,21 +3,21 @@ title: Installation
 order: 1
 ---
 
-# Installing NeoWiki
+# Installing SWS
 
-NeoWiki is not production-ready yet. From 0.1 on, every breaking change to stored data ships with a migration script or
+SWS is not production-ready yet. From 0.1 on, every breaking change to stored data ships with a migration script or
 written upgrade steps.
 
 Install the newest release in one of two ways:
 
-- [Try NeoWiki in Docker](#try-neowiki-in-docker): a self-contained wiki with demo data, the fastest way to evaluate
-  NeoWiki.
-- [Add NeoWiki to an existing wiki](#add-neowiki-to-an-existing-wiki): install it with Composer into a MediaWiki you
+- [Try SWS in Docker](#try-sws-in-docker): a self-contained wiki with demo data, the fastest way to evaluate
+  SWS.
+- [Add SWS to an existing wiki](#add-sws-to-an-existing-wiki): install it with Composer into a MediaWiki you
   already run.
 
-To run master, or to work on NeoWiki itself, see [Unreleased code](#unreleased-code).
+To run master, or to work on SWS itself, see [Unreleased code](#unreleased-code).
 
-## Try NeoWiki in Docker
+## Try SWS in Docker
 
 Requirements:
 
@@ -49,7 +49,7 @@ Open `http://localhost:8484` and log in as `AdminName` with the password `AdminP
 ### Stop, remove or upgrade the demo
 
 `make down` stops and removes the containers, and `make remove` also deletes the data volumes. To move a running stack
-to a newer NeoWiki, see [Upgrading](upgrading.md).
+to a newer SWS, see [Upgrading](upgrading.md).
 
 ### Share the demo with others
 
@@ -63,7 +63,7 @@ COMPOSE_PROFILES=server make demo
 
 This is still an evaluation setup, not a production deployment.
 
-## Add NeoWiki to an existing wiki
+## Add SWS to an existing wiki
 
 Requirements:
 
@@ -71,11 +71,11 @@ Requirements:
 - PHP 8.3 or later
 - Composer
 
-These extensions are recommended. NeoWiki runs without them, but you lose the matching functionality:
+These extensions are recommended. SWS runs without them, but you lose the matching functionality:
 
 - **Scribunto** adds the Lua API and its `nw.*` functions.
 - **CodeEditor** adds JSON syntax highlighting when you edit Schema, Layout, and Mapping pages.
-- **ParserFunctions** is commonly used alongside NeoWiki's parser functions.
+- **ParserFunctions** is commonly used alongside SWS's parser functions.
 
 ### 1. Install the extension
 
@@ -86,14 +86,14 @@ COMPOSER=composer.local.json composer require --no-update neowiki/neowiki:^0.1
 composer update neowiki/neowiki --no-dev -o
 ```
 
-This installs the newest 0.1 release at `extensions/NeoWiki/`.
+This installs the newest 0.1 release at `extensions/SWS/`.
 
 ### 2. Load the extension
 
 Add the following to your `LocalSettings.php`:
 
 ```php
-wfLoadExtension( 'NeoWiki' );
+wfLoadExtension( 'SWS' );
 
 // Recommended soft dependencies, unless your wiki already loads them.
 wfLoadExtension( 'Scribunto' );
@@ -116,14 +116,14 @@ step needs a SPARQL store.
 
 ### Optional: connect a graph store
 
-Queries run against graph stores that NeoWiki keeps in sync with the wiki: [Neo4j](#optional-neo4j) for Cypher, and
+Queries run against graph stores that SWS keeps in sync with the wiki: [Neo4j](#optional-neo4j) for Cypher, and
 [SPARQL stores](#optional-sparql-graph-stores) for SPARQL. Without one, everything but the query surfaces works.
 
 A store receives a page when it is next saved. Fill it with the wiki's existing pages after connecting it, and again
 after pages arrive by a path other than an edit, such as an import. From the MediaWiki root:
 
 ```sh
-php maintenance/run.php NeoWiki:RebuildGraphDatabases
+php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases
 ```
 
 ### Optional: Pretty URLs for the Data tab
@@ -140,29 +140,29 @@ Master holds the changes not yet in a release. To run it:
 
 - **Docker:** run `make demo` in a clone of the repository on master. It runs master's demo image, rebuilt on every
   push to master.
-- **An existing wiki:** in place of step 1 of [Add NeoWiki to an existing wiki](#add-neowiki-to-an-existing-wiki),
+- **An existing wiki:** in place of step 1 of [Add SWS to an existing wiki](#add-sws-to-an-existing-wiki),
   clone the repository from the MediaWiki root:
 
   ```sh
-  git clone https://github.com/ProfessionalWiki/NeoWiki.git extensions/NeoWiki
+  git clone https://github.com/ProfessionalWiki/NeoWiki.git extensions/SWS
   ```
 
   Add its `composer.json` to your wiki's `composer.local.json`, then run `composer update` from the MediaWiki root:
 
   ```json
-  { "extra": { "merge-plugin": { "include": [ "extensions/NeoWiki/composer.json" ] } } }
+  { "extra": { "merge-plugin": { "include": [ "extensions/SWS/composer.json" ] } } }
   ```
 
   Master holds no frontend bundle, so build it, with Node.js 24 or later:
 
   ```sh
-  cd extensions/NeoWiki/resources/ext.neowiki
+  cd extensions/SWS/resources/ext.sws
   npm ci && npm run build
   ```
 
   Then continue with step 2.
 
-To work on NeoWiki itself, use the development stack in the
+To work on SWS itself, use the development stack in the
 [README on GitHub](https://github.com/ProfessionalWiki/NeoWiki/blob/master/README.md#development).
 
 ## Key settings
@@ -172,29 +172,29 @@ These are the settings you are most likely to change. For the full list with des
 
 | Setting | Purpose | Default | Required |
 |---|---|---|---|
-| `$wgNeoWikiNeo4jInternalWriteUrl` | Bolt URL for writing the graph projection | _none_ | For Neo4j features |
-| `$wgNeoWikiNeo4jInternalReadUrl` | Bolt URL for read and query traffic | _none_ | For Neo4j features |
-| `$wgNeoWikiEnableDevelopmentUI` | Enables development-only UIs | `false` | No |
-| `$wgNeoWikiEnableLua` | Registers the `mw.neowiki` Lua library with Scribunto | `true` | No |
-| `$wgNeoWikiEnforceValidation` | Rejects writes that introduce new `error`-severity violations | `false` | No |
-| `$wgNeoWikiAutoRenderMainSubject` | Automatically renders a page's Main Subject as an infobox, or in full on a subject-first wiki | `true` | No |
-| `$wgNeoWikiSubjectFirst` | Puts Subjects before pages: see [Choosing page-first or subject-first](#choosing-page-first-or-subject-first) | `false` | No |
-| `$wgNeoWikiSubjectPageNamespace` | Namespace a subject-first wiki creates each Subject's own page in: see [Choosing page-first or subject-first](#choosing-page-first-or-subject-first) | `7480` (`Subject`) | No |
-| `$wgNeoWikiDataLanguages` | Languages the wiki's data is in: see [Data languages](#data-languages) | `[]` (the content language) | No |
-| `$wgNeoWikiSparqlStores` | SPARQL 1.1 graph stores to keep in sync and query, e.g. QLever | `[]` | No |
-| `$wgNeoWikiAutoRebuildOnMappingChange` | Rebuilds every store holding a Mapping's projection when that Mapping changes | `false` | No |
+| `$wgSWSNeo4jInternalWriteUrl` | Bolt URL for writing the graph projection | _none_ | For Neo4j features |
+| `$wgSWSNeo4jInternalReadUrl` | Bolt URL for read and query traffic | _none_ | For Neo4j features |
+| `$wgSWSEnableDevelopmentUI` | Enables development-only UIs | `false` | No |
+| `$wgSWSEnableLua` | Registers the `mw.sws` Lua library with Scribunto | `true` | No |
+| `$wgSWSEnforceValidation` | Rejects writes that introduce new `error`-severity violations | `false` | No |
+| `$wgSWSAutoRenderMainSubject` | Automatically renders a page's Main Subject as an infobox, or in full on a subject-first wiki | `true` | No |
+| `$wgSWSSubjectFirst` | Puts Subjects before pages: see [Choosing page-first or subject-first](#choosing-page-first-or-subject-first) | `false` | No |
+| `$wgSWSSubjectPageNamespace` | Namespace a subject-first wiki creates each Subject's own page in: see [Choosing page-first or subject-first](#choosing-page-first-or-subject-first) | `7480` (`Subject`) | No |
+| `$wgSWSDataLanguages` | Languages the wiki's data is in: see [Data languages](#data-languages) | `[]` (the content language) | No |
+| `$wgSWSSparqlStores` | SPARQL 1.1 graph stores to keep in sync and query, e.g. QLever | `[]` | No |
+| `$wgSWSAutoRebuildOnMappingChange` | Rebuilds every store holding a Mapping's projection when that Mapping changes | `false` | No |
 
 ## Choosing page-first or subject-first
 
 You can make your wiki [page-first or subject-first](../subject-first-wikis.md). The default is page-first,
-and you can change it in the [on-wiki settings](#on-wiki-settings) or with `$wgNeoWikiSubjectFirst`.
+and you can change it in the [on-wiki settings](#on-wiki-settings) or with `$wgSWSSubjectFirst`.
 
 On a subject-first wiki, Subjects are stored in the `Subject` namespace by default. You can change this with
-`$wgNeoWikiSubjectPageNamespace`.
+`$wgSWSSubjectPageNamespace`.
 
 ## Data languages
 
-`$wgNeoWikiDataLanguages` lists the languages the wiki's data is in, as BCP 47 language tags, such as
+`$wgSWSDataLanguages` lists the languages the wiki's data is in, as BCP 47 language tags, such as
 `[ 'de', 'fr', 'it' ]`. When editing [text with language](../api/schema-format.md#text-with-language-monolingualtext),
 the editor offers them in this order beside each text, and starts a new text in the first of them the value lacks.
 Other languages stay one search away, and texts already in them keep their language. The default, an empty list,
@@ -203,32 +203,32 @@ stands for the wiki's content language (`$wgLanguageCode`). You can also set the
 
 ## Logging
 
-NeoWiki logs on the `NeoWiki` channel: a graph store failing on save, the pages a rebuild could not project, a store
+SWS logs on the `SWS` channel: a graph store failing on save, the pages a rebuild could not project, a store
 entry or name it will not accept, and RDF a projection had to drop. Below `warning` it also records rebuild decisions
 and denied page reads. MediaWiki routes no channel anywhere by default, so none of it reaches you until you route it:
 
 ```php
-$wgDebugLogGroups['NeoWiki'] = '/var/log/mediawiki/neowiki.log';
+$wgDebugLogGroups['SWS'] = '/var/log/mediawiki/sws.log';
 ```
 
 Add a `level` to drop everything below it:
 
 ```php
-$wgDebugLogGroups['NeoWiki'] = [ 'destination' => '/var/log/mediawiki/neowiki.log', 'level' => 'warning' ];
+$wgDebugLogGroups['SWS'] = [ 'destination' => '/var/log/mediawiki/sws.log', 'level' => 'warning' ];
 ```
 
-The [Docker install](#try-neowiki-in-docker) routes the channel to stderr: entries logged while serving requests appear in
+The [Docker install](#try-sws-in-docker) routes the channel to stderr: entries logged while serving requests appear in
 `make logs`, and those logged by a maintenance command, such as `make rebuild-graph-databases`, print only in the
 terminal that ran it.
 
 ## User rights
 
-`neowiki-admin` allows viewing and rebuilding the wiki's graph stores, through
+`sws-admin` allows viewing and rebuilding the wiki's graph stores, through
 [Special:GraphStores](maintenance.md#background-rebuilds) or the matching REST endpoints. Administrators have it by
 default.
 
-`neowiki-query` gates the query surfaces; see [Permissions](../api/query-api.md#permissions). The remaining rights —
-`neowiki-schema-edit`, `neowiki-layout-edit` and `neowiki-mapping-edit` — gate editing in NeoWiki's own namespaces and
+`sws-query` gates the query surfaces; see [Permissions](../api/query-api.md#permissions). The remaining rights —
+`sws-schema-edit`, `sws-layout-edit` and `sws-mapping-edit` — gate editing in SWS's own namespaces and
 are granted to logged-in users.
 
 A wiki whose readers do not all see the same pages needs more than these defaults; see
@@ -237,25 +237,25 @@ A wiki whose readers do not all see the same pages needs more than these default
 ## On-wiki settings
 
 Some settings, such as whether the wiki is [page-first or subject-first](#choosing-page-first-or-subject-first) and its
-[data languages](#data-languages), can also be set in a form at `MediaWiki:NeoWiki`. By default, only administrators can
+[data languages](#data-languages), can also be set in a form at `MediaWiki:SWS`. By default, only administrators can
 change them. Everything else, such as the Neo4j and SPARQL store connections, can only be set in `LocalSettings.php`.
 
 ![A form with radio buttons, a reorderable language list and checkboxes](on-wiki-settings.png)
 
-Set `$wgNeoWikiEnableInWikiConfig` to `false` to disable on-wiki settings.
+Set `$wgSWSEnableInWikiConfig` to `false` to disable on-wiki settings.
 
 Per setting, a valid value on the page overrides `LocalSettings.php`. Pages rendered before a change can lag behind it
 until purged with `?action=purge`.
 
 ## Optional: Neo4j
 
-Cypher queries (`{{#cypher_raw}}`, `nw.query` and `POST /neowiki/v0/query/cypher`) need Neo4j 5.26.4 or later. Connect
-NeoWiki to it over Bolt in `LocalSettings.php`. NeoWiki uses Neo4j only when both URLs are set; for a simple setup, use
+Cypher queries (`{{#cypher_raw}}`, `nw.query` and `POST /sws/v0/query/cypher`) need Neo4j 5.26.4 or later. Connect
+SWS to it over Bolt in `LocalSettings.php`. SWS uses Neo4j only when both URLs are set; for a simple setup, use
 the same user for both:
 
 ```php
-$wgNeoWikiNeo4jInternalWriteUrl = 'bolt://neo4j:SECRET@neo4j-host:7687';
-$wgNeoWikiNeo4jInternalReadUrl  = 'bolt://neo4j:SECRET@neo4j-host:7687';
+$wgSWSNeo4jInternalWriteUrl = 'bolt://neo4j:SECRET@neo4j-host:7687';
+$wgSWSNeo4jInternalReadUrl  = 'bolt://neo4j:SECRET@neo4j-host:7687';
 ```
 
 To check the connection once you [filled it](#optional-connect-a-graph-store), add a Cypher query that lists the
@@ -273,29 +273,29 @@ On Neo4j Enterprise, you can give read and query traffic its own user that canno
 read-only user:
 
 ```cypher
-CREATE USER neowiki_read SET PASSWORD 'SECRET' CHANGE NOT REQUIRED;
-GRANT ROLE reader TO neowiki_read;
+CREATE USER sws_read SET PASSWORD 'SECRET' CHANGE NOT REQUIRED;
+GRANT ROLE reader TO sws_read;
 ```
 
 Then update the read URL to use it. Leave the write URL on the full-access user:
 
 ```php
-$wgNeoWikiNeo4jInternalWriteUrl = 'bolt://neo4j:SECRET@neo4j-host:7687';
-$wgNeoWikiNeo4jInternalReadUrl  = 'bolt://neowiki_read:SECRET@neo4j-host:7687';
+$wgSWSNeo4jInternalWriteUrl = 'bolt://neo4j:SECRET@neo4j-host:7687';
+$wgSWSNeo4jInternalReadUrl  = 'bolt://sws_read:SECRET@neo4j-host:7687';
 ```
 
 On Community Edition, keep both URLs on the same user.
 
 ## Optional: SPARQL graph stores
 
-NeoWiki can keep one or more SPARQL 1.1 graph stores in sync with page changes. This works with QLever, Oxigraph,
-Fuseki and any other SPARQL 1.1 store. Each configured store receives the NeoWiki data as RDF: every page becomes a
+SWS can keep one or more SPARQL 1.1 graph stores in sync with page changes. This works with QLever, Oxigraph,
+Fuseki and any other SPARQL 1.1 store. Each configured store receives the SWS data as RDF: every page becomes a
 named graph, replaced on each edit and dropped on deletion.
 
-Configure the stores with `$wgNeoWikiSparqlStores`, a list of objects:
+Configure the stores with `$wgSWSSparqlStores`, a list of objects:
 
 ```php
-$wgNeoWikiSparqlStores = [
+$wgSWSSparqlStores = [
 	[
 		// Required: the store's SPARQL 1.1 Update endpoint (the write path posts here).
 		'updateUrl' => 'https://qlever.example/api/neowiki',
@@ -319,13 +319,13 @@ to the projection, two entries holding the same projection — mirroring it to a
 one of them sets an explicit `name`.
 
 An entry whose `updateUrl` is missing or empty, or whose name cannot identify it, is skipped with a warning on the
-[`NeoWiki` log channel](#logging) rather than failing the wiki, so its store receives no page changes.
+[`SWS` log channel](#logging) rather than failing the wiki, so its store receives no page changes.
 
 ### QLever
 
 Start `qlever-server`, from a build of August 2026 or later, with:
 
-- `--persist-updates`, or a restart loses NeoWiki's writes.
+- `--persist-updates`, or a restart loses SWS's writes.
 - `--rebuild-index-strategy automatic:10000:50000:0.1`, or
   [saves slow as the wiki grows](performance.md#with-a-sparql-store).
 - `--rebuild-keep-previous-index-dirs none`, or each index rebuild leaves the index it replaced on disk.
@@ -335,7 +335,7 @@ Start `qlever-server`, from a build of August 2026 or later, with:
 Oxigraph serves queries on `/query` and updates on `/update`, so an entry needs both:
 
 ```php
-$wgNeoWikiSparqlStores = [
+$wgSWSSparqlStores = [
 	[
 		'updateUrl' => 'https://oxigraph.example/update',
 		'queryUrl' => 'https://oxigraph.example/query',
@@ -353,7 +353,7 @@ can reach it. Put it behind network isolation or an authenticating reverse proxy
 Fuseki serves each dataset under its own path, queries on `/query` and updates on `/update` below it:
 
 ```php
-$wgNeoWikiSparqlStores = [
+$wgSWSSparqlStores = [
 	[
 		'updateUrl' => 'https://fuseki.example/ds/update',
 		'queryUrl' => 'https://fuseki.example/ds/query',
@@ -373,7 +373,7 @@ the same `updateUrl`. Each projection writes its own [named graphs](../api/rdf-e
 overwrite one another:
 
 ```php
-$wgNeoWikiSparqlStores = [
+$wgSWSSparqlStores = [
 	[
 		'updateUrl' => 'https://qlever.example/api/neowiki',
 		'accessToken' => 'SECRET',
@@ -395,7 +395,7 @@ A newly added entry only receives pages saved from then on. Backfill it, and onl
 [rebuilding that one store](maintenance.md#rebuilding-one-store).
 
 Editing a Mapping page leaves every page already projected under it in the old vocabulary until the store is
-rebuilt: see [stale stores](maintenance.md#stale-stores), which also covers `$wgNeoWikiAutoRebuildOnMappingChange`.
+rebuilt: see [stale stores](maintenance.md#stale-stores), which also covers `$wgSWSAutoRebuildOnMappingChange`.
 
 ### Querying a SPARQL store
 
@@ -404,14 +404,14 @@ configured store:
 
 - The [`{{#sparql_raw}}`](../authoring/parser-functions.md#sparql_raw) parser function.
 - The [`nw.sparqlQuery()`](../authoring/lua-api.md#nwsparqlquerysparql) Lua function.
-- The [`POST /neowiki/v0/query/sparql`](../api/query-api.md#sparql-query-endpoint) REST endpoint.
+- The [`POST /sws/v0/query/sparql`](../api/query-api.md#sparql-query-endpoint) REST endpoint.
 
 Each is read-only: the query is sent as a SPARQL 1.1 *query* operation, posted only to `queryUrl` and never
 `updateUrl`.
 
 A projection configured on a different endpoint is therefore not reachable from these surfaces.
 
-NeoWiki writes pages into named graphs and nothing into the default graph, so whether an unscoped query finds them is
+SWS writes pages into named graphs and nothing into the default graph, so whether an unscoped query finds them is
 the store's choice; see [RDF Export](../api/rdf-export.md#iri-scheme).
 
 Both bundled Docker stacks, demo and dev, run QLever wired up this way, and Oxigraph when selected — see
@@ -428,10 +428,10 @@ to allow, or the deny-all value `-` (an invalid prefix that no IRI matches):
 
 ```sh
 # No federation:
-qlever-server -i neowiki -p 7019 -m 1G --service-allowed-iri-prefixes -
+qlever-server -i sws -p 7019 -m 1G --service-allowed-iri-prefixes -
 
 # Or allow only specific endpoints:
-qlever-server -i neowiki -p 7019 -m 1G --service-allowed-iri-prefixes https://sparql.example.org/
+qlever-server -i sws -p 7019 -m 1G --service-allowed-iri-prefixes https://sparql.example.org/
 ```
 
 The bundled Docker stacks set the deny-all value on their QLever services, so those do not federate unless you
@@ -440,7 +440,7 @@ token, so keep that token secret.
 
 Oxigraph has no equivalent setting and will attempt the outbound request. Other stores vary — consult their
 documentation. Where you cannot restrict the store, restrict around it: block its outbound traffic at the network
-layer, and narrow who holds the `neowiki-query` right — see
-[Narrowing `neowiki-query`](restricted-content.md#narrowing-neowiki-query). The bundled Docker stacks put their
+layer, and narrow who holds the `sws-query` right — see
+[Narrowing `sws-query`](restricted-content.md#narrowing-sws-query). The bundled Docker stacks put their
 Oxigraph services on a network that reaches only the wiki, so a federated query fails unless the stack runs with
 `Docker/docker-compose.tools.yml`.

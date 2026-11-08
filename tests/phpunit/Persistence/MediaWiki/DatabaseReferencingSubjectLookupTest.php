@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseReferencingSubjectLookup
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\LowestPageRows
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
-class DatabaseReferencingSubjectLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseReferencingSubjectLookupTest extends SWSIntegrationTestCase {
 
 	private const string TARGET_ID = 'sTestDRS1111111';
 	private const string SOURCE_ID = 'sTestDRS1111112';

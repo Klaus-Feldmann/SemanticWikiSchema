@@ -5,7 +5,7 @@
 		"[https://Professional.Wiki/ Professional Wiki]"
 	],
 	"license-name": "GPL-2.0-or-later",
-	"description": "Test extension for validating NeoWiki extension points",
+	"description": "Test extension for validating SWS extension points",
 	"requires": {
 		"extensions": {
 			"SemanticWikiSchema": "*"
@@ -23,8 +23,8 @@
 		"RedHerbAliases": "i18n/_Aliases.php"
 	},
 	"Hooks": {
-		"NeoWikiRegistration": "ProfessionalWiki\\RedHerb\\RedHerbHooks::onNeoWikiRegistration",
-		"NeoWikiGetFrontendModules": "RedHerbFrontendModulesHook",
+		"SWSRegistration": "ProfessionalWiki\\RedHerb\\RedHerbHooks::onSWSRegistration",
+		"SWSGetFrontendModules": "RedHerbFrontendModulesHook",
 		"SidebarBeforeOutput": "RedHerbSidebarHook"
 	},
 	"HookHandlers": {
@@ -47,10 +47,10 @@
 		"ext.redherb-subject-finder": {
 			"class": "MediaWiki\\ResourceLoader\\CodexModule",
 			"localBasePath": "resources/subjectFinder",
-			"remoteExtPath": "NeoWiki/tests/RedHerb/resources/subjectFinder",
+			"remoteExtPath": "SWS/tests/RedHerb/resources/subjectFinder",
 			"dependencies": [
 				"vue",
-				"ext.neowiki"
+				"ext.sws"
 			],
 			"codexComponents": [
 				"CdxField",
@@ -74,10 +74,10 @@
 		"ext.redherb-create-subject": {
 			"class": "MediaWiki\\ResourceLoader\\CodexModule",
 			"localBasePath": "resources/createSubject",
-			"remoteExtPath": "NeoWiki/tests/RedHerb/resources/createSubject",
+			"remoteExtPath": "SWS/tests/RedHerb/resources/createSubject",
 			"dependencies": [
 				"vue",
-				"ext.neowiki"
+				"ext.sws"
 			],
 			"codexComponents": [
 				"CdxButton",
@@ -104,10 +104,10 @@
 		"ext.redherb-edit-main-subject": {
 			"class": "MediaWiki\\ResourceLoader\\CodexModule",
 			"localBasePath": "resources/editMainSubject",
-			"remoteExtPath": "NeoWiki/tests/RedHerb/resources/editMainSubject",
+			"remoteExtPath": "SWS/tests/RedHerb/resources/editMainSubject",
 			"dependencies": [
 				"vue",
-				"ext.neowiki"
+				"ext.sws"
 			],
 			"codexComponents": [
 				"CdxButton",
@@ -134,10 +134,10 @@
 		"ext.redherb": {
 			"class": "MediaWiki\\ResourceLoader\\CodexModule",
 			"localBasePath": "resources",
-			"remoteExtPath": "NeoWiki/tests/RedHerb/resources",
+			"remoteExtPath": "SWS/tests/RedHerb/resources",
 			"dependencies": [
 				"vue",
-				"ext.neowiki"
+				"ext.sws"
 			],
 			"codexComponents": [
 				"CdxButton",
@@ -175,9 +175,9 @@
 				"redherb-card-edit-subject",
 				"redherb-card-edit-schema",
 				"redherb-card-edit-layout",
-				"neowiki-field-invalid-color",
-				"neowiki-field-invalid-option",
-				"neowiki-field-required"
+				"sws-field-invalid-color",
+				"sws-field-invalid-option",
+				"sws-field-required"
 			]
 		}
 	},

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
 
 class CypherRawParserFunction {
 
@@ -39,7 +39,7 @@ class CypherRawParserFunction {
 		$json = json_encode( $result->rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 
 		if ( $json === false ) {
-			return $this->formatError( $parser->msg( 'neowiki-cypher-raw-error-json-encode' )->text() );
+			return $this->formatError( $parser->msg( 'sws-cypher-raw-error-json-encode' )->text() );
 		}
 
 		return $this->formatResult( $json );
@@ -49,7 +49,7 @@ class CypherRawParserFunction {
 	 * @return array{0: string, noparse: true, isHTML: true}
 	 */
 	private function formatResult( string $json ): array {
-		return $this->asHtml( '<div class="mw-neowiki-cypher-result"><pre>' . htmlspecialchars( $json ) . '</pre></div>' );
+		return $this->asHtml( '<div class="mw-sws-cypher-result"><pre>' . htmlspecialchars( $json ) . '</pre></div>' );
 	}
 
 	/**

@@ -1,6 +1,6 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ParserFailureCheck as Check;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ParserFailureCheck as Check;
 final class CiteGuardTest extends TestCase {
     public function testActualComteCiteMessageDoesNotBlockIndependentData(): void {
         $html = '<span class="reference-text">Quelle <span class="error mw-ext-cite-error" lang="de" dir="ltr">Referenzfehler: Unbekannter Parameter „details“ im <code>&lt;ref&gt;</code>-Element. Die unterstützten Parameter sind: dir, follow, group, name.</span></span>';

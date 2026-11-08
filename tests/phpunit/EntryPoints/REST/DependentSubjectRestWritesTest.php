@@ -2,52 +2,52 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectPageApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\DeleteSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\MoveSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ReplaceSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetMainSubjectApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetStatementApi;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\SetSubjectsOrderingApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSchema;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi;
+use ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Goes through real pages: the rules for Dependent Subjects are held by the Subject repository all write
  * endpoints share.
  *
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
- * @covers \ProfessionalWiki\NeoWiki\Application\DependentSubjectGuard
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\CreateSubjectPageApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\ReplaceSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetStatementApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\DeleteSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetMainSubjectApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\SetSubjectsOrderingApi
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\MoveSubjectApi
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
+ * @covers \ProfessionalWiki\SWS\Application\DependentSubjectGuard
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi
  * @group Database
  */
-class DependentSubjectRestWritesTest extends NeoWikiIntegrationTestCase {
+class DependentSubjectRestWritesTest extends SWSIntegrationTestCase {
 
 	use HandlerTestTrait;
 
@@ -120,7 +120,7 @@ class DependentSubjectRestWritesTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function subjectsOn( int $pageId ): PageSubjects {
-		return NeoWikiExtension::getInstance()->newSubjectRepository()->getSubjectsByPageId( new PageId( $pageId ) );
+		return SWSExtension::getInstance()->newSubjectRepository()->getSubjectsByPageId( new PageId( $pageId ) );
 	}
 
 	/**
@@ -207,8 +207,8 @@ class DependentSubjectRestWritesTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testABlockingViolationOfADependentSubjectRefusesASubjectPageUnderEnforcement(): void {
-		$this->overrideConfigValue( 'NeoWikiEnforceValidation', true );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSEnforceValidation', true );
+		SWSExtension::resetInstance();
 		$this->createSchema( 'Baptism', '{"subjectsAreDependent":true,"propertyDefinitions":{'
 			. '"Date":{"type":"text","required":{"severity":"error"}}'
 			. '}}' );

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Actions\ImportPages;
+namespace ProfessionalWiki\SWS\Application\Actions\ImportPages;
 
 use DirectoryIterator;
 use FileFetcher\FileFetcher;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\MappingContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
 
 class MappingContentSource {
 

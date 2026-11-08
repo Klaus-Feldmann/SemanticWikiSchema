@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Queries\GetSchema;
+namespace ProfessionalWiki\SWS\Application\Queries\GetSchema;
 
-use ProfessionalWiki\NeoWiki\Application\SchemaLookup;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Presentation\SchemaPresentationSerializer;
+use ProfessionalWiki\SWS\Application\SchemaLookup;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
 
 readonly class GetSchemaQuery {
 

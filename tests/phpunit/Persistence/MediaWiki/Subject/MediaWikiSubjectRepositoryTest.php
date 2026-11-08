@@ -2,48 +2,48 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki\Subject;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\DependentSubjectGuard;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemorySubjectLookup;
+use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
  * @group Database
  */
-class MediaWikiSubjectRepositoryTest extends NeoWikiIntegrationTestCase {
+class MediaWikiSubjectRepositoryTest extends SWSIntegrationTestCase {
 
 	public function setUp(): void {
 		$this->setUpNeo4j();
 	}
 
 	private function newRepository(): MediaWikiSubjectRepository {
-		return NeoWikiExtension::getInstance()->newSubjectRepository();
+		return SWSExtension::getInstance()->newSubjectRepository();
 	}
 
 	private function newDependentSubjectGuard(): DependentSubjectGuard {
 		return new DependentSubjectGuard(
-			NeoWikiExtension::getInstance()->newDependentSubjectRules(),
+			SWSExtension::getInstance()->newDependentSubjectRules(),
 			fn (): InMemorySubjectLookup => new InMemorySubjectLookup()
 		);
 	}
@@ -139,7 +139,7 @@ class MediaWikiSubjectRepositoryTest extends NeoWikiIntegrationTestCase {
 		$repository = new MediaWikiSubjectRepository(
 			pageIdentifiersLookup: $pageIdentifiersLookup,
 			revisionLookup: $this->getServiceContainer()->getRevisionLookup(),
-			pageContentSaver: NeoWikiExtension::getInstance()->getPageContentSaver(),
+			pageContentSaver: SWSExtension::getInstance()->getPageContentSaver(),
 			titleFactory: $this->getServiceContainer()->getTitleFactory(),
 			contentHandlerFactory: $this->getServiceContainer()->getContentHandlerFactory(),
 			dependentSubjectGuard: $this->newDependentSubjectGuard(),
@@ -167,7 +167,7 @@ class MediaWikiSubjectRepositoryTest extends NeoWikiIntegrationTestCase {
 		$repository = new MediaWikiSubjectRepository(
 			pageIdentifiersLookup: $pageIdentifiersLookup,
 			revisionLookup: $this->getServiceContainer()->getRevisionLookup(),
-			pageContentSaver: NeoWikiExtension::getInstance()->getPageContentSaver(),
+			pageContentSaver: SWSExtension::getInstance()->getPageContentSaver(),
 			titleFactory: $this->getServiceContainer()->getTitleFactory(),
 			contentHandlerFactory: $this->getServiceContainer()->getContentHandlerFactory(),
 			dependentSubjectGuard: $this->newDependentSubjectGuard(),
@@ -305,7 +305,7 @@ class MediaWikiSubjectRepositoryTest extends NeoWikiIntegrationTestCase {
 		$repository = new MediaWikiSubjectRepository(
 			pageIdentifiersLookup: $pageIdentifiersLookup,
 			revisionLookup: $this->getServiceContainer()->getRevisionLookup(),
-			pageContentSaver: NeoWikiExtension::getInstance()->getPageContentSaver(),
+			pageContentSaver: SWSExtension::getInstance()->getPageContentSaver(),
 			titleFactory: $this->getServiceContainer()->getTitleFactory(),
 			contentHandlerFactory: $this->getServiceContainer()->getContentHandlerFactory(),
 			dependentSubjectGuard: $this->newDependentSubjectGuard(),

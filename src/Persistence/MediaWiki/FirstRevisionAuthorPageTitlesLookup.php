@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
@@ -10,7 +10,7 @@ use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\ActorNormalization;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\NeoWiki\Persistence\ImportedPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
 use Wikimedia\Rdbms\IReadableDatabase;
 
 /**

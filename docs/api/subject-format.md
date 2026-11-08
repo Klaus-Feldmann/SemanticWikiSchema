@@ -147,7 +147,7 @@ The 15-character grammar, and the creation-time sorting that comes with it, hold
 
 ### Reading Subjects
 
-`GET /rest.php/neowiki/v0/subject/{subjectId}` returns a top-level `requestedId` and a `subjects` map; each
+`GET /rest.php/sws/v0/subject/{subjectId}` returns a top-level `requestedId` and a `subjects` map; each
 Subject gains an `id` and a `displayName`, and carries `label` as `null` where the stored JSON omits it. Every
 endpoint that returns a Subject object serves this shape.
 
@@ -172,15 +172,15 @@ Dependent Subject too. The rows of the Subject lists carry `hostSubject` as well
 
 ### Referencing Subjects
 
-`GET /rest.php/neowiki/v0/subject/{subjectId}/referencingSubjects` returns
+`GET /rest.php/sws/v0/subject/{subjectId}/referencingSubjects` returns
 `{referencingSubjects: [{subject, propertyNames}], truncated}`: the Subjects whose relations point at the given one,
 itself excluded, ordered by name, generated names last, each `subject` carrying its page fields. `truncated` means more
 were left out; `false` does not promise there are none. `?limit=` caps the list, 10 by default.
 
 ### Creating Subjects
 
-`POST /rest.php/neowiki/v0/page/{pageId}/mainSubject` and `.../{pageId}/subjects` create a Subject on a page, and
-`POST /rest.php/neowiki/v0/subjects` creates one together with a page of its own. The body takes `schema` and
+`POST /rest.php/sws/v0/page/{pageId}/mainSubject` and `.../{pageId}/subjects` create a Subject on a page, and
+`POST /rest.php/sws/v0/subjects` creates one together with a page of its own. The body takes `schema` and
 [`statements`](#statement-object), both required, plus an optional `label`, an optional `comment` edit summary, and
 optional [`dependentSubjects`](#dependent-subjects). Omitting `label`, or passing only whitespace, creates a Subject
 with no label.
@@ -189,9 +189,9 @@ The server mints the Subject ID unless you pass one:
 
 | Field | Required | Notes |
 |-------|----------|-------|
-| `id` | No | Subject ID to assign. Well-formed (`400` otherwise) and unused (`409` otherwise). Pre-mint a batch with `POST /rest.php/neowiki/v0/subject-ids` to wire relations before their targets exist. |
+| `id` | No | Subject ID to assign. Well-formed (`400` otherwise) and unused (`409` otherwise). Pre-mint a batch with `POST /rest.php/sws/v0/subject-ids` to wire relations before their targets exist. |
 
-`POST /rest.php/neowiki/v0/subjects` also takes an optional `pageTitle`. A page-first wiki titles the new page by
+`POST /rest.php/sws/v0/subjects` also takes an optional `pageTitle`. A page-first wiki titles the new page by
 `pageTitle`, else by the label, else by the Subject's ID when there is no label or the label cannot be a
 main-namespace title. A subject-first wiki titles it by the Subject's ID, in the `Subject` namespace
 [by default](../operations/installation.md#choosing-page-first-or-subject-first), and answers `400` to any
@@ -200,7 +200,7 @@ main-namespace title. A subject-first wiki titles it by the Subject's ID, in the
 
 ### Writing Subjects
 
-`PUT /rest.php/neowiki/v0/subject/{subjectId}` replaces the Subject's label and statements:
+`PUT /rest.php/sws/v0/subject/{subjectId}` replaces the Subject's label and statements:
 
 ```json
 {
@@ -234,7 +234,7 @@ sent, as are its page fields on these endpoints: the page a Subject is on change
 
 ### Writing one Statement
 
-`PUT /rest.php/neowiki/v0/subject/{subjectId}/statements/{propertyName}` sets a single Statement, leaving the
+`PUT /rest.php/sws/v0/subject/{subjectId}/statements/{propertyName}` sets a single Statement, leaving the
 Subject's label and its other Statements as they are:
 
 ```json
@@ -287,7 +287,7 @@ written in the same revision as the Subject they create or replace:
 ```
 
 Each item has an `id`, a `schema` that declares its Subjects dependent (`400` otherwise), and
-[`statements`](#statement-object). An unused `id`, such as one from `POST /rest.php/neowiki/v0/subject-ids`, creates a
+[`statements`](#statement-object). An unused `id`, such as one from `POST /rest.php/sws/v0/subject-ids`, creates a
 Subject. When replacing a Subject, the `id` of a Dependent Subject of the same Schema that it points at, directly or
 through other Dependent Subjects, replaces that Dependent Subject. Any other `id` in use answers `409`. A relation to
 another Subject of the same request does not report

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\HostSubject;
-use ProfessionalWiki\NeoWiki\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectPresentationSerializer;
+use ProfessionalWiki\SWS\Application\HostSubject;
+use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use ProfessionalWiki\SWS\Presentation\SubjectPresentationSerializer;
 use stdClass;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectPresentationSerializer
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectPresentationSerializer
  */
 class SubjectPresentationSerializerTest extends TestCase {
 

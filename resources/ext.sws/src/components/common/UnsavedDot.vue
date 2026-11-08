@@ -1,0 +1,23 @@
+<!-- The dot sits inside a list row's accessible name, which the row takes from its content,
+	so it needs text of its own: `role="img"` with a label, and a title for the pointer. -->
+<template>
+	<span
+		class="ext-sws-unsaved-dot"
+		role="img"
+		:aria-label="$i18n( 'sws-subject-editor-unsaved' ).text()"
+		:title="$i18n( 'sws-subject-editor-unsaved' ).text()"
+	/>
+</template>
+
+<style lang="less">
+@import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
+
+.ext-sws-unsaved-dot {
+	flex: none;
+	display: inline-block;
+	width: @size-50;
+	height: @size-50;
+	border-radius: @border-radius-circle;
+	background-color: @color-warning;
+}
+</style>

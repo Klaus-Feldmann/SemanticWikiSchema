@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\SubjectSummaries;
+namespace ProfessionalWiki\SWS\Tests\Application\SubjectSummaries;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummarySort;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\SubjectSummaries\SubjectSummaryCursor
+ * @covers \ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor
  */
 class SubjectSummaryCursorTest extends TestCase {
 

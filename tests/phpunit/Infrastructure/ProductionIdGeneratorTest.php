@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Infrastructure;
+namespace ProfessionalWiki\SWS\Tests\Infrastructure;
 
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Infrastructure\ProductionIdGenerator;
+use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
 use Random\Engine;
 use Random\Randomizer;
 use WMDE\Clock\StubClock;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Infrastructure\ProductionIdGenerator
+ * @covers \ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator
  */
 class ProductionIdGeneratorTest extends TestCase {
 

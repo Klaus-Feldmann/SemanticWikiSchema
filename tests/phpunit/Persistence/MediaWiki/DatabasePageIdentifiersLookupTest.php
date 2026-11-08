@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\PageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabasePageIdentifiersLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup
  * @group Database
  */
 class DatabasePageIdentifiersLookupTest extends MediaWikiIntegrationTestCase {
@@ -125,7 +125,7 @@ class DatabasePageIdentifiersLookupTest extends MediaWikiIntegrationTestCase {
 	private function index( string $subjectId, int $pageId ): void {
 		$this->getDb()->newInsertQueryBuilder()
 			->insertInto( DatabaseSubjectPageIndex::TABLE )
-			->row( [ 'nwsp_subject_id' => $subjectId, 'nwsp_page_id' => $pageId ] )
+			->row( [ 'swssp_subject_id' => $subjectId, 'swssp_page_id' => $pageId ] )
 			->caller( __METHOD__ )
 			->execute();
 	}

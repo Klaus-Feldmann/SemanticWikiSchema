@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Semantic;
+namespace ProfessionalWiki\SWS\EntryPoints\Semantic;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Application\PageDependencyRecorder;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /** Full revision output is a merge of slot outputs, not necessarily Parser::getOutput(). */
 final class RevisionDependencies implements PageDependencyRecorder {
@@ -17,7 +17,7 @@ final class RevisionDependencies implements PageDependencyRecorder {
         }
     }
     public function recordDependencyOnSchema(SchemaReference $schema): void {
-        $title=$schema->isLocal() ? Title::makeTitleSafe(NeoWikiExtension::NS_SCHEMA,$schema->name->getText()) : null;
+        $title=$schema->isLocal() ? Title::makeTitleSafe(SWSExtension::NS_SCHEMA,$schema->name->getText()) : null;
         if ($title!==null) { $this->recordDependencyOn($title); }
     }
 }

@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Actions;
+namespace ProfessionalWiki\SWS\Tests\Application\Actions;
 
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPresenter;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SubjectPageData;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\NeoWiki\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\NeoWiki\Persistence\PageDeleter;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageData;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use ProfessionalWiki\SWS\Persistence\PageDeleter;
 use MediaWiki\Content\WikitextContent;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
  * @group Database
  */
 class ImportPagesActionTest extends \MediaWikiIntegrationTestCase {

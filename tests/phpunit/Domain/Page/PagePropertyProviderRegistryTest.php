@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Page;
+namespace ProfessionalWiki\SWS\Tests\Domain\Page;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubPagePropertyProvider;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubPagePropertyProvider;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Page\PagePropertyProviderRegistry
+ * @covers \ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry
  */
 class PagePropertyProviderRegistryTest extends TestCase {
 

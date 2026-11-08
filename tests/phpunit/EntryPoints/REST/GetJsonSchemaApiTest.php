@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\GetJsonSchemaApi;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
+use ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\REST\GetJsonSchemaApi
+ * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi
  * @group Database
  */
-class GetJsonSchemaApiTest extends NeoWikiIntegrationTestCase {
+class GetJsonSchemaApiTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
-	private const string ROUTE = '/neowiki/v0/schema/{schemaName}/json-schema';
+	private const string ROUTE = '/sws/v0/schema/{schemaName}/json-schema';
 	private const string SCHEMA_NAME = 'GetJsonSchemaApiTestSchema';
 	private const string ABSENT_SCHEMA_NAME = 'GetJsonSchemaApiTestAbsentSchema';
 
@@ -61,7 +61,7 @@ JSON
 
 		$this->assertSame( self::SCHEMA_NAME, $document['title'] );
 		$this->assertSame( self::SCHEMA_NAME, $document['properties']['schema']['const'] );
-		$this->assertStringEndsWith( '/neowiki/v0/schema/' . self::SCHEMA_NAME . '/json-schema', $document['$id'] );
+		$this->assertStringEndsWith( '/sws/v0/schema/' . self::SCHEMA_NAME . '/json-schema', $document['$id'] );
 	}
 
 	public function testAbsentSchemaIsNotFound(): void {
@@ -99,7 +99,7 @@ JSON
 		// main context rather than from the one executeHandler injects. Always setting one makes every
 		// test expecting a 200 the control for the denial test above.
 		RequestContext::getMain()->setAuthority( $authority ?? $this->mockRegisteredUltimateAuthority() );
-		NeoWikiExtension::resetInstance();
+		SWSExtension::resetInstance();
 
 		return $this->executeHandler(
 			new GetJsonSchemaApi(),

@@ -167,7 +167,7 @@ function onWorkspaceMounted(workspace: Workspace) {
         `,
 
         // Auch beim Erkunden aller Verbindungen nur
-        // NeoWiki-Eigenschaften berücksichtigen.
+        // SWS-Eigenschaften berücksichtigen.
         filterRefElementLinkPattern: `
           FILTER(STRSTARTS(STR(?link), "${propertyBase}"))
         `,

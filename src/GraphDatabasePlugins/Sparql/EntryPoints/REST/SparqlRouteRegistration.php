@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST;
 
-use ProfessionalWiki\NeoWiki\NeoWikiConfig;
+use ProfessionalWiki\SWS\SWSConfig;
 
 /**
  * The read-side counterpart to
- * {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration}:
+ * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration}:
  * contributes the SPARQL query route only when at least one SPARQL store is configured.
  */
 class SparqlRouteRegistration {
 
 	/**
-	 * REST route files the SPARQL plugin contributes given the raw `NeoWikiSparqlStores` config.
+	 * REST route files the SPARQL plugin contributes given the raw `SWSSparqlStores` config.
 	 *
 	 * @return string[]
 	 */
 	public static function routeFiles( mixed $rawStores ): array {
-		if ( !NeoWikiConfig::hasConfiguredSparqlStore( $rawStores ) ) {
+		if ( !SWSConfig::hasConfiguredSparqlStore( $rawStores ) ) {
 			return [];
 		}
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\Persistence;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use DateTimeImmutable;
 use DateTimeZone;

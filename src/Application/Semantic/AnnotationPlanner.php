@@ -1,18 +1,18 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\NeoWiki\Application\Semantic;
+namespace ProfessionalWiki\SWS\Application\Semantic;
 use InvalidArgumentException;
 
-/** Config is supplied from the existing editable wiki configuration, never hard-coded here. */
+/** Config is supplied by the validated WikiSchemaSmwMapping server settings. */
 final class AnnotationPlanner {
     public function __construct(private readonly array $config) {}
 
     public function build(array $result): AnnotationPlan {
         if ($result['missing'] ?? false) { return new AnnotationPlan([],[]); }
-        if (!is_array($this->config['properties'] ?? null)) { throw new InvalidArgumentException('NeoWiki/config: properties must be a table'); }
+        if (!is_array($this->config['properties'] ?? null)) { throw new InvalidArgumentException('WikiSchemaSmwMapping: properties must be a table'); }
         $names=$this->config['properties'][$result['schema']['name']] ?? [];
-        if (!is_array($names)) { throw new InvalidArgumentException('NeoWiki/config: schema mapping must be a table'); }
+        if (!is_array($names)) { throw new InvalidArgumentException('WikiSchemaSmwMapping: schema mapping must be a table'); }
         $rows=[];$objects=[];$seen=[];$formatter=new SmwValueFormatter();
         foreach($result['fields'] as $field) {
             if ($field['type'] === 'relation' && ($field['status'] ?? '') === 'deferred-relation') {
@@ -34,7 +34,7 @@ final class AnnotationPlanner {
                 if($entry!==null) {
                     $mapping=$this->config['urlEntries'] ?? null;
                     if(!is_array($mapping)) { throw new InvalidArgumentException('URL mapping missing'); }
-                    $args=['neowiki-url-'.sha1($result['subject']['id']."\0".$field['name']."\0".(count($objects)+1))];
+                    $args=['sws-url-'.sha1($result['subject']['id']."\0".$field['name']."\0".(count($objects)+1))];
                     $data=['url'=>$stored,'label'=>$entry['label'] ?? null,'caption'=>$entry['caption'] ?? null,'captionPage'=>$entry['captionPage'] ?? null,'field'=>$field['name'],'subject'=>$result['subject']['id']];
                     foreach(['url','label','caption','captionPage','field','subject'] as $key) {
                         $item=$data[$key];

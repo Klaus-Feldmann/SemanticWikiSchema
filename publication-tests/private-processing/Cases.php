@@ -10,18 +10,18 @@ use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingResult;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingIncomplete;
-use ProfessionalWiki\NeoWiki\EntryPoints\Processing\ProcessingContext;
-use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingResult;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
+use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext;
+use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 function storedProps($title) {return SMW\Services\ServicesFactory::getInstance()->getStore()->getSemanticData(SMW\DataItems\WikiPage::newFromTitle($title))->getProperties();}
 function dataValues($title,$property) {return array_map(fn($v)=>$v instanceof SMW\DataItems\WikiPage ? $v->getTitle()->getPrefixedText() : $v->getSerialization(),SMW\Services\ServicesFactory::getInstance()->getStore()->getSemanticData(SMW\DataItems\WikiPage::newFromTitle($title))->getPropertyValues(SMW\DataItems\Property::newFromUserLabel($property)));}
 $processor=new InternalPageProcessor();
 $factory=$services->getService('SMW.ContentParserFactory');
-checkTest($factory instanceof ProfessionalWiki\NeoWiki\EntryPoints\Processing\SmwContentParserFactory,'SMW content parser factory decorated');
+checkTest($factory instanceof ProfessionalWiki\SWS\EntryPoints\Processing\SmwContentParserFactory,'SMW content parser factory decorated');
 $parserOutput=$factory->newContentParser($title)->parse()->getOutput();
 checkTest(ProcessingResult::isCurrent($title,$parserOutput->getExtensionData(ProcessingResult::STAMP)),'SMW content rebuild uses full authorized result');
 $anon=$services->getUserFactory()->newAnonymous();

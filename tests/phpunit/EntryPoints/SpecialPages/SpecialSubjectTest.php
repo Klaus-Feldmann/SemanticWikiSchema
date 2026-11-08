@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Context\RequestContext;
@@ -10,35 +10,35 @@ use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Subject\StatementList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSubject;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestRelation;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestStatement;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiMockAuthorityTrait;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubject;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use SpecialPageExecutor;
 
 /**
  * The page is rendered in qqx, so what is asserted is which message the error box and the title use
  * rather than what those messages happen to say in English.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialSubject
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectNamePresenter
- * @covers \ProfessionalWiki\NeoWiki\Presentation\SubjectNameMessage
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::getSubjectUiJsConfigVars
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubject
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectNamePresenter
+ * @covers \ProfessionalWiki\SWS\Presentation\SubjectNameMessage
+ * @covers \ProfessionalWiki\SWS\SWSExtension::getSubjectUiJsConfigVars
  * @group Database
  */
-class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
+class SpecialSubjectTest extends SWSIntegrationTestCase {
 
 	use HelpLinkAssertions;
-	use NeoWikiMockAuthorityTrait;
+	use SWSMockAuthorityTrait;
 
 	private const string SUBJECT_ID = 's1demo8aaaaaab5';
 	private const string ABSENT_ID = 's1demo8aaaaaab6';
@@ -46,8 +46,8 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	private const string RECORD_ID = 's1demo8aaaaaab8';
 	private const string OTHER_ID = 's1demo8aaaaaab9';
 	private const string PAGE_NAME = 'SpecialSubjectTest_Company';
-	private const string INVALID_ID_ERROR = '(neowiki-special-subject-invalid-id)';
-	private const string PAGE_DESCRIPTION = '(neowiki-special-subject)';
+	private const string INVALID_ID_ERROR = '(sws-special-subject-invalid-id)';
+	private const string PAGE_DESCRIPTION = '(sws-special-subject)';
 
 	private function outputFor( ?string $subPage ): string {
 		return $this->executeWith( $subPage )->getHTML();
@@ -56,8 +56,8 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	public function testMountPointCarriesTheRequestedSubjectId(): void {
 		$output = $this->outputFor( self::SUBJECT_ID );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-subject"', $output );
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="' . self::SUBJECT_ID . '"', $output );
+		$this->assertStringContainsString( 'id="ext-sws-subject"', $output );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="' . self::SUBJECT_ID . '"', $output );
 		$this->assertStringNotContainsString( self::INVALID_ID_ERROR, $output );
 	}
 
@@ -71,7 +71,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	public function testMountPointCarriesASubjectOfAnotherSource(): void {
 		$output = $this->outputFor( 'otherwiki:abc-123' );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="otherwiki:abc-123"', $output );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="otherwiki:abc-123"', $output );
 		$this->assertStringNotContainsString( self::INVALID_ID_ERROR, $output );
 	}
 
@@ -80,19 +80,19 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * local id every other surface uses for it.
 	 */
 	public function testAnIdNamingThisWikiIsMountedInItsBareForm(): void {
-		$localSourceKey = NeoWikiExtension::getInstance()->getSubjectIdParser()->getLocalSourceKey();
+		$localSourceKey = SWSExtension::getInstance()->getSubjectIdParser()->getLocalSourceKey();
 
 		$output = $this->outputFor( $localSourceKey . ':' . self::SUBJECT_ID );
 
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="' . self::SUBJECT_ID . '"', $output );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="' . self::SUBJECT_ID . '"', $output );
 	}
 
 	public function testAMalformedSubjectIdGetsTheErrorBoxAndNoSubjectToShow(): void {
 		$output = $this->outputFor( 'not-a-subject-id' );
 
 		$this->assertStringContainsString( self::INVALID_ID_ERROR, $output );
-		$this->assertStringContainsString( 'id="ext-neowiki-subject"', $output );
-		$this->assertStringNotContainsString( 'data-mw-neowiki-subject-id', $output );
+		$this->assertStringContainsString( 'id="ext-sws-subject"', $output );
+		$this->assertStringNotContainsString( 'data-mw-sws-subject-id', $output );
 	}
 
 	/**
@@ -116,14 +116,14 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testASubjectFirstWikiForwardsAMainSubjectToItsPage(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithSubjects( self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 
 		$this->assertForwardsToThePage( $this->executeWith( self::SUBJECT_ID ) );
 	}
 
 	public function testASubjectFirstWikiForwardsAMainSubjectWhoseLatestRevisionIsPublished(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$latest = $this->createPageWithSubjects( self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 		$this->registerRevisionPolicy( FixedRevisionPolicy::publishing( $latest ) );
 
@@ -138,14 +138,14 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * The page can get another Main Subject, after which a remembered forward would lead to the wrong one.
 	 */
 	public function testTheForwardIsTemporary(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithSubjects( self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 
 		$this->assertSame( '302', $this->executeWith( self::SUBJECT_ID )->mRedirectCode );
 	}
 
 	public function testASubjectFirstWikiShowsASubjectThatIsNotItsPagesMainSubjectHere(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithSubjects(
 			self::PAGE_NAME,
 			mainSubject: TestSubject::build( id: self::OTHER_ID ),
@@ -159,15 +159,15 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * A page outside the content namespaces does not show its Subjects.
 	 */
 	public function testASubjectFirstWikiShowsTheMainSubjectOfAPageOutsideTheContentNamespacesHere(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithSubjects( 'Help:' . self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 
 		$this->assertShownHere( $this->executeWith( self::SUBJECT_ID ) );
 	}
 
 	public function testASubjectFirstWikiShowsAMainSubjectHereWhenPagesDoNotShowTheirsAutomatically(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 		$this->createPageWithSubjects( self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 
 		$this->assertShownHere( $this->executeWith( self::SUBJECT_ID ) );
@@ -177,7 +177,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * A link to a redirect leads to its target, which does not show the Subject.
 	 */
 	public function testASubjectFirstWikiShowsTheMainSubjectOfARedirectHere(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$this->createPageWithSubjects(
 			self::PAGE_NAME,
 			mainSubject: TestSubject::build( id: self::SUBJECT_ID ),
@@ -192,7 +192,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * latest revision.
 	 */
 	public function testASubjectFirstWikiShowsAMainSubjectHereWhileItsPagePublishesAnOlderRevision(): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', true );
+		$this->overrideConfigValue( 'SWSSubjectFirst', true );
 		$approved = $this->createPageWithSubjects( self::PAGE_NAME, mainSubject: TestSubject::build( id: self::SUBJECT_ID ) );
 		$this->changeSubjectsOfPage( self::PAGE_NAME, TestSubject::build( id: self::SUBJECT_ID, label: 'Draft' ) );
 		$this->registerRevisionPolicy( FixedRevisionPolicy::publishing( $approved ) );
@@ -211,7 +211,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 
 	private function assertShownHere( OutputPage $out ): void {
 		$this->assertSame( '', $out->getRedirect() );
-		$this->assertStringContainsString( 'data-mw-neowiki-subject-id="' . self::SUBJECT_ID . '"', $out->getHTML() );
+		$this->assertStringContainsString( 'data-mw-sws-subject-id="' . self::SUBJECT_ID . '"', $out->getHTML() );
 	}
 
 	/**
@@ -221,7 +221,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	public function testLoadsTheFrontendModule(): void {
 		$out = $this->executeWith( self::SUBJECT_ID );
 
-		$this->assertContains( 'ext.neowiki', $out->getModules() );
+		$this->assertContains( 'ext.sws', $out->getModules() );
 	}
 
 	public function testExposesEachMappingWithTheSchemasItMaps(): void {
@@ -233,7 +233,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertSame(
 			[ [ 'name' => 'EDM', 'schemas' => [ 'Museum' ] ] ],
-			$this->executeWith( self::SUBJECT_ID )->getJsConfigVars()['wgNeoWikiMappings']
+			$this->executeWith( self::SUBJECT_ID )->getJsConfigVars()['wgSWSMappings']
 		);
 	}
 
@@ -245,20 +245,20 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 
 		$this->assertSame(
 			[ 'EDM' ],
-			array_column( $out->getJsConfigVars()['wgNeoWikiMappings'], 'name' ),
+			array_column( $out->getJsConfigVars()['wgSWSMappings'], 'name' ),
 			'A read-restricted Mapping page name must not reach a reader who cannot see it.'
 		);
 	}
 
 	public function testExposesTheSubjectIriBaseAsConfigVar(): void {
-		$this->overrideConfigValue( 'NeoWikiRdfBaseUri', 'https://data.example.org' );
-		NeoWikiExtension::resetInstance();
+		$this->overrideConfigValue( 'SWSRdfBaseUri', 'https://data.example.org' );
+		SWSExtension::resetInstance();
 
 		$out = $this->executeWith( self::SUBJECT_ID );
 
 		$this->assertSame(
 			'https://data.example.org/entity/',
-			$out->getJsConfigVars()['wgNeoWikiSubjectIriBase']
+			$out->getJsConfigVars()['wgSWSSubjectIriBase']
 		);
 	}
 
@@ -279,7 +279,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectWithoutLabel();
 
 		$this->assertSame(
-			'(neowiki-subject-no-label)(word-separator)(parentheses: ' . self::SUBJECT_ID . ')',
+			'(sws-subject-no-label)(word-separator)(parentheses: ' . self::SUBJECT_ID . ')',
 			strip_tags( $this->executeWith( self::SUBJECT_ID )->getPageTitle() )
 		);
 	}
@@ -288,7 +288,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectWithoutLabel();
 
 		$this->assertStringContainsString(
-			'(neowiki-subject-generated-name: ' . self::SUBJECT_ID . ')',
+			'(sws-subject-generated-name: ' . self::SUBJECT_ID . ')',
 			$this->executeWith( self::SUBJECT_ID )->getHTMLTitle()
 		);
 	}
@@ -314,7 +314,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectsOfPicasso();
 
 		$this->assertSame(
-			'(neowiki-dependent-subject-name: Birth, Pablo Picasso)',
+			'(sws-dependent-subject-name: Birth, Pablo Picasso)',
 			$this->executeWith( self::BIRTH_ID )->getPageTitle()
 		);
 	}
@@ -323,7 +323,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectsOfPicasso();
 
 		$this->assertSame(
-			'(neowiki-dependent-subject-name: Record, (neowiki-dependent-subject-name: Birth, Pablo Picasso))',
+			'(sws-dependent-subject-name: Record, (sws-dependent-subject-name: Birth, Pablo Picasso))',
 			$this->executeWith( self::RECORD_ID )->getPageTitle()
 		);
 	}
@@ -332,7 +332,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 		$this->createSubjectsOfPicasso();
 
 		$this->assertStringContainsString(
-			'(neowiki-dependent-subject-name: Birth, Pablo Picasso)',
+			'(sws-dependent-subject-name: Birth, Pablo Picasso)',
 			$this->executeWith( self::BIRTH_ID )->getHTMLTitle()
 		);
 	}
@@ -375,7 +375,7 @@ class SpecialSubjectTest extends NeoWikiIntegrationTestCase {
 	 * @dataProvider wikiModeProvider
 	 */
 	public function testASubjectOnAnUnreadablePageRendersExactlyLikeAnAbsentOne( bool $subjectFirst ): void {
-		$this->overrideConfigValue( 'NeoWikiSubjectFirst', $subjectFirst );
+		$this->overrideConfigValue( 'SWSSubjectFirst', $subjectFirst );
 		$this->createPageWithSubjects(
 			'SpecialSubjectTest_Restricted',
 			mainSubject: TestSubject::build( id: self::SUBJECT_ID, label: 'Restricted Inc' )

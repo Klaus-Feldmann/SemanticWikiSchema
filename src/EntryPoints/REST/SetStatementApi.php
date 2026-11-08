@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\NeoWiki\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
-use ProfessionalWiki\NeoWiki\Presentation\CsrfValidator;
-use ProfessionalWiki\NeoWiki\Presentation\DocumentationUrl;
-use ProfessionalWiki\NeoWiki\Presentation\RestUpdateStatementPresenter;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
+use ProfessionalWiki\SWS\SWSExtension;
+use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use ProfessionalWiki\SWS\Presentation\RestUpdateStatementPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class SetStatementApi extends SimpleHandler {
@@ -50,7 +50,7 @@ class SetStatementApi extends SimpleHandler {
 			// Checked before PropertyName trims it.
 			PropertyNameRules::assertValid( $propertyName );
 
-			$extension = NeoWikiExtension::getInstance();
+			$extension = SWSExtension::getInstance();
 			$extension->newUpdateStatementAction( $presenter, $this->getAuthority() )->setStatement(
 				$extension->getSubjectIdParser()->parseOrThrow( $subjectId ),
 				new PropertyName( $propertyName ),

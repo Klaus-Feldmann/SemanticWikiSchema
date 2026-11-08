@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\{Response, ResponseInterface, SimpleHandler, StringStream};
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\NeoWiki\EntryPoints\REST\ReadOnlyEndpoint;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
+use ProfessionalWiki\SWS\EntryPoints\REST\ReadOnlyEndpoint;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use RuntimeException;
 
@@ -32,7 +32,7 @@ abstract class DataViewExportApi extends SimpleHandler {
 		} catch ( RuntimeException ) { return $this->unavailable(); }
 		if ( !$view['complete'] ) {
 			return $this->getResponseFactory()->createHttpError( 503, [
-				'message' => 'The complete NeoWiki data view could not be resolved. No partial export was produced. Retry or inspect the data-view API for field/source status.',
+				'message' => 'The complete SWS data view could not be resolved. No partial export was produced. Retry or inspect the data-view API for field/source status.',
 			] );
 		}
 		$format = $params['format'] ?? 'json';
@@ -41,18 +41,18 @@ abstract class DataViewExportApi extends SimpleHandler {
 				JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION ) . "\n";
 			$mime = 'application/json; charset=utf-8'; $extension = 'json';
 		} else {
-			$neoWiki = NeoWikiExtension::getInstance();
+			$sws = SWSExtension::getInstance();
 			$gateway = new EntityGateway( $context );
-			$quads = ( new DataViewRdfProjector( $neoWiki->getRdfNamespaces(),
+			$quads = ( new DataViewRdfProjector( $sws->getRdfNamespaces(),
 				static fn ( string $source, string $id ): ?string => $gateway->conceptUri( $source, $id ) ) )->project( $view );
-			$body = $neoWiki->getRdfSerializer()->serialize( $quads, $format === 'turtle' ? RdfFormat::Turtle : RdfFormat::TriG );
+			$body = $sws->getRdfSerializer()->serialize( $quads, $format === 'turtle' ? RdfFormat::Turtle : RdfFormat::TriG );
 			$mime = $format === 'turtle' ? 'text/turtle; charset=utf-8' : 'application/trig; charset=utf-8';
 			$extension = $format === 'turtle' ? 'ttl' : 'trig';
 		}
 		$response = $this->getResponseFactory()->create();
 		$response->setHeader( 'Content-Type', $mime );
 		$response->setHeader( 'Cache-Control', 'private, no-store' );
-		$response->setHeader( 'Content-Disposition', 'attachment; filename="neowiki-' .
+		$response->setHeader( 'Content-Disposition', 'attachment; filename="sws-' .
 			( $subjectId === null ? 'page-' . $title->getArticleID() : 'subject-' . rawurlencode( $subjectId ) ) . '-data-view.' . $extension . '"' );
 		$response->setHeader( 'X-Content-Type-Options', 'nosniff' );
 		$response->setBody( new StringStream( $body ) );
@@ -65,7 +65,7 @@ abstract class DataViewExportApi extends SimpleHandler {
 	}
 
 	protected function unavailable(): Response {
-		return $this->getResponseFactory()->createHttpError( 404, [ 'message' => 'NeoWiki export unavailable.' ] );
+		return $this->getResponseFactory()->createHttpError( 404, [ 'message' => 'SWS export unavailable.' ] );
 	}
 	protected function commonParams(): array {
 		return [

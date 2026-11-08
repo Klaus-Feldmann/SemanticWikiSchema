@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the page whose Subjects the view reads.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onBeforePageDisplay
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
  * @group Database
  */
-class SubjectIdTitledPageHeadingTest extends NeoWikiIntegrationTestCase {
+class SubjectIdTitledPageHeadingTest extends SWSIntegrationTestCase {
 
 	private const string SUBJECT_ID = 's1zz1111111azz5';
 	private const string SUBJECT_NAMESPACE_PAGE = 'Subject:' . self::SUBJECT_ID;
@@ -52,7 +52,7 @@ class SubjectIdTitledPageHeadingTest extends NeoWikiIntegrationTestCase {
 
 	public function testTheHeadingDoesNotDependOnTheMainSubjectBeingRendered(): void {
 		$revisionId = $this->createPageLabelled( 'Ada Lovelace' )->getId();
-		$this->overrideConfigValue( 'NeoWikiAutoRenderMainSubject', false );
+		$this->overrideConfigValue( 'SWSAutoRenderMainSubject', false );
 
 		$this->assertStringContainsString( 'Ada Lovelace', $this->viewContentPage( $revisionId )->getPageTitle() );
 	}
@@ -160,7 +160,7 @@ class SubjectIdTitledPageHeadingTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function display( OutputPage $out ): OutputPage {
-		NeoWikiHooks::onBeforePageDisplay( $out, $out->getSkin() );
+		SWSHooks::onBeforePageDisplay( $out, $out->getSkin() );
 
 		return $out;
 	}

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Source;
+namespace ProfessionalWiki\SWS\Application\Source;
 
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\NeoWiki\Application\SubjectLookup;
-use ProfessionalWiki\NeoWiki\Domain\Source\SourceRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Application\SubjectLookup;
+use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
 
 /**
  * Resolves each Subject through the Source that produced it (ADR 23). Ids are grouped by Source before
@@ -78,7 +78,7 @@ readonly class SourceRoutingSubjectLookup implements SubjectLookup {
 	 * @param string[] $idTexts
 	 */
 	private function unknownSourceMessage( array $idTexts ): string {
-		return 'NeoWiki: no registered Source for Subject id(s): ' . implode( ', ', $idTexts );
+		return 'SWS: no registered Source for Subject id(s): ' . implode( ', ', $idTexts );
 	}
 
 }

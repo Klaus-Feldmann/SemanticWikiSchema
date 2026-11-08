@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Page;
+namespace ProfessionalWiki\SWS\Domain\Page;
 
 /**
  * Marker interface for page property values that need backend-specific

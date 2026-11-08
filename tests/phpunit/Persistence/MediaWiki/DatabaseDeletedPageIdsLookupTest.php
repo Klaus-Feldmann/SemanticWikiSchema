@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestSubject;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
+use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup
+ * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup
  * @group Database
  */
-class DatabaseDeletedPageIdsLookupTest extends NeoWikiIntegrationTestCase {
+class DatabaseDeletedPageIdsLookupTest extends SWSIntegrationTestCase {
 
 	protected function setUp(): void {
 		parent::setUp();

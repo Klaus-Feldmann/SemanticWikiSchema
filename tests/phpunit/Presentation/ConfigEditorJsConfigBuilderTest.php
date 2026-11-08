@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Config\HashConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\WikiConfigLookup;
-use ProfessionalWiki\NeoWiki\Presentation\ConfigEditorJsConfigBuilder;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\StubWikiConfigSource;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
+use ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder;
+use ProfessionalWiki\SWS\Tests\TestDoubles\StubWikiConfigSource;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\ConfigEditorJsConfigBuilder
+ * @covers \ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder
  */
 class ConfigEditorJsConfigBuilderTest extends TestCase {
 
 	private const array PHP_CONFIG = [
-		'NeoWikiSubjectFirst' => false,
-		'NeoWikiAutoRenderMainSubject' => true,
-		'NeoWikiDataLanguages' => [],
-		'NeoWikiEnforceValidation' => false,
+		'SWSSubjectFirst' => false,
+		'SWSAutoRenderMainSubject' => true,
+		'SWSDataLanguages' => [],
+		'SWSEnforceValidation' => false,
 	];
 
 	private function buildFor( ?array $pageConfig, array $phpConfig = self::PHP_CONFIG ): array {
@@ -64,7 +64,7 @@ class ConfigEditorJsConfigBuilderTest extends TestCase {
 	public function testGivesTheLocalSettingsValueWhateverThePageSets(): void {
 		$jsConfig = $this->buildFor(
 			[ 'dataLanguages' => [ 'fr' ] ],
-			[ 'NeoWikiDataLanguages' => [ 'de', 'it' ] ] + self::PHP_CONFIG
+			[ 'SWSDataLanguages' => [ 'de', 'it' ] ] + self::PHP_CONFIG
 		);
 
 		$this->assertSame( [ 'de', 'it' ], $jsConfig['localSettingsValues']['dataLanguages'] );

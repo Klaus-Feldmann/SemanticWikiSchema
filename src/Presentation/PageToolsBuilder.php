@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Presentation;
+namespace ProfessionalWiki\SWS\Presentation;
 
 use MediaWiki\Skin\SkinComponentUtils;
 use MediaWiki\Title\Title;
 
 class PageToolsBuilder {
 
-	public const CREATE_SUBJECT_ID = 't-neowiki-create-subject';
+	public const CREATE_SUBJECT_ID = 't-sws-create-subject';
 
 	/**
 	 * @return list<array<string, mixed>>
@@ -26,11 +26,11 @@ class PageToolsBuilder {
 
 		if ( $canCreateMainSubject && $isLatestRevision ) {
 			$items[] = [
-				'text' => wfMessage( 'neowiki-page-tools-create-subject' )->text(),
+				'text' => wfMessage( 'sws-page-tools-create-subject' )->text(),
 				'href' => '#',
 				'id' => self::CREATE_SUBJECT_ID,
 				'data' => [
-					'mw-neowiki-action' => 'open-subject-creator',
+					'mw-sws-action' => 'open-subject-creator',
 				],
 			];
 		}
@@ -40,20 +40,20 @@ class PageToolsBuilder {
 		// describe: a subject slot holding content that is not Subject data.
 		if ( $pageId !== 0 ) {
 			$items[] = [
-				'text' => wfMessage( 'neowiki-page-tools-rdf' )->text(),
-				'href' => wfScript( 'rest' ) . '/neowiki/v0/page/'
+				'text' => wfMessage( 'sws-page-tools-rdf' )->text(),
+				'href' => wfScript( 'rest' ) . '/sws/v0/page/'
 					. $pageId . '/rdf?format=turtle',
-				'id' => 't-neowiki-rdf',
+				'id' => 't-sws-rdf',
 			];
 		}
 
 		if ( $devUiEnabled ) {
 			$items[] = [
 				'text' => wfMessage(
-					$canEditSubject ? 'neowiki-page-tools-edit-json' : 'neowiki-page-tools-view-json'
+					$canEditSubject ? 'sws-page-tools-edit-json' : 'sws-page-tools-view-json'
 				)->text(),
 				'href' => SkinComponentUtils::makeSpecialUrlSubpage( 'NeoJson', $title->getFullText() ),
-				'id' => 't-neowiki-edit-json',
+				'id' => 't-sws-edit-json',
 			];
 		}
 

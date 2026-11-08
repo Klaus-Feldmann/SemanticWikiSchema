@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Rdf;
+namespace ProfessionalWiki\SWS\Application\Rdf;
 
-use ProfessionalWiki\NeoWiki\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\NodeScope;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
+use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
 
 /**
  * A {@see NodeMapping} whose terms have been expanded and whose place in the node tree is known, ready

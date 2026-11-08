@@ -4,15 +4,15 @@ order: 4
 ---
 # Validation Codes
 
-Constraint violations returned by NeoWiki's validation API use stable `code` strings. This document is
+Constraint violations returned by SWS's validation API use stable `code` strings. This document is
 the reference for those codes.
 
 Violations are returned by:
 
-- `POST /neowiki/v0/subject/validate` — dry-run validation of a proposed create-shape body.
-- `POST /neowiki/v0/subject/{subjectId}/validate` — dry-run validation of a proposed update-shape
+- `POST /sws/v0/subject/validate` — dry-run validation of a proposed create-shape body.
+- `POST /sws/v0/subject/{subjectId}/validate` — dry-run validation of a proposed update-shape
   body against an existing Subject's Schema.
-- `POST /neowiki/v0/subject` and `PUT /neowiki/v0/subject/{subjectId}` — the write endpoints include
+- `POST /sws/v0/subject` and `PUT /sws/v0/subject/{subjectId}` — the write endpoints include
   the resulting `violations` array in their `201`/`200` success body. Whether a write with violations
   is rejected is covered under
   [Severity, blocking, and enforcement](#severity-blocking-and-enforcement).
@@ -62,8 +62,8 @@ severity in the Schema, per Constraint, and the default is `warning`. See
 state, and blocking is what an author opts into. Every other code reports a system condition rather
 than a user-correctable Constraint, so its severity is fixed.
 
-Blocking matters only when an admin enables enforcement (`$wgNeoWikiEnforceValidation`, or
-`enforceValidation` on [`MediaWiki:NeoWiki`](../operations/installation.md#on-wiki-settings); off by
+Blocking matters only when an admin enables enforcement (`$wgSWSEnforceValidation`, or
+`enforceValidation` on [`MediaWiki:SWS`](../operations/installation.md#on-wiki-settings); off by
 default, so every write that keeps the [rules for Dependent Subjects](#rules-for-dependent-subjects)
 persists). Under enforcement, a write that introduces *new* `error`
 violations is rejected with `422 Unprocessable Entity` and an `{ status, message, violations }` body,

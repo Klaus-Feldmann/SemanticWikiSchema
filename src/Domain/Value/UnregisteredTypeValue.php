@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Domain\Value;
+namespace ProfessionalWiki\SWS\Domain\Value;
 
 /**
  * Value whose Property Type is not registered, because the extension owning the type is

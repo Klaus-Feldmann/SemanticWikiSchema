@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MainConfigNames;
@@ -9,13 +9,13 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use PermissionsError;
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialNeoJson;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialNeoJson;
+use ProfessionalWiki\SWS\SWSExtension;
 use SpecialPageTestBase;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialNeoJson
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialNeoJson
  * @group Database
  */
 class SpecialNeoJsonTest extends SpecialPageTestBase {
@@ -82,7 +82,7 @@ class SpecialNeoJsonTest extends SpecialPageTestBase {
 		}
 
 		$this->assertNull(
-			NeoWikiExtension::getInstance()->newSubjectContentRepository( $user )->getSubjectContentByPageTitle( $title ),
+			SWSExtension::getInstance()->newSubjectContentRepository( $user )->getSubjectContentByPageTitle( $title ),
 			'The rejected POST must not have written any Subject content'
 		);
 	}
@@ -101,7 +101,7 @@ class SpecialNeoJsonTest extends SpecialPageTestBase {
 		$this->executeSpecialPage( $title->getPrefixedText(), $this->newJsonPost(), null, $user );
 
 		$this->assertNotNull(
-			NeoWikiExtension::getInstance()->newSubjectContentRepository( $user )->getSubjectContentByPageTitle( $title ),
+			SWSExtension::getInstance()->newSubjectContentRepository( $user )->getSubjectContentByPageTitle( $title ),
 			'Precondition: the POST wrote Subject content'
 		);
 

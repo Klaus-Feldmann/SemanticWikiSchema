@@ -8,7 +8,7 @@ Status: Accepted, relation-target suggestions superseded by [ADR 37](037-subject
 
 Subject ids are not derived from the page title ([ADR 5](005-subject-guids.md)), so finding the page that holds a
 Subject takes a query. The only index answering it was the Neo4j projection: `HasSubject` edges walked backwards.
-Subject CRUD, `{{#view}}`, `{{#neowiki_value}}` and the `mw.neowiki.*` getters all resolved ids that way, so a wiki
+Subject CRUD, `{{#view}}`, `{{#sws_value}}` and the `mw.sws.*` getters all resolved ids that way, so a wiki
 with no graph backend, or with only a SPARQL store, could not store or read Subjects at all.
 
 Identity resolution has stronger requirements than the projection it was living in. A graph store is a rebuildable
@@ -20,7 +20,7 @@ this Subject", and which one replies becomes an accident of wiring order.
 
 ## Decision
 
-The subject-to-page mapping is authoritative in a MediaWiki table, `neowiki_subject_page`, keyed on the Subject id
+The subject-to-page mapping is authoritative in a MediaWiki table, `sws_subject_page`, keyed on the Subject id
 and the page id. It is not a fallback and not a cache: it is the implementation of `PageIdentifiersLookup`.
 
 **Written with the revision it derives from.** `RevisionFromEditComplete` fires inside `PageUpdater`'s atomic section,
@@ -57,8 +57,8 @@ is nothing to allow.
 
 ## Consequences
 
-* NeoWiki works with no graph backend configured. That is a supported mode, not a misconfiguration.
-* A NeoWiki table is now on the correctness path, whereas `neowiki_rebuild_runs` only carries bookkeeping. Every save
+* SWS works with no graph backend configured. That is a supported mode, not a misconfiguration.
+* A SWS table is now on the correctness path, whereas `sws_rebuild_runs` only carries bookkeeping. Every save
   writes the index, so a wiki that has not run `update.php` cannot be edited at all, rather than degrading to
   Subjects being unfindable.
 * `RebuildSubjectPageIndex.php` backfills an existing wiki, registered to run from `update.php`. MediaWiki's web
@@ -79,7 +79,7 @@ is nothing to allow.
 
 * **`page_props`**: only indexed by `pp_propname`, so the Subject id would have to be encoded into the property name,
   one name per Subject. `Special:PagesWithProp` and `list=pagepropnames` enumerate distinct property names wiki-wide,
-  so that breaks core surfaces NeoWiki cannot patch. `page_props` is also written POSTSEND, deliberately outside
+  so that breaks core surfaces SWS cannot patch. `page_props` is also written POSTSEND, deliberately outside
   ChronologyProtector: an eventually-consistent index under a strongly-consistent write path.
 * **The search index**: optional infrastructure and eventually consistent, so it cannot carry a correctness
   dependency.

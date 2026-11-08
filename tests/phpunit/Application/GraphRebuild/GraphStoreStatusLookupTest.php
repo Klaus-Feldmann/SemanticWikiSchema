@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\GraphRebuild;
+namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\NeoWiki\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphStoreStatusLookup;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\StoreSyncState;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\DatabaseRebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Persistence\RebuildRunRepository;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\InMemoryProjectionChangeTimeLookup;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
+use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
+use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
+use ProfessionalWiki\SWS\Application\GraphRebuild\StoreSyncState;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
+use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryProjectionChangeTimeLookup;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\GraphRebuild\GraphStoreStatusLookup
+ * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup
  * @group Database
  */
 class GraphStoreStatusLookupTest extends MediaWikiIntegrationTestCase {
@@ -88,7 +88,7 @@ class GraphStoreStatusLookupTest extends MediaWikiIntegrationTestCase {
 	}
 
 	/**
-	 * The native projection is defined by NeoWiki's own code, not by a page anyone can edit.
+	 * The native projection is defined by SWS's own code, not by a page anyone can edit.
 	 */
 	public function testARebuiltNativeProjectionStoreIsInSync(): void {
 		$rebuild = $this->recordSucceededRun( self::NATIVE_STORE );

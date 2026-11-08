@@ -3,7 +3,7 @@ title: Upgrading
 order: 2
 ---
 
-# Upgrading NeoWiki
+# Upgrading SWS
 
 Before you start, read the [release notes](https://github.com/ProfessionalWiki/NeoWiki/blob/master/RELEASE-NOTES.md)
 of every version after yours: they list any step an upgrade needs beyond the ones below.
@@ -49,10 +49,10 @@ first, then the command above.
 For a branch checkout, update the code, its dependencies, and the frontend bundle from the MediaWiki root:
 
 ```sh
-git -C extensions/NeoWiki pull
+git -C extensions/SWS pull
 composer update
 
-cd extensions/NeoWiki/resources/ext.neowiki
+cd extensions/SWS/resources/ext.sws
 npm ci && npm run build
 ```
 
@@ -60,7 +60,7 @@ Then, either way, run this from the MediaWiki root:
 
 ```sh
 php maintenance/run.php update --quick
-php maintenance/run.php NeoWiki:RebuildGraphDatabases
+php maintenance/run.php SemanticWikiSchema:RebuildGraphDatabases
 ```
 
 If your wiki runs CirrusSearch, also [update its search index](maintenance.md#making-subjects-searchable).

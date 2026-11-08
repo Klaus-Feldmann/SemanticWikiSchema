@@ -1,12 +1,12 @@
 <?php
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints\SpecialPages;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialMappings;
+use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialMappings;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\SpecialPages\SpecialMappings
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialMappings
  */
 class SpecialMappingsTest extends SpecialPageTestBase {
 
@@ -21,7 +21,7 @@ class SpecialMappingsTest extends SpecialPageTestBase {
 		[ $output ] = $this->executeSpecialPage();
 
 		$this->assertStringContainsString(
-			'id="ext-neowiki-mappings"',
+			'id="ext-sws-mappings"',
 			$output
 		);
 	}

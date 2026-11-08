@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application\Rdf;
+namespace ProfessionalWiki\SWS\Application\Rdf;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use ProfessionalWiki\NeoWiki\Application\Source\SchemaResolver;
-use ProfessionalWiki\NeoWiki\Domain\Page\Page;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageValue;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Iri;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Literal;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\Quad;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\QuadList;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\NeoWiki\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\NeoWiki\Domain\Relation\TypedRelation;
-use ProfessionalWiki\NeoWiki\Domain\Statement;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\NeoWiki\Domain\Value\StringValue;
-use ProfessionalWiki\NeoWiki\Domain\Subject\Subject;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectId;
+use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
+use ProfessionalWiki\SWS\Domain\Page\Page;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageValue;
+use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use ProfessionalWiki\SWS\Domain\Rdf\Quad;
+use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
+use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use ProfessionalWiki\SWS\Domain\Relation\TypedRelation;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
+use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -234,14 +234,14 @@ class RdfPageProjector implements PageProjector {
 			$this->warnOnDroppedValues( $statement, count( $terms ), $pageId );
 
 			$predicate = $this->namespaces->property( $statement->getPropertyName()->text );
-			if ( $value instanceof \ProfessionalWiki\NeoWiki\Domain\Value\UrlValue ) {
+			if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ) {
 				foreach ( $value->parts as $index => $entry ) {
 					$node = new Iri( $subjectIri->value . '/url/' . rawurlencode( $name->text ) . '/' . $index );
-					$quads[] = new Quad( $subjectIri, new Iri( 'urn:neowiki:aewi:urlEntry' ), $node, $graph );
-					$quads[] = new Quad( $node, new Iri( 'urn:neowiki:aewi:field' ), $predicate, $graph );
+					$quads[] = new Quad( $subjectIri, new Iri( 'urn:sws:aewi:urlEntry' ), $node, $graph );
+					$quads[] = new Quad( $node, new Iri( 'urn:sws:aewi:field' ), $predicate, $graph );
 					foreach ( $entry as $key => $text ) {
 						$object = $key === 'url' && Iri::isSafeAbsolute( $text ) ? new Iri( $text ) : RdfLiteralFactory::typed( $text, 'string' );
-						$quads[] = new Quad( $node, new Iri( 'urn:neowiki:aewi:url:' . $key ), $object, $graph );
+						$quads[] = new Quad( $node, new Iri( 'urn:sws:aewi:url:' . $key ), $object, $graph );
 					}
 				}
 			}

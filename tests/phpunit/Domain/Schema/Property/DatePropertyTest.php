@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Schema\Property;
+namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\PropertyType\Types\DateType;
-use ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateProperty;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
-use ProfessionalWiki\NeoWiki\Tests\Data\TestProperty;
-use ProfessionalWiki\NeoWiki\Tests\JsonSchemaAssertions;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
+use ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Schema\Property\DateProperty
+ * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty
  */
 class DatePropertyTest extends TestCase {
 

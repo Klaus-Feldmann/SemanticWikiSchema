@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\NeoWiki\Application\PageSubjectsLookup;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\NeoWiki\Presentation\ViewHtmlBuilder;
+use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
 use Throwable;
 
 class MainSubjectParserFunction {
@@ -26,7 +26,7 @@ class MainSubjectParserFunction {
 		$argument = $this->findArgument( $args );
 
 		if ( $argument !== null ) {
-			return '<div class="error">' . $parser->msg( 'neowiki-main-subject-error-argument', $argument )->escaped() . '</div>';
+			return '<div class="error">' . $parser->msg( 'sws-main-subject-error-argument', $argument )->escaped() . '</div>';
 		}
 
 		$mainSubjectId = $this->findMainSubjectId( $parser );

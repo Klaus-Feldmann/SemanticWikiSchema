@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application\WikiConfig;
+namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigValueType;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigValueType;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigValueType
+ * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigValueType
  */
 class ConfigValueTypeTest extends TestCase {
 

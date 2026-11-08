@@ -9,11 +9,11 @@ vendor/
 .phpunit.result.cache
 composer.lock
 package-lock.json
-!resources/ext.neowiki/package-lock.json
+!resources/ext.sws/package-lock.json
 !tests/RedHerb/package-lock.json
 !tests/e2e/package-lock.json
 
-# Installable SemanticNeoWiki test branch keeps built assets and graph lockfile.
+# Installable SemanticWikiSchema branch keeps built assets and graph lockfile.
 !graph-explorer-dev/package-lock.json
 
 # Local publication test output

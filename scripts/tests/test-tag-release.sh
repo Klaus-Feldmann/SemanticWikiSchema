@@ -11,7 +11,7 @@ unset $(git rev-parse --local-env-vars)
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SUT="$SCRIPT_DIR/../tag-release.sh"
-BUNDLE_DIR=resources/ext.neowiki/dist
+BUNDLE_DIR=resources/ext.sws/dist
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -100,16 +100,16 @@ export PATH="$WORK/bin:$PATH" DOWNLOAD_LOG="$WORK/downloads"
 
 export DECOY_DIR="$WORK/decoy"
 mkdir "$DECOY_DIR"
-echo 'console.log( "decoy" );' > "$DECOY_DIR/neowiki.js"
-echo '.decoy {}' > "$DECOY_DIR/neowiki.css"
+echo 'console.log( "decoy" );' > "$DECOY_DIR/sws.js"
+echo '.decoy {}' > "$DECOY_DIR/sws.css"
 
 # The fixture every case copies: an origin whose master has the commits $FIRST and
 # $SECOND, a clone of it, and the artifact of $SECOND's run.
 TEMPLATE="$WORK/template"
 git init -q --bare "$TEMPLATE/origin.git"
 git clone -q "$TEMPLATE/origin.git" "$TEMPLATE/clone" 2>/dev/null
-mkdir -p "$TEMPLATE/clone/resources/ext.neowiki"
-echo 'dist/' > "$TEMPLATE/clone/resources/ext.neowiki/.gitignore"
+mkdir -p "$TEMPLATE/clone/resources/ext.sws"
+echo 'dist/' > "$TEMPLATE/clone/resources/ext.sws/.gitignore"
 echo first > "$TEMPLATE/clone/README.md"
 git -C "$TEMPLATE/clone" add -A
 git -C "$TEMPLATE/clone" commit -q -m first
@@ -119,8 +119,8 @@ git -C "$TEMPLATE/clone" commit -q -am second
 SECOND=$(git -C "$TEMPLATE/clone" rev-parse HEAD)
 git -C "$TEMPLATE/clone" push -q origin master
 mkdir "$TEMPLATE/artifact"
-echo 'console.log( "built" );' > "$TEMPLATE/artifact/neowiki.js"
-echo '.built {}' > "$TEMPLATE/artifact/neowiki.css"
+echo 'console.log( "built" );' > "$TEMPLATE/artifact/sws.js"
+echo '.built {}' > "$TEMPLATE/artifact/sws.css"
 
 # Sets $ORIGIN, $CLONE and $ARTIFACT_DIR to a fresh copy of the fixture.
 setup_case() {
@@ -200,12 +200,12 @@ setup_case head
 run_sut 0.1.0
 assert_eq "Parent is master's head" "$(tag_parent 0.1.0)" "$SECOND"
 assert_eq "Adds only the bundle and the image tag" "$(added_files "$SECOND" 0.1.0)" \
-    "Docker/image-tag $BUNDLE_DIR/neowiki.css $BUNDLE_DIR/neowiki.js "
+    "Docker/image-tag $BUNDLE_DIR/sws.css $BUNDLE_DIR/sws.js "
 assert_eq "Names the version's demo image" "$(git -C "$CLONE" show 0.1.0:Docker/image-tag 2>&1)" '0.1.0'
 assert_eq "Holds the successful master run's JavaScript" \
-    "$(git -C "$CLONE" show "0.1.0:$BUNDLE_DIR/neowiki.js" 2>&1)" 'console.log( "built" );'
+    "$(git -C "$CLONE" show "0.1.0:$BUNDLE_DIR/sws.js" 2>&1)" 'console.log( "built" );'
 assert_eq "Holds the successful master run's stylesheet" \
-    "$(git -C "$CLONE" show "0.1.0:$BUNDLE_DIR/neowiki.css" 2>&1)" '.built {}'
+    "$(git -C "$CLONE" show "0.1.0:$BUNDLE_DIR/sws.css" 2>&1)" '.built {}'
 assert_eq "Links the run that built it" \
     "$(git -C "$CLONE" log -1 --format=%B 0.1.0 | grep -c 'https://github.com/example/actions/runs/4242')" "1"
 
@@ -225,7 +225,7 @@ BUILT_COMMIT=$FIRST
 run_sut 0.1.0 "$FIRST"
 assert_eq "Parent is the given commit" "$(tag_parent 0.1.0)" "$FIRST"
 assert_eq "Adds only the bundle and the image tag to it" "$(added_files "$FIRST" 0.1.0)" \
-    "Docker/image-tag $BUNDLE_DIR/neowiki.css $BUNDLE_DIR/neowiki.js "
+    "Docker/image-tag $BUNDLE_DIR/sws.css $BUNDLE_DIR/sws.js "
 
 echo
 color '36' "Case 4: the default is origin's current master, whatever the clone tracks"
@@ -258,7 +258,7 @@ assert_refused "Unbuilt commit" 0.1.0
 echo
 color '36' "Case 7: an artifact without the stylesheet is refused"
 setup_case no-css
-rm "$ARTIFACT_DIR/neowiki.css"
+rm "$ARTIFACT_DIR/sws.css"
 assert_refused "Incomplete artifact" 0.1.0
 
 echo

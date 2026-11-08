@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Actions;
+namespace ProfessionalWiki\SWS\EntryPoints\Actions;
 
 use FormlessAction;
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\SWSExtension;
 
 class SubjectsAction extends FormlessAction {
 
@@ -29,7 +29,7 @@ class SubjectsAction extends FormlessAction {
 	}
 
 	public function getPageTitle(): Message {
-		return $this->msg( 'neowiki-managesubjects-title', $this->getTitle()->getPrefixedText() );
+		return $this->msg( 'sws-managesubjects-title', $this->getTitle()->getPrefixedText() );
 	}
 
 	protected function getDescription(): string {
@@ -42,11 +42,11 @@ class SubjectsAction extends FormlessAction {
 
 		if ( !self::isEligibleTitle( $title ) ) {
 			return Html::errorBox(
-				$this->msg( 'neowiki-managesubjects-not-applicable' )->escaped()
+				$this->msg( 'sws-managesubjects-not-applicable' )->escaped()
 			);
 		}
 
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$extension->newFrontendModuleLoader()->loadWithSubjectPermissions(
 			$out,
 			$this->getSkin(),
@@ -56,10 +56,10 @@ class SubjectsAction extends FormlessAction {
 
 		$out->addJsConfigVars( [
 			...$extension->getSubjectUiJsConfigVars( $this->getAuthority() ),
-			'wgNeoWikiManageSubjectsPageId' => $title->getArticleID(),
+			'wgSWSManageSubjectsPageId' => $title->getArticleID(),
 		] );
 
-		return Html::element( 'div', [ 'id' => 'ext-neowiki-manage-subjects' ] );
+		return Html::element( 'div', [ 'id' => 'ext-sws-manage-subjects' ] );
 	}
 
 	public static function isEligibleTitle( ?Title $title ): bool {

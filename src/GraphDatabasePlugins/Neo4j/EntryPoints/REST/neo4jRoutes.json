@@ -1,9 +1,9 @@
 [
 	{
-		"path": "/neowiki/v0/query/cypher",
+		"path": "/sws/v0/query/cypher",
 		"method": [
 			"POST"
 		],
-		"factory": "ProfessionalWiki\\NeoWiki\\NeoWikiExtension::newCypherQueryApi"
+		"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCypherQueryApi"
 	}
 ]

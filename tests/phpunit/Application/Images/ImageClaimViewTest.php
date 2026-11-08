@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\NeoWiki\Tests\Application\Images;
+namespace ProfessionalWiki\SWS\Tests\Application\Images;
 use PHPUnit\Framework\TestCase;
-use NeoWikiBaseBridge\ImageClaimView;
+use SWSBaseBridge\ImageClaimView;
 require_once __DIR__ . '/../../../../SchemaBaseBridge/src/ImageClaimView.php';
 class ImageClaimViewTest extends TestCase {
 	private function claim( string $name, string $rank = 'normal' ): array {

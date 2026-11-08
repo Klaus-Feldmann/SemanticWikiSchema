@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\SpecialPage\SpecialPageFactory;
 use MediaWiki\Specials\SpecialSpecialPages;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onSpecialPageInitList
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSpecialPageInitList
  * @group Database
  */
 class SpecialPageGroupOrderTest extends SpecialPageTestBase {
@@ -18,25 +18,25 @@ class SpecialPageGroupOrderTest extends SpecialPageTestBase {
 		return new SpecialSpecialPages();
 	}
 
-	public function testNeoWikiGroupIsListedFirst(): void {
+	public function testSWSGroupIsListedFirst(): void {
 		/** @var string $output */
 		[ $output ] = $this->executeSpecialPage();
 
 		$this->assertSame(
-			'neowiki',
+			'sws',
 			$this->firstGroupHeadingIn( $output ),
 			'Without the reordering "maintenance" leads, as Special:BrokenRedirects heads the core list'
 		);
 	}
 
-	public function testSpecialPageListStartsWithANeoWikiPage(): void {
+	public function testSpecialPageListStartsWithASWSPage(): void {
 		$factory = $this->specialPageFactory();
 		$firstPage = $factory->getNames()[0];
 
 		$this->assertSame(
-			'neowiki',
+			'sws',
 			$factory->getPage( $firstPage )?->getFinalGroupName(),
-			"$firstPage heads the special page list, and it is not a NeoWiki page"
+			"$firstPage heads the special page list, and it is not a SWS page"
 		);
 	}
 
@@ -44,7 +44,7 @@ class SpecialPageGroupOrderTest extends SpecialPageTestBase {
 		$this->assertContains(
 			'Recentchanges',
 			$this->specialPageFactory()->getNames(),
-			'Moving the NeoWiki pages to the front must not drop the pages they overtake'
+			'Moving the SWS pages to the front must not drop the pages they overtake'
 		);
 	}
 

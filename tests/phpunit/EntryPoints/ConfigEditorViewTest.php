@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\EntryPoints;
+namespace ProfessionalWiki\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Context\RequestContext;
@@ -11,19 +11,19 @@ use MediaWiki\Permissions\PermissionStatus;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks;
-use ProfessionalWiki\NeoWiki\Tests\NeoWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\FixedRevisionPolicy;
+use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
- * Viewing MediaWiki:NeoWiki, which shows the form the frontend builds from the configuration it is
+ * Viewing MediaWiki:SWS, which shows the form the frontend builds from the configuration it is
  * handed, or leaves the page to core. Needs the database for the configuration page and its revisions.
  *
- * @covers \ProfessionalWiki\NeoWiki\EntryPoints\NeoWikiHooks::onConfigPageBeforePageDisplay
- * @covers \ProfessionalWiki\NeoWiki\NeoWikiExtension::newConfigEditorJsConfigBuilder
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onConfigPageBeforePageDisplay
+ * @covers \ProfessionalWiki\SWS\SWSExtension::newConfigEditorJsConfigBuilder
  * @group Database
  */
-class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
+class ConfigEditorViewTest extends SWSIntegrationTestCase {
 
 	private const string RENDERED_JSON =
 		'<div class="noresize"><table class="mw-json"><tbody><tr><td>data</td></tr></tbody></table></div>';
@@ -32,10 +32,10 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 		'<table class="diff"><tr><td class="diff-marker">+</td></tr></table>' . self::RENDERED_JSON;
 
 	private const string MISSING_REVISION_ERROR =
-		'<div class="errorbox">The revision #999999999 of the page named "MediaWiki:NeoWiki" does not exist.</div>';
+		'<div class="errorbox">The revision #999999999 of the page named "MediaWiki:SWS" does not exist.</div>';
 
 	private function configTitle(): Title {
-		return Title::makeTitle( NS_MEDIAWIKI, 'NeoWiki' );
+		return Title::makeTitle( NS_MEDIAWIKI, 'SWS' );
 	}
 
 	private function saveConfigPage( string $json ): RevisionRecord {
@@ -64,7 +64,7 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 	 * $out as this hook leaves it, just before MediaWiki sends the page.
 	 */
 	private function display( OutputPage $out ): OutputPage {
-		NeoWikiHooks::onConfigPageBeforePageDisplay( $out, $out->getContext()->getSkin() );
+		SWSHooks::onConfigPageBeforePageDisplay( $out, $out->getContext()->getSkin() );
 
 		return $out;
 	}
@@ -79,7 +79,7 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 	}
 
 	private function formConfig( OutputPage $out ): array {
-		return $out->getJsConfigVars()['wgNeoWikiConfigEditor'];
+		return $out->getJsConfigVars()['wgSWSConfigEditor'];
 	}
 
 	private function pageValueIn( OutputPage $out, string $pageKey ): mixed {
@@ -89,13 +89,13 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 	public function testTheCurrentPageShowsTheFormInPlaceOfItsJson(): void {
 		$out = $this->view( $this->saveConfigPage( '{ "subjectFirst": true }' ) );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-config-editor"', $out->getHTML() );
+		$this->assertStringContainsString( 'id="ext-sws-config-editor"', $out->getHTML() );
 		$this->assertStringNotContainsString( 'mw-json', $out->getHTML() );
-		$this->assertContains( 'ext.neowiki', $out->getModules() );
+		$this->assertContains( 'ext.sws', $out->getModules() );
 	}
 
 	public function testAMissingPageShowsTheForm(): void {
-		$this->assertStringContainsString( 'id="ext-neowiki-config-editor"', $this->view()->getHTML() );
+		$this->assertStringContainsString( 'id="ext-sws-config-editor"', $this->view()->getHTML() );
 	}
 
 	public function testTheLatestRevisionAskedForByIdShowsTheForm(): void {
@@ -103,7 +103,7 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 
 		$out = $this->view( $latest, request: [ 'action' => 'view', 'oldid' => $latest->getId() ] );
 
-		$this->assertStringContainsString( 'id="ext-neowiki-config-editor"', $out->getHTML() );
+		$this->assertStringContainsString( 'id="ext-sws-config-editor"', $out->getHTML() );
 	}
 
 	public function testTheFormStartsFromTheLatestRevisionWhenAnOlderOneIsPublished(): void {
@@ -118,8 +118,8 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 		$this->assertSame( $latest->getId(), $this->formConfig( $out )['revisionId'] );
 	}
 
-	public function testTheFormIsHeadedNeoWikiSettings(): void {
-		$this->assertSame( 'NeoWiki settings', $this->view()->getPageTitle() );
+	public function testTheFormIsHeadedSWSSettings(): void {
+		$this->assertSame( 'SWS settings', $this->view()->getPageTitle() );
 	}
 
 	public function testAMissingPageHasNoRevisionToSaveOver(): void {
@@ -148,8 +148,8 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 
 		$this->display( $out );
 
-		$this->assertStringNotContainsString( 'ext-neowiki-config-editor', $out->getHTML() );
-		$this->assertArrayNotHasKey( 'wgNeoWikiConfigEditor', $out->getJsConfigVars() );
+		$this->assertStringNotContainsString( 'ext-sws-config-editor', $out->getHTML() );
+		$this->assertArrayNotHasKey( 'wgSWSConfigEditor', $out->getJsConfigVars() );
 	}
 
 	public function testAnOlderRevisionIsLeftToCore(): void {
@@ -180,13 +180,13 @@ class ConfigEditorViewTest extends NeoWikiIntegrationTestCase {
 	}
 
 	public function testOtherMediaWikiPagesAreLeftToCore(): void {
-		$out = $this->view( title: Title::makeTitle( NS_MEDIAWIKI, 'NotNeoWiki' ) );
+		$out = $this->view( title: Title::makeTitle( NS_MEDIAWIKI, 'NotSWS' ) );
 
 		$this->assertSame( self::RENDERED_JSON, $out->getHTML() );
 	}
 
 	public function testThePageIsLeftToCoreWhenInWikiConfigIsDisabled(): void {
-		$this->overrideConfigValue( 'NeoWikiEnableInWikiConfig', false );
+		$this->overrideConfigValue( 'SWSEnableInWikiConfig', false );
 
 		$this->assertSame( self::RENDERED_JSON, $this->view()->getHTML() );
 	}

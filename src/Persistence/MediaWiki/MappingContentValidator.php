@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleParser;
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Errors\ValidationError;
 use Opis\JsonSchema\Validator;
-use ProfessionalWiki\NeoWiki\Domain\Mapping\CurieExpander;
-use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\SWSExtension;
 use RuntimeException;
 
 /**
@@ -135,7 +135,7 @@ class MappingContentValidator {
 			return [ $pointer => 'The Schema name "' . $schemaName . '" cannot be used: ' . $exception->getMessage() . '.' ];
 		}
 
-		$page = $this->titleParser->makeTitleValueSafe( NeoWikiExtension::NS_SCHEMA, $schemaName );
+		$page = $this->titleParser->makeTitleValueSafe( SWSExtension::NS_SCHEMA, $schemaName );
 
 		if ( $page === null ) {
 			return [ $pointer => 'The Schema name "' . $schemaName . '" is not a valid page name.' ];

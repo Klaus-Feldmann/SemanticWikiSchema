@@ -1,16 +1,16 @@
 <?php
 
 declare( strict_types = 1 );
-namespace NeoWikiBaseBridge;
+namespace SWSBaseBridge;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 final class ExportSubjectDataViewApi extends DataViewExportApi {
 	public function run( string $subjectId ): Response {
-		$extension = NeoWikiExtension::getInstance();
+		$extension = SWSExtension::getInstance();
 		$id = $extension->getSubjectIdParser()->parse( $subjectId );
 		if ( $id === null ) { return $this->getResponseFactory()->createHttpError( 400, [ 'message' => 'Invalid Subject ID.' ] ); }
 		$page = $extension->newSubjectHostingPageResolver( $this->getAuthority() )->resolveReadableHostingPage( $id );

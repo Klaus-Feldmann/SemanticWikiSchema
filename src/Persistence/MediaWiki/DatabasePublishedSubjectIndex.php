@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\NeoWiki\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageId;
-use ProfessionalWiki\NeoWiki\Domain\Page\PageSubjects;
-use ProfessionalWiki\NeoWiki\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\NeoWiki\Persistence\PublishedSubjectIndex;
+use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
 use stdClass;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
@@ -21,8 +21,8 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
  */
 class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 
-	public const string SUBJECT_TABLE = 'neowiki_subject';
-	public const string RELATION_TABLE = 'neowiki_relation';
+	public const string SUBJECT_TABLE = 'sws_subject';
+	public const string RELATION_TABLE = 'sws_relation';
 
 	/**
 	 * Subject data can name a Schema or property at any length, so a longer name is cut here, on a character
@@ -142,14 +142,14 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 		string $edited
 	): array {
 		return [
-			'nws_subject_id' => $subjectId,
-			'nws_schema' => $schema,
-			'nws_display_name' => $displayName,
-			'nws_display_name_key' => $displayNameKey,
-			'nws_page_key' => $pageKey,
-			'nws_is_main' => $isMain ? 1 : 0,
-			'nws_dependent' => $isDependent ? 1 : 0,
-			'nws_edited' => $edited,
+			'swss_subject_id' => $subjectId,
+			'swss_schema' => $schema,
+			'swss_display_name' => $displayName,
+			'swss_display_name_key' => $displayNameKey,
+			'swss_page_key' => $pageKey,
+			'swss_is_main' => $isMain ? 1 : 0,
+			'swss_dependent' => $isDependent ? 1 : 0,
+			'swss_edited' => $edited,
 		];
 	}
 
@@ -158,7 +158,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 * @return array<string, string|int|null>
 	 */
 	private static function withoutEditTime( array $row ): array {
-		unset( $row['nws_edited'] );
+		unset( $row['swss_edited'] );
 		return $row;
 	}
 
@@ -170,8 +170,8 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 */
 	private static function newEditTimeOfKeptRows( array $keptRows, array $wantedRows ): ?string {
 		foreach ( $keptRows as $subjectId => $storedRow ) {
-			if ( $wantedRows[$subjectId]['nws_edited'] !== $storedRow['nws_edited'] ) {
-				return (string)$wantedRows[$subjectId]['nws_edited'];
+			if ( $wantedRows[$subjectId]['swss_edited'] !== $storedRow['swss_edited'] ) {
+				return (string)$wantedRows[$subjectId]['swss_edited'];
 			}
 		}
 
@@ -212,9 +212,9 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 */
 	private static function relationRow( string $subjectId, string $property, string $targetId ): array {
 		return [
-			'nwr_subject_id' => $subjectId,
-			'nwr_property' => $property,
-			'nwr_target_id' => $targetId,
+			'swsr_subject_id' => $subjectId,
+			'swsr_property' => $property,
+			'swsr_target_id' => $targetId,
 		];
 	}
 
@@ -224,7 +224,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 * @param array<string, string> $row
 	 */
 	private static function relationKey( array $row ): string {
-		return $row['nwr_subject_id'] . ' ' . $row['nwr_target_id'] . ' ' . $row['nwr_property'];
+		return $row['swsr_subject_id'] . ' ' . $row['swsr_target_id'] . ' ' . $row['swsr_property'];
 	}
 
 	/**
@@ -233,17 +233,17 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	private function storedSubjectRows( PageId $pageId ): array {
 		$result = $this->db->newSelectQueryBuilder()
 			->select( [
-				'nws_subject_id',
-				'nws_schema',
-				'nws_display_name',
-				'nws_display_name_key',
-				'nws_page_key',
-				'nws_is_main',
-				'nws_dependent',
-				'nws_edited',
+				'swss_subject_id',
+				'swss_schema',
+				'swss_display_name',
+				'swss_display_name_key',
+				'swss_page_key',
+				'swss_is_main',
+				'swss_dependent',
+				'swss_edited',
 			] )
 			->from( self::SUBJECT_TABLE )
-			->where( [ 'nws_page_id' => $pageId->id ] )
+			->where( [ 'swss_page_id' => $pageId->id ] )
 			->caller( __METHOD__ )
 			->fetchResultSet();
 
@@ -251,16 +251,16 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 
 		/** @var stdClass $row */
 		foreach ( $result as $row ) {
-			$rows[(string)$row->nws_subject_id] = self::subjectRow(
-				subjectId: (string)$row->nws_subject_id,
-				schema: (string)$row->nws_schema,
-				displayName: $row->nws_display_name === null ? null : (string)$row->nws_display_name,
-				displayNameKey: $row->nws_display_name_key === null ? null : (string)$row->nws_display_name_key,
-				pageKey: (string)$row->nws_page_key,
-				isMain: (int)$row->nws_is_main === 1,
-				isDependent: (int)$row->nws_dependent === 1,
+			$rows[(string)$row->swss_subject_id] = self::subjectRow(
+				subjectId: (string)$row->swss_subject_id,
+				schema: (string)$row->swss_schema,
+				displayName: $row->swss_display_name === null ? null : (string)$row->swss_display_name,
+				displayNameKey: $row->swss_display_name_key === null ? null : (string)$row->swss_display_name_key,
+				pageKey: (string)$row->swss_page_key,
+				isMain: (int)$row->swss_is_main === 1,
+				isDependent: (int)$row->swss_dependent === 1,
 				// Converted, since PostgreSQL hands back a format of its own.
-				edited: (string)ConvertibleTimestamp::convert( TS_MW, (string)$row->nws_edited ),
+				edited: (string)ConvertibleTimestamp::convert( TS_MW, (string)$row->swss_edited ),
 			);
 		}
 
@@ -272,9 +272,9 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 */
 	private function storedRelationRows( PageId $pageId ): array {
 		$result = $this->db->newSelectQueryBuilder()
-			->select( [ 'nwr_subject_id', 'nwr_property', 'nwr_target_id' ] )
+			->select( [ 'swsr_subject_id', 'swsr_property', 'swsr_target_id' ] )
 			->from( self::RELATION_TABLE )
-			->where( [ 'nwr_page_id' => $pageId->id ] )
+			->where( [ 'swsr_page_id' => $pageId->id ] )
 			->caller( __METHOD__ )
 			->fetchResultSet();
 
@@ -283,9 +283,9 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 		/** @var stdClass $row */
 		foreach ( $result as $row ) {
 			$relationRow = self::relationRow(
-				(string)$row->nwr_subject_id,
-				(string)$row->nwr_property,
-				(string)$row->nwr_target_id
+				(string)$row->swsr_subject_id,
+				(string)$row->swsr_property,
+				(string)$row->swsr_target_id
 			);
 
 			$rows[self::relationKey( $relationRow )] = $relationRow;
@@ -318,7 +318,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	private function updateEditTime( PageId $pageId, array $subjectIds, string $editTime ): void {
 		$this->db->newUpdateQueryBuilder()
 			->update( self::SUBJECT_TABLE )
-			->set( [ 'nws_edited' => $this->db->timestamp( $editTime ) ] )
+			->set( [ 'swss_edited' => $this->db->timestamp( $editTime ) ] )
 			->where( self::subjectRowsByKey( $pageId, $subjectIds ) )
 			->caller( __METHOD__ )
 			->execute();
@@ -329,7 +329,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 	 * @return array<string, int|list<string>>
 	 */
 	private static function subjectRowsByKey( PageId $pageId, array $subjectIds ): array {
-		return [ 'nws_page_id' => $pageId->id, 'nws_subject_id' => array_values( array_map( 'strval', $subjectIds ) ) ];
+		return [ 'swss_page_id' => $pageId->id, 'swss_subject_id' => array_values( array_map( 'strval', $subjectIds ) ) ];
 	}
 
 	/**
@@ -348,9 +348,9 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 			->ignore()
 			->rows( array_map(
 				fn ( array $row ): array => [
-					'nws_page_id' => $pageId->id,
+					'swss_page_id' => $pageId->id,
 					...$row,
-					'nws_edited' => $this->db->timestamp( (string)$row['nws_edited'] ),
+					'swss_edited' => $this->db->timestamp( (string)$row['swss_edited'] ),
 				],
 				array_values( $rows )
 			) )
@@ -368,7 +368,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 		foreach ( array_chunk( $rows, self::RELATION_DELETE_BATCH_SIZE ) as $batch ) {
 			$this->db->newDeleteQueryBuilder()
 				->deleteFrom( self::RELATION_TABLE )
-				->where( [ 'nwr_page_id' => $pageId->id ] )
+				->where( [ 'swsr_page_id' => $pageId->id ] )
 				->where( $this->db->makeList(
 					array_map(
 						fn ( array $row ): string => $this->db->makeList( $row, IDatabase::LIST_AND ),
@@ -395,7 +395,7 @@ class DatabasePublishedSubjectIndex implements PublishedSubjectIndex {
 			->insertInto( self::RELATION_TABLE )
 			->ignore()
 			->rows( array_map(
-				static fn ( array $row ): array => [ 'nwr_page_id' => $pageId->id, ...$row ],
+				static fn ( array $row ): array => [ 'swsr_page_id' => $pageId->id, ...$row ],
 				array_values( $rows )
 			) )
 			->caller( __METHOD__ )

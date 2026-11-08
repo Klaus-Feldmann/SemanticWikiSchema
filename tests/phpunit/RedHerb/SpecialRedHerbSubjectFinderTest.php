@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\RedHerb;
+namespace ProfessionalWiki\SWS\Tests\RedHerb;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -35,7 +35,7 @@ class SpecialRedHerbSubjectFinderTest extends SpecialPageTestBase {
 
 		$modules = $context->getOutput()->getModules();
 
-		$this->assertContains( 'ext.neowiki', $modules );
+		$this->assertContains( 'ext.sws', $modules );
 		$this->assertContains( 'ext.redherb-subject-finder', $modules );
 	}
 

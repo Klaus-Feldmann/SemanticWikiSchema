@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Persistence\MediaWiki;
+namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use Closure;
-use ProfessionalWiki\NeoWiki\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\NeoWiki\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
+use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\IDatabase;
 
@@ -36,7 +36,7 @@ class DatabaseRebuildStartLock implements RebuildStartLock {
 	public function whileHeld( string $storeName, Closure $start ): RebuildRun {
 		$database = $this->connectionProvider->getPrimaryDatabase();
 		// Named after the store, at full length: MediaWiki hashes a lock name its backend cannot hold.
-		$lockName = 'NeoWiki-graph-rebuild-start:' . $storeName;
+		$lockName = 'SWS-graph-rebuild-start:' . $storeName;
 
 		if ( !$database->lock( $lockName, __METHOD__, self::TIMEOUT_SECONDS ) ) {
 			throw new RebuildStartLockUnavailableException( $storeName );

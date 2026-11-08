@@ -1,5 +1,5 @@
 <?php
-// Isolated integration contract: real NeoWiki hooks, stand-in MediaWiki services/parser/job execution.
+// Isolated integration contract: real SWS hooks, stand-in MediaWiki services/parser/job execution.
 namespace Harness {
  final class State {
   public static $schema,$subject,$old,$parser,$fail=false,$error=false;
@@ -84,18 +84,18 @@ namespace MediaWiki {
   };}};}
  }
 }
-namespace ProfessionalWiki\NeoWiki\EntryPoints {
+namespace ProfessionalWiki\SWS\EntryPoints {
  class ParserAuthority{public static function of($parser){return new \stdClass;}}
 }
-namespace ProfessionalWiki\NeoWiki\Infrastructure {
+namespace ProfessionalWiki\SWS\Infrastructure {
  class ParserPageDependencyRecorder{public function __construct($parser){}public function recordDependencyOnSchema($schema){\Harness\State::$dependencies[]=$schema->name->getText();}}
 }
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Content {
+namespace ProfessionalWiki\SWS\EntryPoints\Content {
  class SchemaContent{public function __construct(private string $text){}public function getText(){return $this->text;}}
  class SubjectContent{public function __construct(private $subject){}public function getPageSubjects(){return new class($this->subject){public function __construct(private $subject){}public function getMainSubject(){return $this->subject;}};}}
 }
-namespace ProfessionalWiki\NeoWiki {
- class NeoWikiExtension {
+namespace ProfessionalWiki\SWS {
+ class SWSExtension {
   public static function getInstance(){return new self;}
   public function newSubjectResolver($parser){return new class{public function resolveMainByTitle($title){return \Harness\State::$subject;}};}
   public function getSchemaResolverFor($authority){return $this->getSchemaResolver();}
@@ -103,7 +103,7 @@ namespace ProfessionalWiki\NeoWiki {
   public function newHookPageRebuilder(){return new class{public function rebuild($title){\Harness\State::$rebuilds++;}};}
  }
 }
-namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing {
+namespace ProfessionalWiki\SWS\EntryPoints\Processing {
  // Scheduling contract only: the real worker is tested in the full MediaWiki fixtures.
  final class InternalPageProcessor {
   public function refresh($title): bool {
@@ -116,17 +116,17 @@ namespace ProfessionalWiki\NeoWiki\EntryPoints\Processing {
 namespace {
  require dirname(__DIR__).'/tests/standalone/autoload.php';
  use Harness\State as S;
- use ProfessionalWiki\NeoWiki\Domain\Schema\Property\WikitextProperty as WP;
- use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyCore;
- use ProfessionalWiki\NeoWiki\Domain\Schema\Schema;
- use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaName;
- use ProfessionalWiki\NeoWiki\Domain\Schema\SchemaReference;
- use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyDefinitions;
- use ProfessionalWiki\NeoWiki\Application\SchemaWikitext;
- use ProfessionalWiki\NeoWiki\EntryPoints\SchemaWikitextHooks as Hooks;
- use ProfessionalWiki\NeoWiki\EntryPoints\Content\SubjectContent;
- use ProfessionalWiki\NeoWiki\EntryPoints\Content\SchemaContent;
- use ProfessionalWiki\NeoWiki\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+ use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty as WP;
+ use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+ use ProfessionalWiki\SWS\Domain\Schema\Schema;
+ use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+ use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+ use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
+ use ProfessionalWiki\SWS\Application\SchemaWikitext;
+ use ProfessionalWiki\SWS\EntryPoints\SchemaWikitextHooks as Hooks;
+ use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+ use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+ use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
  use MediaWiki\Title\Title;
  use MediaWiki\Parser\Parser;
  use MediaWiki\Revision\RevisionRecord;
@@ -134,19 +134,19 @@ namespace {
  function field($execute,$code){return WP::fromPartialJson(new PropertyCore('',false,null),['execute'=>$execute,'wikitext'=>$code]);}
  function resetState(){S::$deferred=[];S::$queued=[];S::$dependencies=[];S::$refresh=0;S::$purges=0;S::$rebuilds=0;S::$old=null;S::$fail=false;S::$error=false;}
  function drain(){while(S::$deferred){$f=array_shift(S::$deferred);$f();}}
- S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}'),'SMW'=>field(true,'{{NeoWiki}}'),'Weiter'=>field(true,'{{PAGENAME}}')]),false);
+ S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}'),'SMW'=>field(true,'{{SWS}}'),'Weiter'=>field(true,'{{PAGENAME}}')]),false);
  S::$subject=new class{public function getSchemaReference(){return SchemaReference::local(new SchemaName('Person'));}};
- check(SchemaWikitext::programs(S::$schema)===['{{NeoWiki}}','{{PAGENAME}}'],'Only explicit programs run, in schema order');
+ check(SchemaWikitext::programs(S::$schema)===['{{SWS}}','{{PAGENAME}}'],'Only explicit programs run, in schema order');
  check(SchemaWikitext::append('Seiteninhalt',[])==='Seiteninhalt','Empty program changes page');
- check(SchemaWikitext::append('Seiteninhalt',['{{NeoWiki}}'])==="Seiteninhalt\n\n{{NeoWiki}}",'Program is not appended');
+ check(SchemaWikitext::append('Seiteninhalt',['{{SWS}}'])==="Seiteninhalt\n\n{{SWS}}",'Program is not appended');
  foreach([['execute'=>true,'wikitext'=>' '],['execute'=>'true','wikitext'=>'{{X}}'],['execute'=>true,'wikitext'=>[]]]as $bad){try{WP::fromPartialJson(new PropertyCore('',false,null),$bad);check(false,'Bad activation accepted');}catch(\InvalidArgumentException){check(true,'Invalid activation refused');}}
  $title=new Title;$source='Unveränderter Quelltext';$parser=new Parser($title);
  Hooks::onParserBeforeInternalParse($parser,$source,null);
- check(str_contains($source,'{{NeoWiki}}'),'Schema program missing from host parse');
+ check(str_contains($source,'{{SWS}}'),'Schema program missing from host parse');
  check(!str_contains($source,'NichtAusfuehren'),'Inactive code executed');
  check(S::$dependencies===['Person'],'Schema dependency not recorded');
  $once=$source;Hooks::onParserBeforeInternalParse($parser,$source,null);check($source===$once,'Recursive parse duplicated program');
- foreach([new Parser($title,41),new Parser($title,42,true),new Parser($title,42,false,2),new Parser(new Title('Schema:Person',42,'NeoWikiSchema'))]as $p){$text='Original';Hooks::onParserBeforeInternalParse($p,$text,null);check($text==='Original','Program ran in wrong context');}
+ foreach([new Parser($title,41),new Parser($title,42,true),new Parser($title,42,false,2),new Parser(new Title('Schema:Person',42,'SWSSchema'))]as $p){$text='Original';Hooks::onParserBeforeInternalParse($p,$text,null);check($text==='Original','Program ran in wrong context');}
  $savedSubject=S::$subject;S::$subject=null;$text='Original';Hooks::onParserBeforeInternalParse(new Parser($title),$text,null);check($text==='Original','Page without main subject changed');S::$subject=$savedSubject;
  S::$error=true;$text='Original';Hooks::onParserBeforeInternalParse(new Parser($title),$text,null);check(str_contains($text,'Schema-Wikitext-Fehler')&&S::$logs>0,'Lookup failure hidden');S::$error=false;
  resetState();$revision=new RevisionRecord('Seiteninhalt',new SubjectContent(S::$subject));$page=new class($title){public function __construct(private $title){}public function getTitle(){return $this->title;}};$tags=[];
@@ -160,10 +160,10 @@ namespace {
  resetState();S::$fail=true;Hooks::onRevisionFromEditComplete($page,$revision,false,null,$tags);drain();check(count(S::$queued)===1&&S::$queued[0]->parameters()['page']===true,'Failure did not queue bounded retry');check(S::$rebuilds===0,'Graph rebuilt after failed page refresh');
  resetState();S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}')]),false);Hooks::onRevisionFromEditComplete($page,$revision,false,null,$tags);check(S::$deferred===[],'Ordinary subject save without program scheduled work');
  // Schema activation/removal must target indexed pages even if no template was ever in their source.
- $schemaPage=new class{public function getTitle(){return new Title('Person',42,'NeoWikiSchema');}};
- $code=['propertyDefinitions'=>['SMW'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'{{NeoWiki}}']]];
+ $schemaPage=new class{public function getTitle(){return new Title('Person',42,'SWSSchema');}};
+ $code=['propertyDefinitions'=>['SMW'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'{{SWS}}']]];
  resetState();Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent(json_encode($code))),false,null,$tags);drain();check(count(S::$queued)===1,'Schema activation did not schedule its subjects');
- S::$ids=range(1,101);$job=array_shift(S::$queued);check($job->run(),'Schema batch failed');check(count(S::$queued)===101,'Batch did not limit pages and schedule continuation');check(S::$conditions===['nws_schema'=>'Person','nws_is_main'=>1],'Batch is not scoped to the schema main subjects');
+ S::$ids=range(1,101);$job=array_shift(S::$queued);check($job->run(),'Schema batch failed');check(count(S::$queued)===101,'Batch did not limit pages and schedule continuation');check(S::$conditions===['swss_schema'=>'Person','swss_is_main'=>1],'Batch is not scoped to the schema main subjects');
  $next=array_pop(S::$queued);check($next->parameters()['after']===100,'Cursor wrong');S::$queued=[];$next->run();check(count(S::$queued)===1,'Continuation did not process remaining page');
  resetState();S::$old=new RevisionRecord(new SchemaContent(json_encode($code)));Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent('{"propertyDefinitions":{}}')),1,null,$tags);drain();check(count(S::$queued)===1,'Removing execution field did not schedule cleanup');
  resetState();S::$old=new RevisionRecord(new SchemaContent(json_encode($code)));Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent(json_encode($code))),1,null,$tags);check(S::$deferred===[],'Unchanged schema program scheduled unnecessary work');

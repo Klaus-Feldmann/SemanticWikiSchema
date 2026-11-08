@@ -2,28 +2,28 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\EntryPoints\REST;
+namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\InternalSparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\Exception\SparqlSyntaxException;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\InternalSparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlSyntaxException;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
 use Throwable;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
- * POST /neowiki/v0/query/sparql — runs a read-only SPARQL query against the first configured SPARQL
+ * POST /sws/v0/query/sparql — runs a read-only SPARQL query against the first configured SPARQL
  * store and returns the W3C `application/sparql-results+json` document unmodified. The read-side sibling
- * of {@see \ProfessionalWiki\NeoWiki\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi}; it
- * reuses the same `neowiki-query` right and rate limit, since both are read-only graph queries.
+ * of {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi}; it
+ * reuses the same `sws-query` right and rate limit, since both are read-only graph queries.
  */
 class SparqlQueryApi extends SimpleHandler {
 
@@ -35,7 +35,7 @@ class SparqlQueryApi extends SimpleHandler {
 	public function run(): Response {
 		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromAuthority( $this->getAuthority() );
 
-		if ( $user->pingLimiter( 'neowiki-query' ) ) {
+		if ( $user->pingLimiter( 'sws-query' ) ) {
 			return $this->errorResponse( 429, 'rateLimitExceeded', 'Query rate limit exceeded.' );
 		}
 
@@ -58,7 +58,7 @@ class SparqlQueryApi extends SimpleHandler {
 			return $this->mapException( $e );
 		}
 
-		// The W3C results document is returned unmodified, with no NeoWiki envelope around it.
+		// The W3C results document is returned unmodified, with no SWS envelope around it.
 		return $this->getResponseFactory()->createJson( $result->document );
 	}
 

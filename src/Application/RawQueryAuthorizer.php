@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Application;
+namespace ProfessionalWiki\SWS\Application;
 
 /**
  * Authorizes running a caller-supplied Cypher or SPARQL query. A raw query has whole-store read

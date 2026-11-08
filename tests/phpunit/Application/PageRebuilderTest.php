@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Application;
+namespace ProfessionalWiki\SWS\Tests\Application;
 
 use LogicException;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome;
-use ProfessionalWiki\NeoWiki\Application\PageRebuilder;
-use ProfessionalWiki\NeoWiki\Tests\TestDoubles\SpyOnRevisionCreatedHandler;
+use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
+use ProfessionalWiki\SWS\Application\PageRebuilder;
+use ProfessionalWiki\SWS\Tests\TestDoubles\SpyOnRevisionCreatedHandler;
 use Wikimedia\Rdbms\IDBAccessObject;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Application\PageRebuilder
+ * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
  */
 class PageRebuilderTest extends TestCase {
 
@@ -39,7 +39,7 @@ class PageRebuilderTest extends TestCase {
 
 	/**
 	 * @dataProvider skipOutcomeProvider
-	 * @covers \ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome::skipReason
+	 * @covers \ProfessionalWiki\SWS\Application\PageRefreshOutcome::skipReason
 	 */
 	public function testEverySkipOutcomeExplainsItself( PageRefreshOutcome $outcome ): void {
 		$this->assertNotSame( '', $outcome->skipReason() );
@@ -58,7 +58,7 @@ class PageRebuilderTest extends TestCase {
 
 	/**
 	 * @dataProvider writeOutcomeProvider
-	 * @covers \ProfessionalWiki\NeoWiki\Application\PageRefreshOutcome::skipReason
+	 * @covers \ProfessionalWiki\SWS\Application\PageRefreshOutcome::skipReason
 	 */
 	public function testAnOutcomeThatWroteHasNoSkipReason( PageRefreshOutcome $outcome ): void {
 		$this->expectException( LogicException::class );

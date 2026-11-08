@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Domain\Layout;
+namespace ProfessionalWiki\SWS\Tests\Domain\Layout;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\NeoWiki\Domain\Schema\PropertyName;
-use ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRule;
-use ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRules;
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Layout\DisplayRule;
+use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Domain\Layout\DisplayRules
+ * @covers \ProfessionalWiki\SWS\Domain\Layout\DisplayRules
  */
 class DisplayRulesTest extends TestCase {
 

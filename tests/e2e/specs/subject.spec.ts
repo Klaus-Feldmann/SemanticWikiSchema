@@ -57,7 +57,7 @@ test( 'an edited Subject shows and keeps its new value without losing the rest',
 
 // The infobox lists its values in plain elements, with no table or list roles to find them by.
 function infoboxValue( page: Page, propertyName: string ): Locator {
-	return page.locator( '.ext-neowiki-infobox__item' )
-		.filter( { has: page.locator( '.ext-neowiki-infobox__property', { hasText: propertyName } ) } )
-		.locator( '.ext-neowiki-infobox__value' );
+	return page.locator( '.ext-sws-infobox__item' )
+		.filter( { has: page.locator( '.ext-sws-infobox__property', { hasText: propertyName } ) } )
+		.locator( '.ext-sws-infobox__value' );
 }

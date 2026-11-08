@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\EntryPoints;
+namespace ProfessionalWiki\SWS\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Deferred\LinksUpdate\LinksDeletionUpdate;
 use MediaWiki\Deferred\LinksUpdate\LinksTable;
 use MediaWiki\Deferred\LinksUpdate\LinksUpdate;
 use MediaWiki\Page\PageReference;
-use ProfessionalWiki\NeoWiki\NeoWikiExtension;
+use ProfessionalWiki\SWS\SWSExtension;
 
 /**
  * No revision hook fires when MediaWiki refreshes a page's links without saving it: after an edit to a template
@@ -28,7 +28,7 @@ class LinksRefreshHandler {
 		$title = $linksUpdate->getTitle();
 
 		DeferredUpdates::addCallableUpdate( static function () use ( $title ): void {
-			NeoWikiExtension::getInstance()->newHookPageRebuilder()->rebuild( $title );
+			SWSExtension::getInstance()->newHookPageRebuilder()->rebuild( $title );
 		} );
 	}
 

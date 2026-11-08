@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\NeoWiki\Tests\Presentation;
+namespace ProfessionalWiki\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MainConfigNames;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\NeoWiki\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\NeoWiki\Presentation\ConfigDocumentationBuilder;
+use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder;
 
 /**
- * @covers \ProfessionalWiki\NeoWiki\Presentation\ConfigDocumentationBuilder
+ * @covers \ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder
  * @group Database
  */
 class ConfigDocumentationBuilderTest extends MediaWikiIntegrationTestCase {
@@ -20,14 +20,14 @@ class ConfigDocumentationBuilderTest extends MediaWikiIntegrationTestCase {
 	private function newBuilder(): ConfigDocumentationBuilder {
 		$context = new RequestContext();
 		$context->setLanguage( 'en' );
-		$context->setTitle( Title::makeTitle( NS_MEDIAWIKI, 'NeoWiki' ) );
+		$context->setTitle( Title::makeTitle( NS_MEDIAWIKI, 'SWS' ) );
 
 		return new ConfigDocumentationBuilder( new ConfigSchema(), $context );
 	}
 
 	private function overrideAcceptedValueMessage( string $wikitext ): void {
 		$this->overrideConfigValue( MainConfigNames::UseDatabaseMessages, true );
-		$this->editPage( Title::makeTitle( NS_MEDIAWIKI, 'Neowiki-config-type-boolean' ), $wikitext );
+		$this->editPage( Title::makeTitle( NS_MEDIAWIKI, 'Sws-config-type-boolean' ), $wikitext );
 	}
 
 	public function testReferenceListsEverySettingAndTheLocalSettingsNameItOverrides(): void {
@@ -69,7 +69,7 @@ class ConfigDocumentationBuilderTest extends MediaWikiIntegrationTestCase {
 		$html = $this->newBuilder()->buildPointer();
 
 		$this->assertStringContainsString( '#' . ConfigDocumentationBuilder::ANCHOR, $html );
-		$this->assertStringContainsString( 'neowiki.ai/docs/operations/installation', $html );
+		$this->assertStringContainsString( 'sws.ai/docs/operations/installation', $html );
 	}
 
 	public function testReferenceShowsScriptTagsFromAnOverriddenMessageAsText(): void {
