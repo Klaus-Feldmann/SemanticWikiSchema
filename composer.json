@@ -108,7 +108,7 @@
 	"extra": {
 		"installer-name": "SemanticWikiSchema",
 		"branch-alias": {
-			"dev-semantic-0.1.18": "0.1.x-dev"
+			"dev-semantic-0.1.19": "0.1.x-dev"
 		}
 	},
 	"conflict": {

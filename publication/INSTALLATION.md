@@ -5,7 +5,7 @@ The sole supported installation path is Composer in an existing MediaWiki 1.47.0
 ## Switch from Semantic NeoWiki 0.1.17 to Semantic WikiSchema 0.1.18
 
 1. Back up the Composer files, LocalSettings.php, the installed extension and its graph-explorer/config.js. If you use MCP, apply the updated runtime patch before changing the wiki registration.
-2. In the MediaWiki root Composer configuration, point the VCS repository at the renamed GitHub repository once it is available. Replace the requirement for `aufeinwort/semantic-neowiki` with `"aufeinwort/semantic-wikischema": "dev-semantic-0.1.18"`. Remove a merge include of the old extension composer.json if present.
+2. In the MediaWiki root Composer configuration, point the VCS repository at the renamed GitHub repository once it is available. Replace the requirement for `aufeinwort/semantic-neowiki` with `"aufeinwort/semantic-wikischema": "dev-semantic-0.1.19"`. Remove a merge include of the old extension composer.json if present.
 3. From the MediaWiki root, preview the switch using `--dry-run`, then run the same command without it.
 
 ```sh
@@ -23,6 +23,18 @@ If you load the registration helper from the extension directory, update its inc
 
 Rebuild the localization cache and verify both extension names in Special:Version. Open a known subject under Data and check a graph node and an export. Check MCP after restarting its connection. An installation already using the 0.1.17 Wiki modules can keep them. There is no schema change for this rename.
 
+## Updating 0.1.18 to 0.1.19
+
+Update the existing requirement to dev-semantic-0.1.19. Save the deployment-specific graph-explorer/config.js outside the extension directory. Preview and then apply the Composer update:
+
+~~~sh
+composer update aufeinwort/semantic-wikischema --with-dependencies --no-dev --prefer-dist --no-scripts --dry-run
+~~~
+
+After reviewing the preview, repeat without --dry-run. Restore the saved graph configuration, rebuild the localization cache and reload the schema editor from the origin. Existing loading statements, package name and installation directory continue to apply. This complete package supersedes the incremental field-type patches; removing a previous field-type patch first is unnecessary.
+
+The editor clears the old P mapping on a real field-type change and displays a notice. A supported target type can receive a newly selected mapping. This update does not convert previously stored subject values.
+
 ## Before changing the server
 
 Back up composer.json, composer.local.json, composer.lock, LocalSettings.php, the old NeoWiki extension directory and graph-explorer/config.js. Preserve your existing database backup. First apply the expanded MCP patch if the MCP tools must remain available after the extension is renamed. No installation command in this guide implicitly changes LocalSettings or patches SMW/Wikibase.
@@ -31,7 +43,7 @@ The current server may have loaded NeoWiki from copied files and a Composer merg
 
 ## Install the candidate
 
-Merge the VCS repository, package requirement and composer/installers allowance shown in README.md into your existing root/local configuration. Use `dev-semantic-0.1.18` explicitly. Then run the README Composer command from the MediaWiki root. The extension installer writes `extensions/SemanticWikiSchema` and its dependencies are loaded through the MediaWiki root vendor/autoload.php.
+Merge the VCS repository, package requirement and composer/installers allowance shown in README.md into your existing root/local configuration. Use `dev-semantic-0.1.19` explicitly. Then run the README Composer command from the MediaWiki root. The extension installer writes `extensions/SemanticWikiSchema` and its dependencies are loaded through the MediaWiki root vendor/autoload.php.
 
 Check that `extensions/SemanticWikiSchema/extension.json` exists before changing loading instructions. Replace the NeoWiki and bundled Bridge load lines with those in README.md. The old directory may be retained for return but must not be loaded in parallel. Do not delete old dependencies, RDF data or namespace contents as part of the rename.
 

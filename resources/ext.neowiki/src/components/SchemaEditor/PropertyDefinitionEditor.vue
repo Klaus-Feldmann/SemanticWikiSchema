@@ -26,6 +26,10 @@
 			/>
 		</CdxField>
 
+		<CdxMessage v-if="sourceResetOnTypeChange" type="notice">
+			{{ $i18n( 'neowiki-property-type-source-reset' ).text() }}
+		</CdxMessage>
+
 		<CdxField>
 			<template #label>
 				{{ $i18n( 'neowiki-property-editor-description' ).text() }}
@@ -55,7 +59,8 @@
 		</CdxField>
 
 		<PropertySourceEditor
-			v-if="localProperty.type !== 'wikitext'"
+			v-if="[ 'text', 'page', 'image', 'historicalDate' ].includes( localProperty.type )"
+			:key="localProperty.type"
 			ref="propertySourceEditor"
 			:property="localProperty as PropertyDefinition"
 			@update:property="updatePropertyAttributes" />
@@ -86,7 +91,7 @@ import WikiLinkEditor from './Property/WikiLinkEditor.vue';
 import { PropertyDefinition, PropertyName, withConstraintSeverity, withoutSeveritiesOfClearedConstraints } from '@/domain/PropertyDefinition.ts';
 import type { Severity } from '@/domain/Severity.ts';
 import SeverityInput from '@/components/SchemaEditor/Property/SeverityInput.vue';
-import { CdxCheckbox, CdxField, CdxSelect, CdxTextArea, CdxTextInput, type MenuItemData } from '@wikimedia/codex';
+import { CdxCheckbox, CdxField, CdxMessage, CdxSelect, CdxTextArea, CdxTextInput, type MenuItemData } from '@wikimedia/codex';
 import { NeoWikiServices } from '@/NeoWikiServices.ts';
 import { ValueInputExposes } from '@/components/Value/ValueInputContract.ts';
 import type { AttributesEditorExposes } from '@/components/SchemaEditor/Property/AttributesEditorContract.ts';
@@ -110,6 +115,7 @@ const emit = defineEmits<{
 }>();
 
 const localProperty = ref<PropertyDefinition>( { ...props.property } );
+const sourceResetOnTypeChange = ref( false );
 
 watch(
 	localProperty,
@@ -208,13 +214,16 @@ const propertyTypeRegistry = NeoWikiServices.getPropertyTypeRegistry();
 // The type-specific Constraints go, and their severities with them; required is
 // shared by every type, so it keeps its severity along with its value.
 function changePropertyType( type: string ): void {
+	if ( type === localProperty.value.type ) {
+		return;
+	}
+	const hadSource = localProperty.value.externalProperty !== undefined;
 	const requiredSeverity = localProperty.value.constraintSeverities?.required;
 
 	localProperty.value = propertyTypeRegistry.getType( type ).createPropertyDefinition(
 		{
 			name: localProperty.value.name,
-			wikiLink: localProperty.value.wikiLink,
-			externalProperty: localProperty.value.externalProperty,
+			wikiLink: type === 'wikitext' ? undefined : localProperty.value.wikiLink,
 			type: type,
 			description: localProperty.value.description,
 			required: localProperty.value.required,
@@ -222,6 +231,7 @@ function changePropertyType( type: string ): void {
 			...( requiredSeverity === undefined ? {} : { constraintSeverities: { required: requiredSeverity } } )
 		} as PropertyDefinition
 	);
+	sourceResetOnTypeChange.value = sourceResetOnTypeChange.value || hadSource;
 }
 
 const componentRegistry = NeoWikiServices.getComponentRegistry();

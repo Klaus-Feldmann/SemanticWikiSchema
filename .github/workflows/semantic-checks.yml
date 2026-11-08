@@ -1,9 +1,9 @@
 name: SemanticWikiSchema candidate checks
 on:
   push:
-    branches: [master, semantic-0.1.18]
+    branches: [master, semantic-0.1.19]
   pull_request:
-    branches: [master, semantic-0.1.18]
+    branches: [master, semantic-0.1.19]
   workflow_dispatch:
 permissions:
   contents: read

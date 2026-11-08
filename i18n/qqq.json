@@ -553,5 +553,6 @@
 	"neowiki-main-page-text": "Wikitext of the Main Page that NeoWiki's Docker setup writes in place of MediaWiki's own ({{msg-mw|mainpagetext}} and {{msg-mw|mainpagedocfooter}}) when it installs a wiki. {{#create_subject: page=new}} renders the button the text refers to, labelled {{msg-mw|neowiki-create-subject-default-label}}. Keep the wiki markup, {{#create_subject: page=new}}, the page names and the URLs unchanged; translate the link labels and the headings.",
 	"neowiki-derived-missing": "Status in a schema-bound source field when the source was successfully queried and has no statement for the property. This is distinct from an unavailable source; it is not a field value.",
 	"neowiki-property-datatype": "Label introducing the source datatype of a property ID in the schema editor.",
-	"neowiki-property-datatype-invalid": "Error preventing a schema save when a new or changed source property cannot be resolved or its datatype is incompatible with the selected NeoWiki field type. $1 gives the field, property ID, and/or datatype."
+	"neowiki-property-datatype-invalid": "Error preventing a schema save when a new or changed source property cannot be resolved or its datatype is incompatible with the selected NeoWiki field type. $1 gives the field, property ID, and/or datatype.",
+	"neowiki-property-type-source-reset": "Notice shown after changing a schema field type removes its external property mapping. The property must be selected again for the new type."
 }

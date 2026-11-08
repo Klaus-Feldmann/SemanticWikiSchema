@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, type VueWrapper } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
-import { CdxCheckbox } from '@wikimedia/codex';
+import { CdxCheckbox, CdxMessage, CdxSelect } from '@wikimedia/codex';
 import PropertyDefinitionEditor from '@/components/SchemaEditor/PropertyDefinitionEditor.vue';
 import PropertySourceEditor from '@/components/SchemaEditor/Property/PropertySourceEditor.vue';
 import IdLookup from '@/components/Id/IdLookup.vue';
@@ -65,6 +65,43 @@ describe( 'property ID selection through the schema field save check', () => {
 		expect( w.emitted( 'update:property-definition' )?.slice( -1 )[ 0 ][ 0 ] ).toMatchObject( {
 			externalProperty: { source: 'wikidata', id: 'P31' }, wikiLink: { labelTarget: 'Vermerk:Klassifizierung' },
 		} );
+		w.unmount();
+	} );
+
+	it.each( [ 'wikitext', 'number', 'image', 'page' ] )( 'clears a previous mapping when changing Text to %s', async ( type ) => {
+		const w = createTestWrapper( PropertyDefinitionEditor, { property: {
+			...newTextProperty( { name: 'Wikidata', required: true } ),
+			externalProperty: { source: 'wikidata', id: 'P31' },
+			wikiLink: { labelTarget: 'Vermerk:Wikidata' },
+		}, otherPropertyNames: [] } );
+		await w.findComponent( CdxSelect ).vm.$emit( 'update:selected', type );
+		await flushPromises();
+		const field = w.emitted( 'update:property-definition' )?.slice( -1 )[ 0 ][ 0 ] as Record<string, unknown>;
+		expect( field.type ).toBe( type );
+		expect( field.externalProperty ).toBeUndefined();
+		expect( field.required ).toBe( true );
+		expect( w.findComponent( CdxMessage ).text() ).toContain( 'neowiki-property-type-source-reset' );
+		expect( blocker( w ) ).toBeNull();
+		if ( type === 'wikitext' ) {
+			expect( field.wikiLink ).toBeUndefined();
+		}
+		if ( type === 'page' ) {
+			expect( w.findComponent( PropertySourceEditor ).findComponent( IdLookup ).exists() ).toBe( false );
+		}
+		if ( type === 'number' ) {
+			expect( w.findComponent( PropertySourceEditor ).exists() ).toBe( false );
+		}
+		w.unmount();
+	} );
+
+	it( 'keeps a mapping when the currently selected type is selected again', async () => {
+		const w = createTestWrapper( PropertyDefinitionEditor, { property: {
+			...newTextProperty( { name: 'Test' } ), externalProperty: { source: 'wikidata', id: 'P31' },
+		}, otherPropertyNames: [] } );
+		await w.findComponent( CdxSelect ).vm.$emit( 'update:selected', 'text' );
+		await flushPromises();
+		expect( w.emitted( 'update:property-definition' ) ).toBeUndefined();
+		expect( w.findComponent( CdxMessage ).exists() ).toBe( false );
 		w.unmount();
 	} );
 
