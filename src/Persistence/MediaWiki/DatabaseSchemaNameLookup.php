@@ -34,9 +34,17 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 			return $this->filterReadable( $this->getFirstSchemaNames( $limit, $offset ) );
 		}
 
-		return $this->filterReadable(
-			$this->searchSuggestionsToTitleArray( $this->getSearchSuggestions( $search, $limit, $offset ) )
-		);
+        $db = $this->db;
+        $pattern = new \Wikimedia\Rdbms\LikeValue( $db->anyString(), CaseInsensitiveKey::of($search), $db->anyString() );
+        $rows = $db->newSelectQueryBuilder()->select(['page_id','page_title'])->distinct()->from('page')
+            ->leftJoin(DatabaseIdentityTermIndex::TABLE,'term','term.swst_page_id = page_id AND term.swst_kind = ' . $db->addQuotes('schema'))
+            ->where(['page_namespace'=>SWSExtension::NS_SCHEMA, 'page_is_redirect'=>0])
+            ->andWhere($db->expr('term.swst_key',\Wikimedia\Rdbms\IExpression::LIKE,$pattern)
+                ->or('page_title',\Wikimedia\Rdbms\IExpression::LIKE,new \Wikimedia\Rdbms\LikeValue($search,$db->anyString())))
+            ->orderBy('page_id')->limit($limit * 4)->offset($offset)->caller(__METHOD__)->fetchResultSet();
+        $titles=[];
+        foreach ($rows as $row) { $titles[]=new TitleValue(SWSExtension::NS_SCHEMA,$row->page_title); }
+        return array_slice($this->filterReadable($titles),0,$limit);
 	}
 
 	/**
@@ -74,6 +82,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 				[ 'page_id', 'page_title' ],
 				[
 					'page_namespace' => SWSExtension::NS_SCHEMA,
+					'page_is_redirect' => 0,
 					$this->db->expr( 'page_id', '>', $lastPageId ),
 				],
 				__METHOD__,
@@ -123,7 +132,7 @@ class DatabaseSchemaNameLookup implements SchemaNameLookup {
 		$res = $this->db->select(
 			'page',
 			[ 'page_title' ],
-			[ 'page_namespace' => SWSExtension::NS_SCHEMA ],
+			[ 'page_namespace' => SWSExtension::NS_SCHEMA, 'page_is_redirect' => 0 ],
 			__METHOD__,
 			[
 				'ORDER BY' => 'page_id ASC',

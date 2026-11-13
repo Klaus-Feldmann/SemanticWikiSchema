@@ -16,6 +16,7 @@ use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
 use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
 use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
 use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextType;
+use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextValueType;
 use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
 use ProfessionalWiki\SWS\Domain\PropertyType\Types\ImageType;
 
@@ -35,6 +36,7 @@ class PropertyTypeRegistry implements PropertyTypeLookup {
 		$registry->registerType( new TextType() );
 		$registry->registerType( new PageType() );
 		$registry->registerType( new WikitextType() );
+		$registry->registerType( new WikitextValueType() );
 		$registry->registerType( new UrlType() );
 		$registry->registerType( new ImageType() );
 		$registry->registerType( new NumberType() );

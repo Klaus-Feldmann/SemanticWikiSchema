@@ -39,11 +39,13 @@ class ReplaceSubjectApi extends SimpleHandler {
 		try {
 			$extension = SWSExtension::getInstance();
 			$extension->newReplaceSubjectAction( $presenter, $this->getAuthority() )->replace(
-				$extension->getSubjectIdParser()->parseOrThrow( $subjectId ),
+				$extension->getSubjectIdParser( true )->parseOrThrow( $subjectId ),
 				$body['label'] ?? null,
 				$body['statements'],
 				$body['comment'] ?? null,
-				$body['dependentSubjects'] ?? []
+				$body['dependentSubjects'] ?? [],
+                $body['fieldNotes'] ?? null,
+				$this->identityFromBody( $body )
 			);
 		} catch ( InvalidArgumentException $e ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
@@ -75,7 +77,7 @@ class ReplaceSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: 15 characters starting with "s" for a Subject of this wiki, or "sourceKey:localId" for one from another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 		];
 	}
@@ -90,7 +92,8 @@ class ReplaceSubjectApi extends SimpleHandler {
 					. 'passing an empty string, leaves the Subject with no label, just as an omitted property name '
 					. 'deletes its Statement.',
 			],
-			'statements' => [
+			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
+            'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
@@ -102,7 +105,7 @@ class ReplaceSubjectApi extends SimpleHandler {
 				ParamValidator::PARAM_REQUIRED => false,
 				self::PARAM_DESCRIPTION => 'Optional edit summary.',
 			],
-		] + $this->dependentSubjectsParamSettings();
+		] + $this->dependentSubjectsParamSettings() + $this->identityParamSettings();
 	}
 
 }

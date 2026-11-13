@@ -30,7 +30,7 @@ globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window)
 const identityFetch=async(url)=>({ok:true,json:async()=>String(url).includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:'https://aufeinwort.info/page/1152'}}]}}:{swsbaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{sF16iHXBMTQdHDY:{wikidata:{status:'resolved',id:'Q154751',url:'https://www.wikidata.org/wiki/Q154751'},'wikibase-local':{status:'resolved',id:'Q56',url:'https://aufeinwort.info/wiki/Qwasi:Q56'}}}}}});
 globalThis.fetch=async(url)=> {
  if(new URL(url).searchParams.get('action')!=='swsbasevalues')return identityFetch(url);
- return {ok:true,json:async()=>({swsbasevalues:{version:1,scope:'current',pageId:1152,mainSubjectId:'sF16iHXBMTQdHDY',presentation:{version:1,pageUrlTemplate:'https://aufeinwort.info/wiki/SWSGRAPHTITLETOKEN',definitions:[
+ return {ok:true,json:async()=>({swsbasevalues:{version:1,scope:'current',pageId:1152,mainSubjectId:'sF16iHXBMTQdHDY',presentation:{version:1,ownDescription:'Eigene Forschungsbeschreibung <script>alert(1)</script>',pageUrlTemplate:'https://aufeinwort.info/wiki/SWSGRAPHTITLETOKEN',definitions:[
   {name:'Klassifizierung',type:'text',predicateLocalName:'Klassifizierung',wikiLink:{labelTarget:'Konzept:Klassifizierung',externalTarget:'local'},externalProperty:{source:'wikidata',id:'P31'}},
   {name:'Forschungsnotiz',type:'text',predicateLocalName:'Forschungsnotiz',wikiLink:{label:false,values:false},externalProperty:null}
  ]},fields:[{name:'Klassifizierung',source:'wikidata',propertyId:'P31',status:'resolved',values:[{kind:'entity',id:'Q5',label:'Mensch',url:'https://www.wikidata.org/wiki/Q5'}]}]}})};
@@ -47,6 +47,7 @@ let bubbled=0, resized=0;
 reactRoot.render(React.createElement('div',{onClick:()=>bubbled++,onLoad:()=>resized++},template.renderTemplate(context))); 
 const start=Date.now();
 while((!container.querySelector('.ge-sws-qids a') || !container.textContent.includes('Mensch'))&&Date.now()-start<30000)await new Promise(r=>setTimeout(r,50));
+const ownDescription=container.querySelector('.graph-explorer-standard-template__properties-own-description');assert.ok(ownDescription);assert.ok(ownDescription.textContent.includes('<script>'));assert.equal(ownDescription.querySelector('script'),null);
 const row=container.querySelector('.ge-sws-qids');assert.ok(row);
 assert.ok(row.textContent.includes('Wikidata: Q154751'),row.textContent);
 assert.ok(row.textContent.includes('Wikibase: Q56'),row.textContent);

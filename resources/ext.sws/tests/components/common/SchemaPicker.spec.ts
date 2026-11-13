@@ -373,20 +373,20 @@ describe( 'SchemaPicker', () => {
 			expect( wrapper.emitted( 'create' ) ).toEqual( [ [ 'Artwork' ] ] );
 		} );
 
-		it( 'makes no offer for typed text naming a schema that exists', async () => {
+		it( 'offers creation for a label already used', async () => {
 			const wrapper = await mountCreatingPicker();
 
 			await type( wrapper, 'office' );
 
-			expect( listedSchemas( wrapper ) ).toEqual( [ 'Office' ] );
+			expect( listedSchemas( wrapper ) ).toEqual( [ 'Office', createItemFor( 'office' ) ] );
 		} );
 
-		it( 'makes no offer for the committed schema, which the list leaves out', async () => {
+		it( 'offers another schema sharing the committed label', async () => {
 			const wrapper = await mountCreatingPicker();
 
 			await wrapper.setProps( { selected: 'Archived' } );
 
-			expect( listedSchemas( wrapper ) ).toEqual( [ 'Product', 'Office', 'City' ] );
+			expect( listedSchemas( wrapper ) ).toEqual( [ 'Product', 'Office', 'City', createItemFor( 'Archived' ) ] );
 		} );
 
 		describe.each( [

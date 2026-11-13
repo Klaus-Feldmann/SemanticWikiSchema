@@ -34,7 +34,7 @@ const expr = node.expression.getText(file);
 const match = /([A-Za-z_$][\w$]*)\.createElement/.exec(expr);
 if (!match || original.includes('__swsBaseQIdRow')) throw new Error('Unexpected baseline renderer');
 const react = match[1];
-const helperBuild = await esbuild.build({stdin:{contents: "export {createSWSQIdRow,createSWSDescriptionRow} from './swsQIds.js'; export {createSWSFields,createSWSThumbnail} from './swsFields.js';",resolveDir:path.join(root,'source'),sourcefile:'graphHelpers.js'},bundle:true,write:false,outfile:'helper.js',format:'esm',target:'es2022',minify:true,sourcemap:'external'});
+const helperBuild = await esbuild.build({stdin:{contents: "export {createSchemaQueries} from './swsSchemaQueries.js'; export {createSWSQIdRow,createSWSDescriptionRow} from './swsQIds.js'; export {createSWSFields,createSWSThumbnail} from './swsFields.js';",resolveDir:path.join(root,'source'),sourcefile:'graphHelpers.js'},bundle:true,write:false,outfile:'helper.js',format:'esm',target:'es2022',minify:true,sourcemap:'external'});
 const helper = {code:helperBuild.outputFiles.find(f=>f.path.endsWith('/helper.js')).text,map:helperBuild.outputFiles.find(f=>f.path.endsWith('.map')).text};
 const helperName = `sws-qids-${hash(helper.code).slice(0,12)}.js`;
 write('assets/' + helperName, helper.code + `\n//# sourceMappingURL=${helperName}.map\n`);
@@ -88,7 +88,13 @@ const entryOriginal = read('envendpoint-Qu3prYG8.js');
 if (entryOriginal.split('./common-CPcN3Iil.js').length !== 2) throw new Error('Unexpected entry imports');
 const configuredEntry = entryOriginal.replace('f=`https://aufeinwort.info/`', 'f=globalThis.SWSGraphConfig.baseIri').replace('endpointUrl:`/graph-explorer/sparql?default-graph-uri=urn%3Ax-arq%3AUnionGraph`', 'endpointUrl:globalThis.SWSGraphConfig.sparqlUrl');
 if (configuredEntry === entryOriginal || configuredEntry.includes('https://aufeinwort.info/')) throw new Error('Entry configuration replacement failed');
-const entryText = configuredEntry.replace('./common-CPcN3Iil.js', './' + commonName).replace(/\n\/\/# sourceMappingURL=.*$/, '');
+let schemaEntry = configuredEntry;
+for (const key of ['classTreeQuery', 'classInfoQuery']) {
+ const pattern = new RegExp(key + ':`[^`]*`', 'g');
+ if ([...schemaEntry.matchAll(pattern)].length !== 1) throw new Error('Unexpected schema query: ' + key);
+ schemaEntry = schemaEntry.replace(pattern, key + ':__swsSchemaQueries.' + key);
+}
+const entryText = `import {createSchemaQueries} from './${helperName}'; const __swsSchemaQueries=createSchemaQueries(globalThis.SWSGraphConfig.baseIri,document.documentElement.lang||navigator.language||'de');\n` + schemaEntry.replace('./common-CPcN3Iil.js', './' + commonName).replace(/\n\/\/# sourceMappingURL=.*$/, '');
 const entry = await esbuild.transform(entryText, {format: 'esm', target: 'es2022', minify: true,
   sourcemap: 'external', sourcefile: 'Ausgangsstand/envendpoint-Qu3prYG8.js'});
 const entryName = `envendpoint-qids-${hash(entry.code).slice(0,12)}.js`;

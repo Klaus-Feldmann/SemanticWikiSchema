@@ -31,7 +31,7 @@ class SchemaWikitextRefreshJob extends Job {
 		$after = (int)( $this->params['after'] ?? 0 );
 		$db = $services->getConnectionProvider()->getPrimaryDatabase();
 		$ids = $db->newSelectQueryBuilder()->select( 'swss_page_id' )->distinct()->from( 'sws_subject' )
-			->where( [ 'swss_schema' => $this->title->getText(), 'swss_is_main' => 1 ] )
+			->where( [ 'swss_schema' => $this->title->getText() ] )
 			->andWhere( $db->expr( 'swss_page_id', '>', $after ) )->orderBy( 'swss_page_id' )->limit( 100 )
 			->caller( __METHOD__ )->fetchFieldValues();
 		foreach ( $ids as $id ) {

@@ -11,7 +11,7 @@ use ProfessionalWiki\SWS\Domain\Subject\Subject;
 
 /** Lossless read model. Never feed this response into a subject replacement endpoint. */
 final class DataViewAssembler {
-	public static function subject( Subject $subject, ?Schema $schema, array $external, callable $resolveRelation ): array {
+	public static function subject( Subject $subject, ?Schema $schema, array $external, callable $resolveRelation, string $sourceMode = 'cache' ): array {
 		$statements = [];
 		foreach ( $subject->getStatements()->asArray() as $statement ) {
 			$statements[$statement->getPropertyName()->text] = $statement;
@@ -55,6 +55,12 @@ final class DataViewAssembler {
 			$remote = $derived[$name] ?? null;
 			$remoteValues = $remote['values'] ?? [];
 			$effectiveOrigin = $own !== [] ? 'own' : ( $remoteValues !== [] ? 'external' : null );
+            $schemaDefaults=[];
+            if($effectiveOrigin===null && $type==='text' && $property?->getExternalProperty()===null){
+                $defaults=$property?->getDefault()??[];if(is_string($defaults)){$defaults=[$defaults];}
+                if(is_array($defaults)){foreach($defaults as$value){if(is_string($value)&&trim($value)!==''){$schemaDefaults[]=['kind'=>'text','value'=>$value,'default'=>true];}}}
+                if($schemaDefaults!==[]){$effectiveOrigin='schema';}
+            }
 			$ownProblem = array_filter( $own, static fn ( array $v ): bool =>
 				in_array( $v['status'] ?? '', [ 'unresolved', 'unavailable' ], true ) ||
 				isset( $v['target'] ) && ( $v['target']['status'] ?? '' ) !== 'resolved' );
@@ -64,12 +70,15 @@ final class DataViewAssembler {
 				'schemaDefined' => $property !== null, 'description' => $property?->getDescription(),
 				'wikiLink' => $property?->getWikiLink(), 'externalProperty' => $property?->getExternalProperty()?->toJson(), 'ownValues' => $own,
 				'external' => $remote, 'effectiveOrigin' => $effectiveOrigin,
-				'effectiveValues' => $effectiveOrigin === 'own' ? $own : $remoteValues, 'status' => $status ];
+				'effectiveValues' => $effectiveOrigin === 'own' ? $own : ($effectiveOrigin === 'schema' ? $schemaDefaults : $remoteValues), 'status' => $status ];
 		}
-		return [ 'id' => $subject->id->text, 'label' => $subject->getLabel()?->text,
-			'schema' => $subject->getSchemaReference()->toJson(), 'schemaStatus' => $schema === null ? 'unavailable' : 'resolved',
+		return [ ...( $subject->getFieldNotes() === [] ? [] : [ 'fieldNotes' => $subject->getFieldNotes() ] ), 'id' => $subject->id->text, ...( $subject->getIdentity()?->toJson() ?? [] ), 'label' => $subject->getLabel()?->text,
+			...( isset( $external['storage'] ) ? [ 'sourceStorage' => $external['storage'] ] : [] ),
+			'schema' => $subject->getSchemaReference()->toJson(),
+            ...( $schema?->getIdentity() === null ? [] : [ 'schemaIdentity'=>[ 'id'=>$schema->getId()->text ] + $schema->getIdentity()->toJson() ] ), 'schemaStatus' => $schema === null ? 'unavailable' : 'resolved',
 			'fields' => $fields, 'complete' => $schema !== null && array_filter( $fields, static fn ( array $f ): bool =>
 				in_array( $f['status'], [ 'unresolved', 'schema-unavailable' ], true ) ||
-				in_array( $f['external']['status'] ?? '', [ 'unavailable', 'unsupported', 'error' ], true ) ) === [] ];
+				( $sourceMode === 'store' && $f['external'] !== null ? !( $f['external']['recorded'] ?? false ) :
+					in_array( $f['external']['status'] ?? '', [ 'unavailable', 'unsupported', 'error' ], true ) ) ) === [] ];
 	}
 }

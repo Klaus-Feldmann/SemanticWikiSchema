@@ -163,3 +163,6 @@ export { default as NeoMultiTextInput } from './components/common/NeoMultiTextIn
 export { default as NeoNestedField } from './components/common/NeoNestedField.vue';
 export { default as SeverityInput } from './components/SchemaEditor/Property/SeverityInput.vue';
 export { default as SubjectPicker } from './components/common/SubjectPicker.vue';
+
+export * from './domain/LocalizedIdentity';
+export * from './domain/SchemaReference';

@@ -41,6 +41,7 @@ export interface PropertyDefinition {
 	readonly required: boolean;
 	readonly default?: Value;
 	readonly externalProperty?: ExternalProperty;
+    readonly fieldNotes?: { type: 'text' | 'wikitext'; annotate?: boolean };
 	readonly wikiLink?: { values?: boolean; namespace?: string; label?: boolean; labelTarget?: string; externalTarget?: 'source' | 'local'; dateBceDe?: string; dateBceEn?: string };
 
 	/**
@@ -149,6 +150,7 @@ export class PropertyDefinitionDeserializer {
 		const base: PropertyDefinition = {
 			name: typeof name === 'string' ? new PropertyName( name ) : name,
 			type: json.type as string,
+            ...( values.fieldNotes ? { fieldNotes: values.fieldNotes as PropertyDefinition['fieldNotes'] } : {} ),
 			description: values.description as string ?? '',
 			required: values.required as boolean ?? false,
 			...( values.externalProperty !== undefined ? { externalProperty: values.externalProperty as ExternalProperty } : {} ),

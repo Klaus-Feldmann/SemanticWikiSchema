@@ -5,6 +5,7 @@ namespace MediaWiki\Permissions { interface Authority { public function authoriz
 namespace MediaWiki {
  class MediaWikiServices {
   public static function getInstance(){return new self();}
+  public function getMainConfig(){return new class {public function get($key){return $key==='SWSSourceDataMode'?'cache':null;}};}
   public function getPageProps(){return new class { public function getProperties($title,$name){
    if(\Harness\State::$pagePropError)throw new \RuntimeException('Page props unavailable');
    return \Harness\State::$shortdesc===null?[]:[$title->getArticleID()=>\Harness\State::$shortdesc];
@@ -34,6 +35,7 @@ namespace ProfessionalWiki\SWS {
   public function getSchemaResolverFor($auth){return $this;}
   public function getSchema($ref){if(\Harness\State::$schemaError)throw new \RuntimeException('schema');return \Harness\State::$schema;}
   public function getSubjectIdParser(){return new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser('local');}
+  public function newIdentityBoundaryResolver(){return new class {public function entity($id){return $id;}};}
   public function newSubjectHostingPageResolver($auth){return $this;}
   public function resolveReadableHostingPage($id){return \Harness\State::$targetAllowed ? new class { public function getId(){return new \ProfessionalWiki\SWS\Domain\Page\PageId(42);} public function getTitle(){return 'Zielseite';} } : null;}
  }

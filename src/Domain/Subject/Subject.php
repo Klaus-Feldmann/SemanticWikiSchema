@@ -7,6 +7,7 @@ namespace ProfessionalWiki\SWS\Domain\Subject;
 use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
 use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
 use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
 
 class Subject {
 
@@ -15,7 +16,12 @@ class Subject {
 		public ?SubjectLabel $label,
 		private readonly SchemaReference $schema,
 		private StatementList $statements,
+        private array $fieldNotes = [],
+		private ?SourceSnapshot $sourceSnapshot = null,
+		private ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity = null,
 	) {
+		$this->setSourceSnapshot( $sourceSnapshot );
+		if ( $identity !== null ) { $this->setIdentity( $identity ); }
 	}
 
 	public static function newSubject( SubjectId $id, ?SubjectLabel $label, SchemaReference $schema ): self {
@@ -58,7 +64,30 @@ class Subject {
 		return $this->statements;
 	}
 
-	public function getTypedRelations(): TypedRelationList {
+	public function getIdentity(): ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity { return $this->identity; }
+	public function setIdentity( \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity ): void {
+		$this->identity = $identity;
+		$this->label = SubjectLabel::fromText( $identity->labels[$identity->language] ?? null );
+	}
+
+	public function getSourceSnapshot(): ?SourceSnapshot {
+		return $this->sourceSnapshot;
+	}
+
+	/** Internal source processing only. Public edit requests never supply this value. */
+	public function setSourceSnapshot( ?SourceSnapshot $snapshot ): void {
+		if ( $snapshot !== null && $snapshot->getSubjectId() !== $this->id->text ) {
+			throw new \InvalidArgumentException( 'Source snapshot belongs to another Subject' );
+		}
+		$this->sourceSnapshot = $snapshot;
+	}
+
+	public function getFieldNotes(): array { return $this->fieldNotes; }
+    public function setFieldNotes( array $notes ): void {
+        $this->fieldNotes = \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $notes );
+    }
+
+    public function getTypedRelations(): TypedRelationList {
 		return $this->statements->getTypedRelations();
 	}
 
@@ -68,6 +97,7 @@ class Subject {
 
 	public function setLabel( ?SubjectLabel $newLabel ): void {
 		$this->label = $newLabel;
+		if ( $this->identity !== null ) { $this->identity = $this->identity->withDefaultLabel( $newLabel?->text ); }
 	}
 
 	public function setStatements( StatementList $statements ): void {
@@ -80,6 +110,9 @@ class Subject {
 			label: $this->label,
 			schema: $this->schema,
 			statements: $statements,
+            fieldNotes: $this->fieldNotes,
+			sourceSnapshot: $this->sourceSnapshot,
+			identity: $this->identity,
 		);
 	}
 

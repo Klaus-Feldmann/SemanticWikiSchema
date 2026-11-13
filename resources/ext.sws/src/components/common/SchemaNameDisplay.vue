@@ -11,7 +11,7 @@
 		<span
 			class="ext-sws-schema-name__text"
 			aria-hidden="true"
-		>{{ props.schemaName }}</span>
+		>{{ shownLabel }}</span>
 	</component>
 </template>
 
@@ -21,7 +21,10 @@ export type SchemaNameLink = 'same-tab' | 'new-tab' | 'none';
 </script>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { getActivePinia } from 'pinia';
+import { useSchemaStore } from '@/stores/SchemaStore';
+import { computed, watch } from 'vue';
+import { schemaSummaryLabel } from '@/presentation/schemaSummaryLabel';
 
 const props = withDefaults( defineProps<{
 	schemaName: string;
@@ -30,12 +33,28 @@ const props = withDefaults( defineProps<{
 	link: 'same-tab'
 } );
 
+const schemaStore = getActivePinia() ? useSchemaStore() : null;
+const shownLabel = computed( () => {
+	const schema = schemaStore?.schemas.get( props.schemaName );
+	const summary = schemaStore?.schemaSummaries.get( props.schemaName );
+	return schema?.getLabel() ?? ( summary ? schemaSummaryLabel( summary ) : props.schemaName );
+} );
+// Summary-only tables may not have loaded the full schema definitions. Share the catalog
+// request across badges and the picker; do not fetch every definition separately.
+watch( () => props.schemaName, async ( name ) => {
+	if ( !schemaStore || !/^S[1-9][0-9]*$/.test( name ) || schemaStore.schemas.has( name ) || schemaStore.schemaSummaries.has( name ) ) {
+		return;
+	}
+	try {
+		await schemaStore.fetchAllSchemaSummaries();
+	} catch { /* A failed lookup leaves the stable ID visible. */ }
+}, { immediate: true } );
 const schemaUrl = computed( (): string => mw.util.getUrl( `Schema:${ props.schemaName }` ) );
 
 // The badge shows the bare name, so the noun reaches a screen reader through this instead;
 // the visible name is aria-hidden, or it would be announced twice.
 const accessibleName = computed( (): string =>
-	mw.message( 'sws-schema-label', props.schemaName ).text()
+	mw.message( 'sws-schema-label', shownLabel.value ).text()
 );
 </script>
 

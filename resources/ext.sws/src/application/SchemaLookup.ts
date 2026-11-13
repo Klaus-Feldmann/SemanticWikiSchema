@@ -2,6 +2,10 @@ import type { Schema, SchemaName } from '@/domain/Schema';
 
 export interface SchemaSummary {
 	name: string;
+	id?: string;
+	identityLanguage?: string;
+	labels?: Record<string, string>;
+	descriptions?: Record<string, string>;
 	description: string;
 	propertyCount: number;
 	subjectsAreDependent: boolean;
@@ -54,6 +58,8 @@ export class InMemorySchemaLookup implements SchemaLookup {
 	public async getSchemaSummaries( cursor: string | null, limit: number ): Promise<SchemaSummaryPage> {
 		const summaries = [ ...this.schemas.values() ].map( ( schema ) => ( {
 			name: schema.getName(),
+			... schema.getIdentity(),
+			...( schema.getId() ? { id: schema.getId()! } : {} ),
 			description: schema.getDescription(),
 			propertyCount: [ ...schema.getPropertyDefinitions() ].length,
 			subjectsAreDependent: schema.subjectsAreDependent(),

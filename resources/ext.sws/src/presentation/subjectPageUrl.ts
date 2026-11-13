@@ -3,5 +3,5 @@
  * stored. Built through mw.util so it follows the wiki's URL style.
  */
 export function subjectPageUrl( subjectId: string ): string {
-	return mw.util.getUrl( 'Special:Subject/' + subjectId );
+	return mw.util.getUrl( 'Special:Entity/' + subjectId );
 }

@@ -6,6 +6,7 @@ import { BasePropertyType } from '@/domain/PropertyType';
 export interface PageProperty extends MultiStringProperty {
 
 	readonly pageNamespace?: number;
+	readonly assignCategories?: boolean;
 	readonly maxLength?: number;
 	readonly minLength?: number;
 
@@ -29,6 +30,7 @@ export class PageType extends BasePropertyType<PageProperty, StringValue> {
 		return {
 			...base,
 			pageNamespace: json.pageNamespace ?? undefined,
+			assignCategories: json.assignCategories ?? false,
 			multiple: json.multiple ?? false,
 			uniqueItems: json.uniqueItems ?? false,
 			minLength: json.minLength ?? undefined,
@@ -52,6 +54,7 @@ export function newPageProperty( attributes: PagePropertyAttributes = {} ): Page
 		multiple: attributes.multiple ?? false,
 		uniqueItems: attributes.uniqueItems ?? true,
 		pageNamespace: attributes.pageNamespace,
+		assignCategories: attributes.assignCategories ?? false,
 		maxLength: attributes.maxLength,
 		minLength: attributes.minLength,
 	};

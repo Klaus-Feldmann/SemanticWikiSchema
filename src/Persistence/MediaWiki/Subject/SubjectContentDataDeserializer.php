@@ -14,6 +14,7 @@ use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
 use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
 use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
 
 class SubjectContentDataDeserializer {
 
@@ -36,6 +37,13 @@ class SubjectContentDataDeserializer {
 			$jsonArray = [];
 		}
 
+		$version = $jsonArray['formatVersion'] ?? 1;
+		if ( !in_array( $version, [1, 2], true ) ) { throw new \InvalidArgumentException( 'Unsupported subject content version' ); }
+		if ( $version === 1 ) {
+			foreach ( array_keys( $jsonArray['subjects'] ?? [] ) as $id ) {
+				if ( str_starts_with( (string)$id, 'E' ) ) { throw new \InvalidArgumentException( 'E IDs require subject format version 2' ); }
+			}
+		}
 		$subjects = $this->deserializeSubjects( $jsonArray );
 
 		$mainSubject = $jsonArray['mainSubject'] ?? null;
@@ -90,11 +98,16 @@ class SubjectContentDataDeserializer {
 	}
 
 	private function deserializeSubject( string $id, array $jsonArray ): Subject {
+		if ( str_starts_with( $id, 'E' ) && !array_key_exists( 'identityLanguage', $jsonArray ) ) { throw new \InvalidArgumentException( 'New entity identity metadata missing' ); }
 		return new Subject(
 			id: new SubjectId( $id ),
 			label: $this->deserializeLabel( $jsonArray['label'] ?? null ),
 			schema: $this->schemaReferenceParser->fromJson( $jsonArray['schema'] ),
 			statements: $this->buildStatementList( $jsonArray ),
+			identity: array_intersect( array_keys( $jsonArray ), [ 'identityLanguage', 'labels', 'descriptions' ] ) !== [] ? \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $jsonArray ) : null,
+            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $jsonArray['fieldNotes'] ?? [] ),
+			sourceSnapshot: array_key_exists( 'sourceSnapshot', $jsonArray )
+				? SourceSnapshot::fromJson( $jsonArray['sourceSnapshot'] ) : null,
 		);
 	}
 
@@ -128,7 +141,10 @@ class SubjectContentDataDeserializer {
 	public static function deserializeSubjectIds( string $json ): array {
 		// Cast so that content that is not a JSON object becomes an array without the key, leaving one
 		// thing to check.
-		$subjects = ( (array)json_decode( $json, true ) )['subjects'] ?? null;
+		$data = (array)json_decode( $json, true );
+		$version = $data['formatVersion'] ?? 1;
+		if ( !in_array( $version, [1, 2], true ) ) { return []; }
+		$subjects = $data['subjects'] ?? null;
 
 		if ( !is_array( $subjects ) ) {
 			return [];
@@ -140,7 +156,7 @@ class SubjectContentDataDeserializer {
 		// would truncate rather than record it.
 		return array_values( array_filter(
 			array_map( 'strval', array_keys( $subjects ) ),
-			SubjectId::isValidLocalId( ... )
+			static fn ( $id ) => SubjectId::isValidLocalId( $id ) && ( $version === 2 || !str_starts_with( $id, 'E' ) )
 		) );
 	}
 

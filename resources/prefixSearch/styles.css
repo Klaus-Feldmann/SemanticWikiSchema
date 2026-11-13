@@ -1,0 +1,21 @@
+.sws-prefixsearch { display: flex; gap: 0; align-items: flex-start; width: 100%; }
+.sws-prefixsearch-scope { flex: 0 0 auto; }
+.sws-prefixsearch-input { flex: 1 1 15em; min-width: 0; }
+.sws-prefixsearch-mount { width: 100%; }
+@media (max-width: 550px) {
+	.sws-prefixsearch { flex-wrap: wrap; }
+	.sws-prefixsearch-scope { flex-basis: 100%; }
+}
+/* Anchor the title menu to the whole search, including its namespace selector.
+   Keep the selector's own menu anchored to CdxSelect. */
+.sws-prefixsearch { position: relative; }
+.sws-prefixsearch-input,
+.sws-prefixsearch-input .cdx-typeahead-search__form,
+.sws-prefixsearch-input .cdx-search-input,
+.sws-prefixsearch-input .cdx-search-input__input-wrapper { position: static; }
+.sws-prefixsearch-input .cdx-menu {
+	top: 100%;
+	left: 0;
+	right: 0;
+	width: 100%;
+}

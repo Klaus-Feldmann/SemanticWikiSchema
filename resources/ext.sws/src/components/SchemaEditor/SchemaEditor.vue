@@ -269,12 +269,7 @@ function buildUpdatedSchema( updatedProperty: PropertyDefinition ): Schema {
 		return currentSchema.value.withAddedPropertyDefinition( updatedProperty );
 	}
 
-	return new Schema(
-		currentSchema.value.getName(),
-		currentSchema.value.getDescription(),
-		replacePropertyDefinition( updatedProperty ),
-		currentSchema.value.subjectsAreDependent()
-	);
+	return currentSchema.value.withPropertyDefinitions( replacePropertyDefinition( updatedProperty ) );
 }
 
 function replacePropertyDefinition( updatedProperty: PropertyDefinition ): PropertyDefinitionList {

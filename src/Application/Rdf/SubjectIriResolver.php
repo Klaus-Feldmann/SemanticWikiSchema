@@ -24,10 +24,12 @@ class SubjectIriResolver {
 		private readonly RdfNamespaces $namespaces,
 		private readonly SourceRegistry $sourceRegistry,
 		private readonly LoggerInterface $logger,
+        private readonly ?\Closure $canonicalize = null,
 	) {
 	}
 
 	public function targetIri( SubjectId $id ): ?Iri {
+        $id = $this->canonicalize === null ? $id : ( $this->canonicalize )( $id );
 		if ( $id->isLocal() ) {
 			return $this->namespaces->subject( $id );
 		}

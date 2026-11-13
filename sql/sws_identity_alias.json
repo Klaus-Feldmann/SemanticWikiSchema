@@ -1,0 +1,51 @@
+[
+  {
+    "name": "sws_identity_alias",
+    "comment": "SWS stable identities: additive administration; no page or revision data is rewritten.",
+    "columns": [
+      {
+        "name": "swsia_hash",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64
+        }
+      },
+      {
+        "name": "swsia_kind",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swsia_origin",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64
+        }
+      },
+      {
+        "name": "swsia_legacy",
+        "type": "text",
+        "options": {
+          "notnull": true
+        }
+      },
+      {
+        "name": "swsia_target",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 32
+        }
+      }
+    ],
+    "indexes": [],
+    "pk": [
+      "swsia_hash"
+    ]
+  }
+]

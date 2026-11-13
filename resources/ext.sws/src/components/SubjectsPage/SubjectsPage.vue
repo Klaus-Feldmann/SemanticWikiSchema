@@ -46,7 +46,7 @@ function showSchemaInUrl( schema: string | null ): void {
 	window.history.replaceState(
 		window.history.state,
 		'',
-		mw.util.getUrl( schema === null ? 'Special:Subjects' : `Special:Subjects/${ schema }` )
+		mw.util.getUrl( schema === null ? 'Special:Entities' : `Special:Entities/${ schema }` )
 	);
 }
 </script>

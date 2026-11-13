@@ -63,6 +63,7 @@ class RdfValueMapperRegistry {
 
 		$registry->registerMapper( TextType::NAME, self::stringMapper( 'string' ) );
 		$registry->registerMapper( 'wikitext', self::stringMapper( 'string' ) );
+		$registry->registerMapper( 'wikitextValue', self::stringMapper( 'string' ) );
 		$registry->registerMapper( 'page', static function ( NeoValue $value ): array {
 			$result = [];
 			foreach ( (array)$value->toScalars() as $text ) {

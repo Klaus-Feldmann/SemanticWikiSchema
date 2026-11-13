@@ -24,7 +24,8 @@ class PageType extends TextType {
 		$violations = parent::validate( $value, $definition );
 		if ( $value instanceof StringValue && $definition instanceof PageProperty ) {
 			foreach ( $value->strings as $index => $part ) {
-				if ( trim( $part ) !== '' && LocalPageTitle::normalize( $part ) === null ) {
+				if ( trim( $part ) !== '' && ( LocalPageTitle::normalize( $part ) === null
+					|| $definition->assignsCategories() && \MediaWiki\Title\Title::newFromText( $part )?->getNamespace() !== 14 ) ) {
 					$violations[] = new Violation( propertyName: null, code: 'invalid-page', valuePartIndex: $index,
 						severity: Severity::Error );
 				}

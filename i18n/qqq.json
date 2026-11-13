@@ -554,5 +554,20 @@
 	"sws-derived-missing": "Status in a schema-bound source field when the source was successfully queried and has no statement for the property. This is distinct from an unavailable source; it is not a field value.",
 	"sws-property-datatype": "Label introducing the source datatype of a property ID in the schema editor.",
 	"sws-property-datatype-invalid": "Error preventing a schema save when a new or changed source property cannot be resolved or its datatype is incompatible with the selected SWS field type. $1 gives the field, property ID, and/or datatype.",
-	"sws-property-type-source-reset": "Notice shown after changing a schema field type removes its external property mapping. The property must be selected again for the new type."
+	"sws-property-type-source-reset": "Notice shown after changing a schema field type removes its external property mapping. The property must be selected again for the new type.",
+	"sws-source-pending": "Source data has not been stored for this field yet; pending processing is distinct from a failed source request.",
+	"sws-source-retained": "Marks a retained previous source value, identity or description after an empty or failed refresh.",
+	"sws-source-language-fallback": "Explains that stored source data is displayed in an available fallback language. $1 is the language code.",
+	"sws-fields-invalid-target": "Error for an ambiguous or absent target in the read-only swsfields API.",
+	"sws-fields-unavailable": "Error for unavailable or invalid read-only SWS field requests.",
+	"sws-page-assign-categories-help": "Help text for category assignment. Explains dynamic schema-default inheritance when the subject has no selected category.",
+	"sws-identity-invalid": "An invalid identity, reservation or attempted change of immutable Schema ID. $1: reason.",
+	"sws-identity-terms": "Label for the own multilingual identity editor: Labels and descriptions",
+	"sws-identity-label": "Label for the own multilingual identity editor: Label",
+	"sws-identity-description": "Label for the own multilingual identity editor: Description",
+	"sws-identity-language": "Label for the own multilingual identity editor: Language code",
+	"sws-identity-add-language": "Label for the own multilingual identity editor: Add language",
+	"sws-mapping-page-schema-ids": "Heading for explicitly ID-keyed schema mappings, kept separate from legacy name mappings.",
+	"sws-migration-field-added-placeholder": "Text default for a migration-created placeholder field, in the schema content language.",
+	"sws-schema-default-value": "Label for a displayed schema text default that is not stored as an author value."
 }

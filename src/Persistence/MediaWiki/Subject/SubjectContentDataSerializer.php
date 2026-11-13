@@ -16,7 +16,7 @@ class SubjectContentDataSerializer {
 	 */
 	public function serialize( PageSubjects $contentData ): string {
 		return json_encode(
-			[
+			( $this->formatVersion( $contentData ) === 2 ? [ 'formatVersion'=>2 ] : [] ) + [
 				'mainSubject' => $contentData->getMainSubject()?->id->text,
 				'subjects' => $this->serializeSubjects( $contentData->getAllSubjects() ),
 			],
@@ -24,18 +24,33 @@ class SubjectContentDataSerializer {
 		);
 	}
 
+	private function formatVersion( PageSubjects $page ): int {
+		foreach ( $page->getAllSubjects()->asArray() as $subject ) {
+			if ( $subject->id->isSequential() || $subject->getIdentity() !== null ) { return 2; }
+		}
+		return 1;
+	}
+
 	private function serializeSubjects( SubjectMap $subjectMap ): object {
 		$serializedSubjects = [];
 
 		foreach ( $subjectMap->asArray() as $subject ) {
 			$serialized = [];
+			if ( $subject->getIdentity() !== null ) { $serialized += $subject->getIdentity()->toJson(); }
+			if ( $subject->id->isSequential() && $subject->getIdentity() === null ) {
+				throw new \InvalidArgumentException( 'New entities require identity metadata' );
+			}
 
 			// A Subject nobody named stores no label.
 			if ( $subject->label !== null ) {
 				$serialized['label'] = $subject->label->text;
 			}
 
-			$serialized['schema'] = $subject->getSchemaReference()->toJson();
+			if ( $subject->getFieldNotes() !== [] ) { $serialized['fieldNotes'] = (object)$subject->getFieldNotes(); }
+			if ( $subject->getSourceSnapshot() !== null ) {
+				$serialized['sourceSnapshot'] = $subject->getSourceSnapshot()->toJson();
+			}
+            $serialized['schema'] = $subject->getSchemaReference()->toJson();
 			$serialized['statements'] = $this->serializeStatementList( $subject->getStatements() );
 
 			$serializedSubjects[$subject->id->text] = $serialized;

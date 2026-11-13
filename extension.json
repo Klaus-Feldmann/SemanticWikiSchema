@@ -1,7 +1,7 @@
 {
 	"name": "SemanticWikiSchema",
 	"namemsg": "sws-name",
-	"version": "0.1.22+2026-11-08",
+	"version": "0.4.03",
 	"author": "Softwaredesign und Weiterentwicklung des Forks: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos. Basiert auf NeoWiki von [https://professional.wiki/ Professional Wiki], [https://www.entropywins.wtf/mediawiki Jeroen De Dauw], Morne Alberts, [https://www.mediawiki.org/wiki/User:Alistair3149 Alistair3149] und [https://github.com/ProfessionalWiki/NeoWiki/graphs/contributors?all=1 weiteren Mitwirkenden].",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"license-name": "GPL-2.0-or-later",
@@ -59,7 +59,8 @@
 		"CodeEditorGetPageLanguage": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onCodeEditorGetPageLanguage",
 		"BeforePageDisplay": [
 			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onBeforePageDisplay",
-			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onConfigPageBeforePageDisplay"
+			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onConfigPageBeforePageDisplay",
+			"ProfessionalWiki\\SWS\\EntryPoints\\PrefixSearchHooks::onBeforePageDisplay"
 		],
 		"DifferenceEngineRenderRevisionAddParserOutput": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput",
 		"SpecialPage_initList": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSpecialPageInitList",
@@ -85,7 +86,8 @@
 		"SMW::Store::BeforeDataUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onBeforeStore",
 		"PageMoveComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onPageMoveComplete",
 		"LinksUpdate": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onLinksUpdate",
-		"SMW::Store::AfterDataUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onAfterStore"
+		"SMW::Store::AfterDataUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onAfterStore",
+		"SkinPageReadyConfig": "ProfessionalWiki\\SWS\\EntryPoints\\PrefixSearchHooks::onSkinPageReadyConfig"
 	},
 	"JobClasses": {
 		"swsGraphRebuild": {
@@ -167,14 +169,14 @@
 		{
 			"id": 7480,
 			"constant": "NS_SWS_SUBJECT",
-			"name": "Subject",
+			"name": "Entity",
 			"subpages": false,
 			"content": true
 		},
 		{
 			"id": 7481,
 			"constant": "NS_SWS_SUBJECT_TALK",
-			"name": "Subject_talk"
+			"name": "Entity_talk"
 		}
 	],
 	"AvailableRights": [
@@ -238,6 +240,10 @@
 		"subjects": "ProfessionalWiki\\SWS\\EntryPoints\\Actions\\SubjectsAction"
 	},
 	"config": {
+		"SWSSourceDataMode": {
+			"value": "store",
+			"description": "Defaults to store: refresh all bindings on processing a save and persist results in each Subject. The optional cache mode keeps the previous source resolution and its cache."
+		},
 		"WikiSchemaSmwMapping": {
 			"description": "Optional SMW property mappings by schema and URL subobject property names. Empty means schema field names and built-in URL defaults. Reprocess affected pages after changing this setting.",
 			"value": []
@@ -310,6 +316,22 @@
 		"SWSSparqlStores": {
 			"description": "SPARQL 1.1 graph stores to keep in sync with page changes and to query, in addition to any Neo4j backend. A list of objects, each with: 'updateUrl' (required, the store's SPARQL 1.1 Update endpoint, e.g. a QLever instance); 'queryUrl' (optional, the store's SPARQL 1.1 Query endpoint the read surfaces use; defaults to 'updateUrl', which is correct for QLever where the two are the same); 'accessToken' (optional, sent as an HTTP Bearer token on both update and query requests, e.g. for a QLever access token or a read-protected endpoint); 'projection' (optional, the RDF vocabulary written to the store: 'native' by default, or any configured Mapping target); and 'name' (optional, what to call this store when rebuilding it, defaulting to the projection, and unique across entries). The query surfaces (the {{#sparql_raw}} parser function, nw.sparqlQuery() in Lua, and POST /sws/v0/query/sparql) target the first configured store. Works with QLever and any SPARQL 1.1 store. Empty by default.",
 			"value": []
+		},
+		"SWSPrefixSearchEnabled": {
+			"value": true,
+			"description": "Replace the main title search with namespace-scoped suggestions."
+		},
+		"SWSPrefixSearchNamespaces": {
+			"value": null,
+			"description": "Null offers all registered non-negative namespaces. An explicit array replaces the list and determines its order; an empty array disables the global search replacement."
+		},
+		"SWSPrefixSearchSubstringFallback": {
+			"value": true,
+			"description": "Fill remaining suggestion slots with literal case-insensitive title substring matches, for explicitly selected namespaces and at least three characters. Requires working CirrusSearch regex support."
+		},
+		"SWSAdditionalSubjectNamespaces": {
+			"value": [],
+			"description": "Additional namespace IDs supporting Subject data alongside all content namespaces. Applies to every page and subpage, irrespective of the main content model. Virtual namespaces and SWS management namespaces/pages remain excluded."
 		}
 	},
 	"ExtensionMessagesFiles": {
@@ -425,6 +447,13 @@
 		},
 		{
 			"path": "/sws/v0/entity/{subjectId}",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveSubjectIriApi"
+		},
+		{
+			"path": "/neowiki/v0/entity/{subjectId}",
 			"method": [
 				"GET"
 			],
@@ -576,6 +605,55 @@
 				"GET"
 			],
 			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetReferencingSubjectsApi"
+		},
+		{
+			"path": "/sws/v0/schema",
+			"method": [
+				"POST"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCreateSchemaApi"
+		},
+		{
+			"path": "/sws/v0/schema-id/{schemaName}",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSchemaByIdApi"
+		},
+		{
+			"path": "/sws/v0/schema-id/{schemaName}/json-schema",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetJsonSchemaByIdApi"
+		},
+		{
+			"path": "/sws/v0/schema-id-iri/{schemaName}",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveSchemaIdIriApi"
+		},
+		{
+			"path": "/sws/v0/schema-iri/{schemaName}",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveLegacySchemaIriApi"
+		},
+		{
+			"path": "/sws/v0/schema-id/{schemaName}/rdf",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportSchemaIdRdfApi"
+		},
+		{
+			"path": "/sws/v0/schema/{schemaName}/rdf",
+			"method": [
+				"GET"
+			],
+			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportLegacySchemaRdfApi"
 		}
 	],
 	"ResourceFileModulePaths": {
@@ -592,7 +670,8 @@
 				"mediawiki.storage",
 				"mediawiki.jqueryMsg",
 				"mediawiki.util",
-				"mediawiki.Title"
+				"mediawiki.Title",
+				"ext.sws.prefixSearch.api"
 			],
 			"codexComponents": [
 				"CdxAccordion",
@@ -1242,8 +1321,6 @@
 				"sws-page-remove",
 				"sws-field-invalid-page",
 				"sws-property-type-wikitext",
-				"sws-wikitext-execute",
-				"sws-wikitext-mode-help",
 				"sws-wikitext-empty",
 				"sws-wikitext-error",
 				"sws-wikitext-add",
@@ -1251,7 +1328,36 @@
 				"sws-auto-identity-page",
 				"sws-managesubjects-export-complete",
 				"sws-managesubjects-export-stored-projection",
-				"sws-property-type-source-reset"
+				"sws-property-type-source-reset",
+				"sws-prefixsearch-namespace",
+				"sws-page-assign-categories",
+				"sws-page-assign-categories-help",
+				"article",
+				"sws-property-type-template",
+				"sws-template-help",
+				"sws-wikitext-render-error",
+				"sws-wikitext-render-loading",
+				"sws-notes-allow",
+				"sws-notes-type",
+				"sws-notes-annotate",
+				"sws-notes-smw-help",
+				"sws-notes-add",
+				"sws-notes-label",
+				"sws-notes-source-label",
+				"sws-notes-property-suffix",
+				"sws-notes-source-unavailable",
+				"sws-notes-source-missing",
+				"sws-notes-source-unsupported",
+				"sws-notes-source-manual",
+				"sws-source-pending",
+				"sws-source-retained",
+				"sws-source-language-fallback",
+				"sws-identity-terms",
+				"sws-identity-label",
+				"sws-identity-description",
+				"sws-identity-language",
+				"sws-identity-add-language",
+				"sws-schema-default-value"
 			],
 			"@group:": "TODO: Load code separately while in development. Remove later.",
 			"group": "ext.sws"
@@ -1266,10 +1372,52 @@
 			"styles": [
 				"resources/styles/subject-label.less"
 			]
+		},
+		"ext.sws.prefixSearch.api": {
+			"packageFiles": [
+				"resources/prefixSearch/api.js"
+			],
+			"dependencies": [
+				"mediawiki.api"
+			]
+		},
+		"ext.sws.prefixSearch": {
+			"packageFiles": [
+				"resources/prefixSearch/main.js",
+				"resources/prefixSearch/component.js"
+			],
+			"dependencies": [
+				"ext.sws.prefixSearch.api",
+				"mediawiki.util",
+				"mediawiki.jqueryMsg",
+				"vue"
+			],
+			"messages": [
+				"sws-prefixsearch-namespace",
+				"sws-prefixsearch-empty",
+				"sws-prefixsearch-error",
+				"searchbutton",
+				"searchsuggest-search",
+				"sws-prefixsearch-fullsearch",
+				"sws-prefixsearch-redirect"
+			],
+			"class": "MediaWiki\\ResourceLoader\\CodexModule",
+			"codexComponents": [
+				"CdxSelect",
+				"CdxTypeaheadSearch"
+			]
+		},
+		"ext.sws.prefixSearch.styles": {
+			"styles": [
+				"resources/prefixSearch/styles.css",
+				"resources/styles/content-width-select.css"
+			]
 		}
 	},
 	"manifest_version": 2,
 	"APIModules": {
-		"swsimages": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiImages"
+		"swsimages": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiImages",
+		"swsrenderwikitext": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiRenderWikitext",
+		"swsfields": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiFieldValues"
 	}
 }

@@ -275,20 +275,20 @@ describe( 'TargetSchemasInput', () => {
 			expect( pinnedItem( wrapper ) ).toBe( offerFor( 'o' ) );
 		} );
 
-		it( 'makes no offer for typed text naming a schema that exists', async () => {
+		it( 'offers creation for a label already used', async () => {
 			const wrapper = await mountCreatingInput( [] );
 
 			await type( wrapper, 'office' );
 
-			expect( listedSchemas( wrapper ) ).toEqual( [ 'Office' ] );
+			expect( listedSchemas( wrapper ) ).toEqual( [ 'Office', offerFor( 'office' ) ] );
 		} );
 
-		it( 'makes no offer for typed text naming a target schema the list leaves out', async () => {
+		it( 'offers another schema sharing a target label', async () => {
 			const wrapper = await mountCreatingInput( [ 'Archived' ] );
 
 			await type( wrapper, 'archived' );
 
-			expect( listedSchemas( wrapper ) ).toEqual( [] );
+			expect( listedSchemas( wrapper ) ).toEqual( [ offerFor( 'archived' ) ] );
 		} );
 
 		it( 'offers to create a schema named like a target schema of another Source', async () => {

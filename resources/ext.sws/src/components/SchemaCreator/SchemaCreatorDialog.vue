@@ -110,10 +110,13 @@ function onDialogUpdateOpen( value: boolean ): void {
 
 watch( () => props.open, ( isOpen ) => {
 	if ( isOpen ) {
+		creationRequestKey = crypto.randomUUID();
 		resetChanged();
 	}
 } );
 
+// One key per dialog instance: retry after a lost response cannot create a second schema.
+let creationRequestKey = crypto.randomUUID();
 const { saving, save: handleSave } = useSaveGuard( createSchema );
 
 async function createSchema( summary: string ): Promise<void> {
@@ -146,9 +149,9 @@ async function createSchema( summary: string ): Promise<void> {
 	const editSummary = summary || mw.msg( 'sws-schema-creator-summary-default' );
 
 	try {
-		await schemaStore.saveSchema( schema, editSummary );
-		mw.notify( mw.msg( 'sws-schema-creator-success', schema.getName() ), { type: 'success' } );
-		emit( 'created', schema );
+		const created = await schemaStore.createSchema( schema, editSummary, creationRequestKey );
+		mw.notify( mw.msg( 'sws-schema-creator-success', created.getLabel() ), { type: 'success' } );
+		emit( 'created', created );
 		close();
 	} catch ( error ) {
 		mw.notify(

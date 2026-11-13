@@ -59,6 +59,7 @@
 					>
 						{{ displayName }}
 					</span>
+					<span v-if="ownDescription" class="ext-sws-subject-row__description">{{ ownDescription }}</span>
 					<span class="ext-sws-subject-row__subtitle">
 						<SchemaNameDisplay
 							v-if="schemaName !== null"
@@ -219,6 +220,7 @@
 </template>
 
 <script setup lang="ts">
+import { identityDescription } from '@/domain/LocalizedIdentity';
 import { computed, provide, ref } from 'vue';
 import { CdxButton, CdxIcon, CdxMenuButton } from '@wikimedia/codex';
 import type { MenuButtonItemData } from '@wikimedia/codex';
@@ -329,6 +331,7 @@ provide( RelationTargetUrlKey, subjectLinkUrlFromRow );
 
 const schemaStore = useSchemaStore();
 
+const ownDescription = computed( () => identityDescription( props.subject.getIdentity() ) );
 const displayName = computed( () => identifyingSubjectName(
 	props.subject,
 	schemaStore.schemas.get( props.subject.getSchemaName() ) as Schema | undefined

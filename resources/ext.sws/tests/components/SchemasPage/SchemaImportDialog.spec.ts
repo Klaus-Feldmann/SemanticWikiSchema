@@ -1,3 +1,5 @@
+import { InMemorySchemaRepository, type SchemaRepository } from '@/application/SchemaRepository';
+import { Service } from '@/SWSServices';
 import { DOMWrapper, enableAutoUnmount, flushPromises, mount, VueWrapper } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
@@ -17,12 +19,13 @@ function item( name: string, status: SchemaImportStatus = 'new' ): SchemaImportI
 	return { schema: newSchema( { title: name } ), status };
 }
 
-function mountDialog( items: SchemaImportItem[] ): VueWrapper {
+function mountDialog( items: SchemaImportItem[], repository?: SchemaRepository ): VueWrapper {
 	return mount( SchemaImportDialog, {
 		props: { items },
 		attachTo: document.body,
 		global: {
 			plugins: [ pinia ],
+			provide: { [ Service.SchemaRepository ]: repository },
 			mocks: { $i18n: createI18nMock() },
 			stubs: { teleport: true },
 		},
@@ -286,4 +289,26 @@ describe( 'SchemaImportDialog', () => {
 
 		expect( wrapper.emitted( 'close' ) ).toHaveLength( 1 );
 	} );
+	it( 'routes a selected source document through the stable batch importer', async () => {
+		const batch = vi.fn().mockResolvedValue( { created: [ 'S9' ] } );
+		const repository = Object.assign( new InMemorySchemaRepository( [] ), { importSchemaDocument: batch } );
+		const wrapper = mountDialog( [ item( 'Person' ) ], repository );
+		await wrapper.setProps( { sourceDocument: '{"schemas":{}}' } );
+		await runImport( wrapper );
+		expect( batch ).toHaveBeenCalledWith( '{"schemas":{}}', [ 'Person' ] );
+		expect( savedNames() ).toEqual( [] );
+		expect( messages( wrapper, 'success' ).join( ' ' ) ).toContain( 'S9' );
+	} );
+
+	it( 'shows a resumable batch error instead of claiming replacement success', async () => {
+		const repository = Object.assign( new InMemorySchemaRepository( [] ), {
+			importSchemaDocument: vi.fn().mockRejectedValue( new Error( 'Repeat the source file' ) ),
+		} );
+		const wrapper = mountDialog( [ item( 'Person' ) ], repository );
+		await wrapper.setProps( { sourceDocument: '{"schemas":{}}' } );
+		await runImport( wrapper );
+		expect( messages( wrapper, 'error' ).join( ' ' ) ).toContain( 'Repeat the source file' );
+		expect( messages( wrapper, 'success' ) ).toEqual( [] );
+	} );
+
 } );

@@ -23,6 +23,7 @@ readonly class DependentSubjectBuilder {
 		private SchemaReferenceResolver $schemaResolver,
 		private StatementListBuilder $statementListBuilder,
 		private DependentSubjectRules $dependentSubjectRules,
+		private string $identityLanguage = 'en',
 	) {
 	}
 
@@ -50,7 +51,17 @@ readonly class DependentSubjectBuilder {
 				throw new SubjectIdInUseException( $subject->id );
 			}
 
-			$subjects->addOrUpdateSubject( $subject );
+			$priorSubject = $pageSubjects->getAllSubjects()->getSubject( $subject->id );
+			$subject->setSourceSnapshot( $priorSubject?->getSourceSnapshot() );
+			if ( \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) === null && $priorSubject?->getIdentity() !== null ) {
+				$subject->setIdentity( $priorSubject->getIdentity()->withDefaultLabel( $subject->getLabel()?->text ) );
+			}
+			if ( !array_key_exists( 'fieldNotes', $item ) ) {
+                $prior = $pageSubjects->getAllSubjects()->getSubject( $subject->id );
+                if ( $prior !== null ) { $subject->setFieldNotes( $prior->getFieldNotes() ); }
+            }
+            $subject->setFieldNotes( \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $subject->getFieldNotes(), $pageSubjects->getAllSubjects()->getSubject( $subject->id )?->getFieldNotes() ?? [], $subject->getFieldNotes() === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) );
+            $subjects->addOrUpdateSubject( $subject );
 		}
 
 		return $subjects;
@@ -70,14 +81,18 @@ readonly class DependentSubjectBuilder {
 	 * @throws InvalidArgumentException
 	 */
 	private function buildSubject( mixed $item ): Subject {
-		if ( !is_array( $item ) || !is_string( $item['id'] ?? null ) || !is_string( $item['schema'] ?? null )
+		if ( is_array( $item ) && array_key_exists( 'sourceSnapshot', $item ) ) {
+			throw new InvalidArgumentException( 'Source snapshots are managed by the server, not dependentSubjects requests' );
+		}
+		if ( !is_array( $item ) || !is_string( $item['id'] ?? null ) || !( is_string( $item['schema'] ?? null ) || is_array( $item['schema'] ?? null ) )
 			|| !is_array( $item['statements'] ?? null ) || !is_string( $item['label'] ?? '' ) ) {
 			throw new InvalidArgumentException(
 				'Each item of dependentSubjects must be an object with a string id, a string schema and statements'
 			);
 		}
 
-		$schemaReference = $this->schemaReferenceParser->localName( $item['schema'] );
+		$schemaReference = is_array( $item['schema'] ) ? $this->schemaReferenceParser->fromJson( $item['schema'] ) : $this->schemaReferenceParser->localName( $item['schema'] );
+		if ( !$schemaReference->isLocal() ) { throw new InvalidArgumentException( 'Dependent entities must use a local Schema' ); }
 		$schema = $this->schemaResolver->getSchema( $schemaReference );
 
 		if ( $schema === null || !$schema->subjectsAreDependent() ) {
@@ -87,12 +102,14 @@ readonly class DependentSubjectBuilder {
 		}
 
 		// Kept, not dropped, so that the rule against labelled Dependent Subjects refuses it.
-		return new Subject(
+		$schemaReference = $schema->getReference();
+		return \ProfessionalWiki\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
 			id: $this->newSubjectIdResolver->resolve( $item['id'] ),
 			label: SubjectLabel::fromText( $item['label'] ?? null ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $item['statements'] ),
-		);
+            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $item['fieldNotes'] ?? [] ),
+		), $this->identityLanguage, \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) );
 	}
 
 	private function takesTheIdOfAnotherSubject( Subject $subject, PageSubjects $pageSubjects, SubjectMap $replaceableSubjects ): bool {

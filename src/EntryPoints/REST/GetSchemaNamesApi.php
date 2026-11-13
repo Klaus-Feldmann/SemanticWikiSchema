@@ -16,12 +16,19 @@ class GetSchemaNamesApi extends SimpleHandler {
 	use ReadOnlyEndpoint;
 
 	public function run( string $search ): Response {
-		$schemaNames = array_map(
-			function ( TitleValue $title ): string {
-				return $title->getText();
-			},
-			SWSExtension::getInstance()->getSchemaNameLookup()->getSchemaNamesMatching( $search, 10 )
-		);
+        $extension = SWSExtension::getInstance();
+        $schemaNames = [];
+        // Inspect bounded search candidates, never the whole Schema catalogue. The published
+        // schema lookup also rejects malformed or withdrawn definitions on otherwise readable pages.
+        foreach ( $extension->getSchemaNameLookup()->getSchemaNamesMatching( $search, 40 ) as $title ) {
+            try {
+                $schema = $extension->getSchemaLookup()->getSchema(
+                    new \ProfessionalWiki\SWS\Domain\Schema\SchemaName( $title->getText() )
+                );
+            } catch ( \InvalidArgumentException ) { continue; }
+            if ( $schema !== null ) { $schemaNames[] = $schema->getName()->getText(); }
+            if ( count( $schemaNames ) >= 10 ) { break; }
+        }
 
 		$response = $this->getResponseFactory()->create();
 		$response->setBody( new StringStream( json_encode( $schemaNames ) ) );

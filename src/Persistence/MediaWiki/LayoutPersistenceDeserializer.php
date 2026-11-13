@@ -32,7 +32,7 @@ class LayoutPersistenceDeserializer {
 
 		return new Layout(
 			name: $layoutName,
-			schema: $this->schemaReferenceParser->localName( $data['schema'] )->name,
+			schema: $this->schemaReferenceParser->fromJson( $data['schema'] ),
 			type: $data['type'],
 			description: $data['description'] ?? '',
 			displayRules: $this->displayRulesFromJson( $data ),

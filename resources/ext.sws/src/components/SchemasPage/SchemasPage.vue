@@ -194,7 +194,7 @@ let schemaDialogRequest = 0;
 // The Schema picker's rule: any part of the name, in any case.
 const foundSchemas = computed( () => {
 	const query = findText.value.trim().toLowerCase();
-	return schemas.value.filter( ( summary ) => summary.name.toLowerCase().includes( query ) );
+	return schemas.value.filter( ( summary ) => [ summary.name, ...Object.keys( summary.labels ?? {} ).map( ( lang ) => summary.labels![ lang ] ), ...Object.keys( summary.descriptions ?? {} ).map( ( lang ) => summary.descriptions![ lang ] ) ].some( ( term ) => term.toLowerCase().includes( query ) ) );
 } );
 
 const emptyText = computed( () => schemas.value.length === 0 ?

@@ -32,7 +32,7 @@ export class ValueDeserializer {
 			return newUnregisteredTypeValue( propertyTypeName, json );
 		}
 
-		if ( propertyTypeName === 'wikitext' ) {
+		if ( [ 'wikitext', 'wikitextValue' ].includes( propertyTypeName ) ) {
 			if ( !Array.isArray( json ) || json.some( ( part: unknown ) => typeof part !== 'string' ) ) { throw new Error( 'Invalid wikitext value' ); }
 			return newWikitextValue( ...json );
 		}

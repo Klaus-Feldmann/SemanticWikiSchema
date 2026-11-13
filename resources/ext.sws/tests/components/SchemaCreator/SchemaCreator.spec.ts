@@ -146,79 +146,14 @@ describe( 'SchemaCreator', () => {
 		expect( field.props( 'status' ) ).toBe( 'default' );
 	} );
 
-	it( 'shows name-taken error after debounce', async () => {
+	it( 'allows an existing label without a duplicate request', async () => {
 		schemaStore.schemaNameExists = vi.fn().mockResolvedValue( true );
-
 		const wrapper = mountComponent();
-
-		const nameInput = wrapper.find( '.cdx-text-input-stub' );
-		await nameInput.setValue( EXISTING_SCHEMA_NAME );
-
-		const field = wrapper.findComponent( { name: 'CdxField' } );
-		expect( field.props( 'status' ) ).toBe( 'default' );
-
+		await wrapper.find( '.cdx-text-input-stub' ).setValue( EXISTING_SCHEMA_NAME );
 		vi.advanceTimersByTime( DEBOUNCE_DELAY );
 		await flushPromises();
-
-		expect( field.props( 'status' ) ).toBe( 'error' );
-	} );
-
-	it( 'does not check for duplicates before debounce delay', async () => {
-		const wrapper = mountComponent();
-
-		const nameInput = wrapper.find( '.cdx-text-input-stub' );
-		await nameInput.setValue( EXISTING_SCHEMA_NAME );
-
-		vi.advanceTimersByTime( DEBOUNCE_DELAY - 1 );
-		await flushPromises();
-
+		expect( wrapper.findComponent( { name: 'CdxField' } ).props( 'status' ) ).toBe( 'default' );
 		expect( schemaStore.schemaNameExists ).not.toHaveBeenCalled();
-	} );
-
-	it( 'cancels pending duplicate check when user types again', async () => {
-		schemaStore.schemaNameExists = vi.fn().mockImplementation(
-			( name: string ) => Promise.resolve( name === EXISTING_SCHEMA_NAME ),
-		);
-
-		const wrapper = mountComponent();
-
-		const nameInput = wrapper.find( '.cdx-text-input-stub' );
-		await nameInput.setValue( EXISTING_SCHEMA_NAME );
-
-		vi.advanceTimersByTime( DEBOUNCE_DELAY - 1 );
-		await nameInput.setValue( NEW_SCHEMA_NAME );
-
-		vi.advanceTimersByTime( DEBOUNCE_DELAY );
-		await flushPromises();
-
-		const field = wrapper.findComponent( { name: 'CdxField' } );
-		expect( field.props( 'status' ) ).toBe( 'default' );
-		expect( schemaStore.schemaNameExists ).toHaveBeenCalledWith( NEW_SCHEMA_NAME );
-		expect( schemaStore.schemaNameExists ).not.toHaveBeenCalledWith( EXISTING_SCHEMA_NAME );
-	} );
-
-	it( 'discards stale duplicate check result when user types during request', async () => {
-		let resolveExists: ( value: boolean ) => void;
-		schemaStore.schemaNameExists = vi.fn().mockImplementation(
-			() => new Promise<boolean>( ( resolve ) => {
-				resolveExists = resolve;
-			} ),
-		);
-
-		const wrapper = mountComponent();
-
-		const nameInput = wrapper.find( '.cdx-text-input-stub' );
-		await nameInput.setValue( EXISTING_SCHEMA_NAME );
-
-		vi.advanceTimersByTime( DEBOUNCE_DELAY );
-
-		await nameInput.setValue( NEW_SCHEMA_NAME );
-
-		resolveExists!( true );
-		await flushPromises();
-
-		const field = wrapper.findComponent( { name: 'CdxField' } );
-		expect( field.props( 'status' ) ).toBe( 'default' );
 	} );
 
 	describe( 'validate', () => {
@@ -232,7 +167,7 @@ describe( 'SchemaCreator', () => {
 			expect( field.props( 'status' ) ).toBe( 'error' );
 		} );
 
-		it( 'returns false when name already exists', async () => {
+		it( 'accepts a label already used by another schema', async () => {
 			schemaStore.schemaNameExists = vi.fn().mockResolvedValue( true );
 
 			const wrapper = mountComponent();
@@ -243,9 +178,9 @@ describe( 'SchemaCreator', () => {
 
 			const valid = await ( wrapper.vm as any ).validate();
 
-			expect( valid ).toBe( false );
+			expect( valid ).toBe( true );
 			const field = wrapper.findComponent( { name: 'CdxField' } );
-			expect( field.props( 'status' ) ).toBe( 'error' );
+			expect( field.props( 'status' ) ).toBe( 'default' );
 		} );
 
 		it( 'returns true when name is available', async () => {

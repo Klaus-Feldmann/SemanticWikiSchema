@@ -186,13 +186,15 @@ class RdfNamespacesTest extends TestCase {
 		$this->assertSame( 'http://www.w3.org/2001/XMLSchema#dateTime', $namespaces->xsd( 'dateTime' )->value );
 	}
 
-	public function testPrefixMapCoversEveryNeoAndStandardNamespace(): void {
+	public function testPrefixMapCoversStableAndLegacyNamespaces(): void {
 		$this->assertSame(
 			[
 				'neo' => 'https://wiki.example/ontology/',
 				'neo-subj' => 'https://wiki.example/entity/',
 				'neo-prop' => 'https://wiki.example/prop/',
 				'neo-schema' => 'https://wiki.example/schema/',
+				'sws-schema' => 'https://wiki.example/schema-id/',
+				'sws-entity' => 'https://wiki.example/entity/',
 				'neo-rel' => 'https://wiki.example/relation/',
 				'neo-page' => 'https://wiki.example/page/',
 				'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',

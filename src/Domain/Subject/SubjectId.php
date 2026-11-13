@@ -11,8 +11,8 @@ use Stringable;
 /**
  * A Subject's identity: the Source that produced it paired with that Source's own id for it (ADR 23).
  *
- * A local Subject serializes to its bare local id, exactly as every local Subject has always been
- * stored, so `s` plus 14 nanoid characters keeps meaning what it did. Everything else serializes as
+ * A local Subject serializes to its bare local id: E plus a positive decimal number for new
+ * identities, or the unchanged s+14 legacy format for existing content. Everything else serializes as
  * `sourceKey:localId`, split at the first colon. The two forms cannot be confused: the local grammar
  * holds no colon.
  *
@@ -23,10 +23,10 @@ use Stringable;
 readonly class SubjectId implements Stringable {
 
 	/**
-	 * The local Source's id grammar (ADR 14): `s` plus 14 characters of a 58-character alphabet that
-	 * omits the visually ambiguous 0, O, I and l.
+	 * The local Source accepts new E IDs and legacy s+14 IDs. Only the server registry mints
+	 * new production entities; accepting the old grammar is for reading existing revisions.
 	 */
-	public const string LOCAL_ID_PATTERN = '/^s[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{14}\z/';
+	public const string LOCAL_ID_PATTERN = '/^(?:s[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{14}|E[1-9][0-9]{0,17})\z/';
 
 	/**
 	 * A Source key is an identifier, not a path: a letter followed by up to 63 letters, digits,
@@ -91,12 +91,16 @@ readonly class SubjectId implements Stringable {
 		return $this->source === null;
 	}
 
+	public function isSequential(): bool {
+		return $this->isLocal() && str_starts_with( $this->localId, 'E' );
+	}
+
 	public function equals( self $other ): bool {
 		return $this->text === $other->text;
 	}
 
 	/**
-	 * Mints an id for a new Subject, which is always local: no path creates a Subject in another Source.
+	 * Legacy generator retained for adapters/tests. Production creation uses the identity registry.
 	 */
 	public static function createNew( IdGenerator $idGenerator ): self {
 		return new self( 's' . $idGenerator->generate() );

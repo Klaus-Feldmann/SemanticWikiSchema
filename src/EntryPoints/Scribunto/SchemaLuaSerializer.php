@@ -10,9 +10,11 @@ use ProfessionalWiki\SWS\Domain\Schema\Schema;
 class SchemaLuaSerializer {
 
 	public function toLuaTable( Schema $schema ): array {
-		$result = [ 'name' => $schema->getName()->getText() ];
+		$result = [ 'name' => $schema->getName()->getText(),
+            ...( $schema->getId() === null ? [] : [ 'id'=>$schema->getId()->text, 'reference'=>$schema->getReference()->toJson(), 'label'=>$schema->getIdentity()->label() ] + $schema->getIdentity()->toJson() ) ];
 
-		$description = $schema->getDescription();
+		$result = json_decode( json_encode( $result, JSON_THROW_ON_ERROR ), true, 512, JSON_THROW_ON_ERROR );
+        $description = $schema->getDescription();
 		if ( $description !== '' ) {
 			$result['description'] = $description;
 		}
@@ -35,6 +37,7 @@ class SchemaLuaSerializer {
 		$entry = [
 			'name' => $name,
 			'type' => $property->getPropertyType(),
+            ...( $property->getFieldNotes() === null ? [] : [ 'fieldNotes' => $property->getFieldNotes() ] ),
 			'required' => $property->isRequired(),
 			...( $property->getWikiLink() === null ? [] : [ 'wikiLink' => $property->getWikiLink() ] ),
 			...( $property->getExternalProperty() === null ? [] : [ 'externalProperty' => $property->getExternalProperty()->toJson() ] ),

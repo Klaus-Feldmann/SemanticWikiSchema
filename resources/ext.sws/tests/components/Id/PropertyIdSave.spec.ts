@@ -68,7 +68,7 @@ describe( 'property ID selection through the schema field save check', () => {
 		w.unmount();
 	} );
 
-	it.each( [ 'wikitext', 'number', 'image', 'page' ] )( 'clears a previous mapping when changing Text to %s', async ( type ) => {
+	it.each( [ 'wikitext', 'wikitextValue', 'number', 'image', 'page' ] )( 'clears a previous mapping when changing Text to %s', async ( type ) => {
 		const w = createTestWrapper( PropertyDefinitionEditor, { property: {
 			...newTextProperty( { name: 'Wikidata', required: true } ),
 			externalProperty: { source: 'wikidata', id: 'P31' },
@@ -81,8 +81,8 @@ describe( 'property ID selection through the schema field save check', () => {
 		expect( field.externalProperty ).toBeUndefined();
 		expect( field.required ).toBe( true );
 		expect( w.findComponent( CdxMessage ).text() ).toContain( 'sws-property-type-source-reset' );
-		expect( blocker( w ) ).toBeNull();
-		if ( type === 'wikitext' ) {
+		expect( blocker( w ) ).toBe( type === 'wikitext' ? 'sws-wikitext-empty' : null );
+		if ( [ 'wikitext', 'wikitextValue' ].includes( type ) ) {
 			expect( field.wikiLink ).toBeUndefined();
 		}
 		if ( type === 'page' ) {

@@ -41,7 +41,6 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/Klaus-Feldmann/SemanticWikiSchema/issues",
 		"source": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 		"email": "info@aufeinwort.info"
 	},
@@ -92,7 +91,28 @@
 			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_subject.json --sql sql/postgres/sws_subject.sql --type postgres",
 			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/mysql/sws_relation.sql --type mysql",
 			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/sqlite/sws_relation.sql --type sqlite",
-			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/postgres/sws_relation.sql --type postgres"
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_relation.json --sql sql/postgres/sws_relation.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_id_counter.json --sql sql/mysql/sws_id_counter.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_id_counter.json --sql sql/sqlite/sws_id_counter.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_id_counter.json --sql sql/postgres/sws_id_counter.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity.json --sql sql/mysql/sws_identity.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity.json --sql sql/sqlite/sws_identity.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity.json --sql sql/postgres/sws_identity.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_alias.json --sql sql/mysql/sws_identity_alias.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_alias.json --sql sql/sqlite/sws_identity_alias.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_alias.json --sql sql/postgres/sws_identity_alias.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_host.json --sql sql/mysql/sws_identity_host.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-owner.json --sql sql/mysql/patch-sws_identity-owner.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-used.json --sql sql/mysql/patch-sws_identity-used.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_host.json --sql sql/sqlite/sws_identity_host.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-owner.json --sql sql/sqlite/patch-sws_identity-owner.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-used.json --sql sql/sqlite/patch-sws_identity-used.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_identity_host.json --sql sql/postgres/sws_identity_host.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-owner.json --sql sql/postgres/patch-sws_identity-owner.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaChangeSql --json sql/abstractSchemaChanges/patch-sws_identity-used.json --sql sql/postgres/patch-sws_identity-used.sql --type postgres",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_search_term.json --sql sql/mysql/sws_search_term.sql --type mysql",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_search_term.json --sql sql/sqlite/sws_search_term.sql --type sqlite",
+			"php ../../maintenance/run.php generateSchemaSql --json sql/sws_search_term.json --sql sql/postgres/sws_search_term.sql --type postgres"
 		]
 	},
 	"scripts-descriptions": {
@@ -108,7 +128,7 @@
 	"extra": {
 		"installer-name": "SemanticWikiSchema",
 		"branch-alias": {
-			"dev-semantic-0.1.22": "0.1.x-dev"
+			"dev-semantic-0.4.03": "0.4.x-dev"
 		}
 	},
 	"conflict": {

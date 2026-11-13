@@ -20,14 +20,28 @@ final class ExternalValuesLookup {
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $p['language'] ) !== 1 ) {
 			throw new RuntimeException( 'SWSBaseBridge: page or language unavailable' );
 		}
+		if ( \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() ) {
+			return ( new StoredSourceLookup( $this->context ) )->fields( $title, $p, $dependencies, $selectedSubject );
+		}
 		$dependencies?->recordDependencyOn( $title );
 		$extension = SWSExtension::getInstance();
-		$subject = $selectedSubject ?? $extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $p['pageid'] ) )->getMainSubject();
+		$processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current();
+		$local = $processing !== null && $processing->useStoredSources && $processing->title->isSamePageAs( $title ) ? $processing->subjects : null;
+		$local ??= \ProfessionalWiki\SWS\EntryPoints\Processing\SourceWriteScope::subjectsFor( $title );
+		$subject = $selectedSubject ?? ( $local !== null
+			? ( isset( $p['subject'] ) ? $local->getAllSubjects()->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $p['subject'] ) ) : $local->getMainSubject() )
+			: $extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $p['pageid'] ) )->getMainSubject() );
+		if ( $local !== null && $subject !== null ) {
+			$subject = $local->getAllSubjects()->getSubject( $subject->id );
+		}
 		$fields = [];
 		$presentation = null;
 		if ( $subject !== null && ( $p['subject'] === null || $subject->id->text === $p['subject'] ) ) {
 			$schema = $extension->getSchemaResolverFor( $this->context->getAuthority() )->getSchema( $subject->getSchemaReference() );
 			$dependencies?->recordDependencyOnSchema( $subject->getSchemaReference() );
+			if ( $local !== null && $schema !== null ) {
+				return \ProfessionalWiki\SWS\Application\Source\StoredSourceValues::read( $subject, $schema, $p['language'], $p['pageid'] );
+			}
 			$groups = [];
 			$fieldTypes = [];
 			if ( ( $p['presentation'] ?? false ) && $schema !== null ) {

@@ -61,7 +61,7 @@ describe( 'historical time values', () => {
 		useSchemaStore().schemas.set( 'Person', newSchema( { title: 'Person', properties: new PropertyDefinitionList( [ property() ] ) } ) );
 		const w = createTestWrapper( SubjectStatementsView, { subject: newSubject( { id: 's1aaaaaaaaaaaa1', schemaName: 'Person', pageIdentifiers: new PageIdentifiers( 1152, 'Person' ) } ) } );
 		await flushPromises();
-		expect( w.text() ).toContain( 'sws-derived-manual' );
+		expect( w.text() ).toContain( 'sws-notes-source-manual' );
 		expect( w.emitted( 'count-change' )?.slice( -1 )[ 0 ] ).toEqual( [ 0 ] );
 		w.unmount();
 	} );

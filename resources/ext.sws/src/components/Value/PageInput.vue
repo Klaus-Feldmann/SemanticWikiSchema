@@ -24,7 +24,7 @@
 					:model-value="text"
 					:input-label="label || property.name.toString()"
 					:namespace="property.pageNamespace"
-					@update:model-value="( value, selected ) => update( index, value, selected )" />
+					@update:model-value="( value, selected, namespace ) => update( index, value, selected, namespace )" />
 			</CdxField>
 			<CdxButton v-if="property.multiple" @click="remove( index )">
 				{{ $i18n( 'sws-page-remove' ).text() }}
@@ -66,11 +66,11 @@ watch( () => props.modelValue, ( value ) => {
 		canonicalDraft.value = null;
 	}
 } );
-function update( index: number, text: string, selected = false ): void {
+function update( index: number, text: string, selected = false, namespace = props.property.pageNamespace ): void {
 	const values = [ ...rows.value ];
 	const canonical = canonicalRows();
 	values[ index ] = text;
-	canonical[ index ] = text.trim() ? pageTitleInput( text, selected ? undefined : props.property.pageNamespace ) || text : text;
+	canonical[ index ] = text.trim() ? pageTitleInput( text, selected ? undefined : namespace ) || text : text;
 	draft.value = values;
 	canonicalDraft.value = canonical;
 	onInput( canonical );

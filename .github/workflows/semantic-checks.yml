@@ -1,9 +1,9 @@
 name: SemanticWikiSchema candidate checks
 on:
   push:
-    branches: [master, semantic-0.1.22]
+    branches: [master, semantic-0.4.03]
   pull_request:
-    branches: [master, semantic-0.1.22]
+    branches: [master, semantic-0.4.03]
   workflow_dispatch:
 permissions:
   contents: read
@@ -15,11 +15,16 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: pdo_sqlite, pcntl
           tools: composer:v2
           coverage: none
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
+      - name: First-installation helper checks
+        run: |
+          python3 installer/tests/test_install.py
+          python3 installer/tests/composer_first_install.py
       - name: Install isolated PHP test dependencies
         run: composer install --working-dir=publication-tests/dependencies --no-interaction --prefer-dist
       - name: PHP standalone checks
@@ -47,3 +52,5 @@ jobs:
         run: |
           npm install --ignore-scripts
           npm test
+      - name: Verify release archives
+        run: python3 scripts/build_release.py --output "${{ runner.temp }}/sws-release"

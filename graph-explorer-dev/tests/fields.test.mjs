@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readPresentation,orderedRows,localPageUrl,createPresentationLoader,createSWSFields} from '../source/swsFields.js';
-const origin='https://wiki.example',sid='sTest123',iri=origin+'/entity/'+sid;
+const origin='https://wiki.example',sid='E1',iri=origin+'/entity/'+sid;
 const property=(source='wikidata',extra={})=>({name:'Klassifizierung',type:'text',predicateLocalName:'Klassifizierung',wikiLink:{labelTarget:'Konzept:Klassifizierung',externalTarget:'local',...extra},externalProperty:{source,id:'P31'}});
 const native=(name,value)=>({name,id:origin+'/prop/'+name,property:{type:'string',values:[{value,language:'de'}]}});
 function response(source='wikidata',valueLabel='Mensch') {return {version:1,scope:'current',pageId:12,mainSubjectId:sid,presentation:{version:1,pageUrlTemplate:origin+'/wiki/SWSGRAPHTITLETOKEN',definitions:[property(source),{name:'Geburtsort',type:'text',predicateLocalName:'Geburtsort',wikiLink:{values:false},externalProperty:null}]},fields:[{name:'Klassifizierung',source,propertyId:'P31',status:'resolved',values:[{kind:'entity',id:'Q5',label:valueLabel,url:source==='wikidata'?'https://www.wikidata.org/wiki/Q5':origin+'/wiki/Objekt:Q5'}]}]};}

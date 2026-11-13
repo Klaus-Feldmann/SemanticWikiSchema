@@ -1,9 +1,9 @@
-# Releasing a SemanticWikiSchema version
+# Publish SWS
 
-1. Verify the source baseline in SEMANTICSWS-VERSION.json, current Wikiseiten revision manifest and the separately versioned MCP patch.
-2. Run the checks in publication/VERIFICATION.md. Keep local and live evidence distinct.
-3. Review the full Git diff, licenses, dependency/configuration exclusions and generated assets. The extension and Composer installer folder are SemanticWikiSchema. Composer is the supported install path.
-4. Publish the reviewed candidate as a new commit on master and a named version branch, preserving the previous history. Never force-push; reconcile a changed remote head before retrying.
-5. Create a GitHub release appropriate to the verified support scope and attach the source archive/patch plus SHA256 checksums; installation uses the Composer VCS branch. No release has been created by the preparation scripts.
+1. Archive the supplied installed baseline unchanged and record its file hashes outside the public package.
+2. Prepare current installation documentation, built assets, dependency metadata and source notices. Preserve runtime behavior; record any production-code changes separately.
+3. Test the installer and the exact archives, run candidate checks and distinguish isolated checks from live confirmation.
+4. Publish the reviewed candidate through a branch/PR, wait for checks, then merge without rewriting history.
+5. Create the version tag and GitHub release, attach the installer/source ZIPs and SHA256SUMS, and verify the uploaded assets. A pre-1.0 release qualified on a MediaWiki development build is marked as a prerelease.
 
-The upstream Docker/website publishing workflows are archived rather than active. Upstream Docker images/Packagist packages do not contain this fork. Original release instructions are preserved in RELEASING-UPSTREAM.md for reference, not as this fork's release procedure.
+The first-installation installer does not upgrade SWS or import NeoWiki. Keep the support contact short; do not mix historical migration instructions into the installation path.

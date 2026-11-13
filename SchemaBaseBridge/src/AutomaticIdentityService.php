@@ -25,7 +25,8 @@ final class AutomaticIdentityService {
 						throw new \UnexpectedValueException( 'Invalid source identity' );
 					}
 					$sources[$source] = [ 'source' => $source, 'status' => 'resolved', 'id' => $id,
-						'url' => $url, 'origin' => $value['origin'] ?? 'page' ];
+						'url' => $url, 'origin' => $value['origin'] ?? 'page' ] +
+						array_intersect_key( $value, array_flip( [ 'sourceStatus', 'retained', 'descriptionRetained', 'lastAttemptedAt', 'lastSuccessfulAt', 'storageMode' ] ) );
 				} else {
 					if ( $status !== 'missing' && function_exists( 'wfDebugLog' ) ) {
 						wfDebugLog( 'SchemaBaseBridge', 'Identity source ' . $source . ': ' . $status );

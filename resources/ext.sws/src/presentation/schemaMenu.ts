@@ -1,3 +1,4 @@
+import { schemaSummaryLabel, schemaSummaryDescription } from './schemaSummaryLabel';
 import type { MenuConfig, MenuItemData } from '@wikimedia/codex';
 import { cdxIconAdd } from '@wikimedia/codex-icons';
 import type { SchemaSummary } from '@/application/SchemaLookup.ts';
@@ -44,11 +45,11 @@ function matchingItems( summaries: readonly SchemaSummary[], search: string ): M
 	const text = search.trim().toLowerCase();
 
 	return summaries
-		.filter( ( summary ) => summary.name.toLowerCase().includes( text ) )
+		.filter( ( summary ) => [ summary.name, ...Object.values( summary.labels ?? {} ), ...Object.values( summary.descriptions ?? {} ) ].some( ( term ) => term.toLowerCase().includes( text ) ) )
 		.map( ( summary ) => ( {
-			label: summary.name,
+			label: summary.id ? `${ schemaSummaryLabel( summary ) } (${ summary.id })` : schemaSummaryLabel( summary ),
 			value: summary.name,
-			description: summary.description || undefined,
+			description: schemaSummaryDescription( summary ) || undefined,
 		} ) );
 }
 

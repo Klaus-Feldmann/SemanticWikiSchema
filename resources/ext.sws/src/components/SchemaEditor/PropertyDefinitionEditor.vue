@@ -58,13 +58,14 @@
 			/>
 		</CdxField>
 
+		<FieldNotesAttributes v-if="!isSchemaExecution( localProperty )" :property="localProperty as PropertyDefinition" @update:property="updatePropertyAttributes" />
 		<PropertySourceEditor
 			v-if="[ 'text', 'page', 'image', 'historicalDate' ].includes( localProperty.type )"
 			:key="localProperty.type"
 			ref="propertySourceEditor"
 			:property="localProperty as PropertyDefinition"
 			@update:property="updatePropertyAttributes" />
-		<WikiLinkEditor v-if="localProperty.type !== 'wikitext'" :property="localProperty as PropertyDefinition" @update:property="updatePropertyAttributes" />
+		<WikiLinkEditor v-if="![ 'wikitext', 'wikitextValue' ].includes( localProperty.type )" :property="localProperty as PropertyDefinition" @update:property="updatePropertyAttributes" />
 		<component
 			:is="componentRegistry.getAttributesEditor( localProperty.type )"
 			ref="attributesEditor"
@@ -85,13 +86,15 @@
 </template>
 
 <script setup lang="ts">
+import FieldNotesAttributes from './Property/FieldNotesAttributes.vue';
 import { isSchemaExecution } from '@/domain/propertyTypes/Wikitext';
 import PropertySourceEditor from './Property/PropertySourceEditor.vue';
 import WikiLinkEditor from './Property/WikiLinkEditor.vue';
 import { PropertyDefinition, PropertyName, withConstraintSeverity, withoutSeveritiesOfClearedConstraints } from '@/domain/PropertyDefinition.ts';
 import type { Severity } from '@/domain/Severity.ts';
 import SeverityInput from '@/components/SchemaEditor/Property/SeverityInput.vue';
-import { CdxCheckbox, CdxField, CdxMessage, CdxSelect, CdxTextArea, CdxTextInput, type MenuItemData } from '@wikimedia/codex';
+import { CdxCheckbox, CdxField, CdxMessage, CdxTextArea, CdxTextInput, type MenuItemData } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import { SWSServices } from '@/SWSServices.ts';
 import { ValueInputExposes } from '@/components/Value/ValueInputContract.ts';
 import type { AttributesEditorExposes } from '@/components/SchemaEditor/Property/AttributesEditorContract.ts';
@@ -223,9 +226,10 @@ function changePropertyType( type: string ): void {
 	localProperty.value = propertyTypeRegistry.getType( type ).createPropertyDefinition(
 		{
 			name: localProperty.value.name,
-			wikiLink: type === 'wikitext' ? undefined : localProperty.value.wikiLink,
+			wikiLink: [ 'wikitext', 'wikitextValue' ].includes( type ) ? undefined : localProperty.value.wikiLink,
 			type: type,
 			description: localProperty.value.description,
+            fieldNotes: localProperty.value.fieldNotes,
 			required: localProperty.value.required,
 			default: undefined,
 			...( requiredSeverity === undefined ? {} : { constraintSeverities: { required: requiredSeverity } } )

@@ -1,3 +1,4 @@
+import { identityFromJson } from '@/domain/LocalizedIdentity';
 import { Schema, type SchemaName } from '@/domain/Schema';
 import { createPropertyDefinitionFromJson } from '@/domain/PropertyDefinition';
 import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList';
@@ -12,6 +13,9 @@ export class SchemaDeserializer {
 			schema.description ?? '',
 			this.deserializePropertyDefinitions( schema.propertyDefinitions ),
 			schema.subjectsAreDependent === true,
+			identityFromJson( schema ),
+			schema.id ?? null,
+			schema.swsImport ?? null,
 		);
 	}
 

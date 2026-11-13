@@ -19,6 +19,7 @@
 					:class="{ 'ext-sws-subject-statements__value--with-description': descriptionImage === resolved.propertyDefinition.name.toString() && descriptionGroups.length > 0 }">
 					<EntityDescriptions v-if="descriptionImage === resolved.propertyDefinition.name.toString()" :groups="descriptionGroups" />
 					<div class="ext-sws-subject-statements__value-content">
+						<small v-if="resolved.defaultValue">{{ $i18n( 'sws-schema-default-value' ).text() }}</small>
 						<small v-if="resolved.value !== undefined && resolved.propertyDefinition.externalProperty">{{ $i18n( 'sws-derived-own' ).text() }}</small>
 						<StatementDisplay
 							v-if="resolved.value !== undefined"
@@ -26,9 +27,14 @@
 							:property="manualProperty( resolved )"
 						/>
 						<ExternalStatementDisplay
-							v-if="resolved.external"
+							v-if="resolved.external?.status === 'resolved'"
 							:field="resolved.external"
 							:property="resolved.propertyDefinition" />
+						<FieldNoteDisplay
+							v-if="resolved.showNote"
+							:property="noteProperty( resolved )"
+							:text="subject.getStatements().fieldNotes[ resolved.sourcePropertyName || resolved.propertyDefinition.name.toString() ] || ''"
+							:source="resolved.value === undefined ? resolved.external : undefined" />
 					</div>
 				</dd>
 			</div>
@@ -45,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import FieldNoteDisplay from './FieldNoteDisplay.vue';
 import EntityDescriptions from './EntityDescriptions.vue';
 import type { EntityDescription } from '@/presentation/entityDescriptions';
 import { isSchemaExecution } from '@/domain/propertyTypes/Wikitext';
@@ -61,7 +68,7 @@ import { Schema } from '@/domain/Schema';
 import { useSchemaStore } from '@/stores/SchemaStore';
 import { resolveAllNonEmptyProperties } from '@/domain/resolveDisplayProperties';
 import StatementDisplay from '@/components/Value/StatementDisplay.vue';
-import { EnclosingSubjectIdsKey } from '@/components/Value/ValueDisplayContract.ts';
+import { EnclosingSubjectIdsKey, WikitextContextKey } from '@/components/Value/ValueDisplayContract.ts';
 
 const emit = defineEmits<{ 'count-change': [ count: number | null ] }>();
 const props = defineProps<{
@@ -74,39 +81,55 @@ const descriptionGroups = ref<EntityDescription[]>( [] );
 const enclosingSubjectIds = inject( EnclosingSubjectIdsKey, ref( [] ) );
 
 provide( EnclosingSubjectIdsKey, computed( () => [ ...enclosingSubjectIds.value, props.subject.getId().text ] ) );
+provide( WikitextContextKey, computed( () => ( { pageId: props.subject.getPageIdentifiers().getPageId(), subject: props.subject.getId().text } ) ) );
 
 const schema = computed( () => schemaStore.schemas.get( props.subject.getSchemaName() ) as Schema | undefined );
 const definitions = computed( () => schema.value ? [ ...schema.value.getPropertyDefinitions() ] : [] );
 const { fields, loading, failed } = useExternalStatements( computed( () => props.subject as Subject ), definitions );
-interface DisplayProperty { sourcePropertyName?: string; propertyDefinition: PropertyDefinition; value?: Value; external?: ExternalField }
+interface DisplayProperty { sourcePropertyName?: string; propertyDefinition: PropertyDefinition; value?: Value; external?: ExternalField; showNote?: boolean; defaultValue?: boolean }
 const displayProperties = computed<DisplayProperty[]>( () => {
 	if ( !schema.value ) {
 		return [];
 	}
 	const own = new Map( resolveAllNonEmptyProperties( schema.value, props.subject as Subject )
+		.filter( ( row ) => row.value.type !== ValueType.String || row.value.parts.some( ( part ) => part.trim() !== '' ) )
 		.map( ( row ) => [ row.propertyDefinition.name.toString(), row.value ] ) );
 	const result: DisplayProperty[] = [];
 	for ( const propertyDefinition of definitions.value ) {
 		if ( isSchemaExecution( propertyDefinition ) ) {
 			continue;
 		}
-		const value = own.get( propertyDefinition.name.toString() );
+		let value = own.get( propertyDefinition.name.toString() );
+		let defaultValue = false;
+		if ( value === undefined && propertyDefinition.type === 'text' && !propertyDefinition.externalProperty &&
+            propertyDefinition.default?.type === ValueType.String && propertyDefinition.default.parts.some( ( part ) => part.trim() !== '' ) ) {
+			value = propertyDefinition.default;
+			defaultValue = true;
+		}
 		// Own image references take precedence, including when their preview is temporarily unavailable.
 		const external = [ 'image', 'historicalDate' ].includes( propertyDefinition.type ) && value?.type === ValueType.String && value.parts.length > 0 ?
 			undefined : fields.value.get( propertyDefinition.name.toString() );
-		if ( value !== undefined || external !== undefined ) {
-			result.push( { propertyDefinition, value, external } );
+		if ( value !== undefined || external !== undefined || props.subject.getStatements().fieldNotes[ propertyDefinition.name.toString() ] ) {
+			result.push( { propertyDefinition, value, external, defaultValue } );
 		}
 	}
-	return expandUrlDisplayRows( result );
+	const seen = new Set<string>();
+	return expandUrlDisplayRows( result ).map( ( row ) => {
+		const showNote = !seen.has( row.sourcePropertyName );
+		seen.add( row.sourcePropertyName );
+		return { ...row, showNote };
+	} );
 } );
 const descriptionImage = computed( () => displayProperties.value.find( ( row ) => row.propertyDefinition.type === 'image' &&
  ( row.value !== undefined || row.external?.status === 'resolved' && row.external.values.some( ( value ) => value.kind === 'image' ) ) )?.propertyDefinition.name.toString() );
 watch( () => [ loading.value, failed.value, displayProperties.value ] as const, () => {
 	emit( 'count-change', loading.value || failed.value ? null : new Set( displayProperties.value.filter( ( row ) =>
-		row.value !== undefined || row.external?.status === 'resolved' && row.external.values.length > 0 ).map( ( row ) => row.sourcePropertyName || row.propertyDefinition.name.toString() ) ).size );
+		row.value !== undefined || row.external?.status === 'resolved' && row.external.values.length > 0 || !!props.subject.getStatements().fieldNotes[ row.sourcePropertyName || row.propertyDefinition.name.toString() ] ).map( ( row ) => row.sourcePropertyName || row.propertyDefinition.name.toString() ) ).size );
 }, { immediate: true } );
 
+function noteProperty( row: DisplayProperty ): PropertyDefinition {
+	return definitions.value.find( ( p ) => p.name.toString() === ( row.sourcePropertyName || row.propertyDefinition.name.toString() ) ) || row.propertyDefinition;
+}
 function manualProperty( row: DisplayProperty ): PropertyDefinition {
 	// A manually entered property ID stays stored, but is not misrepresented as a local page link.
 	if ( row.value?.type === ValueType.String && row.propertyDefinition.externalProperty &&

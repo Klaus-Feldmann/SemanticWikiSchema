@@ -12,11 +12,11 @@
 				class="ext-sws-schemas-table__name"
 				:href="pageUrl( `Schema:${ row.name }` )"
 				:title="row.name"
-			>{{ row.name }}</a>
+			>{{ schemaSummaryLabel( row ) }}{{ row.id ? ` (${ row.id })` : '' }}</a>
 		</template>
 
-		<template #item-description="{ item }">
-			<span class="ext-sws-schemas-table__description">{{ item }}</span>
+		<template #item-description="{ row }">
+			<span class="ext-sws-schemas-table__description">{{ schemaSummaryDescription( row ) }}</span>
 		</template>
 
 		<template #item-actions="{ row }">
@@ -50,7 +50,7 @@
 				<a
 					v-else
 					class="ext-sws-schemas-table__subject-count"
-					:href="pageUrl( `Special:Subjects/${ row.name }` )"
+					:href="pageUrl( `Special:Entities/${ row.name }` )"
 					:aria-describedby="nameId( row.name )"
 				>{{ subjectListLinkText( subjectCountOf( row.name ) ) }}</a>
 				<CdxButton
@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import { schemaSummaryLabel, schemaSummaryDescription } from '@/presentation/schemaSummaryLabel';
 import { computed } from 'vue';
 import { CdxButton, CdxIcon, CdxTable, type TableColumn, useGeneratedId } from '@wikimedia/codex';
 import { cdxIconAdd, cdxIconEdit } from '@wikimedia/codex-icons';

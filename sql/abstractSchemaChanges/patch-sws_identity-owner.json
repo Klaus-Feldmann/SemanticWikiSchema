@@ -1,0 +1,125 @@
+{
+  "before": {
+    "name": "sws_identity",
+    "comment": "SWS stable identities: additive administration; no page or revision data is rewritten.",
+    "columns": [
+      {
+        "name": "swsi_id",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 32
+        }
+      },
+      {
+        "name": "swsi_kind",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swsi_number",
+        "type": "bigint",
+        "options": {
+          "notnull": true
+        }
+      },
+      {
+        "name": "swsi_request",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64
+        }
+      }
+    ],
+    "indexes": [
+      {
+        "name": "swsi_kind_number",
+        "columns": [
+          "swsi_kind",
+          "swsi_number"
+        ],
+        "unique": true
+      },
+      {
+        "name": "swsi_request",
+        "columns": [
+          "swsi_request"
+        ],
+        "unique": true
+      }
+    ],
+    "pk": [
+      "swsi_id"
+    ]
+  },
+  "after": {
+    "name": "sws_identity",
+    "comment": "SWS stable identities: additive administration; no page or revision data is rewritten.",
+    "columns": [
+      {
+        "name": "swsi_id",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 32
+        }
+      },
+      {
+        "name": "swsi_kind",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swsi_number",
+        "type": "bigint",
+        "options": {
+          "notnull": true
+        }
+      },
+      {
+        "name": "swsi_request",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64
+        }
+      },
+      {
+        "name": "swsi_owner",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64,
+          "default": ""
+        }
+      }
+    ],
+    "indexes": [
+      {
+        "name": "swsi_kind_number",
+        "columns": [
+          "swsi_kind",
+          "swsi_number"
+        ],
+        "unique": true
+      },
+      {
+        "name": "swsi_request",
+        "columns": [
+          "swsi_request"
+        ],
+        "unique": true
+      }
+    ],
+    "pk": [
+      "swsi_id"
+    ]
+  }
+}

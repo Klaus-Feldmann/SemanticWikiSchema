@@ -145,10 +145,11 @@ class SubjectResolver {
 
 	private function getPropertyDefinition( Subject $subject, PropertyName $propertyName ): ?PropertyDefinition {
 		$reference = $subject->getSchemaReference();
-		$this->pageDependencyRecorder->recordDependencyOnSchema( $reference );
+		
 
 		try {
 			$schema = $this->schemaResolver->getSchema( $reference );
+            $this->pageDependencyRecorder->recordDependencyOnSchema( $reference->isLocal() ? ( $schema?->getReference() ?? $reference ) : $reference );
 		} catch ( Exception ) {
 			return null;
 		}

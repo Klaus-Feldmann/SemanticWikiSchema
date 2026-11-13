@@ -47,7 +47,7 @@ class ValidateSubjectUpdateApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: 15 characters starting with "s" for a Subject of this wiki, or "sourceKey:localId" for one from another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 		];
 	}
@@ -61,7 +61,8 @@ class ValidateSubjectUpdateApi extends SimpleHandler {
 				self::PARAM_DESCRIPTION => 'Accepted for parity with PUT /subject/{id} but ignored: a label is '
 					. 'optional, so nothing about it can be violated.',
 			],
-			'statements' => [
+			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
+            'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,

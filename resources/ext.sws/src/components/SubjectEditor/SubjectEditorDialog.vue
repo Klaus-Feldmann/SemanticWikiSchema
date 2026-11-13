@@ -139,7 +139,6 @@ import { Subject } from '@/domain/Subject.ts';
 import { enteredSubjectLabel } from '@/domain/enteredSubjectLabel.ts';
 import { SubjectId } from '@/domain/SubjectId.ts';
 import { PageIdentifiers } from '@/domain/PageIdentifiers.ts';
-import { StatementList } from '@/domain/StatementList.ts';
 import { Schema } from '@/domain/Schema.ts';
 import { SubjectCreationKey } from '@/components/common/SubjectCreation.ts';
 import { SubjectIdInUseError } from '@/persistence/SubjectIdInUseError';
@@ -581,7 +580,7 @@ async function createRelationTarget( schemaName: string, label: string | null ):
 				schemaName,
 				schema.initialStatements(),
 				page,
-				null
+				null, null, schema.getReference()
 			),
 			schema,
 			dependentSubjectEditing.schemas
@@ -952,6 +951,9 @@ async function writeDirtyPanes( summary: string ): Promise<void> {
 		{ type: 'success' }
 	);
 	close();
+	// Preserve the Data tab, query and fragment while rebuilding the entire page.
+	// Only reached after all writes succeeded; partial saves keep their editor open.
+	window.location.reload();
 }
 
 function reportWriteFailure( error: unknown, paneId: string, subjectName: string ): void {
@@ -1010,6 +1012,25 @@ defineExpose( { hasChanged: hasUnsavedEdits, rootLabel, shown, visible } );
 @import ( reference ) '@wikimedia/codex-design-tokens/theme-wikimedia-ui.less';
 
 .ext-sws-subject-editor-dialog {
+	&.cdx-dialog {
+		width: calc( 100% - 2rem );
+		max-width: 64rem;
+		height: calc( 100vh - 2rem );
+		height: calc( 100dvh - 2rem );
+		max-height: min( 56rem, calc( 100dvh - 2rem ) );
+	}
+
+	.cdx-dialog__header,
+	.cdx-dialog__footer {
+		flex: 0 0 auto;
+	}
+
+	.cdx-dialog__body {
+		flex: 1 1 auto;
+		min-height: 0;
+		overflow: hidden;
+	}
+
 	/* Overrides, not replications: `.cdx-dialog__header`'s padding is unconditional in Codex,
 		and `align-items: baseline` comes from `--default`, which this header now carries again.
 		Both are deliberate departures — the header is static text beside a 32px close button,

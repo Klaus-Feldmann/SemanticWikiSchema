@@ -129,6 +129,13 @@ describe( 'SubjectPicker', () => {
 		};
 	} );
 
+	it( 'offers a saved entity description without substituting it for the label or ID', async () => {
+		( mockSubjectLabelSearch.searchSubjectLabels as ReturnType<typeof vi.fn> ).mockResolvedValue( [ { id: 'E1', label: 'Gödel', pageTitle: 'Kurt Gödel', description: 'Mathematiker' } ] );
+		const wrapper = createWrapperWithVModel();
+		await type( wrapper, 'Gödel' );
+		expect( menuItemsOf( wrapper )[ 0 ] ).toEqual( expect.objectContaining( { value: 'E1', label: 'Gödel', description: 'Mathematiker' } ) );
+	} );
+
 	it( 'searches the Subjects of every target Schema', async () => {
 		const wrapper = createWrapper( { targetSchemas: [ 'Company', 'Person' ] } );
 

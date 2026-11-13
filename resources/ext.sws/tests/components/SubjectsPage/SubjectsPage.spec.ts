@@ -93,7 +93,7 @@ describe( 'SubjectsPage', () => {
 
 		wrapper.findComponent( SubjectsTable ).vm.$emit( 'update:schema', 'Computer' );
 
-		expect( replaceState ).toHaveBeenLastCalledWith( window.history.state, '', '/wiki/Special:Subjects/Computer' );
+		expect( replaceState ).toHaveBeenLastCalledWith( window.history.state, '', '/wiki/Special:Entities/Computer' );
 	} );
 
 	it( 'takes the Schema out of the URL for every Schema', () => {
@@ -102,7 +102,7 @@ describe( 'SubjectsPage', () => {
 
 		wrapper.findComponent( SubjectsTable ).vm.$emit( 'update:schema', null );
 
-		expect( replaceState ).toHaveBeenLastCalledWith( window.history.state, '', '/wiki/Special:Subjects' );
+		expect( replaceState ).toHaveBeenLastCalledWith( window.history.state, '', '/wiki/Special:Entities' );
 	} );
 
 } );

@@ -12,7 +12,7 @@ export function localSubjectId( iri, origin ) {
     if ( url.origin !== origin || url.search || url.hash ) return null;
     const prefix = new URL('entity/', baseIri(origin));
     if (url.origin !== prefix.origin || !url.pathname.startsWith(prefix.pathname)) return null;
-    const m = /^(s[A-Za-z0-9_-]{1,79})$/.exec(url.pathname.slice(prefix.pathname.length));
+    const m = /^((?:s[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{14}|E[1-9][0-9]{0,17}))$/.exec(url.pathname.slice(prefix.pathname.length));
     return m ? m[1] : null;
   } catch { return null; }
 }

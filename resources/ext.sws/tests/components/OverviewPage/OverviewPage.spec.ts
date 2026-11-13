@@ -31,7 +31,7 @@ const SubjectCreatorDialogStub = {
 };
 
 // The pages the map holds whatever the reader may do. The permission-dependent ones are appended.
-const ALWAYS_MAPPED = [ '/wiki/Special:Subjects', '/wiki/Special:Schemas', '/wiki/Special:Mappings', '/wiki/Special:Layouts' ];
+const ALWAYS_MAPPED = [ '/wiki/Special:Entities', '/wiki/Special:Schemas', '/wiki/Special:Mappings', '/wiki/Special:Layouts' ];
 
 let pinia: ReturnType<typeof createPinia>;
 

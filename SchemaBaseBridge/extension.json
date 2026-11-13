@@ -2,7 +2,7 @@
 	"name": "SchemaBaseBridge",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"namemsg": "swsbasebridge-name",
-	"version": "0.20.0+2026-11-08",
+	"version": "0.21.1",
 	"author": "Softwaredesign: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos.",
 	"type": "other",
 	"manifest_version": 2,

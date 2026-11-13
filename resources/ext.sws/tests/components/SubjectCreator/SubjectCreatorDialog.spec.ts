@@ -1293,7 +1293,7 @@ describe( 'SubjectCreatorDialog', () => {
 
 				await save( wrapper );
 
-				expect( location.href ).toBe( '/wiki/Special:Subject/' + CREATED_PAGE_SUBJECT_ID );
+				expect( location.href ).toBe( '/wiki/Special:Entity/' + CREATED_PAGE_SUBJECT_ID );
 				expect( mw.storage.session.set )
 					.not.toHaveBeenCalledWith( 'sws-subject-creator-success', '1' );
 				expect( reloadMock ).not.toHaveBeenCalled();

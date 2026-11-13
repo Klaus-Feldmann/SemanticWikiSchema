@@ -11,17 +11,19 @@
 				:value="cell.value"
 				:property="cell.property"
 			/>
+            <FieldNoteDisplay :property="cell.property" :text="subject.getStatements().fieldNotes[ cell.property.name.toString() ] || ''" />
 		</td>
 	</tr>
 </template>
 
 <script setup lang="ts">
+import FieldNoteDisplay from '@/components/SubjectsManager/FieldNoteDisplay.vue';
 import { computed, inject, provide, ref } from 'vue';
 import type { Subject } from '@/domain/Subject';
 import type { PropertyDefinition } from '@/domain/PropertyDefinition';
 import type { Value } from '@/domain/Value';
 import StatementDisplay from '@/components/Value/StatementDisplay.vue';
-import { EnclosingSubjectIdsKey } from '@/components/Value/ValueDisplayContract.ts';
+import { EnclosingSubjectIdsKey, WikitextContextKey } from '@/components/Value/ValueDisplayContract.ts';
 import { NumberType } from '@/domain/propertyTypes/Number';
 
 const props = defineProps<{
@@ -32,6 +34,7 @@ const props = defineProps<{
 const enclosingSubjectIds = inject( EnclosingSubjectIdsKey, ref( [] ) );
 
 provide( EnclosingSubjectIdsKey, computed( () => [ ...enclosingSubjectIds.value, props.subject.getId().text ] ) );
+provide( WikitextContextKey, computed( () => ( { pageId: props.subject.getPageIdentifiers().getPageId(), subject: props.subject.getId().text } ) ) );
 
 const cells = computed( (): { property: PropertyDefinition; value: Value | undefined }[] => {
 	const shownNames = new Set( props.subject.getNamesOfNonEmptyProperties().map( ( name ) => name.toString() ) );

@@ -7,7 +7,7 @@ export class StatementList implements Iterable<Statement> {
 
 	private readonly statements = new Map<string, Statement>();
 
-	public constructor( statements: Statement[] ) {
+	public constructor( statements: Statement[], public readonly fieldNotes: Readonly<Record<string, string>> = {}, public readonly notesEdited: boolean = false ) {
 		for ( const statement of statements ) {
 			const propertyName = statement.propertyName.toString();
 
@@ -48,17 +48,18 @@ export class StatementList implements Iterable<Statement> {
 	 */
 	public withStatement( statement: Statement ): StatementList {
 		if ( !this.has( statement.propertyName ) ) {
-			return new StatementList( [ ...this, statement ] );
+			return new StatementList( [ ...this, statement ], this.fieldNotes, this.notesEdited );
 		}
 
 		return new StatementList( [ ...this ].map(
 			( existing ) => existing.propertyName.toString() === statement.propertyName.toString() ? statement : existing,
-		) );
+		), this.fieldNotes, this.notesEdited );
 	}
 
 	private filter( callback: ( property: Statement ) => boolean ): StatementList {
 		return new StatementList(
 			[ ...this ].filter( callback ),
+            this.fieldNotes, this.notesEdited,
 		);
 	}
 

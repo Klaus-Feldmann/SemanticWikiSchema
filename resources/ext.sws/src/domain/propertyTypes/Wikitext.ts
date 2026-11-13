@@ -2,9 +2,9 @@ import type { PropertyDefinition } from '@/domain/PropertyDefinition';
 import { BasePropertyType } from '@/domain/PropertyType';
 import { TextType, type TextProperty } from './Text';
 import { newStringValue, ValueType, type StringValue } from '@/domain/Value';
-export interface WikitextProperty extends TextProperty { readonly execute: boolean; readonly wikitext: string }
+export interface WikitextProperty extends TextProperty { readonly wikitext: string }
 export function isSchemaExecution( property: Pick<PropertyDefinition, 'type'> & { readonly execute?: boolean } ): boolean {
-	return property.type === 'wikitext' && ( property as WikitextProperty ).execute === true;
+	return property.type === 'wikitext';
 }
 export class WikitextType extends BasePropertyType<WikitextProperty, StringValue> {
 	public static readonly typeName = 'wikitext';
@@ -20,7 +20,7 @@ export class WikitextType extends BasePropertyType<WikitextProperty, StringValue
 	}
 
 	public createPropertyDefinitionFromJson( base: PropertyDefinition, json: any ): WikitextProperty {
-		return { ...new TextType().createPropertyDefinitionFromJson( base, json ), execute: json.execute ?? false, wikitext: json.wikitext ?? '' };
+		return { ...new TextType().createPropertyDefinitionFromJson( base, json ), wikitext: json.wikitext ?? '' };
 	}
 }
 

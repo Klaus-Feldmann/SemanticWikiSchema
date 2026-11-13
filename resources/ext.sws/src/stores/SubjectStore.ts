@@ -1,3 +1,4 @@
+import type { LocalizedIdentity } from '@/domain/LocalizedIdentity';
 import { defineStore } from 'pinia';
 import { SubjectId } from '@/domain/SubjectId';
 import { Subject } from '@/domain/Subject';
@@ -134,6 +135,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				subject.getStatements(),
 				dependentSubjects,
 				comment,
+				subject.getIdentity(),
 			);
 
 			this.recordWriteResult( result, schemaEpoch );
@@ -162,6 +164,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				dependentSubjects,
 				comment,
 				subject.getId(),
+				subject.getIdentity(),
 			);
 		},
 		async deleteSubject( subjectId: SubjectId, comment?: string ): Promise<void> {
@@ -241,6 +244,7 @@ export const useSubjectStore = defineStore( 'subject', {
 			dependentSubjects: DependentSubjects,
 			comment?: string,
 			id?: SubjectId,
+			identity?: LocalizedIdentity | null,
 		): Promise<SubjectId> {
 			const schemaEpoch = useSchemaStore().mutationEpoch;
 
@@ -252,6 +256,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				dependentSubjects,
 				comment,
 				id,
+				identity,
 			);
 
 			this.recordWriteResult( result, schemaEpoch );
@@ -267,6 +272,7 @@ export const useSubjectStore = defineStore( 'subject', {
 			dependentSubjects: DependentSubjects,
 			comment?: string,
 			id?: SubjectId,
+			identity?: LocalizedIdentity | null,
 		): Promise<SubjectId> {
 			const schemaEpoch = useSchemaStore().mutationEpoch;
 
@@ -278,6 +284,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				dependentSubjects,
 				comment,
 				id,
+				identity,
 			);
 
 			this.recordWriteResult( result, schemaEpoch );
@@ -295,6 +302,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				comment,
 				undefined,
 				subject.getId(),
+				subject.getIdentity(),
 			);
 		},
 
@@ -310,6 +318,7 @@ export const useSubjectStore = defineStore( 'subject', {
 			comment?: string,
 			pageTitle?: string,
 			id?: SubjectId,
+			identity?: LocalizedIdentity | null,
 		): Promise<CreatedSubjectPage> {
 			const schemaEpoch = useSchemaStore().mutationEpoch;
 
@@ -321,6 +330,7 @@ export const useSubjectStore = defineStore( 'subject', {
 				comment,
 				pageTitle,
 				id,
+				identity,
 			);
 
 			this.recordWriteResult( result, schemaEpoch );

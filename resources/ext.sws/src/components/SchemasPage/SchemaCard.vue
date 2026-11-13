@@ -9,7 +9,7 @@
 					:id="headingId"
 					class="ext-sws-schema-card__name"
 				>
-					<a :href="schemaUrl">{{ summary.name }}</a>
+					<a :href="schemaUrl">{{ schemaSummaryLabel( summary ) }}{{ summary.id ? ` (${ summary.id })` : '' }}</a>
 				</h2>
 				<span
 					v-if="canEdit || canDuplicate || canDelete"
@@ -36,10 +36,10 @@
 			</div>
 
 			<p
-				v-if="summary.description !== ''"
+				v-if="schemaSummaryDescription( summary ) !== ''"
 				class="ext-sws-schema-card__description"
 			>
-				{{ summary.description }}
+				{{ schemaSummaryDescription( summary ) }}
 			</p>
 
 			<ul
@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { schemaSummaryLabel, schemaSummaryDescription } from '@/presentation/schemaSummaryLabel';
 import { computed, ref, watch } from 'vue';
 import { CdxButton, CdxIcon, useGeneratedId, useIntersectionObserver } from '@wikimedia/codex';
 import { cdxIconAdd, cdxIconEdit } from '@wikimedia/codex-icons';
@@ -151,7 +152,7 @@ const subjectsNote = computed( () => {
 } );
 
 const schemaUrl = computed( () => mw.util.getUrl( `Schema:${ props.summary.name }` ) );
-const subjectListUrl = computed( () => mw.util.getUrl( `Special:Subjects/${ props.summary.name }` ) );
+const subjectListUrl = computed( () => mw.util.getUrl( `Special:Entities/${ props.summary.name }` ) );
 
 // As many rows as the Schema has Subjects to show, so the card keeps its height as they arrive.
 const pendingRows = computed( () => Math.min( props.subjectCount ?? SUBJECT_PREVIEW_SIZE, SUBJECT_PREVIEW_SIZE ) );

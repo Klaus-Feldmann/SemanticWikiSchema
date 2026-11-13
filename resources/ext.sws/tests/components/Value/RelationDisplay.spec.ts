@@ -93,7 +93,7 @@ describe( 'RelationDisplay.vue', () => {
 
 		const wrapper = mountDisplay( relationsTo( FOUND_ID ) );
 
-		expect( wrapper.find( 'a' ).attributes( 'href' ) ).toBe( `/wiki/Special:Subject/${ FOUND_ID }` );
+		expect( wrapper.find( 'a' ).attributes( 'href' ) ).toBe( `/wiki/Special:Entity/${ FOUND_ID }` );
 	} );
 
 	// A host that says where relations lead outranks the mode: it is showing Subjects, not pages.
@@ -140,7 +140,7 @@ describe( 'RelationDisplay.vue', () => {
 
 		const link = wrapper.find( 'a.new' );
 		expect( link.text() ).toBe( MISSING_ID );
-		expect( link.attributes( 'href' ) ).toBe( `/wiki/Special:Subject/${ MISSING_ID }` );
+		expect( link.attributes( 'href' ) ).toBe( `/wiki/Special:Entity/${ MISSING_ID }` );
 	} );
 
 	it( 'says on a red link that its target was not found', () => {

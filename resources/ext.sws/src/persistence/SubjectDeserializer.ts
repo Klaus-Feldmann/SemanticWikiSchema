@@ -1,3 +1,4 @@
+import { identityFromJson } from '@/domain/LocalizedIdentity';
 import { SubjectId } from '@/domain/SubjectId';
 import { PageIdentifiers } from '@/domain/PageIdentifiers';
 import { StatementList } from '@/domain/StatementList';
@@ -24,7 +25,8 @@ export class SubjectDeserializer {
 		const schema = schemaReferenceName( json.schema );
 
 		const pageIdentifiers = new PageIdentifiers( json.pageId, json.pageTitle );
-		const statementList = this.deserializeStatements( json.statements );
+		const parsed = this.deserializeStatements( json.statements );
+		const statementList = new StatementList( [ ...parsed ], json.fieldNotes || {} );
 
 		return new Subject(
 			id,
@@ -35,6 +37,7 @@ export class SubjectDeserializer {
 			statementList,
 			pageIdentifiers,
 			hostSubjectFromJson( json.hostSubject ),
+			identityFromJson( json ), json.schema,
 		);
 	}
 

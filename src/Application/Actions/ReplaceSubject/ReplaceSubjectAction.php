@@ -60,7 +60,9 @@ readonly class ReplaceSubjectAction {
 		?string $label,
 		array $statements,
 		?string $comment,
-		array $dependentSubjects = []
+		array $dependentSubjects = [],
+        ?array $fieldNotes = null,
+		?array $identity = null
 	): void {
 		$pageIdentifiers = $this->hostingPageResolver->resolveReadableHostingPage( $subjectId );
 
@@ -84,7 +86,12 @@ readonly class ReplaceSubjectAction {
 
 		$priorViolations = $this->proposedSubjectValidator->validate( $subject );
 
+		if ( $identity !== null ) {
+			$terms = \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $identity );
+		}
 		$subject->setLabel( SubjectLabel::fromText( $label ) );
+		if ( $identity !== null ) { $subject->setIdentity( $terms ); }
+        if ( $fieldNotes !== null ) { $subject->setFieldNotes( \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $fieldNotes, $subject->getFieldNotes(), $fieldNotes === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) ); }
 		$subject->setStatements( $this->statementListBuilder->build( $statements ) );
 
 		$proposedViolations = $this->proposedSubjectValidator->validate( $subject, $newDependentSubjects );

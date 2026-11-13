@@ -49,19 +49,19 @@ describe( 'SchemasTable', () => {
 		const artwork = row( mountTable(), 1 );
 
 		expect( artwork.find( 'a[href="/wiki/Schema:Artwork"]' ).text() ).toBe( 'Artwork' );
-		expect( artwork.find( 'a[href="/wiki/Special:Subjects/Artwork"]' ).text() ).toBe( 'sws-schema-subject-count30' );
+		expect( artwork.find( 'a[href="/wiki/Special:Entities/Artwork"]' ).text() ).toBe( 'sws-schema-subject-count30' );
 	} );
 
 	it( 'links to all the Subjects of a Schema whose count it does not know', () => {
 		const artwork = row( mountTable( { subjectCountOf: () => null } ), 1 );
 
-		expect( artwork.find( 'a[href="/wiki/Special:Subjects/Artwork"]' ).text() ).toBe( 'sws-subjects-view-all' );
+		expect( artwork.find( 'a[href="/wiki/Special:Entities/Artwork"]' ).text() ).toBe( 'sws-subjects-view-all' );
 	} );
 
 	it( 'offers no links to the Subjects until the counts arrive', () => {
 		const wrapper = mountTable( { subjectCountOf: () => null, subjectCountPending: true } );
 
-		expect( wrapper.find( 'a[href^="/wiki/Special:Subjects/"]' ).exists() ).toBe( false );
+		expect( wrapper.find( 'a[href^="/wiki/Special:Entities/"]' ).exists() ).toBe( false );
 	} );
 
 	it.each( [
@@ -130,7 +130,7 @@ describe( 'SchemasTable', () => {
 
 		expect( artist.findAll( 'button' ) ).toEqual( [] );
 		expect( artist.findAll( 'a' ).map( ( link ) => link.attributes( 'href' ) ) )
-			.toEqual( [ '/wiki/Schema:Artist', '/wiki/Special:Subjects/Artist' ] );
+			.toEqual( [ '/wiki/Schema:Artist', '/wiki/Special:Entities/Artist' ] );
 	} );
 
 	it( 'ties the buttons and the Subjects link of each row to its Schema', () => {
@@ -148,7 +148,7 @@ describe( 'SchemasTable', () => {
 		expect( describedAs( wrapper, findButton( demo, 'sws-edit-schema' ) ) ).toEqual( [ 'Validation Demo' ] );
 		expect( describedAs( wrapper, findButton( demo, MORE_ACTIONS ) ) ).toEqual( [ 'Validation Demo' ] );
 		expect( describedAs( wrapper, findButton( demo, CREATE_SUBJECT ) ) ).toEqual( [ 'Validation Demo' ] );
-		expect( describedAs( wrapper, demo.find( 'a[href="/wiki/Special:Subjects/Validation Demo"]' ) ) )
+		expect( describedAs( wrapper, demo.find( 'a[href="/wiki/Special:Entities/Validation Demo"]' ) ) )
 			.toEqual( [ 'Validation Demo' ] );
 	} );
 

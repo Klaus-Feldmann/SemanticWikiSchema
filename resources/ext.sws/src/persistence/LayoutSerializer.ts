@@ -4,7 +4,7 @@ export class LayoutSerializer {
 
 	public serializeLayout( layout: Layout ): string {
 		const data: Record<string, unknown> = {
-			schema: layout.getSchema(),
+			schema: layout.getSchemaReference(),
 			type: layout.getType(),
 		};
 

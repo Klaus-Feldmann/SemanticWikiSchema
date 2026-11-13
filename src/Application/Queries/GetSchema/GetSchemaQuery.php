@@ -13,12 +13,14 @@ readonly class GetSchemaQuery {
 	public function __construct(
 		private GetSchemaPresenter $presenter,
 		private SchemaLookup $schemaLookup,
-		private SchemaPresentationSerializer $serializer
+		private SchemaPresentationSerializer $serializer,
+        private ?\Closure $canonicalName = null,
 	) {
 	}
 
 	public function execute( string $schemaName ): void {
-		$schema = $this->schemaLookup->getSchema( new SchemaName( $schemaName ) );
+		$name = $this->canonicalName === null ? new SchemaName( $schemaName ) : ( $this->canonicalName )( $schemaName );
+        $schema = $this->schemaLookup->getSchema( $name );
 
 		if ( $schema === null ) {
 			$this->presenter->presentSchemaNotFound();

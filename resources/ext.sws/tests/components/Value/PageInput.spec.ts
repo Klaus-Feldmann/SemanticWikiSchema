@@ -123,10 +123,10 @@ describe( 'Page schema and search behavior', () => {
 		const w = createTestWrapper( PageAttributesEditor, { property: newPageProperty() } );
 		w.findComponent( CdxSelect ).vm.$emit( 'update:selected', 102 );
 		await w.vm.$nextTick();
-		expect( w.emitted( 'update:property' )![ 0 ] ).toEqual( [ { pageNamespace: 102 } ] );
+		expect( w.emitted( 'update:property' )![ 0 ] ).toEqual( [ { pageNamespace: 102, assignCategories: false } ] );
 		w.findComponent( CdxSelect ).vm.$emit( 'update:selected', '' );
 		await w.vm.$nextTick();
-		expect( w.emitted( 'update:property' )![ 1 ] ).toEqual( [ { pageNamespace: undefined } ] );
+		expect( w.emitted( 'update:property' )![ 1 ] ).toEqual( [ { pageNamespace: undefined, assignCategories: false } ] );
 	} );
 	it( 'shows a lookup failure without claiming that the page is missing', async () => {
 		vi.mocked( fetch ).mockRejectedValue( new Error( 'offline' ) );

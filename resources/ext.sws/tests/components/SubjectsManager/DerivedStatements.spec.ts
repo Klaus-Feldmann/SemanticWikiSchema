@@ -82,7 +82,7 @@ describe( 'read-only derived entity values in the data view', () => {
 		const { wrapper: w } = show();
 		await flushPromises();
 		expect( w.find( 'dt' ).exists() ).toBe( true );
-		expect( w.text() ).toContain( 'sws-derived-missing' );
+		expect( w.text() ).toContain( 'sws-notes-source-missing' );
 		expect( w.text() ).not.toContain( 'Mensch' );
 		w.unmount();
 	} );
@@ -91,10 +91,16 @@ describe( 'read-only derived entity values in the data view', () => {
 		currentField.values = [];
 		const { wrapper: w } = show();
 		await flushPromises();
-		expect( w.text() ).toContain( 'sws-derived-unavailable' );
-		expect( w.text() ).not.toContain( 'sws-derived-missing' );
+		expect( w.text().match( /sws-notes-source-unavailable/g ) ).toHaveLength( 1 );
+		expect( w.text() ).not.toContain( 'sws-notes-source-missing' );
 		w.unmount();
 	} );
+	it( 'does not mistake an empty stored string list for a manual source override', async () => {
+        currentField.status = 'unavailable'; currentField.values = [];
+        const { wrapper: w } = show( '' ); await flushPromises();
+        expect( w.text().match( /sws-notes-source-unavailable/g ) ).toHaveLength( 1 );
+        expect( w.text() ).not.toContain( 'sws-derived-own' ); w.unmount();
+    } );
 	it( 'renders language-tagged source text without converting it into a page link', async () => {
 		currentField = { ...field,
 			values: [ { kind: 'text', value: 'Avram Noam Chomsky', language: 'en', rank: 'normal' } ] };
@@ -118,7 +124,7 @@ describe( 'read-only derived entity values in the data view', () => {
 		currentField.values[ 0 ].url = window.location.origin + '/wiki/Q5';
 		const { wrapper: w } = show();
 		await flushPromises();
-		expect( w.text() ).toContain( 'sws-derived-unavailable' );
+		expect( w.text().match( /sws-notes-source-unavailable/g ) ).toHaveLength( 1 );
 		expect( w.text() ).not.toContain( 'Mensch' );
 		w.unmount();
 	} );
@@ -127,7 +133,7 @@ describe( 'read-only derived entity values in the data view', () => {
 		const { wrapper: w, subject } = show( 'Eigene Forschung' );
 		await flushPromises();
 		expect( w.text() ).toContain( 'Eigene Forschung' );
-		expect( w.text() ).toContain( 'sws-derived-unavailable' );
+		expect( w.text() ).not.toContain( 'sws-notes-source-unavailable' );
 		expect( subject.getStatementValue( new PropertyName( 'Klassifizierung' ) ) ).toEqual( newStringValue( 'Eigene Forschung' ) );
 		w.unmount();
 	} );

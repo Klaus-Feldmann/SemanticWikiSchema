@@ -35,6 +35,8 @@ readonly class CreateSubjectPageRequest {
 		public ?string $id = null,
 
 		public array $dependentSubjects = [],
+        public array $fieldNotes = [],
+		public ?array $identity = null,
 	) {
 	}
 

@@ -56,7 +56,8 @@ class ValidateSubjectApi extends SimpleHandler {
 				self::PARAM_DESCRIPTION => 'Accepted for parity with the create endpoints but ignored: a label is '
 					. 'optional, so nothing about it can be violated.',
 			],
-			'statements' => [
+			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
+            'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,

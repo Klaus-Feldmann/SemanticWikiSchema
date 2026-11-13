@@ -59,11 +59,17 @@ readonly class RdfNamespaces {
 		return new Iri( $this->baseUri . '/prop/' . self::localName( $propertyName ) );
 	}
 
-	public function schemaClass( SchemaName $schemaName ): Iri {
-		return new Iri( $this->baseUri . '/schema/' . self::localName( $schemaName->getText() ) );
+	public function schemaClass( SchemaName $schemaName, ?string $source = null ): Iri {
+        $prefix = $source === null ? '/schema/' : '/schema-source/' . self::localName( $source ) . '/';
+        return new Iri( $this->baseUri . $prefix . self::localName( $schemaName->getText() ) );
 	}
 
-	public function relationNode( RelationId $id ): Iri {
+	public function identifiedSchemaClass( \ProfessionalWiki\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): Iri {
+        $prefix = $source === null ? '/schema-id/' : '/schema-source-id/' . self::localName( $source ) . '/';
+        return new Iri( $this->baseUri . $prefix . $id->text );
+    }
+
+    public function relationNode( RelationId $id ): Iri {
 		return new Iri( $this->baseUri . '/relation/' . $id->asString() );
 	}
 
@@ -196,6 +202,8 @@ readonly class RdfNamespaces {
 			'neo-subj' => $this->subjectIriBase(),
 			'neo-prop' => $this->baseUri . '/prop/',
 			'neo-schema' => $this->baseUri . '/schema/',
+            'sws-schema' => $this->baseUri . '/schema-id/',
+            'sws-entity' => $this->subjectIriBase(),
 			'neo-rel' => $this->baseUri . '/relation/',
 			'neo-page' => $this->baseUri . '/page/',
 			'rdf' => self::RDF,

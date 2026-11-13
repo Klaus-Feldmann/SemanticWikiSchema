@@ -37,11 +37,17 @@ readonly class Mapping {
 		public MappingName $name,
 		public array $prefixes,
 		public array $schemas,
+        public array $schemaIds = [],
 	) {
 	}
 
-	public function forSchema( SchemaName $schema ): ?SchemaMapping {
-		return $this->schemas[$schema->getText()] ?? null;
+	public function forSchema( SchemaName|\ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): ?SchemaMapping {
+        if ( $schema instanceof \ProfessionalWiki\SWS\Domain\Schema\SchemaReference ) {
+            if ( !$schema->isLocal() ) { return null; }
+            if ( $schema->id !== null ) { return $this->schemaIds[$schema->id->text] ?? null; }
+            $schema = $schema->name;
+        }
+        return $this->schemas[$schema->getText()] ?? null;
 	}
 
 	/**
@@ -49,7 +55,7 @@ readonly class Mapping {
 	 */
 	public function getSchemaNames(): array {
 		// PHP turns a Schema name of digits alone into an integer key.
-		return array_map( strval( ... ), array_keys( $this->schemas ) );
+		return array_map( strval( ... ), array_keys( $this->schemas + $this->schemaIds ) );
 	}
 
 }

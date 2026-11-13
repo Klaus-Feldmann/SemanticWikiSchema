@@ -39,13 +39,14 @@
 import { CdxField, CdxIcon, CdxTextArea, CdxButton } from '@wikimedia/codex';
 import { cdxIconInfo } from '@wikimedia/codex-icons';
 import { toRef, computed } from 'vue';
-import { WikitextProperty, WikitextType, newWikitextValue } from '@/domain/propertyTypes/Wikitext';
+import type { TextProperty } from '@/domain/propertyTypes/Text';
+import { newWikitextValue } from '@/domain/propertyTypes/Wikitext';
 import { ValueInputEmits, ValueInputExposes, ValueInputProps } from '@/components/Value/ValueInputContract';
 import { useStringValueInput } from '@/composables/useStringValueInput.ts';
 import { violationStatus } from '@/composables/useServerViolations.ts';
 import { SWSServices } from '@/SWSServices.ts';
 const props = withDefaults(
-	defineProps<ValueInputProps<WikitextProperty>>(),
+	defineProps<ValueInputProps<TextProperty>>(),
 	{
 		modelValue: undefined,
 		label: ''
@@ -54,7 +55,7 @@ const props = withDefaults(
 
 const emit = defineEmits<ValueInputEmits>();
 
-const propertyType = SWSServices.getPropertyTypeRegistry().getType( WikitextType.typeName );
+const propertyType = SWSServices.getPropertyTypeRegistry().getType( props.property.type );
 
 const {
 	displayValues,

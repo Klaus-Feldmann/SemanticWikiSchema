@@ -1,0 +1,27 @@
+[
+  {
+    "name": "sws_id_counter",
+    "comment": "SWS stable identities: additive administration; no page or revision data is rewritten.",
+    "columns": [
+      {
+        "name": "swsic_kind",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swsic_value",
+        "type": "bigint",
+        "options": {
+          "notnull": true
+        }
+      }
+    ],
+    "indexes": [],
+    "pk": [
+      "swsic_kind"
+    ]
+  }
+]

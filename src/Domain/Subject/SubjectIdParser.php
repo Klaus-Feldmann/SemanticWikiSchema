@@ -18,7 +18,8 @@ use InvalidArgumentException;
 readonly class SubjectIdParser {
 
 	public function __construct(
-		private string $localSourceKey
+		private string $localSourceKey,
+        private ?\Closure $canonicalize = null,
 	) {
 	}
 
@@ -40,7 +41,7 @@ readonly class SubjectIdParser {
 		$id = new SubjectId( $text );
 
 		if ( $id->source !== $this->localSourceKey ) {
-			return $id;
+			return $id->isLocal() && $this->canonicalize !== null ? ( $this->canonicalize )( $id ) : $id;
 		}
 
 		// An id qualified with the local key is a local id, so what follows the key must satisfy the
@@ -50,7 +51,8 @@ readonly class SubjectIdParser {
 			throw new InvalidArgumentException( "Subject ID has the wrong format: '$text'" );
 		}
 
-		return new SubjectId( $id->localId );
+		$local = new SubjectId( $id->localId );
+        return $this->canonicalize === null ? $local : ( $this->canonicalize )( $local );
 	}
 
 	public function getLocalSourceKey(): string {

@@ -1,3 +1,4 @@
+import type { LocalizedIdentity } from './LocalizedIdentity';
 import { SubjectId } from '@/domain/SubjectId';
 import type { StatementList } from '@/domain/StatementList';
 import type { Schema, SchemaName } from '@/domain/Schema';
@@ -106,7 +107,8 @@ export interface SubjectRepository {
 		statements: StatementList,
 		dependentSubjects: readonly Subject[],
 		comment?: string,
-		id?: SubjectId
+		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult>;
 
 	/**
@@ -121,7 +123,8 @@ export interface SubjectRepository {
 		statements: StatementList,
 		dependentSubjects: readonly Subject[],
 		comment?: string,
-		id?: SubjectId
+		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult>;
 
 	/**
@@ -141,7 +144,8 @@ export interface SubjectRepository {
 		dependentSubjects: readonly Subject[],
 		comment?: string,
 		pageTitle?: string,
-		id?: SubjectId
+		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectPageWriteResult>;
 
 	/**
@@ -159,7 +163,8 @@ export interface SubjectRepository {
 		label: string | null,
 		statements: StatementList,
 		dependentSubjects: readonly Subject[],
-		comment?: string
+		comment?: string,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult>;
 
 	deleteSubject( id: SubjectId, comment?: string ): Promise<boolean>;

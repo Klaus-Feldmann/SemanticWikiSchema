@@ -37,7 +37,8 @@
 
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue';
-import { CdxField, CdxTextInput, CdxSelect } from '@wikimedia/codex';
+import { CdxField, CdxTextInput } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import type { PropertyDefinition } from '@/domain/PropertyDefinition';
 import { newStringValue, ValueType, type Value } from '@/domain/Value';
 import type { ValueInputProps, ValueInputEmits, ValueInputExposes } from './ValueInputContract';

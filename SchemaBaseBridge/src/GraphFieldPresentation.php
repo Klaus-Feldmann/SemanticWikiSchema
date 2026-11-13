@@ -24,7 +24,8 @@ final class GraphFieldPresentation {
 				...( $subject !== null && $property->getPropertyType() === 'historicalDate' ? [ 'ownDateParts' => self::ownDateParts( $subject, $name, $language, $property->getWikiLink() ?? [] ) ] : [] ),
 				...( $subject !== null && in_array( $property->getPropertyType(), [ 'image', 'historicalDate' ], true ) ? [ ( $property->getPropertyType() === 'image' ? 'ownImages' : 'ownDates' ) => self::ownImages( $subject, $name ) ] : [] ) ];
 		}
-		return [ 'version' => 1, 'language' => $language, 'pageUrlTemplate' => $pageUrlTemplate, 'definitions' => $definitions ];
+		return [ 'version' => 1, 'language' => $language,
+            ...( $subject?->getIdentity() === null ? [] : [ 'ownIdentity'=>$subject->getIdentity()->toJson(), 'ownDescription'=>$subject->getIdentity()->description( $language ) ] ), 'pageUrlTemplate' => $pageUrlTemplate, 'definitions' => $definitions ];
 	}
 	private static function ownUrls( Subject $subject, string $name ): array {
 		$value = $subject->getStatements()->getStatement( new PropertyName( $name ) )?->getValue();

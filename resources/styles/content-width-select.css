@@ -1,0 +1,9 @@
+.ext-sws-content-width-select { display: inline-grid; grid-template-areas: 'select'; width: max-content; max-width: 100%; min-width: 0; vertical-align: top; align-self: start; }
+.ext-sws-content-width-select__measure { grid-area: select; visibility: hidden; min-width: 0; overflow: hidden; height: 0; pointer-events: none; white-space: nowrap; padding-inline: 12px calc(16px + 1.25rem); border-inline: 1px solid transparent; }
+.ext-sws-content-width-select__measure > span { display: block; }
+.ext-sws-content-width-select > .cdx-select-vue { grid-area: select; width: 100%; min-width: 0; max-width: 100%; }
+.ext-sws-content-width-select .cdx-select-vue__handle { min-width: 0; white-space: nowrap; }
+.ext-sws-content-width-select .cdx-select-vue__selected-label,
+.ext-sws-content-width-select .cdx-menu-item__text__label { white-space: nowrap; }
+
+.ext-sws-content-width-select--has-icon .ext-sws-content-width-select__measure { padding-inline-start: calc(20px + 1.25rem); }

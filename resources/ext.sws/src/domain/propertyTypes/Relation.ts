@@ -2,7 +2,7 @@ import type { PropertyDefinition } from '@/domain/PropertyDefinition';
 import { PropertyName } from '@/domain/PropertyDefinition';
 import { newRelation, RelationValue, ValueType } from '@/domain/Value';
 import { BasePropertyType } from '@/domain/PropertyType';
-import { isLocalSchemaReference, type SchemaReference } from '@/domain/SchemaReference';
+import { isLocalSchemaReference, schemaReferenceName, type SchemaReference } from '@/domain/SchemaReference';
 import type { Schema } from '@/domain/Schema';
 
 export interface RelationProperty extends PropertyDefinition {
@@ -21,7 +21,7 @@ export interface RelationProperty extends PropertyDefinition {
  * given another type since a Statement was written has none.
  */
 export function localTargetSchemaNames( property: RelationProperty ): string[] {
-	return ( property.targetSchemas ?? [] ).filter( isLocalSchemaReference );
+	return ( property.targetSchemas ?? [] ).filter( isLocalSchemaReference ).map( schemaReferenceName );
 }
 
 /**

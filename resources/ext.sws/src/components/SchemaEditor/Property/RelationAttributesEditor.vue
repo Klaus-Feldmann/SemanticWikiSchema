@@ -82,7 +82,7 @@ async function createTargetSchema( schemaName: string, subjectsAreDependent: boo
 
 	// The wiki saved the Schema under its page title, which is the name the field would list it by.
 	if ( schema !== null ) {
-		updateTargetSchemas( [ ...props.property.targetSchemas, normalizeSchemaName( schema.getName() ) ] );
+		updateTargetSchemas( [ ...props.property.targetSchemas, ( schema.getId() ? schema.getReference() : normalizeSchemaName( schema.getName() ) ) ] );
 	}
 }
 

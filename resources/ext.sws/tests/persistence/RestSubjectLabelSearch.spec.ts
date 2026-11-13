@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, onTestFinished } from 'vitest';
 import { RestSubjectLabelSearch } from '@/persistence/RestSubjectLabelSearch';
 import { InMemoryHttpClient } from '@/infrastructure/HttpClient/InMemoryHttpClient';
 
@@ -15,9 +15,19 @@ function jsonResponse( body: unknown ): Response {
 
 describe( 'RestSubjectLabelSearch', () => {
 
+	it( 'requests interface-language labels and retains saved descriptions', async () => {
+		vi.stubGlobal( 'mw', { config: { get: () => 'en' } } );
+		onTestFinished( () => {
+			vi.unstubAllGlobals();
+		} );
+		const result = { id: 'E1', label: 'Goedel', description: 'Mathematician', pageTitle: 'Kurt Gödel' };
+		const search = newSearch( { [ `${ SEARCH_URL }&language=en` ]: jsonResponse( [ result ] ) } );
+		expect( await search.searchSubjectLabels( 'acme', undefined ) ).toEqual( [ result ] );
+	} );
+
 	it( 'asks for the Subjects of the Schemas it is given', async () => {
 		const search = newSearch( {
-			[ `${ SEARCH_URL }&schema=Company%7CPerson` ]: jsonResponse( [
+			[ `${ SEARCH_URL }&schemaKey=Company%7CPerson` ]: jsonResponse( [
 				{ id: 's1demo1aaaaaaa1', label: 'ACME Inc.' },
 			] ),
 		} );
@@ -28,7 +38,7 @@ describe( 'RestSubjectLabelSearch', () => {
 	} );
 
 	// The client this search is given answers no other URL, so a request carrying an empty
-	// `schema=` would throw rather than pass.
+	// `schemaKey=` would throw rather than pass.
 	it( 'names no Schema when it is given none', async () => {
 		const search = newSearch( {
 			[ SEARCH_URL ]: jsonResponse( [ { id: 's1demo1aaaaaaa1', label: 'ACME Inc.' } ] ),

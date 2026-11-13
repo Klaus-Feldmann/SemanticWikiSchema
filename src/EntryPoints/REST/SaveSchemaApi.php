@@ -25,7 +25,7 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 			'contentmodel' => SchemaContent::CONTENT_MODEL_ID,
 			'text' => $this->getSchemaJson(),
 			'summary' => $this->getComment(),
-		];
+		] + (isset($this->getValidatedBody()['baseRevisionId']) ? ['baserevid'=>(string)$this->getValidatedBody()['baseRevisionId']] : []);
 	}
 
 	/**
@@ -33,7 +33,7 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 	 * object, such as an empty `propertyDefinitions`, would come back out as a list. Unicode-normalized here as that
 	 * layer does before decoding: the edit cannot, as the JSON passed to it escapes all non-ASCII text.
 	 */
-	private function getSchemaJson(): string {
+	protected function getSchemaJson(): string {
 		if ( $this->schemaJson === null ) {
 			$body = json_decode( UtfNormalValidator::cleanUp( (string)$this->getRequest()->getBody() ) );
 			$this->schemaJson = (string)json_encode( is_object( $body ) ? $body->schema ?? null : null );
@@ -86,7 +86,8 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 
 	public function getBodyParamSettings(): array {
 		return [
-			'schema' => [
+			'baseRevisionId' => [ self::PARAM_SOURCE=>'body', ParamValidator::PARAM_TYPE=>'integer', ParamValidator::PARAM_REQUIRED=>false ],
+            'schema' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,

@@ -31,7 +31,9 @@ readonly class SchemaReferenceParser {
 	 * @throws InvalidArgumentException When $json is not a well-formed reference.
 	 */
 	public function fromJson( mixed $json ): SchemaReference {
-		return $this->normalizer->normalize( SchemaReference::fromJson( $json, $this->localSourceKey ) );
+		$reference = SchemaReference::fromJson( $json, $this->localSourceKey );
+		// IDs are not page-name spellings; even a legacy normalizer must not turn one back into a name.
+		return $reference->id !== null ? $reference : $this->normalizer->normalize( $reference );
 	}
 
 	/**

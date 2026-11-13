@@ -88,7 +88,6 @@ import SchemaEditor from '@/components/SchemaEditor/SchemaEditor.vue';
 import type { SchemaEditorExposes } from '@/components/SchemaEditor/SchemaEditor.vue';
 import { Schema } from '@/domain/Schema.ts';
 import { PropertyDefinitionList } from '@/domain/PropertyDefinitionList.ts';
-import { useSchemaStore } from '@/stores/SchemaStore.ts';
 import type { SaveBlocker } from '@/components/common/SaveBlocker.ts';
 
 const props = withDefaults( defineProps<{
@@ -109,10 +108,6 @@ const emit = defineEmits<{
 	change: [];
 }>();
 
-const schemaStore = useSchemaStore();
-
-const DEBOUNCE_DELAY = 300;
-
 const baseSchema = props.duplicateOf ?? new Schema( '', '', new PropertyDefinitionList( [] ), false );
 
 const schemaName = ref( props.initialName );
@@ -123,8 +118,6 @@ const nameError = ref( '' );
 const nameStatus = ref<ValidationStatusType>( 'default' );
 const nameInput = ref<InstanceType<typeof CdxTextInput> | null>( null );
 const schemaEditorRef = ref<SchemaEditorExposes | null>( null );
-let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-let requestSequence = 0;
 
 // The Schema editor focuses a duplicate's first property definition; the name is the field to fill in first. A new
 // Schema is left to Codex, which focuses the name itself: focusing it sooner stops Codex returning the focus on close.
@@ -142,8 +135,6 @@ function onNameInput(): void {
 	nameError.value = '';
 	nameStatus.value = 'default';
 	emit( 'change' );
-	clearDebounceTimer();
-	requestSequence++;
 
 	const name = schemaName.value.trim();
 
@@ -153,44 +144,14 @@ function onNameInput(): void {
 		return;
 	}
 
-	const expectedSequence = requestSequence;
-	debounceTimer = setTimeout( () => checkDuplicateName( name, expectedSequence ), DEBOUNCE_DELAY );
-}
-
-async function checkDuplicateName( name: string, expectedSequence: number ): Promise<void> {
-	const exists = await schemaStore.schemaNameExists( name );
-
-	if ( expectedSequence !== requestSequence ) {
-		return;
-	}
-
-	if ( exists ) {
-		nameError.value = mw.msg( 'sws-schema-creator-name-taken' );
-		nameStatus.value = 'error';
-	}
-}
-
-function clearDebounceTimer(): void {
-	if ( debounceTimer !== null ) {
-		clearTimeout( debounceTimer );
-		debounceTimer = null;
-	}
 }
 
 async function validate(): Promise<boolean> {
-	clearDebounceTimer();
-	requestSequence++;
 
 	const name = schemaName.value.trim();
 
 	if ( !name ) {
 		nameError.value = mw.msg( 'sws-schema-creator-name-required' );
-		nameStatus.value = 'error';
-		return false;
-	}
-
-	if ( await schemaStore.schemaNameExists( name ) ) {
-		nameError.value = mw.msg( 'sws-schema-creator-name-taken' );
 		nameStatus.value = 'error';
 		return false;
 	}
@@ -206,7 +167,7 @@ function getSchema(): Schema | null {
 	}
 
 	return ( schemaEditorRef.value?.getSchema() ?? baseSchema )
-		.withName( name )
+		.asNew( name )
 		.withDescription( schemaDescription.value.trim() )
 		.withSubjectsAreDependent( subjectsAreDependent.value );
 }

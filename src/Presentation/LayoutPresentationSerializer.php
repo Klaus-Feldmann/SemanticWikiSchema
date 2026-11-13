@@ -11,7 +11,7 @@ class LayoutPresentationSerializer {
 
 	public function serialize( Layout $layout ): string {
 		$data = [
-			'schema' => $layout->getSchema()->getText(),
+			'schema' => $layout->getSchemaReference()->toJson(),
 			'type' => $layout->getType(),
 		];
 

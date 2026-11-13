@@ -26,6 +26,9 @@ class SubjectContentHandler extends JsonContentHandler {
 		ParserOutput &$parserOutput
 	): void {
 		$parserOutput->setContentHolderText( '' );
+		if ( $content instanceof SubjectContent ) {
+			\ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories( $content, $cpoParams, $parserOutput );
+		}
 	}
 
 	/**

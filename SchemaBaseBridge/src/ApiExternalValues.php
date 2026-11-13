@@ -16,7 +16,8 @@ final class ApiExternalValues extends ApiBase {
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $p['language'] ) !== 1 ) {
 			$this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' );
 		}
-		$data = ( new ExternalValuesLookup( $this->getContext() ) )->read( $title, $p );
+		try { $data = ( new ExternalValuesLookup( $this->getContext() ) )->read( $title, $p ); }
+		catch ( \RuntimeException ) { $this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' ); }
 		$this->getResult()->addValue( null, $this->getModuleName(), $data );
 	}
 

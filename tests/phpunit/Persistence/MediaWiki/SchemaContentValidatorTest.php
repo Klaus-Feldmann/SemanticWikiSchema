@@ -200,7 +200,7 @@ JSON
 		);
 
 		$this->assertContains(
-			'A target schema must be a Schema name, or an object with a source key and a name. Neither may be empty or have surrounding whitespace.',
+			'A target schema must be a legacy name/source-name reference or an explicit S-ID reference.',
 			$validator->getErrors()
 		);
 	}
@@ -215,7 +215,7 @@ JSON
 		);
 
 		$this->assertContains(
-			'A target schema must be a Schema name, or an object with a source key and a name. Neither may be empty or have surrounding whitespace.',
+			'A target schema must be a legacy name/source-name reference or an explicit S-ID reference.',
 			$validator->getErrors()
 		);
 	}

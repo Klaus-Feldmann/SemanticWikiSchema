@@ -25,6 +25,6 @@ final class FieldSnapshot {
             }
             $statements[$statement->getPropertyName()->text] = ['values'=>$parts];
         }
-        return new FieldValues($definitions,['id'=>$subject->id->text,'schema'=>$subject->getSchemaReference()->toJson(),'statements'=>$statements],$external);
+        return new FieldValues($definitions,['id'=>$subject->id->text,'schema'=>$subject->getSchemaReference()->toJson(),'statements'=>$statements,'fieldNotes'=>$subject->getFieldNotes()],$external);
     }
 }

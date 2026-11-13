@@ -6,7 +6,6 @@ namespace ProfessionalWiki\SWS\EntryPoints\Actions;
 
 use FormlessAction;
 use MediaWiki\Html\Html;
-use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\Title\Title;
 use ProfessionalWiki\SWS\Domain\Page\PageId;
@@ -67,9 +66,7 @@ class SubjectsAction extends FormlessAction {
 			return false;
 		}
 
-		return MediaWikiServices::getInstance()
-			->getNamespaceInfo()
-			->isContent( $title->getNamespace() );
+		return \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
 	}
 
 }

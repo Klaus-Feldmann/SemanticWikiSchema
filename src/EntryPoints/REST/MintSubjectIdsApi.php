@@ -12,7 +12,8 @@ use Wikimedia\ParamValidator\ParamValidator;
 
 /**
  * Mints a batch of unused Subject IDs so an importer can wire relations between interlinked Subjects
- * before creating them. Stateless: no reservation, no graph dependency. See docs/api/subject-format.md.
+ * before creating them. Reservations are confirmed with the request transaction; minting requires
+ * write access and CSRF validation.
  */
 class MintSubjectIdsApi extends SimpleHandler {
 
@@ -21,10 +22,14 @@ class MintSubjectIdsApi extends SimpleHandler {
 
 	public function __construct(
 		private readonly SubjectIdMinter $subjectIdMinter,
+		private readonly ?\ProfessionalWiki\SWS\Presentation\CsrfValidator $csrfValidator = null,
 	) {
 	}
 
 	public function run(): Response {
+		if ( $this->csrfValidator === null ) { throw new \LogicException( 'Mint API requires CSRF validation' ); }
+		$this->csrfValidator->verifyCsrfToken();
+		if ( !$this->getAuthority()->isAllowed( 'edit' ) ) { return $this->getResponseFactory()->createHttpError( 403, [ 'message'=>'Edit permission required' ] ); }
 		$count = $this->getValidatedBody()['count'];
 
 		if ( $count < self::MIN_COUNT || $count > self::MAX_COUNT ) {
@@ -37,13 +42,14 @@ class MintSubjectIdsApi extends SimpleHandler {
 		return $this->getResponseFactory()->createJson( [
 			'subjectIds' => array_map(
 				static fn ( SubjectId $id ): string => $id->text,
-				$this->subjectIdMinter->mint( $count )
+				$this->subjectIdMinter->mint( $count, $this->getValidatedBody()['requestKey'] ?? null )
 			),
 		] );
 	}
 
 	public function getBodyParamSettings(): array {
 		return [
+			'requestKey' => [ self::PARAM_SOURCE=>'body', ParamValidator::PARAM_TYPE=>'string', ParamValidator::PARAM_REQUIRED=>false ],
 			'count' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'integer',
@@ -55,7 +61,7 @@ class MintSubjectIdsApi extends SimpleHandler {
 	}
 
 	public function needsWriteAccess(): bool {
-		return false;
+		return true;
 	}
 
 }

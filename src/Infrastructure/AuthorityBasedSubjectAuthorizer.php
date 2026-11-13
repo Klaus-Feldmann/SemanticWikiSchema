@@ -18,7 +18,8 @@ class AuthorityBasedSubjectAuthorizer implements SubjectPermissionHints, Subject
 
 	public function __construct(
 		private Authority $authority,
-		private TitleFactory $titleFactory
+		private TitleFactory $titleFactory,
+		private ?\Closure $titleIsEligible = null
 	) {
 	}
 
@@ -46,6 +47,7 @@ class AuthorityBasedSubjectAuthorizer implements SubjectPermissionHints, Subject
 
 			// definitelyCan reads permissions from a replica and only peeks at the edit rate limit.
 			$this->canEditPageById[$pageId->id] = $title !== null
+				&& ( $this->titleIsEligible === null || ( $this->titleIsEligible )( $title ) )
 				&& $this->authority->definitelyCan( 'edit', $title );
 		}
 
@@ -69,7 +71,9 @@ class AuthorityBasedSubjectAuthorizer implements SubjectPermissionHints, Subject
 	 * the write against the edit rate limit.
 	 */
 	private function authorizeEditOf( ?Title $title ): bool {
-		return $title !== null && $this->authority->authorizeWrite( 'edit', $title );
+		return $title !== null
+			&& ( $this->titleIsEligible === null || ( $this->titleIsEligible )( $title ) )
+			&& $this->authority->authorizeWrite( 'edit', $title );
 	}
 
 	/**

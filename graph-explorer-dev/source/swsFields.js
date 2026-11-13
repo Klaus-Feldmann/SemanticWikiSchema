@@ -43,6 +43,7 @@ export function readPresentation(data, pageId, subjectId, origin) {
     if (def.ownDateParts !== undefined && (!Array.isArray(def.ownDateParts) || def.ownDateParts.some(v=>!validDateParts(v)))) throw new Error('Invalid own date presentation');
     if (link?.externalTarget !== undefined && !['source','local'].includes(link.externalTarget)) throw new Error('Invalid link target');
   }
+  if (meta.ownDescription !== undefined && meta.ownDescription !== null && typeof meta.ownDescription !== 'string') throw new Error('Invalid own description');
   const fields = new Map();
   for (const field of data.fields) {
     const def = meta.definitions.find(d => d.name === field.name);
@@ -180,7 +181,7 @@ export function createSWSFields(React, options = {}) {
       const stop=e=>e.stopPropagation();
       const link=(text,href)=>href?h('a',{href,target:'_blank',rel:'noopener noreferrer',onClick:stop,onPointerDown:stop,onMouseDown:stop,onDoubleClick:stop},text):text;
       const rows=orderedRows(this.state.presentation,this.props.nativeProps,origin);
-      return h('div',{className:CLASS},...rows.map((row,index)=>h('div',{key:index,className:CLASS+'-row'},
+      return h('div',{className:CLASS},this.state.presentation.ownDescription ? h('div',{className:CLASS+'-own-description'},this.state.presentation.ownDescription) : null,...rows.map((row,index)=>h('div',{key:index,className:CLASS+'-row'},
         h('div',{className:CLASS+'-key',title:row.name},link(row.name,row.labelHref)),
         h('div',{className:CLASS+'-values'},
           ...row.own.map((v,i)=>h('div',{className:CLASS+'-value',key:'own'+i},

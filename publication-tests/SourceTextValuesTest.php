@@ -31,8 +31,8 @@ final class SourceTextValuesTest extends TestCase {
     public function testOwnTextWins(): void {
         self::assertSame(['Geburtsname=Eigene Angabe','Kontrolle=Bleibt'],$this->rows($this->reader([], 'unavailable',['Eigene Angabe'])));
     }
-    public function testUnavailableStillAbortsBeforePublishing(): void {
-        $this->expectException(InvalidArgumentException::class);$this->reader([],'unavailable')->collectForAnnotations();
+    public function testUnavailableDoesNotBlockOtherFields(): void {
+        self::assertSame(['Kontrolle=Bleibt'],$this->rows($this->reader([],'unavailable')));
     }
     public function testMultipleLanguagesAndRanksStayInReadValues(): void {
         $claims=[];

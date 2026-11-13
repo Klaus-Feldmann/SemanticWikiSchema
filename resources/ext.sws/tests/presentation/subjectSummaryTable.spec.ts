@@ -78,7 +78,7 @@ describe( 'subjectSummaryTable', () => {
 	it( 'links to the Subject on a subject-first wiki', () => {
 		onWiki( true );
 
-		expect( summaryUrl( SUMMARY ) ).toBe( '/wiki/Special:Subject/s1demo1aaaaaaa1' );
+		expect( summaryUrl( SUMMARY ) ).toBe( '/wiki/Special:Entity/s1demo1aaaaaaa1' );
 	} );
 
 	it( 'links to the Subject\'s row on its page\'s Data tab on a page-first wiki', () => {

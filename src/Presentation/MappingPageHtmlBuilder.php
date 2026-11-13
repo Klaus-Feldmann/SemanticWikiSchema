@@ -52,7 +52,8 @@ class MappingPageHtmlBuilder {
 
 		$schemas = $mapping->schemas;
 
-		$this->schemaTitles = $this->resolveSchemaTitles( $schemas );
+		$idSchemas = ( $mapping->schemaIds ?? null ) instanceof stdClass ? $mapping->schemaIds : new stdClass();
+        $this->schemaTitles = $this->resolveSchemaTitles( (object)( get_object_vars( $schemas ) + get_object_vars( $idSchemas ) ) );
 
 		$html = Html::rawElement(
 			'div',
@@ -61,6 +62,7 @@ class MappingPageHtmlBuilder {
 				. $this->schemasOverviewHtml( $schemas )
 				. $this->prefixesHtml( $mapping->prefixes ?? null )
 				. $this->schemaSectionsHtml( $schemas )
+                . ( get_object_vars( $idSchemas ) === [] ? '' : $this->headingHtml( 'sws-mapping-page-schema-ids' ) . $this->schemasOverviewHtml( $idSchemas ) . $this->schemaSectionsHtml( $idSchemas ) )
 		);
 
 		return new MappingPageRendering( $html, $this->schemaLinks, $this->externalLinks );

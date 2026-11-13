@@ -59,7 +59,7 @@ describe( 'RecentSubjectsTable', () => {
 		const wrapper = mountTable();
 		await flushPromises();
 
-		const link = wrapper.find( 'a[href="/wiki/Special:Subjects"]' );
+		const link = wrapper.find( 'a[href="/wiki/Special:Entities"]' );
 
 		expect( link.text() ).toBe( 'sws-subjects-view-all' );
 		expect( link.element.closest( '.cdx-table__footer' ) ).not.toBeNull();

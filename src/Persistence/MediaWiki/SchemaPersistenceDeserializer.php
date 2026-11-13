@@ -34,8 +34,12 @@ class SchemaPersistenceDeserializer {
 			throw new InvalidArgumentException( 'Invalid JSON' );
 		}
 
+		$version = $json['formatVersion'] ?? 1;
+		if ( !in_array( $version, [1, 2], true ) ) { throw new InvalidArgumentException( 'Unsupported schema content version' ); }
 		return new Schema(
 			name: $schemaName,
+			id: $version === 2 ? new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $json['id'] ?? '' ) : null,
+			identity: $version === 2 ? \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $json ) : null,
 			description: $json['description'] ?? '',
 			properties: $this->propertiesFromJson( $json ),
 			subjectsAreDependent: ( $json['subjectsAreDependent'] ?? false ) === true,

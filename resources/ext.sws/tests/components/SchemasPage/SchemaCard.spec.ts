@@ -201,7 +201,7 @@ describe( 'SchemaCard', () => {
 		const link = findSubjectListLink( mountCard( { subjectCount: 1234 } ) );
 
 		expect( link.text() ).toBe( 'sws-schema-subject-count1,234' );
-		expect( link.attributes( 'href' ) ).toBe( '/wiki/Special:Subjects/Artist' );
+		expect( link.attributes( 'href' ) ).toBe( '/wiki/Special:Entities/Artist' );
 		expect( findSubjectListLink( mountCard( { subjectCount: 0 } ) ).text() ).toBe( 'sws-schema-subject-count0' );
 	} );
 
@@ -209,7 +209,7 @@ describe( 'SchemaCard', () => {
 		const link = findSubjectListLink( mountCard( { subjectCount: null } ) );
 
 		expect( link.text() ).toBe( 'sws-subjects-view-all' );
-		expect( link.attributes( 'href' ) ).toBe( '/wiki/Special:Subjects/Artist' );
+		expect( link.attributes( 'href' ) ).toBe( '/wiki/Special:Entities/Artist' );
 	} );
 
 	it( 'offers no link to its Subjects until the counts arrive', () => {

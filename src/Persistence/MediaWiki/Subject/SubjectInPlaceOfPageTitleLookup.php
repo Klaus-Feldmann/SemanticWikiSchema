@@ -53,6 +53,7 @@ class SubjectInPlaceOfPageTitleLookup {
 		private readonly RevisionPolicy $revisionPolicy,
 		private readonly Closure $newReadAuthorizer,
 		private readonly int $maxPages,
+        private readonly ?Closure $canonicalize = null,
 	) {
 	}
 
@@ -188,7 +189,7 @@ class SubjectInPlaceOfPageTitleLookup {
 		$title = Title::newFromPageIdentity( $publishedRevision->getPage() );
 
 		try {
-			$subject = SubjectDisplayName::inPlaceOfPageTitle( $content->getPageSubjects(), $title->getPrefixedText() );
+			$subject = SubjectDisplayName::inPlaceOfPageTitle( $content->getPageSubjects(), $title->getPrefixedText(), $this->canonicalize );
 		} catch ( Throwable ) {
 			// Subject data that does not deserialize must not take the list down; its page keeps its title.
 			return;

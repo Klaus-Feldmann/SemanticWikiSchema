@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use ProfessionalWiki\SWS\Domain\HistoricalDate;
 use ProfessionalWiki\SWS\Domain\HistoricalCalendar;
 
-/** Pure, schema-driven read model. Caller supplies an authorized snapshot and lazy remote reader.
+/** Pure, schema-driven read model. Caller supplies an authorized snapshot and lazy source reader.
  * No global cache, no network, no store writes. One instance belongs to one snapshot.
  */
 final class FieldValues {
@@ -19,7 +19,12 @@ final class FieldValues {
     }
 
     /** Scalar SMW projection only. Relation identity stays in the snapshot, never coerced to text. */
-    public function collectForAnnotations(string $language = 'de'): array {
+    public function collectForAnnotations(string $language = 'de', bool $includeSourceStates = false): array {
+        if ($includeSourceStates) {
+            foreach ($this->schema['properties'] as $definition) {
+                if (($definition['externalProperty'] ?? null) !== null && $definition['type'] !== 'wikitext') { $this->loadExternal(); break; }
+            }
+        }
         return $this->collectInternal(null,'all',$language,false,true);
     }
 
@@ -29,7 +34,7 @@ final class FieldValues {
         foreach ($this->schema['properties'] as $definition) {
             if ($name !== null && $definition['name'] !== $name) { continue; }
             $type = $definition['type'];
-            if ($type === 'wikitext' || $type === 'image' && !$includeImages) { continue; }
+            if ($type === 'wikitext' || $forAnnotations && $type === 'wikitextValue' || $type === 'image' && !$includeImages) { continue; }
             $found = true;
             $stored = $this->subject['statements'][$definition['name']]['values'] ?? [];
             if ($forAnnotations && $type === 'relation') {
@@ -42,7 +47,7 @@ final class FieldValues {
                 continue;
             }
             $own = $origin === 'external' ? [] : array_values(array_filter($stored,
-                static fn($v) => $v !== null && (!is_string($v) || trim($v) !== '')));
+                static fn($v) => $v !== null && (!is_string($v) || $v !== '')));
             $values = []; $seen = [];
             $add = static function($value, string $source, array $metadata) use (&$values, &$seen): void {
                 if (!is_scalar($value) || is_float($value) && !is_finite($value)) { throw new InvalidArgumentException('Unsupported scalar'); }
@@ -70,6 +75,8 @@ final class FieldValues {
                     if (!is_string($value['url'] ?? null)) { throw new InvalidArgumentException('Invalid URL entry'); }
                     foreach (['label','caption','captionPage'] as $key) { if (isset($value[$key]) && !is_string($value[$key])) { throw new InvalidArgumentException('Invalid URL metadata'); } }
                     $add($value['url'],'own',['raw'=>$value['url'],'urlEntry'=>$value]);
+                } elseif ($type === 'monolingualText' && is_array($value)) {
+                    $add($value['text'],'own',['raw'=>$value]);
                 } elseif ($type === 'select') {
                     $label = null;
                     foreach ($definition['options'] ?? [] as $option) { if ($value === $option['label']) { $label = $value; break; } }
@@ -81,18 +88,12 @@ final class FieldValues {
             $remote = null;
             $status = $own !== [] ? 'own' : 'missing';
             $binding = $definition['externalProperty'] ?? null;
-            if ($own === [] && $binding !== null && $origin !== 'own') {
-                if ($this->external === null) {
-                    $response = ($this->readExternal)();
-                    if (($response['version'] ?? null) !== 1 || ($response['scope'] ?? null) !== 'current' || ($response['mainSubjectId'] ?? null) !== $this->subject['id'] || !is_array($response['fields'] ?? null)) { throw new InvalidArgumentException('Invalid external snapshot'); }
-                    $remoteFields = [];
-                    foreach ($response['fields'] as $field) { if (isset($remoteFields[$field['name']])) { throw new InvalidArgumentException('Duplicate external field'); } $remoteFields[$field['name']] = $field; }
-                    $this->external = $remoteFields;
-                }
+            if ($binding !== null && $origin !== 'own') {
+                $this->loadExternal();
                 $remote = $this->external[$definition['name']] ?? null;
-                if (!$remote || !in_array($remote['status'], ['resolved','missing', ...($type === 'historicalDate' ? ['manual'] : [])], true) || $remote['source'] !== $binding['source'] || $remote['propertyId'] !== $binding['id'] || !is_array($remote['values'] ?? null)) { throw new InvalidArgumentException('External field unavailable: '.$definition['name']); }
-                $status = $remote['status'];
-                foreach ($remote['values'] as $value) {
+                if (!$remote || !in_array($remote['status'], ['resolved','missing','unavailable','unsupported', ...($type === 'historicalDate' ? ['manual'] : [])], true) || $remote['source'] !== $binding['source'] || $remote['propertyId'] !== $binding['id'] || !is_array($remote['values'] ?? null)) { throw new InvalidArgumentException('External field unavailable: '.$definition['name']); }
+                $status = $own !== [] ? 'own' : $remote['status'];
+                foreach ($own === [] && in_array($status,['resolved','manual'],true) ? $remote['values'] : [] as $value) {
                     if ($value['kind'] === 'time' && $type === 'historicalDate') {
                         if (!is_array($value['sourceTime'] ?? null) || !is_string($value['label'] ?? null)) { throw new InvalidArgumentException('Invalid time'); }
                         $add($value['label'],$remote['source'],$value);
@@ -102,12 +103,31 @@ final class FieldValues {
                     } elseif ($value['kind'] === 'entity') {
                         if (!is_string($value['label'] ?? null) || $value['label'] === '' || $value['label'] === $value['id']) { throw new InvalidArgumentException('Missing entity label'); }
                         $add($value['label'],$remote['source'],$value);
+                    } elseif ($type === 'image' && $value['kind'] === 'image') {
+                        if (!$forAnnotations) { $add($value['filename'],$remote['source'],$value); }
                     } elseif (!in_array($value['kind'], ['somevalue','novalue'], true)) { throw new InvalidArgumentException('Unsupported external value'); }
                 }
             }
-            $fields[] = ['name'=>$definition['name'],'type'=>$type,'values'=>$values,'hasStoredValues'=>$stored !== [],'status'=>$status,'externalProperty'=>$binding,'rawStatement'=>$this->subject['statements'][$definition['name']] ?? null,'reason'=>$remote['reason'] ?? null];
+            if($values===[] && $origin==='all' && $type==='text' && $binding===null) {
+                $defaults=$definition['default']??[];
+                if(is_string($defaults)){$defaults=[$defaults];}
+                if(is_array($defaults)){foreach($defaults as$value){if(is_string($value)&&trim($value)!==''){$add($value,'schema',['raw'=>$value,'default'=>true]);}}}
+                if($values!==[]){$status='default';}
+            }
+            $fields[] = (isset($remote['sourceStatus']) ? ['sourceStatus'=>$remote['sourceStatus']] : []) + ($type === 'page' && ($definition['assignCategories'] ?? false) ? ['assignCategories'=>true] : []) + ['name'=>$definition['name'],'type'=>$type,'values'=>$values,'hasStoredValues'=>$stored !== [],'status'=>$status,'externalProperty'=>$binding,'rawStatement'=>$this->subject['statements'][$definition['name']] ?? null,'reason'=>$remote['reason'] ?? null, 'external'=>$remote,
+                'authorNote'=>$this->subject['fieldNotes'][$definition['name']] ?? null];
         }
         if ($name !== null && !$found) { throw new InvalidArgumentException('Field not found: '.$name); }
-        return ['subject'=>$this->subject,'schema'=>$this->schema,'fields'=>$fields];
+        return ['version'=>1,'readOnly'=>true,'subject'=>$this->subject,'schema'=>$this->schema,'fields'=>$fields] + ($forAnnotations ? ['sourceFields'=>$this->external ?? []] : []);
     }
+    private function loadExternal(): void {
+        if ($this->external === null) {
+            $response = ($this->readExternal)();
+            if (($response['version'] ?? null) !== 1 || ($response['scope'] ?? null) !== 'current' || ($response['mainSubjectId'] ?? null) !== $this->subject['id'] || !is_array($response['fields'] ?? null)) { throw new InvalidArgumentException('Invalid external snapshot'); }
+            $remoteFields = [];
+            foreach ($response['fields'] as $field) { if (isset($remoteFields[$field['name']])) { throw new InvalidArgumentException('Duplicate external field'); } $remoteFields[$field['name']] = $field; }
+            $this->external = $remoteFields;
+        }
+    }
+
 }

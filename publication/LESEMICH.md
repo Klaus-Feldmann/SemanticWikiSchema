@@ -1,5 +1,5 @@
-# Semantic WikiSchema 0.1.22
+# Semantic WikiSchema 0.4.03
 
-Eigenständig weiterentwickelter Fork mit eigenen technischen SWS-Kennungen. Ein direkter Austausch mit NeoWiki ist ab dieser Version nicht möglich; vorhandene Installationen benötigen eine abgestimmte Migration. Der Wechsel der angepassten 0.1.20 auf 0.1.22 wurde auf AufEinWort mit erhaltenen Daten und Seiten durchgeführt. Für andere NeoWiki-Ausgangsversionen ist zunächst deren Bestand zu prüfen.
+[Erstinstallation](../docs/operations/install/de/README.md) · [Funktionen und Herkunft](../README.md) · [Prüfstand](VERIFICATION.md)
 
-Siehe MIGRATION-0.1.22.md und VERIFICATION-0.1.22.md. Vorhandene Seiten oder Schemata nicht löschen. Die lokale Installation und lesende MCP-Aufrufe sind bestätigt; eine neue Composer-Installation sowie erneute Exportdownloads dieser Version sind noch nicht verifiziert.
+Softwaredesign: Klaus Feldmann / AufEinWort, Programmierung: ChatGPT/Sophos. Die Urheber- und Lizenzangaben der ursprünglichen Projekte bleiben erhalten.

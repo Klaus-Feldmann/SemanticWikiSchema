@@ -245,7 +245,7 @@ describe( 'SubjectRow', () => {
 	describe( 'the way to the Subject\'s own page', () => {
 
 		const NAME_LINK = 'a.ext-sws-subject-row__name';
-		const URL = '/wiki/Special:Subject/' + SUBJECT_ID;
+		const URL = '/wiki/Special:Entity/' + SUBJECT_ID;
 
 		afterEach( () => {
 			vi.unstubAllGlobals();
@@ -332,7 +332,7 @@ describe( 'SubjectRow', () => {
 			const wrapper = mountRowRelatingToTarget( true );
 
 			expect( wrapper.find( RELATION_LINK ).attributes( 'href' ) )
-				.toBe( '/wiki/Special:Subject/' + TARGET_ID );
+				.toBe( '/wiki/Special:Entity/' + TARGET_ID );
 		} );
 
 		// The page-first answer to the same problem: the target's row on the Data tab of the page

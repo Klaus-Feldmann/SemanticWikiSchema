@@ -14,6 +14,18 @@ trait TakesDependentSubjects {
 	/**
 	 * @return array<string, array<string, mixed>>
 	 */
+	private function identityFromBody( array $body ): ?array {
+		return \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $body );
+	}
+
+	private function identityParamSettings(): array {
+		return [
+			'identityLanguage'=>[ self::PARAM_SOURCE=>'body', ParamValidator::PARAM_TYPE=>'string', ParamValidator::PARAM_REQUIRED=>false ],
+			'labels'=>[ self::PARAM_SOURCE=>'body', ParamValidator::PARAM_TYPE=>'array', ParamValidator::PARAM_REQUIRED=>false ],
+			'descriptions'=>[ self::PARAM_SOURCE=>'body', ParamValidator::PARAM_TYPE=>'array', ParamValidator::PARAM_REQUIRED=>false ],
+		];
+	}
+
 	private function dependentSubjectsParamSettings(): array {
 		return [
 			'dependentSubjects' => [
