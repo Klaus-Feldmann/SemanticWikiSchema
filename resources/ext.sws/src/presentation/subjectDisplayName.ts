@@ -1,3 +1,5 @@
+import { getActivePinia } from 'pinia';
+import { useSchemaStore } from '@/stores/SchemaStore';
 import type { Subject } from '@/domain/Subject';
 import type { Schema } from '@/domain/Schema';
 import type { SubjectNameFields } from '@/domain/HostSubject';
@@ -60,7 +62,7 @@ export function identifyingSubjectName( subject: Subject, schema: Schema | undef
  */
 export function displayNameOf( named: SubjectNameFields ): string {
 	if ( named.hostSubject !== null ) {
-		return mw.msg( 'sws-dependent-subject-name', named.schemaName, displayNameOf( named.hostSubject ) );
+		return mw.msg( 'sws-dependent-subject-name', getActivePinia() ? useSchemaStore().schemas.get( named.schemaName )?.getLabel() ?? named.schemaName : named.schemaName, displayNameOf( named.hostSubject ) );
 	}
 
 	return named.displayNameIsGenerated ? generatedSubjectName( named.id ) : named.displayName;

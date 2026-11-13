@@ -25,6 +25,7 @@ use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
 use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
 use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use Wikimedia\Rdbms\IDBAccessObject;
 
 class MediaWikiSubjectRepository implements SubjectRepository {
 
@@ -108,22 +109,51 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			$pageSubjects->putSubject( $dependentSubject );
 		}
 
-		return $this->saveGuarded( $content, $pageSubjects, $dependentSubjects->getIds(), $pageId, $comment );
+		return $this->saveGuarded( $pageSubjects, $dependentSubjects->getIds(), $pageId, $comment );
 	}
 
 	/**
 	 * @throws DependentSubjectRulesViolatedException
 	 */
 	private function saveGuarded(
-		SubjectContent $content,
 		PageSubjects $pageSubjects,
 		SubjectIdList $suppliedIds,
 		PageId $pageId,
 		?string $comment
 	): PageContentSavingStatus {
-		$content->setPageSubjects( $this->dependentSubjectGuard->admit( $content->getPageSubjects(), $pageSubjects, $suppliedIds ) );
-
-		return $this->saveContent( $content, $pageId, $comment );
+		$revision = $this->revisionLookup->getRevisionByPageId( $pageId->id, 0, IDBAccessObject::READ_LATEST );
+		if ( $revision === null ) {
+			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Page not found' );
+		}
+		return $this->pageContentSaver->updateContentAtRevision(
+			$pageId,
+			$revision->getId(),
+			function ( \MediaWiki\Revision\RevisionRecord $parent ) use ( $pageSubjects, $suppliedIds ): array {
+				$content = $parent->hasSlot( self::SLOT_NAME )
+					? $parent->getContent( self::SLOT_NAME ) : SubjectContent::newEmpty();
+				// A page without a subject slot may receive its first Subject. A foreign or
+				// inaccessible slot must never be read as empty and overwritten.
+				if ( !$content instanceof SubjectContent ) {
+					throw new \RuntimeException( 'Content is not a SubjectContent' );
+				}
+				$previous = $content->getPageSubjects();
+				// Copy from the CAS parent, not an earlier replica/Subject object: normal edits
+				// cannot erase a source result that finished while the editor was open.
+				foreach ( $pageSubjects->getAllSubjects()->asArray() as $subject ) {
+					$prior = $previous->getAllSubjects()->getSubject( $subject->id );
+					if ( $prior !== null && $prior->getSchemaReference()->equals( $subject->getSchemaReference() ) ) {
+						$subject->setSourceSnapshot( $prior->getSourceSnapshot() );
+					}
+				}
+				$next = SubjectContent::newFromData( $this->dependentSubjectGuard->admit( $previous, $pageSubjects, $suppliedIds ) );
+                $title = str_contains( $content->getText(), '"sourceRefresh"' ) ? $this->titleFactory->newFromID( $parent->getPageId() ) : null;
+                if ( $title !== null ) {
+                    $next = \ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt::carryMetadata( $title, $parent, $next );
+                }
+                return [ self::SLOT_NAME => $next ];
+			},
+			CommentStoreComment::newUnsavedComment( $comment ?? 'Update SWS subject' )
+		);
 	}
 
 	private function saveContent( SubjectContent $content, PageId $pageId, ?string $comment = null ): PageContentSavingStatus {
@@ -157,7 +187,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			return new PageContentSavingStatus( PageContentSavingStatus::NO_CHANGES );
 		}
 
-		return $this->saveGuarded( $content, $content->getPageSubjects()->without( $id ), new SubjectIdList( [] ), $pageId, $comment );
+		return $this->saveGuarded( $content->getPageSubjects()->without( $id ), new SubjectIdList( [] ), $pageId, $comment );
 	}
 
 	public function getMainSubject( PageId $pageId ): ?Subject {
@@ -170,7 +200,6 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 
 	public function savePageSubjects( PageSubjects $pageSubjects, PageId $pageId, ?string $comment = null ): PageContentSavingStatus {
 		return $this->saveGuarded(
-			$this->getContentByPageId( $pageId ) ?? SubjectContent::newEmpty(),
 			$pageSubjects,
 			new SubjectIdList( [] ),
 			$pageId,

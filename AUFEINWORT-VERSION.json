@@ -1,33 +1,70 @@
 {
   "name": "SemanticWikiSchema",
-  "testedSWSVersion": "0.1.22+2026-11-08",
-  "bridgeVersion": "0.20.0+2026-11-08",
-  "prepared": "2026-11-08",
+  "testedSWSVersion": "0.4.03",
+  "bridgeVersion": "0.21.1",
+  "prepared": "2026-11-13",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
     "commit": "92cf0e347d40899647cdbb1312c4f0dc09768ae3",
     "version": "0.1.0"
   },
-  "forkMasterAtPreparation": "6203ae0fbae36124036ae97095605cd99e9bb38d",
-  "branch": "semantic-0.1.22",
+  "forkMasterAtPreparation": "4ba83840675620924335a0749d91c8d5e4d280cb",
+  "branch": "semantic-0.4.03",
   "extensionName": "SemanticWikiSchema",
-  "extensionVersion": "0.1.22+2026-11-08",
+  "extensionVersion": "0.4.03",
   "composerPackage": "aufeinwort/semantic-wikischema",
   "minimumMediaWiki": "1.47.0-wmf.24",
   "composerLiveInstallVerified": false,
   "contact": "info@aufeinwort.info",
-  "composerLocalInstallVerified": false,
+  "composerLocalInstallVerified": true,
   "publicationBranches": [
     "master",
-    "semantic-0.1.22"
+    "semantic-0.4.03"
   ],
   "runtimeLiveInstallVerified": true,
-  "runtimeInstallMethod": "Coordinated database-identifier migration from adapted 0.1.20 and full folder replacement",
+  "runtimeInstallMethod": "Operator-confirmed installed baseline; publication runtime files unchanged",
   "previousComposerLiveInstallVerified": {
     "version": "0.1.9-test+2026-11-03",
     "date": "2026-11-03"
   },
-  "inputVersion": "0.1.20+2026-11-08",
-  "mcpLiveReadVerified": true,
-  "databaseMigrationVerified": true
+  "inputVersion": "Operator-supplied installed SWS 0.4.03 on 2026-11-13",
+  "prefixSearchBaseline": "User-confirmed Test4 with categories and PrefixSearch",
+  "verificationLevel": "543 PHP tests, 57 contracts, 3826 UI tests, 71 Graph tests, 12 installer tests; actual Composer first-install check in controlled core layout; installed runtime operator-confirmed",
+  "developmentBuild": "0.4.03",
+  "sourceDataModeDefault": "store",
+  "sourceDataModeOptions": [
+    "store",
+    "cache"
+  ],
+  "existingDataMigrationPerformed": true,
+  "identityContentFormatVersion": 2,
+  "identityTransactionMode": "ordinary primary connection; publication after outer commit",
+  "identityPrefixes": {
+    "schema": "S",
+    "entity": "E",
+    "relationPrepared": "R"
+  },
+  "entityNamespace": {
+    "id": 7480,
+    "en": "Entity",
+    "de": "Entität",
+    "legacyAliases": [
+      "Subject",
+      "Subjekt"
+    ]
+  },
+  "publishedIdentityTermIndex": "sws_search_term; rebuilt from current published revision metadata with RebuildData",
+  "installationPackage": true,
+  "localVerification": {
+    "phpUnitTests": 543,
+    "phpUnitAssertions": 917,
+    "phpContracts": 57,
+    "uiTests": 3826,
+    "uiFiles": 242,
+    "graphTests": 71,
+    "installerTests": 12,
+    "composerFirstInstall": "actual Composer, controlled MediaWiki layout",
+    "fullFreshMediaWikiRuntime": false
+  },
+  "installerLiveInstallVerified": false
 }

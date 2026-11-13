@@ -2,7 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use SWSBaseBridge\DataViewAssembler;
 use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
-use ProfessionalWiki\SWS\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption,WikitextProperty};
+use ProfessionalWiki\SWS\Domain\Schema\Property\{TextProperty,SelectProperty,SelectOption,WikitextProperty,WikitextValueProperty};
 use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
 use ProfessionalWiki\SWS\Domain\Statement;
 use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue,BooleanValue,UrlValue};
@@ -40,11 +40,11 @@ final class DataViewAssemblerTest extends TestCase {
   $v=$this->view([$this->st('Bild','image',new StringValue('commons:Portrait.jpg')),$this->st('Art','select',new StringValue('missing'))],['Art'=>new SelectProperty(new PropertyCore('',false,null),[],false)]);
   self::assertSame('unresolved',$v['fields'][0]['status']);self::assertFalse($v['complete']);self::assertSame('commons',$v['fields'][1]['ownValues'][0]['repository']);
  }
- public function testExecutableSchemaCodeExcludedButPassiveWikitextPreserved():void {
+ public function testSchemaTemplatesExcludedAndUserWikitextPreserved():void {
   $core=new PropertyCore('',false,null);
   $program=WikitextProperty::fromPartialJson($core,['execute'=>true,'wikitext'=>'{{SWS}}']);
-  $passive=WikitextProperty::fromPartialJson($core,[]);
-  $v=$this->view([$this->st('Programm','wikitext',new StringValue('dormant')),$this->st('Notiz','wikitext',new StringValue('{{Beleg}}'))],['Programm'=>$program,'Notiz'=>$passive]);
+  $userWikitext=WikitextValueProperty::fromPartialJson($core,[]);
+  $v=$this->view([$this->st('Programm','wikitext',new StringValue('dormant')),$this->st('Notiz','wikitextValue',new StringValue('{{Beleg}}'))],['Programm'=>$program,'Notiz'=>$userWikitext]);
   self::assertCount(1,$v['fields']);self::assertSame('Notiz',$v['fields'][0]['name']);self::assertSame('{{Beleg}}',$v['fields'][0]['ownValues'][0]['value']);
  }
  public function testRelationTargetAndUnresolvedDateRetainRawValue():void {

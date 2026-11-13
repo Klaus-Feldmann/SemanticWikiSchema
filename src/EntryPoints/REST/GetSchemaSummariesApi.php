@@ -61,6 +61,7 @@ class GetSchemaSummariesApi extends SimpleHandler {
 	private function schemaToSummary( Schema $schema ): array {
 		return [
 			'name' => $schema->getName()->getText(),
+            ...( $schema->getId() === null ? [] : [ 'id'=>$schema->getId()->text ] + $schema->getIdentity()->toJson() ),
 			'description' => $schema->getDescription(),
 			'propertyCount' => count( $schema->getAllProperties()->asMap() ),
 			'subjectsAreDependent' => $schema->subjectsAreDependent(),

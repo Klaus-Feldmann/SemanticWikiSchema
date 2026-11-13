@@ -21,7 +21,7 @@ class LinksRefreshHandler {
 	 * @see LinksUpdateCompleteHook
 	 */
 	public static function onLinksUpdateComplete( LinksUpdate $linksUpdate, mixed $ticket ): void {
-		if ( !self::isRefresh( $linksUpdate ) || !self::changedCategoriesOrPageProperties( $linksUpdate ) ) {
+		if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() || !self::isRefresh( $linksUpdate ) || !self::changedCategoriesOrPageProperties( $linksUpdate ) ) {
 			return;
 		}
 

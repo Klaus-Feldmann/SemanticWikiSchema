@@ -54,6 +54,7 @@ readonly class Neo4jPlugin {
 		Neo4jValueBuilderRegistry $valueBuilderRegistry,
 		LoggerInterface $logger,
 		string $wikiId,
+        ?\Closure $canonicalize = null,
 	) {
 		$this->writeQueryEngine = new Neo4jWriteQueryEngine( $client );
 		$this->projectionStore = new Neo4jProjectionStore(
@@ -63,6 +64,7 @@ readonly class Neo4jPlugin {
 				valueBuilderRegistry: $valueBuilderRegistry,
 				logger: $logger,
 				wikiId: $wikiId,
+                canonicalize: $canonicalize,
 			),
 			// Reuse the write engine the plugin already owns so initialize() creates constraints through it.
 			constraintUpdater: new Neo4jConstraintUpdater( $this->writeQueryEngine ),

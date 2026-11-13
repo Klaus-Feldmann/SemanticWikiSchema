@@ -13,9 +13,15 @@ package-lock.json
 !tests/RedHerb/package-lock.json
 !tests/e2e/package-lock.json
 
-# Installable SemanticWikiSchema branch keeps built assets and graph lockfile.
+# Installable SemanticSWS test branch keeps built assets and graph lockfile.
 !graph-explorer-dev/package-lock.json
 
 # Local publication test output
 graph-explorer-dev/Pruefergebnisse/
 publication-tests/dependencies/vendor/
+
+!publication-tests/dependencies/composer.lock
+__pycache__/
+
+# Also exclude dependency symlinks used only for local checks.
+node_modules

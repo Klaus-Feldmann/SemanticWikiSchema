@@ -9,8 +9,8 @@ use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use Stringable;
 
 /**
- * Which Schema, and where it comes from (ADR 23). Schema identity stays the name (ADR 17); this pairs
- * that name with the Source offering it, which need not be the Source of the Subject using it.
+ * Which Schema, and where it comes from (ADR 23). Legacy schemas keep their names (ADR 17). New schemas use
+ * explicit S-ID references; the Source need not be the Source of the Subject using the schema.
  *
  * A Schema of this wiki is referenced by its bare name, which is its page title in the Schema namespace.
  * That title may itself contain a colon (`ISO:9001`), so a stored string is never split: it is always
@@ -27,7 +27,13 @@ readonly class SchemaReference implements Stringable {
 	private function __construct(
 		public ?string $source,
 		public SchemaName $name,
+		public ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId $id = null,
 	) {
+	}
+
+	public static function identified( \ProfessionalWiki\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): self {
+		if ( $source !== null && !SubjectId::isValidSourceKey( $source ) ) { throw new InvalidArgumentException( 'Invalid Schema source' ); }
+		return new self( $source, new SchemaName( $id->text ), $id );
 	}
 
 	public static function local( SchemaName $name ): self {
@@ -55,6 +61,11 @@ readonly class SchemaReference implements Stringable {
 	 * @throws InvalidArgumentException When $json is not a well-formed reference.
 	 */
 	public static function fromJson( mixed $json, string $localSourceKey ): self {
+		if ( is_array( $json ) && array_key_exists( 'id', $json ) ) {
+			$ref = \ProfessionalWiki\SWS\Domain\Identity\IdentityReference::fromJson( $json, $localSourceKey );
+			if ( !$ref->id instanceof \ProfessionalWiki\SWS\Domain\Identity\SchemaId ) { throw new InvalidArgumentException( 'Expected a Schema ID' ); }
+			return self::identified( $ref->id, $ref->source );
+		}
 		if ( is_string( $json ) ) {
 			return self::local( new SchemaName( $json ) );
 		}
@@ -71,10 +82,11 @@ readonly class SchemaReference implements Stringable {
 	}
 
 	/**
-	 * @return string|array{source: string, name: string} A local reference keeps the bare string every
+	 * @return string|array A legacy local reference keeps the bare string every
 	 *   stored reference has always used; only a sourced one costs the object form.
 	 */
 	public function toJson(): string|array {
+		if ( $this->id !== null ) { return ( new \ProfessionalWiki\SWS\Domain\Identity\IdentityReference( $this->id, $this->source ) )->toJson(); }
 		if ( $this->source === null ) {
 			return $this->name->getText();
 		}
@@ -95,7 +107,7 @@ readonly class SchemaReference implements Stringable {
 	}
 
 	public function equals( self $other ): bool {
-		return $this->source === $other->source && $this->name->getText() === $other->name->getText();
+		return $this->source === $other->source && ( $this->id === null ) === ( $other->id === null ) && $this->name->getText() === $other->name->getText();
 	}
 
 	public function __toString(): string {

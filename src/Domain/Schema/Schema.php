@@ -13,7 +13,18 @@ readonly class Schema {
 		private string $description,
 		private PropertyDefinitions $properties,
 		private bool $subjectsAreDependent,
+		private ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId $id = null,
+		private ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity = null,
 	) {
+		if ( $id !== null && ( $name->getText() !== $id->text || $identity === null ) ) {
+			throw new \InvalidArgumentException( 'Schema ID must match its ID page and have identity metadata' );
+		}
+	}
+
+	public function getId(): ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId { return $this->id; }
+	public function getIdentity(): ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity { return $this->identity; }
+	public function getReference(): SchemaReference {
+		return $this->id === null ? SchemaReference::local( $this->name ) : SchemaReference::identified( $this->id );
 	}
 
 	public function getName(): SchemaName {
@@ -21,7 +32,7 @@ readonly class Schema {
 	}
 
 	public function getDescription(): string {
-		return $this->description;
+		return $this->identity === null ? $this->description : ( $this->identity->description() ?? '' );
 	}
 
 	/**

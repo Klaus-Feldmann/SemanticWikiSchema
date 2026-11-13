@@ -2,7 +2,7 @@
 // Isolated integration contract: real SWS hooks, stand-in MediaWiki services/parser/job execution.
 namespace Harness {
  final class State {
-  public static $schema,$subject,$old,$parser,$fail=false,$error=false;
+  public static $schema,$subject,$old,$parser,$current=null,$fail=false,$error=false;
   public static array $deferred=[],$queued=[],$dependencies=[],$ids=[],$conditions=[];
   public static int $refresh=0,$purges=0,$rebuilds=0,$logs=0;
  }
@@ -22,7 +22,7 @@ namespace MediaWiki\Title {
   public function __construct(public string $name='Regiomontanus',public int $latest=42,public string $model='wikitext'){}
   public static function newFromID($id){return new self('Page'.$id);}
   public static function newFromText($name){return new self($name);}
-  public function getText(){return $this->name;}
+  public function getText(){return $this->name;} public function getPrefixedText(){return $this->name;} public function isExternal(){return false;} public function getNamespace(){return str_starts_with($this->name,'Kategorie:')?14:0;} public function getDBkey(){return str_replace(' ','_',substr($this->name,10));}
   public function canExist(){return true;}
   public function getContentModel(){return $this->model;}
   public function getLatestRevID(){return $this->latest;}
@@ -33,7 +33,7 @@ namespace MediaWiki\Revision {
  class SlotRecord {public const MAIN='main'; public function __construct(private bool $inherited){} public function isInherited(){return $this->inherited;} }
  class RevisionAccessException extends \Exception{}
  class RevisionRecord {
-  public const RAW=1;
+  public const RAW=1, DELETED_TEXT=2; public function userCan(...$args){return true;}
   public function __construct(public $main,public $neo=null,public bool $inherited=false){}
   public function getContent($role){return $role==='main'?$this->main:$this->neo;}
   public function hasSlot($role){return $role==='main'||$this->neo!==null;}
@@ -41,13 +41,16 @@ namespace MediaWiki\Revision {
  }
 }
 namespace MediaWiki\Parser {
+ class ParserOutput {
+  public array $data=[], $categories=[];
+  public function getExtensionData($key){return $this->data[$key]??null;}
+  public function setExtensionData($key,$value){$this->data[$key]=$value;}
+  public function getCategoryNames(){return array_keys($this->categories);}
+  public function addCategory($name,$sort){$this->categories[$name]=$sort;}
+ }
  class Parser {
   public const OT_HTML=1;
-  public function __construct(public $title,public int $revision=42,public bool $message=false,public int $type=1){$this->output=new class{
-   public array $data=[];
-   public function getExtensionData($key){return $this->data[$key]??null;}
-   public function setExtensionData($key,$value){$this->data[$key]=$value;}
-  };}
+  public function __construct(public $title,public int $revision=42,public bool $message=false,public int $type=1){$this->output=new ParserOutput;}
   public $output;
   public function getOutputType(){return $this->type;}
   public function getOptions(){return new class($this->message){public function __construct(private $message){}public function isMessage(){return $this->message;}};}
@@ -65,8 +68,8 @@ namespace MediaWiki\JobQueue\Jobs {class RefreshLinksJob{
 namespace MediaWiki {
  class MediaWikiServices {
   public static function getInstance(){return new self;}
-  public function hasService($name){return false;}
-  public function getRevisionLookup(){return new class{public function getRevisionById($id){return \Harness\State::$old;}};}
+  public function hasService($name){return false;} public function getNamespaceInfo(){return new class{ public function getCanonicalNamespaces(){return [0=>'',14=>'Category'];} };}
+  public function getRevisionLookup(){return new class{public function getRevisionById($id){return \Harness\State::$old;} public function getRevisionByTitle($title){return \Harness\State::$current;}};}
   public function getJobQueueGroup(){return new class{public function push($job){\Harness\State::$queued[]=$job;}};}
   public function getWikiPageFactory(){return new class{public function newFromTitle($title){return new class($title){
    public function __construct(private $title){}public function doPurge(){\Harness\State::$purges++;}public function getTitle(){return $this->title;}
@@ -92,7 +95,7 @@ namespace ProfessionalWiki\SWS\Infrastructure {
 }
 namespace ProfessionalWiki\SWS\EntryPoints\Content {
  class SchemaContent{public function __construct(private string $text){}public function getText(){return $this->text;}}
- class SubjectContent{public function __construct(private $subject){}public function getPageSubjects(){return new class($this->subject){public function __construct(private $subject){}public function getMainSubject(){return $this->subject;}};}}
+ class SubjectContent{public function __construct(private $subject){}public function getPageSubjects(){if($this->subject instanceof \ProfessionalWiki\SWS\Domain\Page\PageSubjects)return $this->subject; return new class($this->subject){public function __construct(private $subject){}public function getMainSubject(){return $this->subject;} public function getAllSubjects(){return new class($this->subject){ public function __construct(private $subject){} public function asArray(){return $this->subject ? [$this->subject] : [];} };}};}}
 }
 namespace ProfessionalWiki\SWS {
  class SWSExtension {
@@ -136,14 +139,14 @@ namespace {
  function drain(){while(S::$deferred){$f=array_shift(S::$deferred);$f();}}
  S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}'),'SMW'=>field(true,'{{SWS}}'),'Weiter'=>field(true,'{{PAGENAME}}')]),false);
  S::$subject=new class{public function getSchemaReference(){return SchemaReference::local(new SchemaName('Person'));}};
- check(SchemaWikitext::programs(S::$schema)===['{{SWS}}','{{PAGENAME}}'],'Only explicit programs run, in schema order');
+ check(SchemaWikitext::programs(S::$schema)===['{{NichtAusfuehren}}','{{SWS}}','{{PAGENAME}}'],'Only explicit programs run, in schema order');
  check(SchemaWikitext::append('Seiteninhalt',[])==='Seiteninhalt','Empty program changes page');
  check(SchemaWikitext::append('Seiteninhalt',['{{SWS}}'])==="Seiteninhalt\n\n{{SWS}}",'Program is not appended');
- foreach([['execute'=>true,'wikitext'=>' '],['execute'=>'true','wikitext'=>'{{X}}'],['execute'=>true,'wikitext'=>[]]]as $bad){try{WP::fromPartialJson(new PropertyCore('',false,null),$bad);check(false,'Bad activation accepted');}catch(\InvalidArgumentException){check(true,'Invalid activation refused');}}
+ foreach([['execute'=>'true','wikitext'=>'{{X}}'],['execute'=>true,'wikitext'=>[]]]as $bad){try{WP::fromPartialJson(new PropertyCore('',false,null),$bad);check(false,'Bad activation accepted');}catch(\InvalidArgumentException){check(true,'Invalid activation refused');}}
  $title=new Title;$source='Unveränderter Quelltext';$parser=new Parser($title);
  Hooks::onParserBeforeInternalParse($parser,$source,null);
  check(str_contains($source,'{{SWS}}'),'Schema program missing from host parse');
- check(!str_contains($source,'NichtAusfuehren'),'Inactive code executed');
+ check(str_contains($source,'NichtAusfuehren'),'Legacy schema code must execute without switch');
  check(S::$dependencies===['Person'],'Schema dependency not recorded');
  $once=$source;Hooks::onParserBeforeInternalParse($parser,$source,null);check($source===$once,'Recursive parse duplicated program');
  foreach([new Parser($title,41),new Parser($title,42,true),new Parser($title,42,false,2),new Parser(new Title('Schema:Person',42,'SWSSchema'))]as $p){$text='Original';Hooks::onParserBeforeInternalParse($p,$text,null);check($text==='Original','Program ran in wrong context');}
@@ -158,15 +161,27 @@ namespace {
  resetState();S::$old=$revision;$deleted=new RevisionRecord('Seiteninhalt',new SubjectContent(null));Hooks::onRevisionFromEditComplete($page,$deleted,1,null,$tags);drain();check(S::$refresh===1,'Last-subject removal did not refresh stale annotations');
  resetState();S::$old=$revision;Hooks::onRevisionFromEditComplete($page,new RevisionRecord('Seiteninhalt'),1,null,$tags);drain();check(S::$refresh===1,'Removed subject slot did not refresh stale annotations');
  resetState();S::$fail=true;Hooks::onRevisionFromEditComplete($page,$revision,false,null,$tags);drain();check(count(S::$queued)===1&&S::$queued[0]->parameters()['page']===true,'Failure did not queue bounded retry');check(S::$rebuilds===0,'Graph rebuilt after failed page refresh');
- resetState();S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}')]),false);Hooks::onRevisionFromEditComplete($page,$revision,false,null,$tags);check(S::$deferred===[],'Ordinary subject save without program scheduled work');
+ resetState();S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'')]),false);Hooks::onRevisionFromEditComplete($page,$revision,false,null,$tags);check(S::$deferred===[],'Ordinary subject save without program scheduled work');
  // Schema activation/removal must target indexed pages even if no template was ever in their source.
  $schemaPage=new class{public function getTitle(){return new Title('Person',42,'SWSSchema');}};
  $code=['propertyDefinitions'=>['SMW'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'{{SWS}}']]];
  resetState();Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent(json_encode($code))),false,null,$tags);drain();check(count(S::$queued)===1,'Schema activation did not schedule its subjects');
- S::$ids=range(1,101);$job=array_shift(S::$queued);check($job->run(),'Schema batch failed');check(count(S::$queued)===101,'Batch did not limit pages and schedule continuation');check(S::$conditions===['swss_schema'=>'Person','swss_is_main'=>1],'Batch is not scoped to the schema main subjects');
+ S::$ids=range(1,101);$job=array_shift(S::$queued);check($job->run(),'Schema batch failed');check(count(S::$queued)===101,'Batch did not limit pages and schedule continuation');check(S::$conditions===['swss_schema'=>'Person'],'Batch is not scoped to the schema subjects, including dependent subjects');
  $next=array_pop(S::$queued);check($next->parameters()['after']===100,'Cursor wrong');S::$queued=[];$next->run();check(count(S::$queued)===1,'Continuation did not process remaining page');
  resetState();S::$old=new RevisionRecord(new SchemaContent(json_encode($code)));Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent('{"propertyDefinitions":{}}')),1,null,$tags);drain();check(count(S::$queued)===1,'Removing execution field did not schedule cleanup');
  resetState();S::$old=new RevisionRecord(new SchemaContent(json_encode($code)));Hooks::onRevisionFromEditComplete($schemaPage,new RevisionRecord(new SchemaContent(json_encode($code))),1,null,$tags);check(S::$deferred===[],'Unchanged schema program scheduled unnecessary work');
  $job=Hooks::refreshJob($title);check($job->params['recursive']===false&&$job->params['useRecursiveLinksUpdate']===false,'Refresh could recurse');check(!isset($job->params['rootJobTimestamp']),'Refresh can reuse inherited parser output');
+ // Category-only schema: ordinary display parse and no-SMW refresh scheduling.
+ resetState();
+ $category=\ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty::fromPartialJson(new PropertyCore('',false,null),['pageNamespace'=>14,'assignCategories'=>true]);
+ S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Kategorien'=>$category]),false);
+ S::$subject=\ProfessionalWiki\SWS\Tests\Data\TestSubject::build(schemaName:new SchemaName('Person'),statements:new \ProfessionalWiki\SWS\Domain\Subject\StatementList([new \ProfessionalWiki\SWS\Domain\Statement(new \ProfessionalWiki\SWS\Domain\Schema\PropertyName('Kategorien'),'page',new \ProfessionalWiki\SWS\Domain\Value\StringValue('Kategorie:Goethe'))]));
+ $subjects=new \ProfessionalWiki\SWS\Domain\Page\PageSubjects(S::$subject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap);
+ S::$current=new RevisionRecord('Inhalt',new SubjectContent($subjects));
+ $parser=new Parser($title);$source='Inhalt';Hooks::onParserBeforeInternalParse($parser,$source,null);
+ check($parser->getOutput()->categories===['Goethe'=>''],'Category missing from ordinary display parse');
+ check($source==='Inhalt','Category assignment edited page wikitext');
+ Hooks::onRevisionFromEditComplete($page,S::$current,false,null,$tags);
+ check(count(S::$deferred)===1,'Category-only save without SMW did not schedule refresh');
  echo "$checks wikitext hook/storage/refresh contract checks passed (isolated MediaWiki stand-ins).\n";
 }

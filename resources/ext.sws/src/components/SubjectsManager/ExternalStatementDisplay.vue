@@ -32,6 +32,8 @@
 			<span v-else>{{ $i18n( 'sws-derived-' + value.kind ).text() }}</span>
 		</span></span>
 		<span v-else>{{ wordSeparator }}{{ $i18n( 'sws-derived-' + field.status ).text() }}</span>
+		<small v-if="field.retained"> {{ $i18n( 'sws-source-retained' ).text() }}</small>
+		<small v-if="field.languageFallback && field.language"> {{ $i18n( 'sws-source-language-fallback', field.language ).text() }}</small>
 	</div>
 </template>
 

@@ -6,6 +6,7 @@ namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
 
 use LogicException;
 use MediaWiki\Content\JsonContent;
+use MediaWiki\Content\WikitextContent;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\SlotRecord;
@@ -34,7 +35,7 @@ class PublishedPageJsonLookup {
 	}
 
 	/**
-	 * Null when the page publishes no revision, or when the revision's content could not be read,
+	 * Null when the page publishes no revision, is a Wikitext redirect, or its content could not be read,
 	 * which the next call may well manage and so is not cached.
 	 */
 	public function getJson( Title $page ): ?string {
@@ -64,7 +65,7 @@ class PublishedPageJsonLookup {
 			return $content->getText();
 		}
 
-		if ( $content === null ) {
+		if ( $content === null || ( $content instanceof WikitextContent && $content->isRedirect() ) ) {
 			return false;
 		}
 

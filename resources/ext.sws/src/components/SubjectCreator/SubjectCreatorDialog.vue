@@ -196,6 +196,7 @@
 </template>
 
 <script setup lang="ts">
+import type { LocalizedIdentity } from '@/domain/LocalizedIdentity';
 import { ref, shallowRef, computed, watch, nextTick, onMounted } from 'vue';
 import { CdxAccordion, CdxDialog, CdxField, CdxMessage, CdxRadio } from '@wikimedia/codex';
 import type { ValidationMessages, ValidationStatusType } from '@wikimedia/codex';
@@ -791,7 +792,7 @@ function openSubjectStep( schema: Schema, id: SubjectId ): void {
 		schema.getName(),
 		schema.initialStatements(),
 		UNANSWERED_PAGE,
-		null
+		null, null, schema.getReference()
 	);
 }
 
@@ -886,8 +887,8 @@ async function writeRootSubject( subject: Subject, dependentSubjects: DependentS
 	}
 
 	const subjectId = answer.besideMainSubject ?
-		await createBesideMainSubject( pageId, label, schemaName, statements, dependentSubjects, comment, subject.getId() ) :
-		await subjectStore.createMainSubject( pageId, label, schemaName, statements, dependentSubjects, comment, subject.getId() );
+		await createBesideMainSubject( pageId, label, schemaName, statements, dependentSubjects, comment, subject.getId(), subject.getIdentity() ) :
+		await subjectStore.createMainSubject( pageId, label, schemaName, statements, dependentSubjects, comment, subject.getId(), subject.getIdentity() );
 
 	writtenRoot = { subjectId, pageId, pageTitle: answer.pageTitle };
 }
@@ -905,7 +906,8 @@ function asWrittenRoot( subject: Subject, written: { subjectId: SubjectId; pageI
 		subject.getSchemaName(),
 		subject.getStatements(),
 		new PageIdentifiers( written.pageId ?? 0, written.pageTitle ?? '' ),
-		subject.getHostSubject()
+		subject.getHostSubject(),
+		subject.getIdentity(), subject.getSchemaReference()
 	);
 }
 
@@ -922,10 +924,11 @@ async function createBesideMainSubject(
 	statements: StatementList,
 	dependentSubjects: DependentSubjects,
 	comment: string,
-	id: SubjectId
+	id: SubjectId,
+	identity?: LocalizedIdentity | null
 ): Promise<SubjectId> {
 	try {
-		return await subjectStore.createOtherSubject( pageId, label, schemaName, statements, dependentSubjects, comment, id );
+		return await subjectStore.createOtherSubject( pageId, label, schemaName, statements, dependentSubjects, comment, id, identity );
 	} catch ( error ) {
 		if ( error instanceof SubjectIdInUseError && givenSubjectId.value === undefined ) {
 			return id;
@@ -966,7 +969,8 @@ async function createOnNewPage(
 			dependentSubjects,
 			comment,
 			title,
-			subject.getId()
+			subject.getId(),
+			subject.getIdentity()
 		);
 	} catch ( error ) {
 		if ( error instanceof PageTitleTakenError ) {

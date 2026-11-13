@@ -1,3 +1,4 @@
+import { schemaSummaryLabel } from '@/presentation/schemaSummaryLabel';
 import { defineStore } from 'pinia';
 import { Schema } from '@/domain/Schema.ts';
 import { SWSExtension } from '@/SWSExtension.ts';
@@ -35,12 +36,13 @@ async function pageThroughSchemaSummaries(): Promise<SchemaSummary[]> {
 		cursor = page.nextCursor;
 	} while ( cursor !== null );
 
-	return summaries.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+	return summaries.sort( ( a, b ) => schemaSummaryLabel( a ).localeCompare( schemaSummaryLabel( b ) ) || a.name.localeCompare( b.name ) );
 }
 
 export const useSchemaStore = defineStore( 'schema', {
 	state: () => ( {
 		schemas: new Map<string, Schema>(),
+		schemaSummaries: new Map<string, SchemaSummary>(),
 		summariesRequest: null as Promise<SchemaSummary[]> | null,
 		// Bumped when a write is acknowledged (save or removal). Async reads snapshot it
 		// before their await and discard the write-back when it moved: a response that
@@ -73,9 +75,16 @@ export const useSchemaStore = defineStore( 'schema', {
 			}
 
 			const request = this.summariesRequest;
+			const epoch = this.mutationEpoch;
 
 			try {
-				return await request;
+				const summaries = await request;
+				if ( epoch === this.mutationEpoch ) {
+					for ( const summary of summaries ) {
+						this.schemaSummaries.set( summary.name, summary );
+					}
+				}
+				return summaries;
 			} finally {
 				if ( this.summariesRequest === request ) {
 					this.summariesRequest = null;
@@ -92,6 +101,16 @@ export const useSchemaStore = defineStore( 'schema', {
 			const matches = await SWSExtension.getInstance().getSchemaRepository().getSchemaNames( normalized );
 			return matches.some( ( match ) => normalizeSchemaName( match ) === normalized );
 		},
+		async createSchema( schema: Schema, comment?: string, requestKey?: string ): Promise<Schema> {
+			try {
+				const created = await SWSExtension.getInstance().getSchemaRepository().createSchema( schema, comment, requestKey );
+				this.mutationEpoch++;
+				this.setSchema( created.getName(), created );
+				return created;
+			} finally {
+				this.summariesRequest = null;
+			}
+		},
 		async saveSchema( schema: Schema, comment?: string ): Promise<void> {
 			try {
 				await SWSExtension.getInstance().getSchemaRepository().saveSchema( schema, comment );
@@ -107,6 +126,7 @@ export const useSchemaStore = defineStore( 'schema', {
 		removeSchema( name: string ): void {
 			this.mutationEpoch++;
 			this.schemas.delete( name );
+			this.schemaSummaries.delete( name );
 			this.summariesRequest = null;
 		},
 	},

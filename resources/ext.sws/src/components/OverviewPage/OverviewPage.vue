@@ -68,7 +68,7 @@ import { useSubjectStore } from '@/stores/SubjectStore.ts';
 
 const PAGE_LINKS = [
 	{
-		page: 'Special:Subjects',
+		page: 'Special:Entities',
 		label: 'sws-special-subjects',
 		description: 'sws-overview-subjects-description',
 		icon: cdxIconListBullet

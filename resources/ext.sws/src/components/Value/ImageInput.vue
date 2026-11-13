@@ -60,7 +60,8 @@
 
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, ref, toRef, watch } from 'vue';
-import { CdxButton, CdxField, CdxLookup, CdxMessage, CdxSelect } from '@wikimedia/codex';
+import { CdxButton, CdxField, CdxLookup, CdxMessage } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import { newStringValue, ValueType, type Value } from '@/domain/Value';
 import type { ImageProperty, ImageSource } from '@/domain/propertyTypes/Image';
 import { lookupImages, parseImageReference, type ImageInfo } from '@/persistence/ImageLookup';

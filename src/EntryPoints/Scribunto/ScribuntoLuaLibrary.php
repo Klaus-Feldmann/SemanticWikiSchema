@@ -21,7 +21,7 @@ use ProfessionalWiki\SWS\SWSExtension;
 class ScribuntoLuaLibrary extends LibraryBase {
 
 	private ?SubjectDataLookup $subjectDataLookup = null;
-    private array $effectiveReaders = [];
+	private ?\ProfessionalWiki\SWS\EntryPoints\EffectiveFieldLookup $effectiveFields = null;
 	private ?SchemaLuaSerializer $schemaLuaSerializer = null;
 	private ?CypherQueryRunner $cypherQueryRunner = null;
 	private ?SparqlQueryRunner $sparqlQueryRunner = null;
@@ -89,21 +89,35 @@ class ScribuntoLuaLibrary extends LibraryBase {
 	public function getValue( ?string $propertyName = null, ?array $options = null ): array {
 		$this->checkType( 'mw.sws.getValue', 1, $propertyName, 'string' );
 
-		if ( $options !== null && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
+		if ( ( $options['origin'] ?? 'all' ) === 'own' && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
 			$this->incrementExpensiveFunctionCount();
 		}
 
-		return $this->getSubjectDataLookup()->getValue( $this->getTitle(), $propertyName, $options );
+		if ( ( $options['origin'] ?? 'all' ) === 'own' ) {
+			return $this->getSubjectDataLookup()->getValue( $this->getTitle(), $propertyName, $options );
+		}
+		$result = $this->collectFields( [ ...( $options ?? [] ), 'field' => $propertyName ] )[0];
+		$values = array_map( static fn ( array $v ) => $v['origin'] === 'own' && is_scalar( $v['metadata']['raw'] ?? null )
+			&& ( is_bool( $v['metadata']['raw'] ) || is_int( $v['metadata']['raw'] ) || is_float( $v['metadata']['raw'] ) )
+			? $v['metadata']['raw'] : $v['value'], array_values( $result['fields'][1]['values'] ?? [] ) );
+		return [ $values[0] ?? null ];
 	}
 
 	public function getAll( ?string $propertyName = null, ?array $options = null ): array {
 		$this->checkType( 'mw.sws.getAll', 1, $propertyName, 'string' );
 
-		if ( $options !== null && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
+		if ( ( $options['origin'] ?? 'all' ) === 'own' && ( isset( $options['page'] ) || isset( $options['subject'] ) ) ) {
 			$this->incrementExpensiveFunctionCount();
 		}
 
-		return $this->getSubjectDataLookup()->getAll( $this->getTitle(), $propertyName, $options );
+		if ( ( $options['origin'] ?? 'all' ) === 'own' ) {
+			return $this->getSubjectDataLookup()->getAll( $this->getTitle(), $propertyName, $options );
+		}
+		$result = $this->collectFields( [ ...( $options ?? [] ), 'field' => $propertyName ] )[0];
+		$values = array_map( static fn ( array $v ) => $v['origin'] === 'own' && is_scalar( $v['metadata']['raw'] ?? null )
+			&& ( is_bool( $v['metadata']['raw'] ) || is_int( $v['metadata']['raw'] ) || is_float( $v['metadata']['raw'] ) )
+			? $v['metadata']['raw'] : $v['value'], array_values( $result['fields'][1]['values'] ?? [] ) );
+		return [ $values === [] ? null : array_combine( range( 1, count( $values ) ), $values ) ];
 	}
 
 	public function getMainSubject( ?string $pageName = null ): array {
@@ -192,55 +206,33 @@ class ScribuntoLuaLibrary extends LibraryBase {
 			return [ null ];
 		}
 
-		return [ $this->getSchemaLuaSerializer()->toLuaTable( $schema ) ];
+		if ( $reference->isLocal() ) { ( new \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder( $this->getParser() ) )->recordDependencyOnSchema( $schema->getReference() ); }
+        return [ $this->getSchemaLuaSerializer()->toLuaTable( $schema ) ];
 	}
 
     public function hasAutomaticAnnotations(): array { return [ true ]; }
 
-    public function collectFields(?array $options = null): array {
-        $o=$options ?? [];
-        foreach($o as $key=>$value) {
-            if(!in_array($key,['page','subject','field','language','origin','includeImages'],true) || ($key==='includeImages' ? !is_bool($value) : !is_string($value))) {
-                throw new LuaError('SWS: invalid field lookup option');
-            }
-        }
-        if(isset($o['page'],$o['subject'])) { throw new LuaError('SWS: specify page or subject, not both'); }
-        $title=isset($o['page']) ? \MediaWiki\Title\Title::newFromText($o['page']) : $this->getTitle();
-        if(!$title || $title->isExternal() || !$title->canExist()) { throw new LuaError('SWS: invalid lookup page'); }
-        $extension=SWSExtension::getInstance();
-        $resolver=$extension->newSubjectResolver($this->getParser());
-        $subject=isset($o['subject']) ? $resolver->resolveById($o['subject']) : $resolver->resolveMainByTitle($title);
-        if(!$subject) { return [ [ 'fields'=>[], 'missing'=>true ] ]; }
-        $authority=ParserAuthority::of($this->getParser());
-        $schema=$extension->getSchemaResolverFor($authority)->getSchema($subject->getSchemaReference());
-        if(!$schema) { throw new LuaError('SWS: schema unavailable'); }
-        $dependencies=new \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder($this->getParser());
-        $dependencies->recordDependencyOnSchema($subject->getSchemaReference());
-        $services=\MediaWiki\MediaWikiServices::getInstance();
-        $language=$o['language'] ?? $services->getContentLanguage()->getCode();
-        if(!preg_match('/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/',$language)) { throw new LuaError('SWS: invalid language'); }
-        $key=json_encode([$subject->id->text,$title->getPrefixedText(),$language]);
-        try {
-            if(!isset($this->effectiveReaders[$key])) {
-                $this->incrementExpensiveFunctionCount();
-                $context=new \MediaWiki\Context\DerivativeContext(\MediaWiki\Context\RequestContext::getMain());
-                $context->setUser($services->getUserFactory()->newFromUserIdentity($this->getParser()->getUserIdentity()));
-                $this->effectiveReaders[$key]=\ProfessionalWiki\SWS\Application\Semantic\FieldSnapshot::reader($schema,$subject,
-                    static function() use($context,$title,$subject,$language,$dependencies): array {
-                        if(!class_exists(\SWSBaseBridge\ExternalValuesLookup::class)) { throw new \RuntimeException('SWS source bridge unavailable'); }
-                        return (new \SWSBaseBridge\ExternalValuesLookup($context))->read($title,[
-                            'pageid'=>$title->getArticleID(),'subject'=>$subject->id->text,'language'=>$language,'presentation'=>false
-                        ],$dependencies);
-                    }, fn(string $name) => $this->getSubjectDataLookup()->getAll($title,$name,['subject'=>$subject->id->text])[0]);
-            }
-            $result=$this->effectiveReaders[$key]->collect($o['field'] ?? null,$o['origin'] ?? 'all',$language,$o['includeImages'] ?? false);
-            $result['subject']=isset($o['subject']) ? $this->getSubjectDataLookup()->getSubjectData($o['subject'])[0]
-                : $this->getSubjectDataLookup()->getMainSubjectData($title)[0];
-            return [ self::fieldsToLua($result) ];
-        } catch (\Throwable $e) { throw new LuaError('SWS: '.$e->getMessage()); }
-    }
+	public function collectFields( ?array $options = null ): array {
+		$options ??= [];
+		// The expensive-function limit also bounds reads of other local pages.
+		if ( isset( $options['page'] ) || isset( $options['subject'] ) ) { $this->incrementExpensiveFunctionCount(); }
+		try {
+			$this->effectiveFields ??= \ProfessionalWiki\SWS\EntryPoints\ParserFieldLookup::create( $this->getParser() );
+			return [ self::fieldsToLua( $this->effectiveFields->read( $this->getTitle(), $options ) ) ];
+		} catch ( \InvalidArgumentException|\RuntimeException $e ) {
+			if ( $processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
+			throw new LuaError( 'SWS: ' . $e->getMessage() );
+		}
+	}
 
     private static function fieldsToLua(mixed $value): mixed {
+        // JSON identity maps remain objects in stored/read-model data, but Scribunto
+        // accepts PHP arrays as Lua tables, not stdClass. Convert only at this boundary.
+        if($value instanceof \stdClass) {
+            $out=[];
+            foreach(get_object_vars($value)as$key=>$item) { $out[$key]=self::fieldsToLua($item); }
+            return $out;
+        }
         if(!is_array($value)) { return $value; }
         $list=array_is_list($value);$out=[];
         foreach($value as $key=>$item) { $out[$list ? $key+1 : $key]=self::fieldsToLua($item); }

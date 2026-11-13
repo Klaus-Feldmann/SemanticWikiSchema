@@ -156,7 +156,7 @@ The mode is the wiki operator's choice; see [Choosing page-first or subject-firs
 The negotiator is always reachable at the REST path, which needs no server configuration:
 
 ```sh
-curl -H 'Accept: text/turtle' 'https://wiki.example/rest.php/neowiki/v0/entity/s1demo8aaaaaab5'
+curl -H 'Accept: text/turtle' 'https://wiki.example/rest.php/sws/v0/entity/s1demo8aaaaaab5'
 ```
 
 To make the bare `neo-subj:` IRI dereference, route `/entity/{id}` to that REST path with an internal proxy — a plain
@@ -165,7 +165,7 @@ rewrite leaves the path unchanged, so MediaWiki's REST router never matches it. 
 its own `rest.php` path:
 
 ```apache
-RewriteRule ^/?entity/(.+)$ http://127.0.0.1/w/rest.php/neowiki/v0/entity/$1 [P,L]
+RewriteRule ^/?entity/(.+)$ http://127.0.0.1/w/rest.php/sws/v0/entity/$1 [P,L]
 ```
 
 This applies when `$wgSWSRdfBaseUri` is the wiki's own host (the default); an external or institutional base URI is

@@ -1,7 +1,6 @@
 # SWS Documentation
 
-New to SWS? Try the live sandbox at [sws.dev](https://neowiki.dev), or
-[install it locally](operations/installation.md).
+[Install SWS 0.4.03](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 
@@ -11,7 +10,6 @@ For people working in a wiki that runs SWS.
 * [Author an ontology mapping](guide/author-an-ontology-mapping.md) — publish Subjects in EDM, CIDOC-CRM, or another
   vocabulary
 * [Project a Person to EDM](guide/person-to-edm.md) — an ontology mapping walked end to end
-* [Keep your wiki current](guide/keep-your-wiki-current.md) — upgrade an evaluation wiki
 
 Concepts:
 
@@ -72,8 +70,7 @@ For developers of MediaWiki extensions that build on SWS.
 
 For the people who operate the server.
 
-* [Installation](operations/installation.md) — the Docker demo, or adding SWS to an existing MediaWiki
-* [Upgrading](operations/upgrading.md) — moving your wiki to a newer SWS
+* [Installation](operations/installation.md) — first installation into an existing MediaWiki
 * [Maintenance](operations/maintenance.md) — rebuilding the graph and search index, Neo4j outage behavior, and backups
 * [Performance](operations/performance.md) — measured write throughput
 * [Restricted content](operations/restricted-content.md) — wikis where some content is readable only by certain

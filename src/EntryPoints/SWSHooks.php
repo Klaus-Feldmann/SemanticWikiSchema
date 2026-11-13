@@ -118,7 +118,7 @@ class SWSHooks {
 
 	private static function isContentPage( OutputPage $out ): bool {
 		return $out->isArticle()
-			&& MediaWikiServices::getInstance()->getNamespaceInfo()->isContent( $out->getTitle()->getNamespace() );
+			&& \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $out->getTitle() );
 	}
 
 	private static function handleContentPage( OutputPage $out, Skin $skin ): void {
@@ -341,7 +341,8 @@ class SWSHooks {
 
 		return SubjectDisplayName::isTitledBySubjectOnIt(
 			$title->getPrefixedText(),
-			$extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $title->getArticleID() ) )
+			$extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $title->getArticleID() ) ),
+            fn(string $id): string => $extension->getSubjectIdParser(true)->parse($id)?->text ?? $id
 		);
 	}
 
@@ -478,12 +479,30 @@ class SWSHooks {
 		$updater->addExtensionTable( 'sws_subject', $sqlDirectory . '/sws_subject.sql' );
 		$updater->addExtensionTable( 'sws_relation', $sqlDirectory . '/sws_relation.sql' );
 
+		foreach ( [ 'sws_id_counter', 'sws_identity', 'sws_identity_alias', 'sws_identity_host', 'sws_search_term' ] as $identityTable ) {
+			$updater->addExtensionTable( $identityTable, $sqlDirectory . '/' . $identityTable . '.sql' );
+		}
+
+		$updater->addExtensionField( 'sws_identity', 'swsi_owner', $sqlDirectory . '/patch-sws_identity-owner.sql' );
+		$updater->addExtensionField( 'sws_identity', 'swsi_used', $sqlDirectory . '/patch-sws_identity-used.sql' );
+
 		// Between creating a table and filling it, no Subject that existed before is found through it, so
 		// each backfill runs in the same update.php as the table it fills.
 		$updater->addPostDatabaseUpdateMaintenance( RebuildSubjectPageIndex::class );
 		$updater->addPostDatabaseUpdateMaintenance( RebuildPublishedSubjectIndex::class );
 
+		$updater->addExtensionUpdate( [ [ self::class, 'initializeIdentityCounters' ] ] );
 		$updater->addExtensionUpdate( [ [ self::class, 'initializeGraphDatabases' ] ] );
+	}
+
+	/** Seed identity kinds without resetting previously issued numbers. */
+	public static function initializeIdentityCounters( DatabaseUpdater $updater ): void {
+		// Seed once through update.php. Runtime locks existing rows directly; it does not upgrade
+		// shared duplicate-insert locks to exclusive locks on every MySQL reservation.
+		foreach ( \ProfessionalWiki\SWS\Domain\Identity\IdentityKind::cases() as $kind ) {
+			$updater->getDB()->insert( 'sws_id_counter', [ 'swsic_kind' => $kind->value, 'swsic_value' => 0 ],
+				__METHOD__, [ 'IGNORE' ] );
+		}
 	}
 
 	/**
@@ -581,7 +600,8 @@ class SWSHooks {
 			'sws_value',
 			static function ( Parser $parser, string ...$args ): string|array {
 				$parserFunction = new SWSValueParserFunction(
-					SWSExtension::getInstance()->newSubjectResolver( $parser )
+					SWSExtension::getInstance()->newSubjectResolver( $parser ),
+					ParserFieldLookup::create( $parser )
 				);
 				return $parserFunction->handle( $parser, ...$args );
 			}
@@ -642,6 +662,17 @@ class SWSHooks {
 		UserIdentity $user,
 		array &$tags
 	): void {
+		$mainContent = $revision->getContent( 'main' );
+		if ( !$originalRevId && $mainContent instanceof SchemaContent ) {
+			$data = json_decode( $mainContent->getText(), true );
+			if ( ( $data['formatVersion'] ?? 1 ) === 2 ) {
+				SWSExtension::getInstance()->newIdentityRegistry()->markUsed( new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $data['id'] ) );
+			}
+		}
+        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
+            SWSExtension::getInstance()->indexMigrationRevision( $revision );
+            return;
+        }
 		SWSExtension::getInstance()->getStoreContentUC()->onRevisionCreated( $revision );
 		$wikiPage->doPurge(); // clear cache
 
@@ -1083,7 +1114,10 @@ class SWSHooks {
 
 	public static function onContentModelCanBeUsedOn( string $modelId, Title $title, bool &$ok ): void {
 		if ( $title->getNamespace() === SWSExtension::NS_SCHEMA ) {
-			$ok = $modelId === SchemaContent::CONTENT_MODEL_ID;
+			$ok = $modelId === SchemaContent::CONTENT_MODEL_ID || (
+                $modelId === CONTENT_MODEL_WIKITEXT &&
+                \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::allowsSchemaRedirect($title->getDBkey())
+            );
 		}
 
 		if ( $title->getNamespace() === SWSExtension::NS_LAYOUT ) {
@@ -1170,15 +1204,13 @@ class SWSHooks {
 	}
 
 	/**
-	 * Page tools are offered on content pages only. The check comes before the builder so that other page
+	 * Page tools are offered on SWS-eligible namespaces. The check comes before the builder so that other page
 	 * views, special pages included, skip the Subject permission lookups the tools need.
 	 *
 	 * @return list<array<string, mixed>>
 	 */
 	private static function pageTools( Skin $skin, Title $title ): array {
-		$isContentNamespace = MediaWikiServices::getInstance()
-			->getNamespaceInfo()
-			->isContent( $title->getNamespace() );
+		$isContentNamespace = \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
 
 		if ( !$isContentNamespace ) {
 			return [];

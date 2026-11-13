@@ -94,6 +94,7 @@ vi.mock( '@/stores/SchemaStore.ts', () => ( {
 		saveSchema: vi.fn(),
 		getSchema: vi.fn(),
 		schemas: schemaStoreSchemas,
+		schemaSummaries: new Map(),
 	} ),
 } ) );
 
@@ -343,7 +344,7 @@ describe( 'SubjectsManagerPage rows and the Subject pages behind them', () => {
 
 		expect( wrapper.findAll( 'a.ext-sws-subject-row__name' )
 			.map( ( link ) => link.attributes( 'href' ) ) )
-			.toEqual( [ '/wiki/Special:Subject/' + ID_A, '/wiki/Special:Subject/' + ID_B ] );
+			.toEqual( [ '/wiki/Special:Entity/' + ID_A, '/wiki/Special:Entity/' + ID_B ] );
 	} );
 
 	// Every row is on the page the reader already has open, so naming it in each footer says nothing.

@@ -1,3 +1,4 @@
+import { schemaReferenceName, type SchemaReference } from '@/domain/SchemaReference';
 import type { SchemaName } from '@/domain/Schema';
 import type { PropertyName } from '@/domain/PropertyDefinition';
 
@@ -12,7 +13,7 @@ export class Layout {
 
 	public constructor(
 		private readonly name: LayoutName,
-		private readonly schema: SchemaName,
+		private readonly schema: SchemaReference,
 		private readonly type: string,
 		private readonly description: string,
 		private readonly displayRules: DisplayRule[],
@@ -25,6 +26,10 @@ export class Layout {
 	}
 
 	public getSchema(): SchemaName {
+		return schemaReferenceName( this.schema );
+	}
+
+	public getSchemaReference(): SchemaReference {
 		return this.schema;
 	}
 

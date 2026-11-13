@@ -32,6 +32,7 @@ class OnRevisionCreatedHandler {
 		private readonly RevisionPolicy $revisionPolicy,
 		private readonly TitleFormatter $titleFormatter,
 		private readonly LoggerInterface $logger,
+        private readonly ?\ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex $termIndex = null,
 	) {
 	}
 
@@ -63,6 +64,7 @@ class OnRevisionCreatedHandler {
 		if ( $published === null ) {
 			$this->graphDatabasePlugin->deletePage( $pageId );
 			$this->publishedSubjectIndex->removePage( $pageId );
+            $this->termIndex?->removePage( $pageId );
 			return PageRefreshOutcome::Unpublished;
 		}
 
@@ -94,6 +96,15 @@ class OnRevisionCreatedHandler {
 			$subjects,
 			(string)$published->getTimestamp()
 		);
+
+        if ( $this->termIndex !== null ) {
+            $pageName = $this->titleFormatter->getPrefixedText( $revisionRecord->getPage() );
+            $this->termIndex->setSubjects( $pageId, $pageName, $subjects );
+            $main = $published->getContent('main');
+            $schema = $main instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent
+                ? json_decode($main->getText(),true,512,JSON_THROW_ON_ERROR) : null;
+            $this->termIndex->setSchema($pageId, is_array($schema)?$schema:null, str_replace('_', ' ', $revisionRecord->getPage()->getDBkey()));
+        }
 
 		return $this->projectPage( $pageId, $published, $subjects );
 	}
@@ -149,6 +160,7 @@ class OnRevisionCreatedHandler {
 		$this->graphDatabasePlugin->deletePage( $page );
 		$this->subjectPageIndex->removePage( $page );
 		$this->publishedSubjectIndex->removePage( $page );
+        $this->termIndex?->removePage( $page );
 	}
 
 }

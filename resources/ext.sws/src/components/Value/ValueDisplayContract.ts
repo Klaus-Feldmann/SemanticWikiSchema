@@ -26,3 +26,6 @@ export const RelationTargetCreationKey: InjectionKey<Readonly<Ref<boolean>>> = S
  * rather than nesting it again without end, which only data written past the rules can call for.
  */
 export const EnclosingSubjectIdsKey: InjectionKey<Readonly<Ref<readonly string[]>>> = Symbol( 'SWSEnclosingSubjectIds' );
+
+/** Host identity for rendering a saved Subject wikitext field. */
+export const WikitextContextKey: InjectionKey<Readonly<Ref<{ pageId: number; subject: string }>>> = Symbol( 'SWSWikitextContext' );

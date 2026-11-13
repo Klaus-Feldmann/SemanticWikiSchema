@@ -14,6 +14,7 @@
 		<SchemaImportDialog
 			v-if="items !== null"
 			:items="items"
+			:source-document="sourceDocument"
 			@imported="emit( 'imported' )"
 			@close="items = null"
 		/>
@@ -26,17 +27,14 @@ import { CdxButton, CdxIcon } from '@wikimedia/codex';
 import { cdxIconUpload } from '@wikimedia/codex-icons';
 import SchemaImportDialog from '@/components/SchemasPage/SchemaImportDialog.vue';
 import { parseSchemaExport } from '@/components/SchemasPage/schemaExport.ts';
-import { planSchemaImport, type SchemaImportItem } from '@/components/SchemasPage/schemaImport.ts';
-import { SWSServices } from '@/SWSServices.ts';
-import { useSchemaStore } from '@/stores/SchemaStore.ts';
+import { type SchemaImportItem } from '@/components/SchemasPage/schemaImport.ts';
 
 const emit = defineEmits<{
 	imported: [];
 }>();
 
-const schemaStore = useSchemaStore();
-const schemaLookup = SWSServices.getSchemaRepository();
 const fileInput = ref<HTMLInputElement | null>( null );
+const sourceDocument = ref( '' );
 const items = shallowRef<SchemaImportItem[] | null>( null );
 
 async function onFileChosen( event: Event ): Promise<void> {
@@ -51,9 +49,9 @@ async function onFileChosen( event: Event ): Promise<void> {
 	}
 
 	try {
-		const schemas = parseSchemaExport( await file.text() );
-		const summaries = await schemaStore.fetchAllSchemaSummaries();
-		items.value = await planSchemaImport( schemas, summaries.map( ( summary ) => summary.name ), schemaLookup );
+		sourceDocument.value = await file.text();
+		const schemas = parseSchemaExport( sourceDocument.value );
+		items.value = schemas.map( ( schema ) => ( { schema, status: 'new' } ) );
 	} catch ( error ) {
 		mw.notify(
 			error instanceof Error ? error.message : String( error ),

@@ -56,7 +56,7 @@ class DatabaseSubjectLabelLookup implements SubjectLabelLookup {
 			if ( $readablePages[(int)$row->page_id] ) {
 				$results[] = new SubjectLabelLookupResult(
 					id: (string)$row->swss_subject_id,
-					label: (string)$row->swss_display_name,
+					label: $row->swss_display_name !== null && trim( (string)$row->swss_display_name ) !== '' ? (string)$row->swss_display_name : (string)$row->swss_subject_id,
 					pageTitle: $title->getPrefixedText(),
 				);
 			}
@@ -75,14 +75,16 @@ class DatabaseSubjectLabelLookup implements SubjectLabelLookup {
 		$db = $this->connectionProvider->getReplicaDatabase();
 
 		$query = $db->newSelectQueryBuilder()
-			->select( [ 'swss_subject_id', 'swss_display_name', 'page_id', 'page_namespace', 'page_title' ] )
+			->select( [ 'swss_subject_id', 'swss_display_name', 'page_id', 'page_namespace', 'page_title', 'subject.swss_display_name_key' ] )->distinct()
 			->from( DatabasePublishedSubjectIndex::SUBJECT_TABLE, 'subject' )
 			->join( 'page', null, 'page_id = subject.swss_page_id' )
+            ->leftJoin( DatabaseIdentityTermIndex::TABLE, 'term', 'term.swst_page_id = subject.swss_page_id AND term.swst_reference = subject.swss_subject_id AND term.swst_kind = ' . $db->addQuotes('entity') . ' AND term.swst_role = ' . $db->addQuotes('label') )
 			->where( $db->expr(
 				'subject.swss_display_name_key',
 				IExpression::LIKE,
 				new LikeValue( CaseInsensitiveKey::of( $search ), $db->anyString() )
-			) )
+			)->or( 'subject.swss_subject_id', IExpression::LIKE, new LikeValue( $search, $db->anyString() ) )
+            ->or( 'term.swst_key', IExpression::LIKE, new LikeValue( CaseInsensitiveKey::of( $search ), $db->anyString() ) ) )
 			->andWhere( [ 'subject.swss_dependent' => 0 ] )
 			->andWhere( LowestPageRows::condition( $db, 'subject' ) )
 			->orderBy( [ 'subject.swss_display_name_key', 'subject.swss_subject_id' ] )

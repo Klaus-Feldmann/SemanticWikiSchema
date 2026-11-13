@@ -4,7 +4,6 @@ import type { Schema } from '@/domain/Schema';
 import type { SubjectRepository } from '@/domain/SubjectRepository';
 import type { PageIdentifiers } from '@/domain/PageIdentifiers';
 import { Statement } from '@/domain/Statement';
-import { StatementList } from '@/domain/StatementList';
 import { type SchemaLookup, type SchemaSummary, subjectsAreDependentIn } from '@/application/SchemaLookup';
 import { isValueEmpty, newRelation, RelationValue } from '@/domain/Value';
 import {
@@ -211,7 +210,7 @@ export class DependentSubjectLoader {
 			schema.getName(),
 			schema.initialStatements(),
 			page,
-			null,
+			null, null, schema.getReference(),
 		);
 
 		const started = await this.withStartingDependentSubjects( blank, schema, schemas, ancestorSchemaNames );

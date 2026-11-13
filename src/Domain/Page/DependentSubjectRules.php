@@ -223,7 +223,7 @@ class DependentSubjectRules {
 			$codes = array_keys( array_filter( [
 				self::REFERENCED_TWICE => ( $referenceCounts[$subject->id->text] ?? 0 ) > 1,
 				self::IS_MAIN => $pageSubjects->isMainSubject( $subject->id ),
-				self::HAS_LABEL => $subject->getLabel() !== null,
+				self::HAS_LABEL => $subject->getLabel() !== null || array_filter( $subject->getIdentity()?->labels ?? [], static fn ( $label ) => trim( $label ) !== '' ) !== [],
 			] ) );
 
 			foreach ( $codes as $code ) {
@@ -497,7 +497,7 @@ class DependentSubjectRules {
 
 	private function getSchema( SchemaReference $reference ): ?Schema {
 		// A Source key is never empty, so the empty prefix tells a local name apart from a sourced one.
-		$key = ( $reference->source ?? '' ) . "\0" . $reference->name->getText();
+		$key = json_encode( $reference->toJson(), JSON_THROW_ON_ERROR );
 
 		if ( !array_key_exists( $key, $this->schemas ) ) {
 			$this->schemas[$key] = $this->schemaResolver->getSchema( $reference );

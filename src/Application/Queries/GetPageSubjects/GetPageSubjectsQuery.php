@@ -15,6 +15,7 @@ use ProfessionalWiki\SWS\Domain\Page\PageId;
 use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
 use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
 use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
 use ProfessionalWiki\SWS\Domain\Subject\Subject;
 use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
 use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
@@ -162,8 +163,10 @@ readonly class GetPageSubjectsQuery {
 		// under. Consumers read that Subject's Schema reference and resolve it themselves.
 		$schemaNames = [];
 		foreach ( array_merge( $pageSubjectItems, $referencedSubjectItems ?? [] ) as $item ) {
-			if ( is_string( $item->schema ) ) {
-				$schemaNames[$item->schema] = true;
+			// Response references have already canonicalized this wiki's source to local.
+			$reference = SchemaReference::fromJson( $item->schema, '' );
+			if ( $reference->isLocal() ) {
+				$schemaNames[$reference->name->getText()] = true;
 			}
 		}
 

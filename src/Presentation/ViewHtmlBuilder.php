@@ -24,7 +24,8 @@ class ViewHtmlBuilder {
 	private array $pageSubjectsRead = [];
 
 	public function __construct(
-		private readonly SubjectContentRepository $subjectContentRepository
+		private readonly SubjectContentRepository $subjectContentRepository,
+        private readonly ?\Closure $canonicalize = null
 	) {
 	}
 
@@ -87,7 +88,7 @@ class ViewHtmlBuilder {
 
 		$pageSubjects = $this->getPageSubjects( $title, $revisionId );
 
-		return $pageSubjects === null ? null : SubjectDisplayName::inPlaceOfPageTitle( $pageSubjects, $title->getPrefixedText() );
+		return $pageSubjects === null ? null : SubjectDisplayName::inPlaceOfPageTitle( $pageSubjects, $title->getPrefixedText(), $this->canonicalize );
 	}
 
 	private function getPageSubjects( Title $title, ?int $revisionId ): ?PageSubjects {

@@ -6,6 +6,7 @@ import { RightsBasedSubjectPermissionHints } from '@/persistence/RightsBasedSubj
 import { CurrentPageSubjectPermissionHints } from '@/persistence/CurrentPageSubjectPermissionHints.ts';
 import { SubjectPermissionHints } from '@/application/SubjectPermissionHints.ts';
 import { RightsFetcher, UserObjectBasedRightsFetcher } from '@/persistence/UserObjectBasedRightsFetcher.ts';
+import { WikitextValueType } from '@/domain/propertyTypes/WikitextValue';
 import { WikitextType } from '@/domain/propertyTypes/Wikitext';
 import { PageType } from '@/domain/propertyTypes/Page';
 import WikitextInput from '@/components/Value/WikitextInput.vue';
@@ -121,6 +122,10 @@ export class SWSExtension {
 
 		registry.registerType( WikitextType.typeName, {
 			valueDisplayComponent: WikitextDisplay, valueEditor: WikitextInput, attributesEditor: WikitextAttributesEditor,
+			label: 'sws-property-type-template', icon: cdxIconSearchCaseSensitive,
+		} );
+		registry.registerType( WikitextValueType.typeName, {
+			valueDisplayComponent: WikitextDisplay, valueEditor: WikitextInput, attributesEditor: TextAttributesEditor,
 			label: 'sws-property-type-wikitext', icon: cdxIconSearchCaseSensitive,
 		} );
 		registry.registerType( PageType.typeName, {

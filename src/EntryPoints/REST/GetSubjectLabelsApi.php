@@ -19,20 +19,23 @@ class GetSubjectLabelsApi extends SimpleHandler {
 	public function run(): Response {
 		$params = $this->getValidatedParams();
 
-		$subjects = array_map(
-			function ( SubjectLabelLookupResult $result ): array {
-				return [
-					'id' => $result->id,
-					'label' => $result->label,
-					'pageTitle' => $result->pageTitle,
-				];
-			},
-			SWSExtension::getInstance()->getSubjectLabelLookup()->getSubjectLabelsMatching(
-				$params['search'],
-				$params['limit'],
-				$params['schema'],
-			)
-		);
+        $extension = SWSExtension::getInstance();
+        $filters = $params['schemaKey'] ?? null;
+        if ($filters === null && $params['schema'] !== null) {
+            $filters = [];
+            foreach ($params['schema'] as $name) {
+                try {
+                    $reference = $extension->getSchemaReferenceParser()->localName($name);
+                    $schema = $extension->getSchemaResolverFor($this->getAuthority())->getSchema($reference);
+                } catch (\InvalidArgumentException) { continue; }
+                if ($schema !== null) { $filters[] = $schema->getName()->getText(); }
+            }
+        }
+        $results = $extension->getSubjectLabelLookup()->getSubjectLabelsMatching( $params['search'], $params['limit'], $filters );
+        $ids = new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdList( array_map( static fn ( $result ) => new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $result->id ), $results ) );
+        $published = $extension->newIdentityPresentationLookup( $this->getAuthority() )->getSubjects( $ids );
+        $subjects = array_map( static fn ( $result ) => \ProfessionalWiki\SWS\Presentation\IdentityLabelResult::serialize(
+            $result, $published->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $result->id ) ), $params['language'] ?? null ), $results );
 
 		$response = $this->getResponseFactory()->create();
 		$response->setBody( new StringStream( json_encode( $subjects ) ) );
@@ -43,14 +46,16 @@ class GetSubjectLabelsApi extends SimpleHandler {
 
 	public function getParamSettings(): array {
 		return [
-			'search' => [
+			'language' => [ self::PARAM_SOURCE=>'query', ParamValidator::PARAM_TYPE=>'string', ParamValidator::PARAM_REQUIRED=>false ],
+            'search' => [
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
 				ParamValidator::PARAM_DEFAULT => '',
-				self::PARAM_DESCRIPTION => 'Case-insensitive search prefix matched against Subject labels.',
+				self::PARAM_DESCRIPTION => 'Case-insensitive label prefix or entity-ID prefix; own display terms use the requested language.',
 			],
-			'schema' => [
+			'schemaKey' => [ self::PARAM_SOURCE=>'query', ParamValidator::PARAM_TYPE=>'string', ParamValidator::PARAM_ISMULTI=>true, ParamValidator::PARAM_REQUIRED=>false, self::PARAM_DESCRIPTION=>'Explicit current schema page keys. Unlike the legacy schema parameter, these do not resolve old name aliases.' ],
+            'schema' => [
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_ISMULTI => true,

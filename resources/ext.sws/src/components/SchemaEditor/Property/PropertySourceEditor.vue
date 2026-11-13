@@ -54,7 +54,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { CdxCheckbox, CdxField, CdxSelect } from '@wikimedia/codex';
+import { CdxCheckbox, CdxField } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import type { ImageProperty, ImageSource } from '@/domain/propertyTypes/Image';
 import { imageSourceOptions } from '@/presentation/imageSources';
 import IdLookup from '@/components/Id/IdLookup.vue';

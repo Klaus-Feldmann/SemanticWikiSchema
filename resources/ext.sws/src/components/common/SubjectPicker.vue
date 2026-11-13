@@ -361,7 +361,7 @@ function menuItemFor( result: DisambiguatedSubjectLabel ): MenuItemData {
 	return {
 		value: result.id,
 		label: result.label,
-		description: result.showPageTitle ? result.pageTitle : undefined,
+		description: result.description || ( result.showPageTitle ? result.pageTitle : undefined ),
 		supportingText: result.showId ? mw.msg( 'parentheses', result.id ) : undefined
 	};
 }

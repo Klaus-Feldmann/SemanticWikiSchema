@@ -2,7 +2,7 @@
 	<div class="ext-sws-schema-display-header">
 		<div class="ext-sws-schema-display-header__content">
 			<div class="ext-sws-schema-display-header__title">
-				{{ schema.getName() }}
+				{{ schema.getLabel() }}{{ schema.getId() ? ` (${ schema.getId() })` : '' }}
 			</div>
 			<div
 				v-if="schema.getDescription()"
@@ -24,7 +24,7 @@
 				@click="emit( 'create-subject' )"
 			>
 				<CdxIcon :icon="cdxIconAdd" />
-				{{ $i18n( 'sws-schema-create-subject', schema.getName() ).text() }}
+				{{ $i18n( 'sws-schema-create-subject', schema.getLabel() ).text() }}
 			</CdxButton>
 		</div>
 		<div class="ext-sws-schema-display-header__actions">

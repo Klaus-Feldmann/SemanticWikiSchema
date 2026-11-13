@@ -39,7 +39,7 @@ class SpecialSubject extends SpecialPage {
 
 		$out = $this->getOutput();
 		$extension = SWSExtension::getInstance();
-		$subjectId = $extension->getSubjectIdParser()->parse( $subPage );
+		$subjectId = $extension->getSubjectIdParser( true )->parse( $subPage );
 		$attributes = [ 'id' => 'ext-sws-subject' ];
 
 		if ( $subjectId !== null ) {
@@ -84,7 +84,7 @@ class SpecialSubject extends SpecialPage {
 
 		if ( $title === null
 			|| $title->isRedirect()
-			|| !MediaWikiServices::getInstance()->getNamespaceInfo()->isContent( $title->getNamespace() )
+			|| !\ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title )
 			|| !$this->isMainSubjectOfPublishedLatestRevision( $extension, $title, $subjectId )
 		) {
 			return null;

@@ -32,7 +32,7 @@ class TitleBasedSchemaReferenceNormalizer implements SchemaReferenceNormalizer {
 	}
 
 	public function normalize( SchemaReference $reference ): SchemaReference {
-		if ( !$reference->isLocal() ) {
+		if ( !$reference->isLocal() || $reference->id !== null ) {
 			return $reference;
 		}
 

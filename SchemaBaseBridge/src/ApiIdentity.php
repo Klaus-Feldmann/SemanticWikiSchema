@@ -17,16 +17,21 @@ final class ApiIdentity extends ApiBase {
 			( $params['descriptions'] && preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $params['language'] ) !== 1 ) ) {
 			$this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' );
 		}
-		$pageSubjects = SWSExtension::getInstance()->newPageSubjectsLookup()
-			->getPageSubjects( new PageId( $title->getArticleID() ) );
-		$mainId = $pageSubjects->getMainSubject()?->id->text;
-		$descriptionIdentities = $params['descriptions'] && $mainId !== null
-			? ( new DataViewLookup( $this->getContext() ) )->readIdentities( $title, $params['language'] ) : [];
+		$store = \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore();
+		$stored = $store ? new StoredSourceLookup( $this->getContext() ) : null;
+		try {
+			$pageSubjects = $stored !== null ? $stored->page( $title ) :
+				SWSExtension::getInstance()->newPageSubjectsLookup()->getPageSubjects( new PageId( $title->getArticleID() ) );
+			$mainId = $pageSubjects->getMainSubject()?->id->text;
+			$descriptionIdentities = ( $params['descriptions'] || $store ) && $mainId !== null
+				? ( $stored !== null ? $stored->identities( $title, $params['language'] ) :
+					( new DataViewLookup( $this->getContext() ) )->readIdentities( $title, $params['language'] ) ) : [];
+		} catch ( \RuntimeException ) { $this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' ); }
 		$pageDescription = $params['descriptions'] ? ( new PageDescriptionLookup() )->read( $title, $this->getAuthority() ) : [];
-		$lookup = new PageIdentityLookup();
+		$lookup = $store ? null : new PageIdentityLookup();
 		$identities = ( new AutomaticIdentityService() )->resolve( $mainId, [
-			'wikidata' => fn () => $descriptionIdentities['wikidata'] ?? $lookup->wikidata( $title ),
-			'wikibase-local' => fn () => $descriptionIdentities['wikibase-local'] ?? $lookup->wikibase( $title, $this->getAuthority() ),
+			'wikidata' => fn () => $descriptionIdentities['wikidata'] ?? $lookup?->wikidata( $title ) ?? [ 'status' => 'unavailable' ],
+			'wikibase-local' => fn () => $descriptionIdentities['wikibase-local'] ?? $lookup?->wikibase( $title, $this->getAuthority() ) ?? [ 'status' => 'unavailable' ],
 		] );
 		$this->getResult()->addValue( null, $this->getModuleName(), [
 			'version' => 2, 'pageId' => $title->getArticleID(), 'scope' => 'current',

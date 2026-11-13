@@ -189,10 +189,19 @@ class RdfPageProjector implements PageProjector {
 		// and the Schema shows up as rdf:type rather than as a label.
 		$displayName = SubjectDisplayName::forSubjectOnPage( $subject, $page );
 
-		$quads = [
-			new Quad( $subjectIri, $this->namespaces->rdfType(), $this->namespaces->schemaClass( $subject->getSchemaName() ), $graph ),
-			new Quad( $subjectIri, $this->namespaces->rdfsLabel(), RdfLiteralFactory::typed( $displayName, 'string' ), $graph ),
-		];
+        $schema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );
+        $schemaId = $schema?->getId() ?? $subject->getSchemaReference()->id;
+        $class = $schemaId === null
+            ? $this->namespaces->schemaClass( $schema?->getName() ?? $subject->getSchemaName(), $subject->getSchemaReference()->source )
+            : $this->namespaces->identifiedSchemaClass( $schemaId, $subject->getSchemaReference()->source );
+        $quads = [ new Quad( $subjectIri, $this->namespaces->rdfType(), $class, $graph ) ];
+        if ( $subject->getIdentity() !== null && array_filter( $subject->getIdentity()->labels, static fn ( $label ) => trim( $label ) !== '' ) !== [] ) {
+            $quads = array_merge( $quads, IdentityRdfMetadata::quads( $subjectIri, $subject->getIdentity(), $graph ) );
+        } else {
+            $quads[] = new Quad( $subjectIri, $this->namespaces->rdfsLabel(), RdfLiteralFactory::typed( $displayName, 'string' ), $graph );
+            if ( $subject->getIdentity() !== null ) { $quads = array_merge( $quads, IdentityRdfMetadata::quads( $subjectIri, $subject->getIdentity(), $graph ) ); }
+        }
+        if ( $schema?->getIdentity() !== null ) { $quads = array_merge( $quads, IdentityRdfMetadata::quads( $class, $schema->getIdentity(), $graph ) ); }
 
 		$quads = array_merge( $quads, $this->projectStatements( $subject, $subjectIri, $graph, $page->getId() ) );
 
@@ -261,7 +270,7 @@ class RdfPageProjector implements PageProjector {
 		$quads = [];
 
 		foreach ( $subject->getTypedRelations()->relations as $relation ) {
-			$quads = array_merge( $quads, $this->projectRelation( $relation, $subjectIri, $graph ) );
+			$quads = array_merge( $quads, $this->projectRelation( $relation, $subjectIri, $graph, $subject->getIdentity()?->label() ?? $subject->getLabel()?->text ?? $subject->id->text ) );
 		}
 
 		return $quads;
@@ -273,7 +282,7 @@ class RdfPageProjector implements PageProjector {
 	 *
 	 * @return Quad[]
 	 */
-	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph ): array {
+	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph, string $sourceLabel ): array {
 		$targetIri = $this->subjectIris->targetIri( $relation->targetId );
 
 		if ( $targetIri === null ) {
@@ -282,8 +291,10 @@ class RdfPageProjector implements PageProjector {
 
 		$predicate = $this->namespaces->property( $relation->propertyName->text );
 		$relationIri = $this->namespaces->relationNode( $relation->id );
+        $targetName = $relation->targetId->isLocal() ? substr( $targetIri->value, strlen( $this->namespaces->subjectIriBase() ) ) : $relation->targetId->text;
 
 		return [
+            new Quad( $relationIri, $this->namespaces->rdfsLabel(), RdfLiteralFactory::typed( $sourceLabel . " — " . $relation->propertyName->text . " → " . $targetName, 'string' ), $graph ),
 			new Quad( $subjectIri, $predicate, $targetIri, $graph ),
 			new Quad( $relationIri, $this->namespaces->rdfType(), $this->namespaces->term( RdfNamespaces::CLASS_RELATION ), $graph ),
 			new Quad( $relationIri, $this->namespaces->term( RdfNamespaces::TERM_SOURCE ), $subjectIri, $graph ),

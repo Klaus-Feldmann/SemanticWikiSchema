@@ -45,9 +45,17 @@ final class DataViewRdfProjector {
 			if ( $subject['isMainSubject'] ?? false ) {
 				$this->add( $page, $this->namespaces->baseUri . '/ontology/mainSubject', $subjectIri, $this->metadataGraph );
 			}
-			if ( is_string( $subject['schema'] ?? null ) ) {
-				$this->add( $subjectIri, RdfNamespaces::RDF . 'type', $this->namespaces->schemaClass( new SchemaName( $subject['schema'] ) ), $effectiveGraph );
-			}
+            try {
+                $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::fromJson( $subject['schema'], 'local' );
+                if ( isset( $subject['schemaIdentity']['id'] ) ) { $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $subject['schemaIdentity']['id'] ), $reference->source ); }
+                // A foreign schema reference retains its source in a disjoint class-IRI namespace.
+                $this->add( $subjectIri, RdfNamespaces::RDF . 'type', $reference->id === null ? $this->namespaces->schemaClass( $reference->name, $reference->source ) : $this->namespaces->identifiedSchemaClass( $reference->id, $reference->source ), $effectiveGraph );
+            } catch ( \InvalidArgumentException ) { /* Incomplete data views retain their status instead of inventing a type. */ }
+            if ( isset( $subject['identityLanguage'], $subject['labels'], $subject['descriptions'] ) ) {
+                foreach ( \ProfessionalWiki\SWS\Application\Rdf\IdentityRdfMetadata::quads( $subjectIri,
+                    \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( [ 'identityLanguage'=>$subject['identityLanguage'], 'labels'=>(array)$subject['labels'], 'descriptions'=>(array)$subject['descriptions'] ] ), $effectiveGraph ) as $quad ) { $this->quads[] = $quad; }
+            }
+
 			if ( is_string( $subject['displayName'] ?? null ) ) {
 				$this->add( $subjectIri, RdfNamespaces::RDFS . 'label', $this->literal( $subject['displayName'] ), $effectiveGraph );
 			}
@@ -88,7 +96,8 @@ final class DataViewRdfProjector {
 						$this->add( $record, RdfNamespaces::RDF . 'predicate', $property, $graph );
 						$this->add( $record, RdfNamespaces::RDF . 'object', $object, $graph );
 						$this->add( $record, $this->vocabulary . 'origin', $this->literal( $source ), $graph );
-						$sourceUrl = $origin === 'own' ? $view['page']['url'] : ( $view['identities'][$source]['url'] ?? null );
+						$sourceUrl = $origin === 'own' ? $view['page']['url'] :
+							( $field['external']['entityUrl'] ?? $view['identities'][$source]['url'] ?? null );
 						if ( is_string( $sourceUrl ) && Iri::isSafeAbsolute( $sourceUrl ) ) {
 							$this->add( $record, 'http://www.w3.org/ns/prov#wasDerivedFrom', new Iri( $sourceUrl ), $graph );
 						}

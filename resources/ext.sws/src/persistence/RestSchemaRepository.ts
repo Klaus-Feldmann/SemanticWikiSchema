@@ -1,3 +1,4 @@
+import { importSchemaDocument } from '@/components/SchemasPage/schemaIdImport';
 import { Schema, type SchemaName } from '@/domain/Schema';
 import type { HttpClient } from '@/infrastructure/HttpClient/HttpClient';
 import type { SchemaRepository } from '@/application/SchemaRepository';
@@ -41,7 +42,7 @@ export class RestSchemaRepository implements SchemaRepository {
 
 	public async getSchemaNames( search: string ): Promise<string[]> {
 		const response = await this.httpClient.get(
-			`${ this.mediaWikiRestApiUrl }/sws/v0/schema-names/${ search }`,
+			`${ this.mediaWikiRestApiUrl }/sws/v0/schema-names/${ encodeURIComponent( search ) }`,
 		);
 
 		if ( !response.ok ) {
@@ -62,6 +63,25 @@ export class RestSchemaRepository implements SchemaRepository {
 		}
 
 		return await response.json();
+	}
+
+	public async importSchemaDocument( document: string, selected: string[] ): Promise<{ created: string[] }> {
+		return importSchemaDocument( document, selected, this.mediaWikiRestApiUrl, this.httpClient,
+			mw.config.get( 'wgContentLanguage' ) || 'en' );
+	}
+
+	public async createSchema( schema: Schema, comment?: string, requestKey?: string ): Promise<Schema> {
+		const response = await this.httpClient.post( `${ this.mediaWikiRestApiUrl }/sws/v0/schema`, {
+			schema: this.serializer.schemaToJson( schema ), comment, requestKey,
+		} );
+		if ( !response.ok ) {
+			throw new Error( 'Error creating schema' );
+		}
+		const data = await response.json();
+		if ( typeof data.schema?.id !== 'string' ) {
+			throw new Error( 'Created schema has no stable ID' );
+		}
+		return this.deserializer.deserialize( data.schema.id, data.schema );
 	}
 
 	public async saveSchema( schema: Schema, comment?: string ): Promise<void> {

@@ -45,6 +45,7 @@ class MappingPersistenceDeserializer {
 			name: $name,
 			prefixes: $this->prefixesFromJson( $data ),
 			schemas: $this->schemasFromJson( $data['schemas'] ),
+            schemaIds: $this->schemaIdsFromJson( $data['schemaIds'] ?? [] ),
 		);
 	}
 
@@ -52,7 +53,13 @@ class MappingPersistenceDeserializer {
 	 * @param array<string, mixed> $data
 	 * @return array<string, string>
 	 */
-	private function prefixesFromJson( array $data ): array {
+	private function schemaIdsFromJson( mixed $entries ): array {
+        if ( !is_array( $entries ) ) { throw new InvalidArgumentException( 'Invalid schema ID mappings' ); }
+        foreach ( array_keys( $entries ) as $id ) { new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( (string)$id ); }
+        return $this->schemasFromJson( $entries );
+    }
+
+    private function prefixesFromJson( array $data ): array {
 		$prefixes = [];
 
 		foreach ( $this->arrayValue( $data, 'prefixes' ) as $label => $namespace ) {

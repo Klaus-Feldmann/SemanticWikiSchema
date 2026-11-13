@@ -29,6 +29,7 @@ class Neo4jSubjectUpdater {
 		private readonly LoggerInterface $logger,
 		private readonly string $wikiId,
 		private readonly Neo4jOrphanCandidates $orphanCandidates,
+        private readonly ?\Closure $canonicalize = null,
 	) {
 	}
 
@@ -139,6 +140,17 @@ class Neo4jSubjectUpdater {
 		// different property name.
 		$properties['id'] = $subject->id->text;
 		$properties['wiki_id'] = $this->wikiId;
+        if ( $subject->getIdentity() !== null ) {
+            $identity = $subject->getIdentity();
+            $properties['sws#identityLanguage'] ??= $identity->language;
+            $properties['sws#labels'] ??= json_encode( (object)$identity->labels, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE );
+            $properties['sws#descriptions'] ??= json_encode( (object)$identity->descriptions, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE );
+        }
+        if ( $schema?->getId() !== null ) {
+            $properties['sws#schemaSource'] ??= $subject->getSchemaReference()->source ?? $this->wikiId;
+            $properties['sws#schemaId'] ??= $schema->getId()->text;
+            $properties['sws#schemaLabels'] ??= json_encode( (object)$schema->getIdentity()->labels, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE );
+        }
 
 		$name = $this->nodeName( $pageSubject, $page );
 
@@ -253,7 +265,8 @@ class Neo4jSubjectUpdater {
 
 		foreach ( $relations->relations as $relation ) {
 			if ( $relation->targetId->isLocal() ) {
-				$local[] = $relation;
+				$target = $this->canonicalize === null ? $relation->targetId : ( $this->canonicalize )( $relation->targetId );
+                $local[] = new \ProfessionalWiki\SWS\Domain\Relation\TypedRelation( $relation->id, $target, $relation->propertyName );
 				continue;
 			}
 
@@ -300,7 +313,8 @@ class Neo4jSubjectUpdater {
 
 		foreach ( $subjects as $pageSubject ) {
 			$oldLabels = $currentLabels[$pageSubject->getId()] ?? [];
-			$newLabels = [ 'Subject', $pageSubject->subject->getSchemaName()->getText() ];
+			$schema = $this->schemaResolver->getSchema( $pageSubject->subject->getSchemaReference() );
+            $newLabels = [ 'Subject', Neo4jSchemaIdentity::label( $schema, $pageSubject->subject->getSchemaReference() ) ];
 
 			$labelsToRemove[$pageSubject->getId()] = array_diff( $oldLabels, $newLabels );
 			$labelsToAdd[$pageSubject->getId()] = array_diff( $newLabels, $oldLabels );

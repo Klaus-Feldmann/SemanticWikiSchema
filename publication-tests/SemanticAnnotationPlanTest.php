@@ -28,11 +28,12 @@ final class SemanticAnnotationPlanTest extends TestCase {
             self::assertSame([$expected],(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($this->fixture($name))->collect())->rows);
         }
     }
-    public function testOwnValueNeedsNoExternalFetchAndOriginsRemainSelectable(): void {
+    public function testOwnValuePrecedenceAndSingleSourceSnapshotRead(): void {
         $c=$this->fixture('wikidata-own');$calls=0;
         $reader=$this->reader($c,function() use($c,&$calls) { $calls++;return $c['external']; });
         self::assertSame('Eigene Angabe',$reader->collect()['fields'][0]['values'][0]['value']);
-        self::assertSame(0,$calls);
+        // The supplied callback reads the authorized source snapshot; it is not a network transport.
+        self::assertSame(1,$calls);
         self::assertSame('Mensch',$reader->collect(null,'external')['fields'][0]['values'][0]['value']);
         $reader->collect(null,'external');self::assertSame(1,$calls);
         self::assertSame('Eigene Angabe',$reader->collect(null,'own')['fields'][0]['values'][0]['value']);
@@ -49,13 +50,12 @@ final class SemanticAnnotationPlanTest extends TestCase {
         self::assertContains('Quellentitel=Regiomontanus',$plan->objects[0]);
         self::assertContains('Quellenbezeichnungsseite=Vermerk:Wikipedia (de)',$plan->objects[0]);
     }
-    public function testFailureDoesNotPublishPartialPlan(): void {
+    public function testUnavailableSourceDoesNotDiscardOtherFields(): void {
         $c=$this->fixture('remote-unavailable');
         array_unshift($c['schema']['properties'],['name'=>'Vorher','type'=>'text']);
         $c['subject']['statements']['Vorher']=['values'=>['Gut']];
-        $published=null;
-        try { $published=(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($c)->collect());self::fail('Expected failure'); }
-        catch (InvalidArgumentException $e) { self::assertNull($published); }
+        $plan=(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($c)->collect());
+        self::assertSame(['Vorher=Gut'],$plan->rows);
     }
     public function testExistingMappingsPreserved(): void {
         foreach (['Leserschaft','Leserschaftziel','Werkausgabe'] as $name) {
@@ -63,9 +63,19 @@ final class SemanticAnnotationPlanTest extends TestCase {
         }
     }
     public function testEmptyAndSkippedFields(): void {
-        foreach (['empty','image-7','wikitext-8','remote-manual','remote-missing'] as $name) {
+        $empty=$this->fixture('empty');
+        $empty['subject']['statements']['Feld']['values']=['',null];
+        self::assertSame([],(new AnnotationPlanner($empty['config']))->build($this->reader($empty)->collect())->rows);
+        foreach (['image-7','wikitext-8','remote-manual','remote-missing'] as $name) {
             self::assertSame([],(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($this->fixture($name))->collect())->rows);
         }
+    }
+    public function testPlainTextWhitespaceIsNotRewrittenInTheReadModel(): void {
+        $case=$this->fixture('empty');
+        $result=$this->reader($case)->collect();
+        self::assertSame('  ',$result['fields'][0]['values'][0]['value']);
+        // Planner rows are parser input; preserving raw text is not proof SMW stores an empty value.
+        self::assertSame(['Feld=  '],(new AnnotationPlanner($case['config']))->build($result)->rows);
     }
     public function testSnapshotIsNotChangedByCollecting(): void {
         $c=$this->fixture('url-structured');$before=$c;$this->reader($c)->collect();self::assertSame($before,$c);

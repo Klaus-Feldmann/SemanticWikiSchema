@@ -18,6 +18,7 @@
 
 					<div class="cdx-dialog__header__subtitle">
 						<EditableText
+							v-if="!identity"
 							ref="descriptionField"
 							:model-value="description"
 							:edit-button-label="$i18n( 'sws-schema-editor-description-edit' ).text()"
@@ -51,6 +52,14 @@
 					<CdxIcon :icon="cdxIconClose" />
 				</CdxButton>
 			</template>
+
+			<div class="ext-sws-schema-editor-dialog__identity">
+				<IdentityEditor
+					v-if="identity"
+					:id="props.initialSchema.getId()"
+					:model-value="identity"
+					@update:model-value="identity = $event; markChanged()" />
+			</div>
 
 			<SchemaEditor
 				ref="schemaEditor"
@@ -88,6 +97,7 @@
 </template>
 
 <script setup lang="ts">
+import IdentityEditor from '@/components/common/IdentityEditor.vue';
 import SchemaEditor, { SchemaEditorExposes } from '@/components/SchemaEditor/SchemaEditor.vue';
 import SummaryAction from '@/components/common/SummaryAction.vue';
 import CloseConfirmationDialog from '@/components/common/CloseConfirmationDialog.vue';
@@ -117,6 +127,7 @@ const emit = defineEmits<{
 
 const schemaEditor = ref<SchemaEditorExposes | null>( null );
 const description = ref( props.initialSchema.getDescription() );
+const identity = ref( props.initialSchema.getIdentity() );
 const { hasChanged: committed, markChanged, resetChanged } = useChangeDetection();
 
 // A description still being typed is already something to save, and nothing once it is discarded.
@@ -126,10 +137,11 @@ const descriptionField = ref<InstanceType<typeof EditableText> | null>( null );
 
 const hasChanged = computed( (): boolean => committed.value || descriptionDirty.value );
 
-const dialogTitle = computed( () => mw.msg( 'sws-editing-schema', props.initialSchema.getName() ) );
+const dialogTitle = computed( () => mw.msg( 'sws-editing-schema', props.initialSchema.getLabel() ) );
 
 watch( () => props.initialSchema, ( schema ) => {
 	description.value = schema.getDescription();
+	identity.value = schema.getIdentity();
 } );
 
 function onDescriptionChanged( value: string ): void {
@@ -160,6 +172,7 @@ watch( () => props.open, ( isOpen ) => {
 	if ( isOpen ) {
 		// Reopening after a discard must not keep the abandoned description.
 		description.value = props.initialSchema.getDescription();
+		identity.value = props.initialSchema.getIdentity();
 		resetChanged();
 	}
 } );
@@ -186,7 +199,11 @@ async function writeSchema( summary: string ): Promise<void> {
 		return;
 	}
 
-	const schema = schemaEditor.value.getSchema();
+	const schema = identity.value === null ? schemaEditor.value.getSchema() : schemaEditor.value.getSchema().withIdentity( identity.value );
+	if ( schema.getId() !== null && !Object.keys( identity.value?.labels ?? {} ).some( ( lang ) => identity.value!.labels[ lang ].trim() !== '' ) ) {
+		mw.notify( mw.msg( 'sws-schema-creator-name-required' ), { type: 'error' } );
+		return;
+	}
 	const schemaName = schema.getName();
 	const editSummary = summary || mw.msg( 'sws-schema-editor-summary-default' );
 
@@ -225,6 +242,7 @@ defineExpose( { hasChanged } );
 		.cdx-dialog__body {
 			padding: 0;
 			display: grid;
+            grid-template-rows: auto minmax( 0, 1fr );
 			flex-grow: 1;
 		}
 
@@ -249,6 +267,12 @@ defineExpose( { hasChanged } );
 			min-width: 0;
 		}
 	}
+
+    &__identity {
+        max-height: 35vh;
+        overflow-y: auto;
+        padding-inline: @spacing-100;
+    }
 
 	&__dependence {
 		margin: @spacing-25 0 0;

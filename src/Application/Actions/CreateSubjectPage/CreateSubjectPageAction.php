@@ -54,6 +54,7 @@ readonly class CreateSubjectPageAction {
 		private bool $validationEnforced,
 		private bool $subjectFirst,
 		private int $subjectPageNamespace,
+		private string $identityLanguage = 'en',
 	) {
 	}
 
@@ -190,12 +191,14 @@ readonly class CreateSubjectPageAction {
 	}
 
 	private function buildSubject( CreateSubjectPageRequest $request, SchemaReference $schemaReference ): Subject {
-		return new Subject(
+		$schemaReference = $this->schemaResolver->getSchema( $schemaReference )?->getReference() ?? $schemaReference;
+		return \ProfessionalWiki\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
 			id: $this->newSubjectIdResolver->resolve( $request->id ),
 			label: SubjectLabel::fromText( $request->label ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $request->statements ),
-		);
+            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $request->fieldNotes, [], $request->fieldNotes === [] ? null : $this->schemaResolver->getSchema( $schemaReference ) ),
+	), $this->identityLanguage, $request->identity );
 	}
 
 }

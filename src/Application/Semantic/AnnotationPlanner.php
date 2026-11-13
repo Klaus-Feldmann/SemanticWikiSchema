@@ -15,6 +15,8 @@ final class AnnotationPlanner {
         if (!is_array($names)) { throw new InvalidArgumentException('WikiSchemaSmwMapping: schema mapping must be a table'); }
         $rows=[];$objects=[];$seen=[];$formatter=new SmwValueFormatter();
         foreach($result['fields'] as $field) {
+            if ($field['type'] === 'image') { continue; }
+            if ($field['type'] === 'page' && ($field['assignCategories'] ?? false)) { continue; }
             if ($field['type'] === 'relation' && ($field['status'] ?? '') === 'deferred-relation') {
                 continue;
             }

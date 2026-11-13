@@ -1,3 +1,5 @@
+import { type LocalizedIdentity, identityLabel, identityWithLabel } from './LocalizedIdentity';
+import type { SchemaReference } from './SchemaReference';
 import { SubjectId } from '@/domain/SubjectId';
 import { StatementList } from '@/domain/StatementList';
 import type { SchemaName } from '@/domain/Schema';
@@ -17,7 +19,23 @@ export class Subject {
 		private readonly statements: StatementList,
 		private readonly pageIdentifiers: PageIdentifiers,
 		private readonly hostSubject: HostSubject | null,
+		private readonly identity: LocalizedIdentity | null = null,
+		private readonly schemaReference: SchemaReference = schemaName,
 	) {
+	}
+
+	public getIdentity(): LocalizedIdentity | null {
+		return this.identity;
+	}
+
+	public getSchemaReference(): SchemaReference {
+		return this.schemaReference;
+	}
+
+	public withIdentity( identity: LocalizedIdentity | null ): Subject {
+		const label = identity === null ? this.label : identity.labels[ identity.identityLanguage ] || null;
+		return new Subject( this.id, label, label ?? this.displayName, this.displayNameIsGenerated,
+			this.schemaName, this.statements, this.pageIdentifiers, this.hostSubject, identity, this.schemaReference );
 	}
 
 	public getId(): SubjectId {
@@ -38,7 +56,7 @@ export class Subject {
 	 * fallback as the Subject's id.
 	 */
 	public getDisplayName(): string {
-		return this.displayName;
+		return identityLabel( this.identity, this.displayName );
 	}
 
 	/**
@@ -47,7 +65,7 @@ export class Subject {
 	 * because someone typed it. Displays go through presentation/subjectDisplayName.ts.
 	 */
 	public hasGeneratedDisplayName(): boolean {
-		return this.displayNameIsGenerated;
+		return this.displayNameIsGenerated && !Object.values( this.identity?.labels ?? {} ).some( ( label ) => label.trim() !== '' );
 	}
 
 	public getSchemaName(): SchemaName {
@@ -97,6 +115,7 @@ export class Subject {
 			this.statements,
 			this.pageIdentifiers,
 			this.hostSubject,
+			identityWithLabel( this.identity, label ), this.schemaReference,
 		);
 	}
 
@@ -110,6 +129,7 @@ export class Subject {
 			statements,
 			this.pageIdentifiers,
 			this.hostSubject,
+			this.identity, this.schemaReference,
 		);
 	}
 

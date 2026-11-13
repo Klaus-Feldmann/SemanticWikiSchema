@@ -1,49 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RestPageTitleSearch } from '@/persistence/RestPageTitleSearch';
 import { InMemoryHttpClient } from '@/infrastructure/HttpClient/InMemoryHttpClient';
-
-const REST_URL = '/rest.php';
-const SEARCH_URL = `${ REST_URL }/v1/search/title?q=amster&limit=10`;
-
-function newSearch( responses: Record<string, Response> ): RestPageTitleSearch {
-	return new RestPageTitleSearch( REST_URL, new InMemoryHttpClient( responses ) );
-}
-
-function jsonResponse( body: unknown ): Response {
-	return { ok: true, json: async () => body } as Response;
-}
-
-describe( 'RestPageTitleSearch', () => {
-
-	it( 'reads MediaWiki\'s own title search, which already carries the page id', async () => {
-		const search = newSearch( {
-			[ SEARCH_URL ]: jsonResponse( {
-				pages: [
-					{ id: 12, key: 'Amsterdam_Museum', title: 'Amsterdam Museum' },
-					{ id: 34, key: 'Amsterdam', title: 'Amsterdam' },
-				],
-			} ),
-		} );
-
-		expect( await search.searchPageTitles( 'amster', 10 ) ).toEqual( [
-			{ pageId: 12, title: 'Amsterdam Museum' },
-			{ pageId: 34, title: 'Amsterdam' },
-		] );
+afterEach( () => vi.unstubAllGlobals() );
+describe( 'Shared page title adapter', () => {
+	it.each( [ 0, 14, undefined ] )( 'forwards namespace %s and preserves canonical identity', async ( namespace ) => {
+		const pages = [ { pageId: 1, title: 'Canonical', displayTitle: 'Anzeige' } ];
+		const search = vi.fn().mockResolvedValue( pages );
+		vi.stubGlobal( 'mw', { loader: { using: vi.fn().mockResolvedValue( undefined ), require: () => ( { search } ) } } );
+		const adapter = new RestPageTitleSearch( '/rest.php', new InMemoryHttpClient( {} ) );
+		expect( await adapter.searchPageTitles( 'a', 10, namespace ) ).toEqual( pages );
+		expect( search ).toHaveBeenCalledWith( 'a', 10, namespace );
 	} );
-
-	it( 'answers with nothing when the search matched nothing', async () => {
-		const search = newSearch( { [ SEARCH_URL ]: jsonResponse( { pages: [] } ) } );
-
-		expect( await search.searchPageTitles( 'amster', 10 ) ).toEqual( [] );
+	it( 'propagates failures', async () => {
+		vi.stubGlobal( 'mw', { loader: { using: vi.fn().mockRejectedValue( new Error( 'Failed' ) ) } } );
+		await expect( new RestPageTitleSearch( '', new InMemoryHttpClient( {} ) ).searchPageTitles( 'x', 10 ) ).rejects.toThrow( 'Failed' );
 	} );
-
-	it( 'throws when the search fails', async () => {
-		const search = newSearch( {
-			[ SEARCH_URL ]: { ok: false, json: async () => ( {} ) } as Response,
-		} );
-
-		await expect( search.searchPageTitles( 'amster', 10 ) )
-			.rejects.toThrow( 'Error searching page titles' );
-	} );
-
 } );

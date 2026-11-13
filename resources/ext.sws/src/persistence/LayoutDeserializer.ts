@@ -1,3 +1,4 @@
+import type { SchemaReference } from '@/domain/SchemaReference';
 import { Layout, type LayoutName, type DisplayRule } from '@/domain/Layout';
 import { PropertyName } from '@/domain/PropertyDefinition';
 
@@ -6,7 +7,7 @@ export class LayoutDeserializer {
 	public deserialize( layoutName: LayoutName, data: Record<string, unknown> ): Layout {
 		return new Layout(
 			layoutName,
-			data.schema as string,
+			data.schema as SchemaReference,
 			data.type as string,
 			( data.description ?? '' ) as string,
 			this.deserializeDisplayRules( ( data.displayRules ?? [] ) as Record<string, unknown>[] ),

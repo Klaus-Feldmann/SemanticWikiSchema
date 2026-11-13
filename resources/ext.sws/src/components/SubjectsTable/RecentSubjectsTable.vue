@@ -66,7 +66,7 @@ const loading = ref( true );
 const loadFailed = ref( false );
 
 const columns = subjectColumns( { showSchema: true, showPage: !isSubjectFirst(), sortable: false } );
-const listUrl = mw.util.getUrl( 'Special:Subjects' );
+const listUrl = mw.util.getUrl( 'Special:Entities' );
 const emptyText = computed( () => mw.msg( loadFailed.value ? 'sws-subjects-load-error' : 'sws-subjects-empty' ) );
 
 onMounted( async () => {

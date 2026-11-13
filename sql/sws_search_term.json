@@ -1,0 +1,72 @@
+[
+  {
+    "name": "sws_search_term",
+    "comment": "Rebuildable published identity terms; revisioned labels remain in page content.",
+    "columns": [
+      {
+        "name": "swst_page_id",
+        "type": "bigint",
+        "options": {
+          "notnull": true
+        }
+      },
+      {
+        "name": "swst_kind",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swst_reference",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 255
+        }
+      },
+      {
+        "name": "swst_language",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 64
+        }
+      },
+      {
+        "name": "swst_role",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 16
+        }
+      },
+      {
+        "name": "swst_key",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 255
+        }
+      }
+    ],
+    "indexes": [
+      {
+        "name": "swst_lookup",
+        "columns": [
+          "swst_kind",
+          "swst_key",
+          "swst_page_id"
+        ]
+      }
+    ],
+    "pk": [
+      "swst_page_id",
+      "swst_kind",
+      "swst_reference",
+      "swst_language",
+      "swst_role"
+    ]
+  }
+]

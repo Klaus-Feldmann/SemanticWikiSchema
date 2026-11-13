@@ -44,7 +44,8 @@ import type { Value } from '@/domain/Value';
 
 <script setup lang="ts">
 import { ref, watch, computed, nextTick, toRef } from 'vue';
-import { CdxField, CdxIcon, CdxMultiselectLookup, CdxSelect } from '@wikimedia/codex';
+import { CdxField, CdxIcon, CdxMultiselectLookup } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import type { ChipInputItem, MenuItemData } from '@wikimedia/codex';
 import { cdxIconInfo } from '@wikimedia/codex-icons';
 import { newStringValue, StringValue, ValueType } from '@/domain/Value';

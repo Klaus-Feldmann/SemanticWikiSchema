@@ -1,3 +1,4 @@
+import type { LocalizedIdentity } from '@/domain/LocalizedIdentity';
 import type {
 	ReferencingSubject,
 	ReferencingSubjects,
@@ -58,8 +59,10 @@ function dependentSubjectsField( subjects: readonly Subject[] ): { dependentSubj
 	return {
 		dependentSubjects: subjects.map( ( subject ) => ( {
 			id: subject.getId().text,
-			schema: subject.getSchemaName(),
+			schema: subject.getSchemaReference(),
+			... subject.getIdentity(),
 			statements: statementsToJson( subject.getStatements() ),
+			...( Object.keys( subject.getStatements().fieldNotes ).length || subject.getStatements().notesEdited ? { fieldNotes: subject.getStatements().fieldNotes } : {} ),
 		} ) ),
 	};
 }
@@ -299,11 +302,14 @@ export class RestSubjectRepository implements SubjectRepository {
 		dependentSubjects: readonly Subject[],
 		comment?: string,
 		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult> {
 		const payload = {
 			label: label,
+			... identity,
 			schema: schemaName,
 			statements: statementsToJson( statements ),
+			...( Object.keys( statements.fieldNotes ).length || statements.notesEdited ? { fieldNotes: statements.fieldNotes } : {} ),
 			comment,
 			id: id?.text,
 			...dependentSubjectsField( dependentSubjects ),
@@ -331,11 +337,14 @@ export class RestSubjectRepository implements SubjectRepository {
 		dependentSubjects: readonly Subject[],
 		comment?: string,
 		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult> {
 		const payload = {
 			label: label,
+			... identity,
 			schema: schemaName,
 			statements: statementsToJson( statements ),
+			...( Object.keys( statements.fieldNotes ).length || statements.notesEdited ? { fieldNotes: statements.fieldNotes } : {} ),
 			comment,
 			id: id?.text,
 			...dependentSubjectsField( dependentSubjects ),
@@ -367,6 +376,7 @@ export class RestSubjectRepository implements SubjectRepository {
 		comment?: string,
 		pageTitle?: string,
 		id?: SubjectId,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectPageWriteResult> {
 		let response: Response;
 
@@ -379,9 +389,11 @@ export class RestSubjectRepository implements SubjectRepository {
 				`${ this.mediaWikiRestApiUrl }/sws/v0/subjects`,
 				{
 					label: label,
+					... identity,
 					pageTitle,
 					schema: schemaName,
 					statements: statementsToJson( statements ),
+					...( Object.keys( statements.fieldNotes ).length || statements.notesEdited ? { fieldNotes: statements.fieldNotes } : {} ),
 					comment,
 					id: id?.text,
 					...dependentSubjectsField( dependentSubjects ),
@@ -448,12 +460,15 @@ export class RestSubjectRepository implements SubjectRepository {
 		statements: StatementList,
 		dependentSubjects: readonly Subject[],
 		comment?: string,
+		identity?: LocalizedIdentity | null,
 	): Promise<SubjectWriteResult> {
 		const response = await this.httpClient.put(
 			`${ this.mediaWikiRestApiUrl }/sws/v0/subject/${ id.text }`,
 			{
+				... identity,
 				label,
 				statements: statementsToJson( statements ),
+				...( Object.keys( statements.fieldNotes ).length || statements.notesEdited ? { fieldNotes: statements.fieldNotes } : {} ),
 				comment,
 				...dependentSubjectsField( dependentSubjects ),
 			},

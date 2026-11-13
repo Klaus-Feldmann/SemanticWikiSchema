@@ -65,11 +65,16 @@ abstract class SchemaPageWriteApi extends ActionModuleBasedHandler {
 		}
 
 		$this->schemaPage = $schemaPage;
+        $existing = $this->responseForExistingResource();
+        if ($existing !== null) { return $existing; }
 
 		return parent::execute();
 	}
 
-	private function newSchemaPage(): ?Title {
+    /** A verified idempotent create may return the existing resource without editing it. */
+    protected function responseForExistingResource(): ?Response { return null; }
+
+	protected function newSchemaPage(): ?Title {
 		return MediaWikiServices::getInstance()->getTitleFactory()->newFromText(
 			SWSExtension::getInstance()->getPageIdentifiersResolver()->getTitleInNamespace(
 				SWSExtension::NS_SCHEMA,
@@ -79,7 +84,7 @@ abstract class SchemaPageWriteApi extends ActionModuleBasedHandler {
 	}
 
 	private function getSchemaName(): string {
-		return $this->getValidatedParams()['schemaName'];
+		return $this->getValidatedParams()['schemaName'] ?? '';
 	}
 
 	/**

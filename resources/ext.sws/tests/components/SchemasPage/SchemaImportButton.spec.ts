@@ -79,7 +79,7 @@ describe( 'SchemaImportButton', () => {
 		expect( fileInput( wrapper ).attributes( 'accept' ) ).toContain( '.json' );
 	} );
 
-	it( 'offers the Schemas of the chosen file, compared with the wiki\'s', async () => {
+	it( 'offers fresh identities even when existing schemas have the same name', async () => {
 		listSchemas( 'Company', 'Person' );
 		const wrapper = mountButton( new InMemorySchemaRepository( [
 			newSchema( { title: 'Company' } ),
@@ -88,7 +88,7 @@ describe( 'SchemaImportButton', () => {
 
 		await chooseFile( wrapper, exportFile( 'Person', 'Museum' ) );
 
-		expect( plannedImport( wrapper ) ).toEqual( [ [ 'Person', 'changed' ], [ 'Museum', 'new' ] ] );
+		expect( plannedImport( wrapper ) ).toEqual( [ [ 'Person', 'new' ], [ 'Museum', 'new' ] ] );
 	} );
 
 	it( 'reports a file it cannot import, and opens no dialog', async () => {

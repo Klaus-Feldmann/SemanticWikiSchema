@@ -2,7 +2,7 @@
  * The local Source's id grammar (ADR 14): `s` plus 14 characters of a 58-character alphabet that omits
  * the visually ambiguous 0, O, I and l.
  */
-const LOCAL_ID_PATTERN = /^s[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{14}$/;
+const LOCAL_ID_PATTERN = /^(?:s[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{14}|E[1-9][0-9]{0,17})$/;
 
 /**
  * A Source key is an identifier, not a path: a letter followed by up to 63 letters, digits, underscores

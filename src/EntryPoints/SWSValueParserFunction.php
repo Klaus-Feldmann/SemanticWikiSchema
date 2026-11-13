@@ -22,6 +22,7 @@ class SWSValueParserFunction {
 
 	public function __construct(
 		private readonly SubjectResolver $subjectResolver,
+		private readonly ?EffectiveFieldLookup $fields = null,
 	) {
 	}
 
@@ -36,6 +37,10 @@ class SWSValueParserFunction {
 		}
 
 		$params = self::parseNamedParams( array_slice( $args, 1 ) );
+		if ( $this->fields !== null && ( ( $params['origin'] ?? 'all' ) !== 'own' || isset( $params['part'] ) ) ) {
+			return $this->effective( $parser, $propertyName, $params );
+		}
+
 
 		$subject = $this->resolveSubject( $parser, $params );
 
@@ -57,6 +62,30 @@ class SWSValueParserFunction {
 		}
 
 		return [ htmlspecialchars( $formatted ), 'noparse' => true, 'isHTML' => true ];
+	}
+
+	/** Always return escaped text: data and notes cannot inject parser functions or categories here. */
+	private function effective( Parser $parser, string $name, array $params ): string|array {
+		$part = $params['part'] ?? 'value';
+		if ( !in_array( $part, [ 'value', 'authorNote', 'sourceNote', 'origin', 'status', 'sourceStatus' ], true ) ) { return ''; }
+		$title = $parser->getTitle();
+		if ( $title === null ) { return ''; }
+		$options = array_intersect_key( $params, array_flip( [ 'page', 'subject', 'language', 'origin' ] ) );
+		$options['field'] = $name;
+		if ( ( isset( $params['page'] ) || isset( $params['subject'] ) ) && !$parser->incrementExpensiveFunctionCount() ) { return ''; }
+		try { $result = $this->fields->read( $title, $options ); }
+		catch ( \RuntimeException|\InvalidArgumentException $e ) {
+			if ( $processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
+			return '';
+		}
+		$field = $result['fields'][0] ?? null;
+		if ( $field === null ) { return ''; }
+		$text = match ( $part ) {
+			'value' => implode( $params['separator'] ?? self::DEFAULT_SEPARATOR, array_column( $field['values'], 'value' ) ),
+			'origin' => implode( $params['separator'] ?? self::DEFAULT_SEPARATOR, array_values( array_unique( array_column( $field['values'], 'origin' ) ) ) ),
+			default => $field[$part] ?? '',
+		};
+		return [ htmlspecialchars( (string)$text ), 'noparse' => true, 'isHTML' => true ];
 	}
 
 	/**

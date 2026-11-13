@@ -401,7 +401,7 @@ describe( 'SubjectPage', () => {
 		const wrapper = await mountLoadedPage();
 
 		expect( wrapper.find( `${ REFERENCED_ROW } ${ NAME_LINK }` ).attributes( 'href' ) )
-			.toBe( '/wiki/Special:Subject/' + REFERENCED_ID );
+			.toBe( '/wiki/Special:Entity/' + REFERENCED_ID );
 		expect( wrapper.find( `${ REQUESTED_ROW } ${ NAME_LINK }` ).exists() ).toBe( false );
 	} );
 
@@ -975,7 +975,7 @@ describe( 'SubjectPage', () => {
 		await flushPromises();
 
 		const copied = new URL( writeText.mock.calls[ 0 ][ 0 ] as string );
-		expect( copied.pathname ).toBe( '/wiki/Special:Subject/' + REFERENCED_ID );
+		expect( copied.pathname ).toBe( '/wiki/Special:Entity/' + REFERENCED_ID );
 		expect( copied.origin ).toBe( location.origin );
 		expect( mw.notify ).toHaveBeenCalledWith( 'sws-managesubjects-link-copied', { type: 'success' } );
 	} );

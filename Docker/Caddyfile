@@ -1,3 +1,0 @@
-{$MW_SERVER} {
-	reverse_proxy mediawiki:80
-}

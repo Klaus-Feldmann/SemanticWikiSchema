@@ -9,6 +9,8 @@ export interface ExternalField {
 	name: string; source: 'wikidata' | 'wikibase-local'; propertyId: string;
 	propertyLabel?: string; propertyUrl?: string | null;
 	status: 'resolved' | 'missing' | 'unavailable' | 'unsupported' | 'manual'; values: ExternalEntityValue[];
+	sourceStatus?: ExternalField['status']; retained?: boolean; recorded?: boolean; storageMode?: 'store';
+	language?: string | null; languageFallback?: boolean; lastAttemptedAt?: string; lastSuccessfulAt?: string;
 }
 function safeLink( source: string, id: string, value: unknown, property: boolean ): value is string {
 	if ( typeof value !== 'string' ) {
@@ -80,6 +82,11 @@ export function useExternalStatements( subject: Ref<Subject>, definitions: Ref<P
 					( field.propertyUrl && !safeLink( field.source, field.propertyId, field.propertyUrl, true ) ) ) {
 					throw new Error( 'Invalid derived property' );
 				}
+				if ( ( field.sourceStatus !== undefined && ![ 'resolved', 'missing', 'unavailable', 'unsupported', 'manual' ].includes( field.sourceStatus ) ) ||
+					[ field.retained, field.recorded, field.languageFallback ].some( ( value ) => value !== undefined && typeof value !== 'boolean' ) ||
+					( field.language !== undefined && field.language !== null && !/^[a-z]{2,12}(?:-[a-z0-9]{1,12})*$/.test( field.language ) ) ) {
+					throw new Error( 'Invalid stored source metadata' );
+				}
 				for ( const value of field.values ) {
 					if ( ![ 'entity', 'text', 'image', 'time', 'novalue', 'somevalue' ].includes( value.kind ) || ( value.kind === 'entity' &&
 						( typeof value.id !== 'string' || !/^Q[1-9][0-9]*$/.test( value.id ) || value.id !== value.id.trim() ||
@@ -111,7 +118,8 @@ export function useExternalStatements( subject: Ref<Subject>, definitions: Ref<P
 			}
 		} catch {
 			if ( ticket === sequence ) {
-				failed.value = true;
+				fields.value = new Map( bound.map( ( p ) => [ p.name.toString(), { name: p.name.toString(), source: p.externalProperty!.source, propertyId: p.externalProperty!.id, status: 'unavailable' as const, values: [] } ] ) );
+                failed.value = false;
 			}
 		} finally {
 			clearTimeout( timeout );

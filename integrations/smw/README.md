@@ -23,7 +23,7 @@ Omitted URL keys retain these defaults: `url` -> Quellen-URL, `label` -> Quellen
 
 Changing server settings requires affected pages to be reprocessed. There is no automatic page dependency on LocalSettings.php. In contrast, subject/schema changes keep their existing refresh behavior. Existing SMW property types are not modified. Define WikiSchema-Feld and WikiSchema-Subjekt as Text properties in the actual localized property namespace when using the new defaults; adapt tables that query the old names. Old annotations are replaced on normal full-page processing, not by a database migration.
 
-Main subjects and linked dependent subjects on the same page contribute supported scalar/date annotations. Images and executable Wikitext are not mirrored as scalar annotations; standalone secondary subjects do not contribute. Preserve the running job worker and the existing Q-ID registration workflow. True source failures retain the existing safeguards.
+Main subjects and linked dependent subjects on the same page contribute supported scalar/date annotations. Images and executable Wikitext are not mirrored as scalar annotations; standalone secondary subjects do not contribute. Preserve the running job worker and the existing Q-ID registration workflow. Recognized source failures are empty field outcomes in SWS 0.2.02: other fields continue and optionally emit a source note. Malformed snapshots, stale revisions and unrelated parser errors remain guarded. Historical Lua fixtures under tests/legacy describe the old implementation, not this current policy.
 
 ## Tests
 

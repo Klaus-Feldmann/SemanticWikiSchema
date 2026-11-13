@@ -159,6 +159,142 @@
 					"dependentRequired": "\"properties\" and \"nodes\" project the Subject, so they need a \"subject\"."
 				}
 			}
+		},
+		"schemaIds": {
+			"type": "object",
+			"maxProperties": 1000,
+			"propertyNames": {
+				"pattern": "^S[1-9][0-9]{0,17}$"
+			},
+			"$error": {
+				"maxProperties": "A mapping may hold at most 1000 schema entries."
+			},
+			"additionalProperties": {
+				"type": "object",
+				"properties": {
+					"subject": {
+						"type": "object",
+						"required": [
+							"class"
+						],
+						"properties": {
+							"class": {
+								"type": "string",
+								"minLength": 1
+							},
+							"labelPredicate": {
+								"type": "string",
+								"minLength": 1
+							}
+						},
+						"additionalProperties": false
+					},
+					"nodes": {
+						"type": "object",
+						"maxProperties": 64,
+						"propertyNames": {
+							"pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+							"$error": "A node key must start with a letter or an underscore, and may only contain letters, digits, underscores and hyphens."
+						},
+						"$error": {
+							"maxProperties": "A schema entry may declare at most 64 nodes."
+						},
+						"additionalProperties": {
+							"type": "object",
+							"required": [
+								"class",
+								"linkPredicate"
+							],
+							"properties": {
+								"class": {
+									"type": "string",
+									"minLength": 1
+								},
+								"linkPredicate": {
+									"type": "string",
+									"minLength": 1
+								},
+								"parent": {
+									"type": "string",
+									"pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+								},
+								"per": {
+									"enum": [
+										"subject",
+										"value"
+									],
+									"$error": "A node is either per \"subject\" or per \"value\"."
+								},
+								"linkDirection": {
+									"enum": [
+										"toNode",
+										"fromNode"
+									],
+									"$error": "A node's link direction is either \"toNode\" or \"fromNode\"."
+								}
+							},
+							"additionalProperties": false
+						}
+					},
+					"properties": {
+						"type": "object",
+						"maxProperties": 500,
+						"additionalProperties": {
+							"$ref": "#/$defs/propertyMapping"
+						},
+						"$error": {
+							"maxProperties": "A schema entry may map at most 500 properties."
+						}
+					},
+					"contributions": {
+						"type": "object",
+						"minProperties": 1,
+						"maxProperties": 32,
+						"propertyNames": {
+							"minLength": 1
+						},
+						"additionalProperties": {
+							"type": "object",
+							"minProperties": 1,
+							"maxProperties": 100,
+							"additionalProperties": {
+								"$ref": "#/$defs/valueMapping"
+							},
+							"$error": {
+								"maxProperties": "A contribution may map at most 100 properties."
+							}
+						},
+						"$error": {
+							"maxProperties": "A schema entry may contribute through at most 32 relations."
+						}
+					}
+				},
+				"additionalProperties": false,
+				"anyOf": [
+					{
+						"required": [
+							"subject"
+						]
+					},
+					{
+						"required": [
+							"contributions"
+						]
+					}
+				],
+				"dependentRequired": {
+					"properties": [
+						"subject"
+					],
+					"nodes": [
+						"subject"
+					]
+				},
+				"$error": {
+					"anyOf": "A schema entry must project the Subject itself, contribute to other Subjects, or both.",
+					"dependentRequired": "\"properties\" and \"nodes\" project the Subject, so they need a \"subject\"."
+				}
+			}
 		}
 	},
 	"additionalProperties": false,

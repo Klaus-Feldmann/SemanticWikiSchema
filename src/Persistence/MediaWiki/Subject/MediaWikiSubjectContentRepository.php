@@ -17,6 +17,7 @@ use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
 use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
 use RuntimeException;
 use WikiPage;
+use Wikimedia\Rdbms\IDBAccessObject;
 
 class MediaWikiSubjectContentRepository implements SubjectContentRepository {
 
@@ -90,11 +91,20 @@ class MediaWikiSubjectContentRepository implements SubjectContentRepository {
 		PageId $pageId,
 		string $editSummary
 	): void {
-		$savingResult = $this->pageContentSaver->saveContent(
+		$proposed = $subjectContent->getPageSubjects();
+		$revision = $this->revisionLookup->getRevisionByPageId( $pageId->id, 0, IDBAccessObject::READ_LATEST );
+		if ( $revision === null ) {
+			throw new RuntimeException( 'Page not found' );
+		}
+		$savingResult = $this->pageContentSaver->updateContentAtRevision(
 			$pageId,
-			[
-				MediaWikiSubjectRepository::SLOT_NAME => $subjectContent,
-			],
+			$revision->getId(),
+			function ( RevisionRecord $parent ) use ( $proposed ): array {
+				$current = $this->getSubjectContentFromRevision( $parent );
+				\ProfessionalWiki\SWS\Application\Source\SourceSnapshotEditGuard::preserve( $proposed,
+					$current?->getPageSubjects() ?? \ProfessionalWiki\SWS\Domain\Page\PageSubjects::newEmpty() );
+				return [ MediaWikiSubjectRepository::SLOT_NAME => SubjectContent::newFromData( $proposed ) ];
+			},
 			CommentStoreComment::newUnsavedComment( $editSummary )
 		);
 

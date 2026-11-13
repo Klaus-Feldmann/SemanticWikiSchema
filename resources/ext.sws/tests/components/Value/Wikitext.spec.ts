@@ -27,9 +27,9 @@ function schema( execute = true ) {
 	} } );
 }
 describe( 'Wikitext modes', () => {
-	it( 'registers a string-backed type which is passive by default', () => {
-		expect( property().execute ).toBe( false );
-		expect( isSchemaExecution( property() ) ).toBe( false );
+	it( 'registers a string-backed type which always represents a schema template', () => {
+		expect( property() ).not.toHaveProperty( 'execute' );
+		expect( isSchemaExecution( property() ) ).toBe( true );
 		expect( Neo.getInstance().getPropertyTypeRegistry().getType( 'wikitext' ).getValueType() ).toBe( 'string' );
 	} );
 	it( 'preserves meaningful whitespace and multiline source through serialization', () => {
@@ -51,11 +51,9 @@ describe( 'Wikitext modes', () => {
 		expect( w.find( 'b' ).exists() ).toBe( false );
 		expect( w.text() ).toBe( '<b>{{SWS}}</b>' );
 	} );
-	it( 'the checkbox changes mode without making subject values executable', async () => {
+	it( 'does not offer an execution switch', () => {
 		const w = createTestWrapper( WikitextAttributesEditor, { property: property() } );
-		w.findComponent( CdxCheckbox ).vm.$emit( 'update:modelValue', true );
-		await w.vm.$nextTick();
-		expect( w.emitted( 'update:property' )![ 0 ] ).toEqual( [ { execute: true } ] );
+		expect( w.findComponent( CdxCheckbox ).exists() ).toBe( false );
 	} );
 	it( 'blocks an empty schema program', () => {
 		const w = createTestWrapper( WikitextAttributesEditor, { property: property( { execute: true, wikitext: ' ' } ) } );
@@ -68,16 +66,16 @@ describe( 'Wikitext modes', () => {
 	it( 'retains the program and mode after saving and reopening the schema', () => {
 		const saved = new SchemaSerializer().schemaToJson( schema() );
 		const reopened = new SchemaDeserializer().deserialize( 'Person', saved );
-		expect( reopened.getPropertyDefinition( 'Verarbeitung' ) ).toMatchObject( { type: 'wikitext', execute: true, wikitext: '{{SWS}}' } );
+		expect( reopened.getPropertyDefinition( 'Verarbeitung' ) ).toMatchObject( { type: 'wikitext', wikitext: '{{SWS}}' } );
 	} );
-	it( 'retains inactive schema code without running it', () => {
-		expect( schema( false ).getPropertyDefinition( 'Verarbeitung' ) ).toMatchObject( { execute: false, wikitext: '{{SWS}}' } );
+	it( 'treats legacy inactive schema code as a template', () => {
+		expect( schema( false ).getPropertyDefinition( 'Verarbeitung' ) ).toMatchObject( { wikitext: '{{SWS}}' } );
 	} );
 	it( 'does not create an input or statement for a schema program', () => {
 		expect( [ ...schema().blankStatements() ].map( ( s ) => s.propertyName.toString() ) ).toEqual( [ 'Notiz' ] );
 	} );
-	it( 'an ordinary wikitext property remains a normal subject input', () => {
-		expect( [ ...schema( false ).blankStatements() ].map( ( s ) => s.propertyName.toString() ) ).toEqual( [ 'Verarbeitung', 'Notiz' ] );
+	it( 'legacy template fields remain hidden subject inputs', () => {
+		expect( [ ...schema( false ).blankStatements() ].map( ( s ) => s.propertyName.toString() ) ).toEqual( [ 'Notiz' ] );
 	} );
 	it( 'preserves dormant subject values when editing other fields in execution mode', () => {
 		const old = new StatementList( [ new Statement( new PropertyName( 'Verarbeitung' ), 'wikitext', newWikitextValue( '{{NichtAusfuehren}}' ) ) ] );
@@ -87,6 +85,6 @@ describe( 'Wikitext modes', () => {
 	it( 'hides dormant values from the Data view and its field count', () => {
 		const statements = new StatementList( [ new Statement( new PropertyName( 'Verarbeitung' ), 'wikitext', newWikitextValue( '{{NichtAusfuehren}}' ) ) ] );
 		expect( resolveAllNonEmptyProperties( schema(), newSubject( { statements } ) ) ).toEqual( [] );
-		expect( resolveAllNonEmptyProperties( schema( false ), newSubject( { statements } ) ) ).toHaveLength( 1 );
+		expect( resolveAllNonEmptyProperties( schema( false ), newSubject( { statements } ) ) ).toHaveLength( 0 );
 	} );
 } );

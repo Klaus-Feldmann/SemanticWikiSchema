@@ -47,13 +47,22 @@ readonly class JsonSchemaSerializer {
 		return [
 			'$schema' => self::DIALECT,
 			'$id' => $this->documentUrl,
-			'title' => $schema->getName()->getText(),
+			'title' => $schema->getIdentity()?->label() ?? $schema->getName()->getText(),
 		] + $this->description( $schema->getDescription() ) + [
 			'type' => 'object',
 			'required' => [ 'statements' ],
+			'dependentRequired' => [
+				'identityLanguage'=>[ 'labels', 'descriptions' ],
+				'labels'=>[ 'identityLanguage', 'descriptions' ],
+				'descriptions'=>[ 'identityLanguage', 'labels' ],
+			],
 			'properties' => [
-				'schema' => [ 'const' => $schema->getName()->getText() ],
+				'schema' => [ 'const' => $schema->getReference()->toJson() ],
 				'label' => $this->labelSchema( $schema ),
+				'identityLanguage' => [ 'type'=>'string' ],
+				'labels' => [ 'type'=>'object', 'additionalProperties'=>[ 'type'=>'string' ] ],
+				'descriptions' => [ 'type'=>'object', 'additionalProperties'=>[ 'type'=>'string' ] ],
+                'fieldNotes' => [ 'type' => 'object', 'additionalProperties' => [ 'type' => 'string' ] ],
 				'statements' => $this->statementsSchema( $schema->getAllProperties() ),
 			],
 		];

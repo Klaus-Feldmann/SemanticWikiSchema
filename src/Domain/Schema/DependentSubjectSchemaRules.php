@@ -20,7 +20,7 @@ readonly class DependentSubjectSchemaRules {
 	 * Whether $schema declares its Subjects dependent differently from the stored Schema of its name.
 	 */
 	public function changesDeclaration( Schema $schema ): bool {
-		$storedSchema = $this->schemaResolver->getSchema( SchemaReference::local( $schema->getName() ) );
+		$storedSchema = $this->schemaResolver->getSchema( $schema->getReference() );
 
 		return $storedSchema !== null && $storedSchema->subjectsAreDependent() !== $schema->subjectsAreDependent();
 	}
@@ -64,7 +64,7 @@ readonly class DependentSubjectSchemaRules {
 	 * A Schema targeting itself targets itself as saved, not as stored.
 	 */
 	private function resolveTarget( Schema $schema, SchemaReference $targetReference ): ?Schema {
-		if ( $targetReference->equals( SchemaReference::local( $schema->getName() ) ) ) {
+		if ( $targetReference->equals( $schema->getReference() ) ) {
 			return $schema;
 		}
 

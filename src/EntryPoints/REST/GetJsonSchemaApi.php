@@ -44,15 +44,15 @@ class GetJsonSchemaApi extends SimpleHandler {
 		return $response;
 	}
 
-	private function findSchema( string $schemaName ): ?Schema {
-		try {
-			$name = new SchemaName( $schemaName );
-		} catch ( InvalidArgumentException ) {
-			// A reserved name such as "page" can never be a Schema.
-			return null;
-		}
-
-		return SWSExtension::getInstance()->getSchemaLookup()->getSchema( $name );
+	protected function findSchema( string $schemaName ): ?Schema {
+        try {
+            $extension = SWSExtension::getInstance();
+            return $extension->getSchemaResolverFor( $this->getAuthority() )->getSchema(
+                $extension->getSchemaReferenceParser()->localName( $schemaName )
+            );
+        } catch ( InvalidArgumentException ) {
+            return null;
+        }
 	}
 
 	public function getParamSettings(): array {

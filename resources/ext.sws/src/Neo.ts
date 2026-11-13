@@ -1,3 +1,4 @@
+import { WikitextValueType } from '@/domain/propertyTypes/WikitextValue';
 import { WikitextType } from '@/domain/propertyTypes/Wikitext';
 import { PageType } from '@/domain/propertyTypes/Page';
 import { TextType } from '@/domain/propertyTypes/Text';
@@ -39,6 +40,7 @@ export class Neo {
 		registry.registerType( new TextType() );
 		registry.registerType( new PageType() );
 		registry.registerType( new WikitextType() );
+		registry.registerType( new WikitextValueType() );
 		registry.registerType( new NumberType() );
 		registry.registerType( new SelectType() );
 		registry.registerType( new BooleanType() );

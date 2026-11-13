@@ -1,0 +1,35 @@
+[
+  {
+    "name": "sws_identity_host",
+    "columns": [
+      {
+        "name": "swsih_id",
+        "type": "binary",
+        "options": {
+          "notnull": true,
+          "length": 32
+        }
+      },
+      {
+        "name": "swsih_page",
+        "type": "integer",
+        "options": {
+          "notnull": true,
+          "unsigned": true
+        }
+      }
+    ],
+    "indexes": [
+      {
+        "name": "swsih_page",
+        "columns": [
+          "swsih_page"
+        ],
+        "unique": false
+      }
+    ],
+    "pk": [
+      "swsih_id"
+    ]
+  }
+]

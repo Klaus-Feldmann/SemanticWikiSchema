@@ -14,12 +14,17 @@ final class ProcessingHooks {
     public static ?Title $movedFrom = null;
 
     public static function queue( Title $title, ?Title $old = null ): void {
+        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
         MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title,
             [ 'page' => true ] + ( $old ? [ 'movedFrom' => $old->getPrefixedText() ] : [] ) ) );
     }
 
     public static function onRevisionDataUpdates( $title, $renderedRevision, array &$updates ): void {
         if ( !InternalPageProcessor::manages( $title, $renderedRevision->getRevision() ) ) { return; }
+        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
+            $updates = array_values( array_filter( $updates, static fn ( $update ) => !$update instanceof LinksUpdate ) );
+            return;
+        }
         $output = $renderedRevision->getRevisionParserOutput();
         if ( ProcessingResult::isCurrent( $title, $output->getExtensionData( ProcessingResult::STAMP ) ) ) {
             if ( self::$movedFrom ) {
@@ -32,6 +37,10 @@ final class ProcessingHooks {
         // Retain content-handler updates, indexing and other extensions' work. Only the incomplete
         // LinksUpdate (including pageprops and its SMW callback) is replaced by a complete worker.
         $updates = array_values( array_filter( $updates, static fn ( $update ) => !$update instanceof LinksUpdate ) );
+        // The outer worker publishes the final sealed output after its source-only revision.
+        // Deferred updates outside this scope may queue a final pass; its signed receipt skips fetch.
+        if ( SourceWriteScope::subjectsFor( $title ) !== null &&
+            SourceRefreshReceipt::isCurrent( $title, $renderedRevision->getRevision() ) ) { return; }
         self::queue( $title );
     }
 

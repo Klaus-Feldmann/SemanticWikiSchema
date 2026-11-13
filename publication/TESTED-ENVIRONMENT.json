@@ -1,53 +1,12 @@
 {
-  "generator": "MediaWiki 1.47.0-wmf.24",
-  "phpversion": "8.3.36",
-  "extensions": [
-    {
-      "name": "UnlinkedWikibase",
-      "version": "3.0.0"
-    },
-    {
-      "name": "SemanticWikiSchema",
-      "version": "0.1.22+2026-11-08"
-    },
-    {
-      "name": "SchemaBaseBridge",
-      "version": "0.20.0+2026-11-08"
-    },
-    {
-      "name": "Data Transfer",
-      "version": "1.8.1"
-    },
-    {
-      "name": "SemanticMediaWiki",
-      "version": "7.4.0"
-    },
-    {
-      "name": "SemanticScribunto",
-      "version": "3.0.0"
-    },
-    {
-      "name": "Scribunto"
-    },
-    {
-      "name": "ShortDescription",
-      "version": "4.0.1"
-    },
-    {
-      "name": "WikibaseRepository"
-    },
-    {
-      "name": "WikibaseClient"
-    }
-  ],
-  "verifiedDate": "2026-11-08",
+  "date": "2026-11-13",
+  "MediaWiki": "1.47.0-wmf.24",
+  "PHP": "8.3.36",
+  "SWS": "0.4.03",
+  "SchemaBaseBridge": "0.21.1",
   "parser": "legacy",
-  "privateProcessing": {
-    "anonymousRead": false,
-    "jobWorker": "enabled",
-    "ownValueChangesAndRemoval": "verified via MCP SMW reads",
-    "manualAnnotations": "preserved"
-  },
-  "runtimeInstallMethod": "Database identifier migration from adapted 0.1.20; full extension folder replacement",
-  "runtimeEvidence": "M4 journal: 42 operations complete. User confirmed browser data/edit workflow. MCP SWS schema, subject, dependent relation, search and complete Data-view reads verified. Other environment component versions are retained from the prior environment snapshot, not re-probed on this date."
+  "skin": "Vector 2022",
+  "Fuseki": "5.3.0",
+  "runtimeEvidence": "Operator confirmation on existing AufEinWort installation",
+  "freshInstallerEvidence": "Actual Composer in controlled core layout; no independent full core/database fresh-install test"
 }

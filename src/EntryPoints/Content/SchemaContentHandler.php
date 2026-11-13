@@ -57,14 +57,26 @@ class SchemaContentHandler extends JsonContentHandler {
 		}
 
 		if ( $status->isOK() ) {
+			try {
+				$new = json_decode( $content->getText(), true, 512, JSON_THROW_ON_ERROR );
+				$oldRevision = \MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
+				$old = json_decode( $oldRevision?->getContent( 'main' )?->getText() ?? '{}', true );
+				\ProfessionalWiki\SWS\Application\Identity\SchemaIdentityWritePolicy::validate(
+					$schemaName, $oldRevision === null ? null : ( is_array( $old ) ? $old : [] ), $new,
+					SWSExtension::getInstance()->newIdentityRegistry(), SWSExtension::getInstance()->getIdentityOwner()
+				);
+			} catch ( \Throwable $error ) { $status->fatal( 'sws-identity-invalid', $error->getMessage() ); }
+		}
+
+		if ( $status->isOK() ) {
 			$this->checkPropertyNames( $status, $content->getText() );
 		}
 
 		if ( $schemaName !== null && $status->isOK() ) {
-			$this->checkDependentSubjectRules(
-				$status,
-				SWSExtension::getInstance()->getPersistenceSchemaDeserializer()->deserialize( $schemaName, $content->getText() )
-			);
+			try {
+				$this->checkDependentSubjectRules( $status,
+					SWSExtension::getInstance()->getPersistenceSchemaDeserializer()->deserialize( $schemaName, $content->getText() ) );
+			} catch ( InvalidArgumentException $error ) { $status->fatal( 'sws-identity-invalid', $error->getMessage() ); }
 		}
 
         if ($status->isOK() && class_exists(\SWSBaseBridge\SchemaPropertyBindings::class)) {
@@ -72,6 +84,7 @@ class SchemaContentHandler extends JsonContentHandler {
                 $old=\MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle($title);
                 $oldContent=$old?->getContent('main');
                 $previous=$oldContent instanceof SchemaContent ? json_decode($oldContent->getText(),true) : [];
+                $previous=\ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::originalSchema($content->getText()) ?? $previous;
                 \SWSBaseBridge\SchemaPropertyBindings::validate(json_decode($content->getText(),true),$previous ?? [],\MediaWiki\Context\RequestContext::getMain());
             } catch (\Throwable $e) {
                 $status->fatal('sws-property-datatype-invalid',$e->getMessage());

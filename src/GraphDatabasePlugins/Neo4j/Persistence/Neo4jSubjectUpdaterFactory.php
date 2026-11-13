@@ -16,6 +16,7 @@ class Neo4jSubjectUpdaterFactory {
 		private readonly Neo4jValueBuilderRegistry $valueBuilderRegistry,
 		private readonly LoggerInterface $logger,
 		private readonly string $wikiId,
+        private readonly ?\Closure $canonicalize = null,
 	) {
 	}
 
@@ -31,7 +32,7 @@ class Neo4jSubjectUpdaterFactory {
 			$this->valueBuilderRegistry,
 			$this->logger,
 			$this->wikiId,
-			$orphanCandidates,
+			$orphanCandidates, $this->canonicalize,
 		);
 	}
 

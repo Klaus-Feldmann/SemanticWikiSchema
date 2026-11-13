@@ -115,7 +115,7 @@ defineExpose( {
 	getLayout: function(): Layout {
 		return new Layout(
 			props.initialLayout.getName(),
-			props.initialLayout.getSchema(),
+			props.initialLayout.getSchemaReference(),
 			props.initialLayout.getType(),
 			description.value,
 			currentDisplayRules.value,

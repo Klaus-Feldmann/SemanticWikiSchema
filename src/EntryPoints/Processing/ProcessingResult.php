@@ -18,7 +18,9 @@ final class ProcessingResult {
         public readonly RevisionRecord $revision,
         public readonly ParserOutput $output,
         public readonly ParserOptions $options,
-        public readonly array $stamp
+        public readonly array $stamp,
+        public readonly array $sourceSnapshots = [],
+        public readonly bool $isSourcePreparation = false
     ) {}
 
     public static function seal( array $snapshot ): array {
@@ -27,15 +29,22 @@ final class ProcessingResult {
         return $snapshot;
     }
 
-    public static function isCurrent( Title $title, mixed $stamp ): bool {
+    public static function isCurrent( Title $title, mixed $stamp, bool $allowSourcePreparation = false ): bool {
         if ( !is_array( $stamp ) || !isset( $stamp['signature'], $stamp['revision'], $stamp['dependencies'] ) ) { return false; }
+        if ( ( $stamp['stage'] ?? 'complete' ) !== 'complete' && !$allowSourcePreparation ) { return false; }
+        if ( isset( $stamp['sourceDataMode'] ) && $stamp['sourceDataMode'] !== \ProfessionalWiki\SWS\Application\Source\SourceDataMode::current() ) { return false; }
         $signature = $stamp['signature'];
         unset( $stamp['signature'] );
         if ( !hash_equals( self::seal( $stamp )['signature'], $signature ) || $stamp['page'] !== $title->getArticleID() ) { return false; }
         $lookup = MediaWikiServices::getInstance()->getRevisionLookup();
         $revision = $lookup->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
         if ( !$revision || $revision->getId() !== $stamp['revision'] || $revision->getSha1() !== $stamp['sha1'] ) { return false; }
-        foreach ( $stamp['dependencies'] as $dependency ) {
+        return self::dependenciesCurrent( $stamp['dependencies'] );
+    }
+
+    public static function dependenciesCurrent( array $dependencies ): bool {
+        $lookup = MediaWikiServices::getInstance()->getRevisionLookup();
+        foreach ( $dependencies as $dependency ) {
             $page = Title::makeTitleSafe( $dependency['namespace'], $dependency['title'] );
             if ( $page === null ) { return false; }
             $current = $lookup->getRevisionByTitle( $page, 0, IDBAccessObject::READ_LATEST );
@@ -65,7 +74,7 @@ final class ProcessingResult {
     }
 
     public function assertCurrent(): void {
-        if ( !self::isCurrent( $this->title, $this->stamp ) ) {
+        if ( !self::isCurrent( $this->title, $this->stamp, $this->isSourcePreparation ) ) {
             throw new ProcessingIncomplete( 'SemanticWikiSchema: revision or dependency changed during processing; retry required.', 'superseded' );
         }
     }

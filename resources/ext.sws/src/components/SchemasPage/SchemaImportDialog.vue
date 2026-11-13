@@ -39,7 +39,7 @@
 						:input-value="name"
 						:disabled="importing"
 					>
-						{{ name }}
+						{{ displayImportName( name ) }}
 					</CdxCheckbox>
 				</div>
 			</div>
@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, shallowRef } from 'vue';
+import { computed, inject, nextTick, ref, shallowRef } from 'vue';
 import { CdxCheckbox, CdxDialog, CdxMessage } from '@wikimedia/codex';
 import type { DialogAction, PrimaryDialogAction } from '@wikimedia/codex';
 import {
@@ -96,10 +96,13 @@ import {
 	type SchemaImportOutcome,
 	type SchemaImportStatus
 } from '@/components/SchemasPage/schemaImport.ts';
+import { Service } from '@/SWSServices';
+import type { SchemaRepository } from '@/application/SchemaRepository';
 import { useSchemaStore } from '@/stores/SchemaStore.ts';
 
 const props = defineProps<{
 	items: SchemaImportItem[];
+	sourceDocument?: string;
 }>();
 
 const emit = defineEmits<{
@@ -108,10 +111,17 @@ const emit = defineEmits<{
 }>();
 
 const schemaStore = useSchemaStore();
+const schemaRepository = inject<SchemaRepository | undefined>( Service.SchemaRepository, undefined );
 
 const listedItems = [ ...props.items ].sort(
 	( a, b ) => a.schema.getName().localeCompare( b.schema.getName() )
 );
+
+function displayImportName( name: string ): string {
+	const schema = props.items.find( ( item ) => item.schema.getName() === name )?.schema;
+	const label = schema?.getLabel() ?? name;
+	return label === name ? name : `${ label } (${ name })`;
+}
 
 function namesWith( status: SchemaImportStatus ): string[] {
 	return listedItems.filter( ( item ) => item.status === status ).map( ( item ) => item.schema.getName() );
@@ -156,10 +166,23 @@ function onUpdateOpen( open: boolean ): void {
 async function importCheckedSchemas(): Promise<void> {
 	importing.value = true;
 
-	outcome.value = await importSchemas(
-		listedItems.filter( ( item ) => checkedNames.value.includes( item.schema.getName() ) ),
-		( schema ) => schemaStore.saveSchema( schema, mw.msg( 'sws-schemas-import-summary' ) )
-	);
+	if ( props.sourceDocument !== undefined ) {
+		try {
+			if ( schemaRepository?.importSchemaDocument === undefined ) {
+				throw new Error( 'Stable schema import is unavailable' );
+			}
+			const result = await schemaRepository.importSchemaDocument( props.sourceDocument, checkedNames.value );
+			outcome.value = { created: result.created.map( ( id, index ) => `${ displayImportName( checkedNames.value[ index ] ) } (${ id })` ), replaced: [], failed: [] };
+		} catch ( error ) {
+			outcome.value = { created: [], replaced: [], failed: [ { name: '', reason: error instanceof Error ? error.message : String( error ) } ] };
+		}
+	} else {
+		outcome.value = await importSchemas(
+			listedItems.filter( ( item ) => checkedNames.value.includes( item.schema.getName() ) ),
+			( schema ) => schemaStore.saveSchema( schema, mw.msg( 'sws-schemas-import-summary' ) )
+		);
+
+	}
 
 	importing.value = false;
 	emit( 'imported' );

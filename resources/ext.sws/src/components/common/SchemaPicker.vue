@@ -28,9 +28,10 @@
 </template>
 
 <script setup lang="ts">
+import { schemaSummaryLabel } from '@/presentation/schemaSummaryLabel';
 import { computed, nextTick, ref, watch } from 'vue';
 import { CdxLookup } from '@wikimedia/codex';
-import { normalizeSchemaName, useSchemaStore } from '@/stores/SchemaStore.ts';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
 import type { SchemaSummary } from '@/application/SchemaLookup.ts';
 import { CREATE_SCHEMA, schemaMenu, type SchemaMenu } from '@/presentation/schemaMenu.ts';
 
@@ -73,18 +74,14 @@ const wikiHasNoSchemas = ref( false );
 const query = ref<string>( '' );
 const lookupRef = ref<InstanceType<typeof CdxLookup> | null>( null );
 
+function shownName( name: string ): string {
+	const summary = summaries.value.find( ( item ) => item.name === name );
+	return summary ? ( summary.id ? `${ schemaSummaryLabel( summary ) } (${ summary.id })` : schemaSummaryLabel( summary ) ) : name;
+}
 const typedName = computed( (): string => String( inputText.value ).trim() );
 
-// Schema names are unique, so a name that is taken can only be picked. The committed Schema's name is
-// taken even while the list leaves it out.
-const takenNames = computed( (): Set<string> => {
-	const names = summaries.value.map( ( summary ) => summary.name );
-
-	return new Set( ( props.selected ? [ ...names, props.selected ] : names ).map( normalizeSchemaName ) );
-} );
-
 const creationOffered = computed( (): boolean =>
-	props.offersCreation && !takenNames.value.has( normalizeSchemaName( typedName.value ) ) );
+	props.offersCreation === true && ( selectedSchema.value === null || query.value.trim() !== '' ) );
 
 const offeredSummaries = computed( (): SchemaSummary[] => summaries.value.filter( ( summary ) =>
 	( props.schemaNames === undefined || props.schemaNames.includes( summary.name ) ) &&
@@ -123,6 +120,9 @@ async function loadSchemas(): Promise<void> {
 		console.error( 'Failed to load schemas for the picker:', error );
 	}
 	schemasLoaded.value = true;
+	if ( props.selected && query.value === '' ) {
+		inputText.value = shownName( props.selected );
+	}
 }
 
 const schemasReady = loadSchemas();
@@ -133,7 +133,7 @@ const schemasReady = loadSchemas();
 // than the list, so the list is fetched again. Text typed in the meantime is not overwritten.
 watch( () => props.selected, async ( value ) => {
 	selectedSchema.value = selectableSchema( value ?? null );
-	inputText.value = value ?? '';
+	inputText.value = value ? shownName( value ) : '';
 	query.value = '';
 
 	if ( value && selectedSchema.value === null ) {
@@ -175,7 +175,7 @@ function onSelect( schemaName: string | null ): void {
 		return;
 	}
 
-	inputText.value = schemaName;
+	inputText.value = shownName( schemaName );
 	query.value = '';
 
 	if ( schemaName !== props.selected ) {
@@ -185,7 +185,7 @@ function onSelect( schemaName: string | null ): void {
 
 function revertUncommittedTyping(): void {
 	selectedSchema.value = selectableSchema( props.selected ?? null );
-	inputText.value = props.selected ?? '';
+	inputText.value = props.selected ? shownName( props.selected ) : '';
 	query.value = '';
 }
 

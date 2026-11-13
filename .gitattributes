@@ -1,3 +1,6 @@
 # Production Composer archives omit inherited demo-only material.
 /DemoData export-ignore
 /Docker export-ignore
+
+/migration export-ignore
+/.github export-ignore

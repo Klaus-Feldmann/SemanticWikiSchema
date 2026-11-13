@@ -84,7 +84,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, onScopeDispose, ref, watch } from 'vue';
-import { CdxButton, CdxIcon, CdxSearchInput, CdxSelect, CdxTable } from '@wikimedia/codex';
+import { CdxButton, CdxIcon, CdxSearchInput, CdxTable } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import type { MenuItemData, TableSort } from '@wikimedia/codex';
 import { cdxIconAdd } from '@wikimedia/codex-icons';
 import SubjectSummaryCell from './SubjectSummaryCell.vue';

@@ -68,10 +68,10 @@ class SubjectDisplayName {
 	 * The Subject to show in place of the page's own title, or null to show the title: the Main Subject
 	 * of a page the system titled by a Subject id, since the id names nothing a reader knows.
 	 */
-	public static function inPlaceOfPageTitle( PageSubjects $pageSubjects, string $pageName ): ?Subject {
+	public static function inPlaceOfPageTitle( PageSubjects $pageSubjects, string $pageName, ?\Closure $canonicalize = null ): ?Subject {
 		$mainSubject = $pageSubjects->getMainSubject();
 
-		if ( $mainSubject === null || !self::isTitledBySubjectOnIt( $pageName, $pageSubjects ) ) {
+		if ( $mainSubject === null || !self::isTitledBySubjectOnIt( $pageName, $pageSubjects, $canonicalize ) ) {
 			return null;
 		}
 
@@ -83,7 +83,7 @@ class SubjectDisplayName {
 	 * page is read, so every other page is spared the read. The first letter is set aside as below.
 	 */
 	public static function mayBeTitledBySubjectId( string $pageName ): bool {
-		return SubjectId::isValidLocalId( lcfirst( self::titleText( $pageName ) ) );
+		return SubjectId::isValidLocalId( self::idTitleText( $pageName ) );
 	}
 
 	/**
@@ -99,19 +99,23 @@ class SubjectDisplayName {
 	 * stores such a page under an upper-case S. Nothing else of an id can differ: its grammar
 	 * (ADR 14) is ASCII that MediaWiki leaves alone.
 	 */
-	public static function isTitledBySubjectOnIt( string $pageName, PageSubjects $pageSubjects ): bool {
-		return in_array(
-			lcfirst( self::titleText( $pageName ) ),
-			$pageSubjects->getAllSubjects()->getIdsAsTextArray(),
-			true
-		);
+	public static function isTitledBySubjectOnIt( string $pageName, PageSubjects $pageSubjects, ?\Closure $canonicalize = null ): bool {
+        $text = self::idTitleText($pageName);
+        $ids = $pageSubjects->getAllSubjects()->getIdsAsTextArray();
+        if (in_array($text,$ids,true)) { return true; }
+        return $canonicalize !== null && in_array($canonicalize($text),$ids,true);
 	}
 
 	/**
 	 * The text after the first colon, and the whole name without one: a namespace name holds no colon,
 	 * and neither does an id (ADR 14), so a second colon means someone chose the title.
 	 */
-	private static function titleText( string $pageName ): string {
+	private static function idTitleText( string $pageName ): string {
+        $text = self::titleText( $pageName );
+        return str_starts_with( $text, 'E' ) ? $text : lcfirst( $text );
+    }
+
+    private static function titleText( string $pageName ): string {
 		$colon = strpos( $pageName, ':' );
 
 		return $colon === false ? $pageName : substr( $pageName, $colon + 1 );

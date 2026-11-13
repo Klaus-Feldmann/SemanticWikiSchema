@@ -96,7 +96,11 @@ const CloseConfirmationDialogStub = {
 };
 
 describe( 'SubjectEditorDialog', () => {
+	const reloadPage = vi.fn();
+	afterEach( () => vi.unstubAllGlobals() );
 	beforeEach( () => {
+		reloadPage.mockReset();
+		vi.stubGlobal( 'location', { ...window.location, reload: reloadPage } );
 		editorSaveBlocker = null;
 		editorSaveBlockerBySchema = {};
 		editorStatementsBySchema = {};
@@ -557,13 +561,14 @@ describe( 'SubjectEditorDialog', () => {
 			await flushPromises();
 
 			expect( onSave ).not.toHaveBeenCalled();
+			expect( reloadPage ).not.toHaveBeenCalled();
 			expect( ( mw.notify as Mock ).mock.calls.some(
 				( call ) => typeof call[ 0 ] === 'string' && call[ 0 ].includes( 'sws-subject-editor-success' ),
 			) ).toBe( false );
 			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
 		} );
 
-		it( 'calls onSave once, notifies success once, and closes when a dirty pane is saved', async () => {
+		it( 'reloads the current page once after saving and closing the dirty pane', async () => {
 			const onSave = vi.fn().mockResolvedValue( undefined );
 			const wrapper = mountComponent( true, saveButtonTestStubs, onSave );
 			await flushPromises();
@@ -578,6 +583,19 @@ describe( 'SubjectEditorDialog', () => {
 				{ type: 'success' },
 			] );
 			expect( wrapper.emitted( 'update:open' ) ).toEqual( [ [ false ] ] );
+			expect( reloadPage ).toHaveBeenCalledOnce();
+			expect( onSave.mock.invocationCallOrder[ 0 ] ).toBeLessThan( reloadPage.mock.invocationCallOrder[ 0 ] );
+		} );
+
+		it( 'does not reload when saving fails', async () => {
+			const onSave = vi.fn().mockRejectedValue( new Error( 'Write failed' ) );
+			const wrapper = mountComponent( true, saveButtonTestStubs, onSave );
+			await flushPromises();
+			await wrapper.findComponent( SubjectEditor ).vm.$emit( 'change' );
+			await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', '' );
+			await flushPromises();
+			expect( reloadPage ).not.toHaveBeenCalled();
+			expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
 		} );
 	} );
 
@@ -2067,6 +2085,7 @@ describe( 'SubjectEditorDialog', () => {
 				expect( partialSaveLine( wrapper ).text() )
 					.toBe( 'sws-subject-editor-partial-save12' );
 				expect( partialSaveMessage( wrapper )?.props( 'type' ) ).toBe( 'warning' );
+				expect( reloadPage ).not.toHaveBeenCalled();
 			} );
 
 			// Two messages, not one slot they take turns in.
@@ -2094,6 +2113,7 @@ describe( 'SubjectEditorDialog', () => {
 				await triggerSave( wrapper, '' );
 
 				expect( partialSaveLine( wrapper ).exists() ).toBe( false );
+				expect( reloadPage ).toHaveBeenCalledOnce();
 				expect( ( mw.notify as Mock ).mock.calls.filter(
 					( call ) => typeof call[ 0 ] === 'string' &&
 						call[ 0 ].includes( 'sws-subject-editor-success' ),
@@ -3544,6 +3564,7 @@ describe( 'SubjectEditorDialog', () => {
 					await triggerSave( wrapper, '' );
 
 					expect( onSaved ).toHaveBeenCalled();
+					expect( reloadPage ).not.toHaveBeenCalled();
 					expect( wrapper.emitted( 'update:open' ) ).toBeUndefined();
 				} );
 

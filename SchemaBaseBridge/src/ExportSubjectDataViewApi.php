@@ -11,7 +11,7 @@ use Wikimedia\ParamValidator\ParamValidator;
 final class ExportSubjectDataViewApi extends DataViewExportApi {
 	public function run( string $subjectId ): Response {
 		$extension = SWSExtension::getInstance();
-		$id = $extension->getSubjectIdParser()->parse( $subjectId );
+		$id = $extension->getSubjectIdParser( true )->parse( $subjectId );
 		if ( $id === null ) { return $this->getResponseFactory()->createHttpError( 400, [ 'message' => 'Invalid Subject ID.' ] ); }
 		$page = $extension->newSubjectHostingPageResolver( $this->getAuthority() )->resolveReadableHostingPage( $id );
 		$title = $page === null ? null : Title::newFromID( $page->getId()->id );

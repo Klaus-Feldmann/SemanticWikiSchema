@@ -258,9 +258,11 @@ class SubjectDataLookup {
 	private function subjectToTable( Subject $subject, string $displayName ): array {
 		return [
 			'id' => $subject->getId()->text,
+            ...( $subject->getIdentity() === null ? [] : json_decode( json_encode( $subject->getIdentity()->toJson(), JSON_THROW_ON_ERROR ), true, 512, JSON_THROW_ON_ERROR ) ),
 			'label' => $displayName,
 			'storedLabel' => $subject->getLabel()?->text,
 			'schema' => $subject->getSchemaReference()->toJson(),
+            ...( $subject->getFieldNotes() === [] ? [] : [ 'fieldNotes' => $subject->getFieldNotes() ] ),
 			'statements' => $this->statementsToTable( $subject ),
 		];
 	}

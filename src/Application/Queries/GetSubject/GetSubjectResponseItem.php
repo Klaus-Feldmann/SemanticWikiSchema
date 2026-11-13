@@ -28,7 +28,7 @@ readonly class GetSubjectResponseItem {
 		 * The Schema reference in its stored shape: the bare name for a Schema of this wiki, a
 		 * {source, name} object for one from elsewhere, so read and write name a Schema alike.
 		 *
-		 * @var string|array{source: string, name: string}
+		 * @var string|array{id: string, source?: string}|array{source: string, name: string}
 		 */
 		public string|array $schema,
 		/**
@@ -43,6 +43,8 @@ readonly class GetSubjectResponseItem {
 		 * $displayName.
 		 */
 		public ?HostSubject $hostSubject,
+        public array $fieldNotes = [],
+		public ?array $identity = null,
 	) {
 	}
 
@@ -72,6 +74,8 @@ readonly class GetSubjectResponseItem {
 			pageTitle: $pageIdentifiers?->getTitle(),
 			pageNamespaceId: $pageIdentifiers?->getNamespaceId(),
 			hostSubject: $hostSubject,
+            fieldNotes: $subject->getFieldNotes(),
+			identity: $subject->getIdentity()?->toJson(),
 		);
 	}
 

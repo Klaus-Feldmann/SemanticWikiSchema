@@ -32,7 +32,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 		$extension = SWSExtension::getInstance();
 
 		// Validate the ID shape first, so a malformed value is a clean 400 rather than becoming a 500.
-		$id = $extension->getSubjectIdParser()->parse( $subjectId );
+		$id = $extension->getSubjectIdParser( true )->parse( $subjectId );
 
 		if ( $id === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
@@ -84,7 +84,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: 15 characters starting with "s" for a Subject of this wiki, or "sourceKey:localId" for one from another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'format' => [
 				self::PARAM_SOURCE => 'query',

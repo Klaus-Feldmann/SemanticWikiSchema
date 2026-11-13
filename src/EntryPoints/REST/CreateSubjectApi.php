@@ -42,6 +42,8 @@ class CreateSubjectApi extends SimpleHandler {
 					comment: $body['comment'] ?? null,
 					id: $body['id'] ?? null,
 					dependentSubjects: $body['dependentSubjects'] ?? [],
+                    fieldNotes: $body['fieldNotes'] ?? [],
+					identity: $this->identityFromBody( $body ),
 				)
 			);
 		} catch ( \InvalidArgumentException $e ) {
@@ -90,7 +92,8 @@ class CreateSubjectApi extends SimpleHandler {
 				ParamValidator::PARAM_REQUIRED => true,
 				self::PARAM_DESCRIPTION => 'Name of the Schema this Subject is an instance of.',
 			],
-			'statements' => [
+			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
+            'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
@@ -110,7 +113,7 @@ class CreateSubjectApi extends SimpleHandler {
 					. 'Subject ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
 					. 'mints one. Pre-mint IDs with POST /sws/v0/subject-ids to wire relations across a batch.',
 			],
-		] + $this->dependentSubjectsParamSettings();
+		] + $this->dependentSubjectsParamSettings() + $this->identityParamSettings();
 	}
 
 }

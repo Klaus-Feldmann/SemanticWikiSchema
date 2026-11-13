@@ -7,6 +7,7 @@
 			<span v-if="index > 0"> · </span>
 			<strong>{{ $i18n( 'sws-auto-identity-' + source ).text() }}:</strong>&nbsp;
 			<a :href="identities![ source ].url!">{{ identities![ source ].id }}</a>
+			<small v-if="identities![ source ].retained || identities![ source ].descriptionRetained"> {{ $i18n( 'sws-source-retained' ).text() }}</small>
 		</span>
 	</div>
 </template>
@@ -19,7 +20,7 @@ const emit = defineEmits<{ descriptions: [ groups: EntityDescription[] ] }>();
 const props = defineProps<{ subject: Subject }>();
 const sources = [ 'wikidata', 'wikibase-local' ] as const;
 type Source = typeof sources[number];
-interface Identity { status: 'resolved' | 'missing' | 'unavailable' | 'error'; id: string | null; url: string | null }
+interface Identity { status: 'resolved' | 'missing' | 'unavailable' | 'error'; id: string | null; url: string | null; retained?: boolean; descriptionRetained?: boolean }
 const identities = ref<Record<Source, Identity> | null>( null );
 const visibleSources = computed( () => sources.filter( ( source ) => identities.value?.[ source ].status === 'resolved' ) );
 const historical = computed( () => !!mw.config.get( 'wgDiffOldId' ) ||

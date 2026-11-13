@@ -16,7 +16,11 @@
 				@edit-relation-target="emit( 'edit-relation-target', $event )"
 				@dependent-subject-change="emit( 'dependent-subject-change', $event )"
 			/>
-		</CdxField>
+            <FieldNoteInput
+                v-if="props.schema.getPropertyDefinition( statement.propertyName ).fieldNotes || notes[ statement.propertyName.toString() ]"
+                :model-value="notes[ statement.propertyName.toString() ] || ''"
+                @update:model-value="notes[ statement.propertyName.toString() ] = $event; emit( 'change' )" />
+        </CdxField>
 	</div>
 </template>
 
@@ -41,7 +45,8 @@ export interface SubjectEditorExposes {
 </script>
 
 <script setup lang="ts">
-import { ref, onBeforeUpdate, inject, type Component } from 'vue';
+import FieldNoteInput from './FieldNoteInput.vue';
+import { ref, onBeforeUpdate, inject, watch, type Component } from 'vue';
 import { CdxField } from '@wikimedia/codex';
 import { Statement } from '@/domain/Statement.ts';
 import { SWSServices } from '@/SWSServices.ts';
@@ -71,6 +76,9 @@ const emit = defineEmits<{
 	'clear-server-violation': [ { propertyName: string; valuePartIndex: number | null } ];
 	'edit-relation-target': [ SubjectId ];
 }>();
+
+const notes = ref<Record<string, string>>( { ...props.statements.fieldNotes } );
+watch( () => props.statements, ( statements ) => { notes.value = { ...statements.fieldNotes }; } );
 
 const componentRegistry = SWSServices.getComponentRegistry();
 const dependentSubjectEditing = inject( DependentSubjectEditingKey, undefined );
@@ -121,7 +129,7 @@ const getSubjectData = (): StatementList => {
 		)
 	);
 
-	return new StatementList( newStatements );
+	return new StatementList( newStatements, { ...notes.value }, JSON.stringify( notes.value ) !== JSON.stringify( props.statements.fieldNotes ) );
 };
 
 const getDependentSubjects = (): Subject[] => {
@@ -155,3 +163,22 @@ const saveBlocker = (): SaveBlocker | null => {
 defineExpose<SubjectEditorExposes>( { getSubjectData, getDependentSubjects, saveBlocker } );
 
 </script>
+
+<style lang="less">
+.ext-sws-subject-editor-dialog .ext-sws-subject-editor {
+	display: grid;
+	grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+	gap: 1.25rem 2rem;
+	align-items: start;
+
+	> .cdx-field {
+		min-width: 0;
+		margin-block: 0;
+	}
+
+	// Embedded dependent subjects keep their full field width, without further subdivision.
+	.ext-sws-subject-editor {
+		grid-template-columns: minmax( 0, 1fr );
+	}
+}
+</style>

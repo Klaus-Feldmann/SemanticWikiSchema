@@ -10,7 +10,7 @@ final class SchemaWikitext {
 	public static function programs( Schema $schema ): array {
 		$result = [];
 		foreach ( $schema->getAllProperties()->asMap() as $property ) {
-			if ( $property instanceof WikitextProperty && $property->isSchemaExecution() ) {
+			if ( $property instanceof WikitextProperty && trim( $property->getWikitext() ) !== '' ) {
 				$result[] = $property->getWikitext();
 			}
 		}

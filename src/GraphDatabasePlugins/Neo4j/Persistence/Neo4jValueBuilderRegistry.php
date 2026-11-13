@@ -45,6 +45,7 @@ class Neo4jValueBuilderRegistry {
 
 		$registry->registerBuilder( 'text', $toScalars );
 		$registry->registerBuilder( 'wikitext', $toScalars );
+		$registry->registerBuilder( 'wikitextValue', $toScalars );
 		$registry->registerBuilder( 'page', $toScalars );
 		$registry->registerBuilder( 'url', static fn ( NeoValue $value ): array => $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ? $value->urls() : (array)$value->toScalars() );
 		$registry->registerBuilder( 'image', $toScalars );

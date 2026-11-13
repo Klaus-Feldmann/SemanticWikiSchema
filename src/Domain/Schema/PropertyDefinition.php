@@ -42,6 +42,8 @@ abstract class PropertyDefinition {
 		return $this->core->externalProperty;
 	}
 
+	public function getFieldNotes(): ?array { return $this->core->fieldNotes; }
+
 	public function getDefault(): mixed {
 		return $this->core->default;
 	}
@@ -66,6 +68,7 @@ abstract class PropertyDefinition {
 	 */
 	protected function coreToJson(): array {
 		return [
+			...( $this->getFieldNotes() === null ? [] : [ 'fieldNotes' => $this->getFieldNotes() ] ),
 			'type' => $this->getPropertyType(),
 			'description' => $this->getDescription(),
 			'required' => $this->isRequired(),
@@ -156,13 +159,19 @@ abstract class PropertyDefinition {
 			}
 		}
 
-		$propertyCore = new PropertyCore(
+		$notes = $values['fieldNotes'] ?? null;
+        if ( $notes !== null && ( !is_array( $notes ) || array_diff( array_keys( $notes ), [ 'type', 'annotate' ] )
+            || !in_array( $notes['type'] ?? null, [ 'text', 'wikitext' ], true ) || !is_bool( $notes['annotate'] ?? false ) ) ) {
+            throw new InvalidArgumentException( 'Invalid fieldNotes configuration' );
+        }
+        $propertyCore = new PropertyCore(
 			description: $description,
 			required: $required,
 			default: $values['default'] ?? null,
 			constraintSeverities: $severities,
 			wikiLink: $wikiLink,
 			externalProperty: isset( $values['externalProperty'] ) ? ExternalProperty::fromJson( $values['externalProperty'] ) : null,
+            fieldNotes: $notes,
 		);
 
 		// The extension owning the type is disabled or failed to load. Preserve the property

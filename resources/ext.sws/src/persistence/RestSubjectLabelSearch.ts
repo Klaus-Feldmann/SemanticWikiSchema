@@ -11,11 +11,16 @@ export class RestSubjectLabelSearch implements SubjectLabelSearch {
 
 	public async searchSubjectLabels( search: string, schemas: readonly string[] | undefined ): Promise<SubjectLabelResult[]> {
 		const params = new URLSearchParams( { search } );
+		const language = typeof mw === 'undefined' ? undefined : mw.config?.get( 'wgUserLanguage' );
+		if ( typeof language === 'string' && language !== '' ) {
+			params.set( 'language', language );
+		}
 
+		// Explicit current page keys avoid confusing a new S-ID with an old same-spelled name.
 		// The endpoint reads an absent parameter as every Schema. No Schema name holds the separator,
 		// as no page title does.
 		if ( schemas !== undefined ) {
-			params.set( 'schema', schemas.join( '|' ) );
+			params.set( 'schemaKey', schemas.join( '|' ) );
 		}
 
 		const response = await this.httpClient.get(

@@ -5,11 +5,18 @@ $specialPageAliases = [];
 $specialPageAliases['en'] = [
 	'NeoJson' => [ 'NeoJson' ],
 	'Schemas' => [ 'Schemas' ],
-	'Subjects' => [ 'Subjects' ],
+	'Subjects' => [ 'Entities', 'Subjects' ],
 	'Layouts' => [ 'Layouts' ],
 	'Mappings' => [ 'Mappings' ],
 	'GraphStores' => [ 'GraphStores' ],
-	'CreateSubject' => [ 'CreateSubject', 'NewSubject' ],
-	'Subject' => [ 'Subject' ],
+	'CreateSubject' => [ 'CreateEntity', 'CreateSubject', 'NewSubject' ],
+	'Subject' => [ 'Entity', 'Subject' ],
 	'SWS' => [ 'SWS' ],
+];
+
+$specialPageAliases['de'] = [
+ 'Schemas' => [ 'Schemata', 'Schemas' ],
+ 'Subjects' => [ 'Entitäten', 'Subjekte' ],
+ 'Subject' => [ 'Entität', 'Subjekt' ],
+ 'CreateSubject' => [ 'Entität_erstellen', 'Subjekt_erstellen' ],
 ];

@@ -75,6 +75,11 @@
 			</div>
 		</div>
 
+		<IdentityEditor
+			v-if="identity && !subjectsAreDependent"
+			:id="subject.getId().text"
+			:model-value="identity"
+			@update:model-value="onIdentityChanged" />
 		<SubjectViolationBanners :violations="anchorlessViolations" />
 
 		<SubjectEditor
@@ -116,6 +121,8 @@ export interface SubjectEditPaneExposes {
 </script>
 
 <script setup lang="ts">
+import IdentityEditor from '@/components/common/IdentityEditor.vue';
+import { identityWithLabel } from '@/domain/LocalizedIdentity';
 import { ref, shallowRef, computed, watch, provide } from 'vue';
 import { CdxField, CdxTextInput } from '@wikimedia/codex';
 import SubjectEditor from '@/components/SubjectEditor/SubjectEditor.vue';
@@ -204,6 +211,25 @@ function handleRelationChange(): void {
 const subjectsAreDependent = computed( (): boolean => props.schema.subjectsAreDependent() );
 
 const label = ref( props.subject.getLabel() ?? '' );
+function initialIdentity(): ReturnType<Subject['getIdentity']> {
+	if ( props.subject.getIdentity() !== null ) {
+		return props.subject.getIdentity();
+	}
+	if ( !/^E[1-9][0-9]*$/.test( props.subject.getId().text ) ) {
+		return null;
+	}
+	const language = mw.config?.get( 'wgContentLanguage' ) || 'en';
+	return { identityLanguage: language, labels: label.value ? { [ language ]: label.value } : {}, descriptions: {} };
+}
+const identity = ref( initialIdentity() );
+watch( label, ( value ) => {
+	identity.value = identityWithLabel( identity.value, value );
+}, { flush: 'sync' } );
+function onIdentityChanged( value: NonNullable<ReturnType<Subject['getIdentity']>> ): void {
+	identity.value = value;
+	label.value = value.labels[ value.identityLanguage ] ?? '';
+	handleEditorChange();
+}
 
 const storedLabel = computed( (): string | null => enteredSubjectLabel( label.value ) );
 
@@ -365,6 +391,7 @@ watch( [ subjectEditorRef, () => props.schema ], ( [ editor ] ) => {
 // draft graph with relations the form no longer displays.
 watch( () => props.subject, ( newSubject ) => {
 	label.value = newSubject.getLabel() ?? '';
+	identity.value = initialIdentity();
 	editedSubject.value = newSubject;
 	editedDependentSubjects.value = [];
 } );
@@ -375,6 +402,7 @@ function buildUpdatedSubject(): Subject | null {
 	}
 	return props.subject
 		.withLabel( storedLabel.value )
+		.withIdentity( identity.value )
 		.withStatements( props.schema.statementsAfterEdit(
 			props.subject.getStatements(),
 			subjectEditorRef.value.getSubjectData().withNonEmptyValues()

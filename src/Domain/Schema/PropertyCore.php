@@ -21,6 +21,7 @@ readonly class PropertyCore {
 		public array $constraintSeverities = [],
 		public ?array $wikiLink = null,
 		public ?ExternalProperty $externalProperty = null,
+		public ?array $fieldNotes = null,
 	) {
 	}
 

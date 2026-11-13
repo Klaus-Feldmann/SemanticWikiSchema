@@ -10,7 +10,7 @@ use ProfessionalWiki\SWS\Application\Semantic\SmwMappingConfig;
 
 /** Server settings only: no wiki module execution or configuration-page dependency. */
 final class WikiAnnotationConfig {
-    public function read(Parser $parser, ParserOutput $output, User $user): array {
+    public function read(?Parser $parser, ParserOutput $output, User $user): array {
         return SmwMappingConfig::resolve(
             MediaWikiServices::getInstance()->getMainConfig()->get('WikiSchemaSmwMapping')
         );

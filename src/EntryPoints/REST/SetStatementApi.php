@@ -52,7 +52,7 @@ class SetStatementApi extends SimpleHandler {
 
 			$extension = SWSExtension::getInstance();
 			$extension->newUpdateStatementAction( $presenter, $this->getAuthority() )->setStatement(
-				$extension->getSubjectIdParser()->parseOrThrow( $subjectId ),
+				$extension->getSubjectIdParser( true )->parseOrThrow( $subjectId ),
 				new PropertyName( $propertyName ),
 				$statement['propertyType'] ?? null,
 				$statement['value'] ?? null,
@@ -86,7 +86,7 @@ class SetStatementApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: 15 characters starting with "s" for a Subject of this wiki, or "sourceKey:localId" for one from another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'propertyName' => [
 				self::PARAM_SOURCE => 'path',

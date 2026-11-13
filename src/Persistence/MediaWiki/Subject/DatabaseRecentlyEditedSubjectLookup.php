@@ -188,7 +188,7 @@ class DatabaseRecentlyEditedSubjectLookup implements RecentlyEditedSubjectLookup
 		);
 		ksort( $statements, SORT_STRING );
 
-		return [ $subject->getLabel()?->text, $subject->getSchemaReference()->toJson(), $statements ];
+		return [ $subject->getLabel()?->text, $subject->getSchemaReference()->toJson(), $statements, $subject->getFieldNotes() ];
 	}
 
 	private function newSummary( Subject $subject, PageSubjects $pageSubjects, RevisionRecord $published, stdClass $change ): SubjectSummary {

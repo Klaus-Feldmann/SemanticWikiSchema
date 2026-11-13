@@ -23,10 +23,12 @@ readonly class SchemaResolver implements SchemaReferenceResolver {
 	public function __construct(
 		private SourceRegistry $sourceRegistry,
 		private LoggerInterface $logger,
+        private ?\Closure $canonicalize = null,
 	) {
 	}
 
 	public function getSchema( SchemaReference $reference ): ?Schema {
+        $reference = $this->canonicalize === null ? $reference : ( $this->canonicalize )( $reference );
 		$source = $this->sourceRegistry->getSource(
 			$reference->source ?? $this->sourceRegistry->getLocalSourceKey()
 		);
@@ -38,7 +40,10 @@ readonly class SchemaResolver implements SchemaReferenceResolver {
 			return null;
 		}
 
-		return $source->getSchema( $reference->name );
+		$schema = $source->getSchema( $reference->name );
+		// An ID reference cannot resolve to an old, merely same-named Schema page.
+		if ( $reference->id !== null && ( $schema?->getId() === null || !$reference->id->equals( $schema->getId() ) ) ) { return null; }
+		return $schema;
 	}
 
 }

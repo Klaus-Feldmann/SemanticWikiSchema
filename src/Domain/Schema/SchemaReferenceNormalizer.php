@@ -9,7 +9,8 @@ namespace ProfessionalWiki\SWS\Domain\Schema;
  * is identified by its page name (ADR 17) and MediaWiki resolves several spellings to one page:
  * `person` and `Person` are the same page, as are `Person_name` and `Person name`.
  *
- * A reference to another Source is returned unchanged: that Source names its own Schemas (ADR 23).
+ * ID-based references bypass name normalization in SchemaReferenceParser. A reference to another
+ * Source is returned unchanged: that Source names its own Schemas (ADR 23).
  */
 interface SchemaReferenceNormalizer {
 

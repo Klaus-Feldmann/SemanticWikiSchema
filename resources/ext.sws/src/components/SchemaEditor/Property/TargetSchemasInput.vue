@@ -37,12 +37,13 @@
 </template>
 
 <script setup lang="ts">
+import { schemaSummaryLabel } from '@/presentation/schemaSummaryLabel';
 import { computed, ref, watch } from 'vue';
 import { CdxInfoChip, CdxMultiselectLookup } from '@wikimedia/codex';
 import type { ChipInputItem } from '@wikimedia/codex';
-import { normalizeSchemaName, useSchemaStore } from '@/stores/SchemaStore.ts';
+import { useSchemaStore } from '@/stores/SchemaStore.ts';
 import { type SchemaSummary, subjectsAreDependentIn } from '@/application/SchemaLookup.ts';
-import { isLocalSchemaReference, schemaReferenceText, type SchemaReference } from '@/domain/SchemaReference';
+import { isLocalSchemaReference, schemaReferenceName, schemaReferenceText, type SchemaReference } from '@/domain/SchemaReference';
 import { CREATE_SCHEMA, schemaMenu, type SchemaMenu } from '@/presentation/schemaMenu.ts';
 import { targetsDependentSubjects } from '@/domain/propertyTypes/Relation.ts';
 
@@ -67,27 +68,22 @@ const schemasLoaded = ref( false );
 const inputText = ref<string | number>( '' );
 const query = ref( '' );
 
-const localTargets = computed( (): string[] => props.modelValue.filter( isLocalSchemaReference ) );
+const localTargets = computed( (): string[] => props.modelValue.filter( isLocalSchemaReference ).map( schemaReferenceName ) );
 const otherSourceTargets = computed( (): SchemaReference[] =>
 	props.modelValue.filter( ( reference ) => !isLocalSchemaReference( reference ) )
 );
 
 function chipFor( schemaName: string ): ChipInputItem {
-	return { value: schemaName, label: schemaName };
+	const summary = summaries.value.find( ( item ) => item.name === schemaName );
+	return { value: schemaName, label: summary ? `${ schemaSummaryLabel( summary ) }${ summary.id ? ` (${ summary.id })` : '' }` : schemaName };
 }
 
 const chips = computed( (): ChipInputItem[] => localTargets.value.map( chipFor ) );
 
 const typedName = computed( (): string => String( inputText.value ).trim() );
 
-// Schema names are unique, so a name that is taken can only be picked. A target's name is taken even
-// while the list leaves it out.
-const takenNames = computed( (): Set<string> => new Set(
-	[ ...summaries.value.map( ( summary ) => summary.name ), ...localTargets.value ].map( normalizeSchemaName )
-) );
-
 const creationOffered = computed( (): boolean =>
-	props.offersCreation && !takenNames.value.has( normalizeSchemaName( typedName.value ) ) );
+	props.offersCreation === true );
 
 // The targets of one property all have Dependent Subjects or none does, so once one is chosen, only
 // Schemas like it are offered.
@@ -170,7 +166,7 @@ function setLocalTargets( names: readonly string[] ): void {
 		clearSearch();
 	}
 
-	emit( 'update:modelValue', [ ...names, ...otherSourceTargets.value ] );
+	emit( 'update:modelValue', [ ...names.map( ( name ) => props.modelValue.find( ( reference ) => isLocalSchemaReference( reference ) && schemaReferenceName( reference ) === name ) ?? ( summaries.value.find( ( summary ) => summary.name === name )?.id ? { id: name } : name ) ), ...otherSourceTargets.value ] );
 }
 
 function clearSearch(): void {

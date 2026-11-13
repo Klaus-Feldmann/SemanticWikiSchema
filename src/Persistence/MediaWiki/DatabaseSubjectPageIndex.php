@@ -24,6 +24,7 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 
 	public function __construct(
 		private readonly IDatabase $db,
+		private readonly bool $enforceSequentialIds = false,
 	) {
 	}
 
@@ -33,20 +34,35 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 	public function setSubjectsOfPage( PageId $pageId, array $subjectIds ): void {
 		$wanted = $subjectIds;
 		sort( $wanted );
-
 		$stored = $this->subjectsOfPage( $pageId );
-
-		// Most pages hold no Subjects and most edits change none, and this runs inside the transaction
-		// that writes the revision. A page whose rows already say this is left alone, so the common edit
-		// touches the index not at all.
-		//
-		// Reading them takes no lock, which is safe because PageUpdater derives the parent revision from
-		// an equally unlocked READ_LATEST read taken first, then CAS-compares it against
-		// lockAndGetLatest() before writing. A read stale enough to matter here therefore implies a
-		// stale parent revision, which is already refused as an edit conflict.
-		if ( $stored === $wanted ) {
-			return;
+		// Existing revisions already established the host invariant. Most saves change no IDs,
+		// so preserve the old one-read/no-write fast path, including source-snapshot updates.
+		if ( $stored === $wanted ) { return; }
+		$changedSequentialIds = $this->enforceSequentialIds && array_filter( array_merge( $stored, $wanted ),
+			static fn ( $id ) => preg_match( '/^E[1-9][0-9]{0,17}\z/', $id ) === 1 ) !== [];
+		if ( !$changedSequentialIds ) { $this->replaceSubjects( $pageId, $wanted, $stored ); return; }
+		$scope = $this->db->startAtomic( __METHOD__, IDatabase::ATOMIC_CANCELABLE );
+		try {
+			$this->synchronizeIdentityHosts( $pageId, $wanted );
+			$this->replaceSubjects( $pageId, $wanted, $stored );
+			$this->db->endAtomic( __METHOD__ );
+		} catch ( \Throwable $error ) {
+			$this->db->cancelAtomic( __METHOD__, $scope );
+			throw $error;
 		}
+	}
+
+    /** Explicit repair also checks hosting rows when the ordinary one-read fast path would skip them. */
+    public function reconcileSubjectsOfPage(PageId $pageId,array $subjectIds):void {
+        $scope=$this->db->startAtomic(__METHOD__,IDatabase::ATOMIC_CANCELABLE);
+        try {
+            $this->synchronizeIdentityHosts($pageId,$subjectIds);
+            $this->setSubjectsOfPage($pageId,$subjectIds);
+            $this->db->endAtomic(__METHOD__);
+        } catch (\Throwable $error) { $this->db->cancelAtomic(__METHOD__,$scope);throw $error; }
+    }
+
+	private function replaceSubjects( PageId $pageId, array $wanted, array $stored ): void {
 
 		// Replacing the rows is one step. The maintenance rebuild runs under CLI without DBO_TRX, so
 		// without this the delete and the insert commit separately, leaving a window in which the page's
@@ -117,7 +133,26 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 		return $stored;
 	}
 
+	private function synchronizeIdentityHosts( PageId $pageId, array $wanted ): void {
+		// The revision save owns the outer transaction. Old IDs keep their historical behavior.
+		$ids = array_values( array_filter( $wanted, static fn ( $id ) => preg_match( '/^E[1-9][0-9]{0,17}\z/', $id ) === 1 ) );
+		$old = $this->db->selectFieldValues( 'sws_identity_host', 'swsih_id', [ 'swsih_page'=>$pageId->id ], __METHOD__ );
+		foreach ( array_diff( $old, $ids ) as $id ) {
+			$this->db->delete( 'sws_identity_host', [ 'swsih_id'=>$id, 'swsih_page'=>$pageId->id ], __METHOD__ );
+		}
+		foreach ( $ids as $id ) {
+			if ( !$this->db->selectField( 'sws_identity', 'swsi_id', [ 'swsi_id'=>$id, 'swsi_kind'=>'entity' ], __METHOD__ ) ) {
+				throw new \RuntimeException( 'Entity ID was not reserved: ' . $id );
+			}
+			$this->db->insert( 'sws_identity_host', [ 'swsih_id'=>$id, 'swsih_page'=>$pageId->id ], __METHOD__, [ 'IGNORE' ] );
+			$host = $this->db->selectField( 'sws_identity_host', 'swsih_page', [ 'swsih_id'=>$id ], __METHOD__, [ 'FOR UPDATE' ] );
+			if ( (int)$host !== $pageId->id ) { throw new \ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $id ) ); }
+			$this->db->update( 'sws_identity', [ 'swsi_used'=>1 ], [ 'swsi_id'=>$id ], __METHOD__ );
+		}
+	}
+
 	public function removePage( PageId $pageId ): void {
+		if ( $this->enforceSequentialIds ) { $this->db->delete( 'sws_identity_host', [ 'swsih_page'=>$pageId->id ], __METHOD__ ); }
 		$this->db->newDeleteQueryBuilder()
 			->deleteFrom( self::TABLE )
 			->where( [ 'swssp_page_id' => $pageId->id ] )

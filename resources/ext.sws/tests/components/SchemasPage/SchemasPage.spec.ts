@@ -249,7 +249,7 @@ describe( 'SchemasPage', () => {
 		const wrapper = mountPage( { subjectCountLookup: { getSubjectCounts: neverLands() } } );
 		await flushPromises();
 
-		expect( wrapper.find( 'a[href^="/wiki/Special:Subjects/"]' ).exists() ).toBe( false );
+		expect( wrapper.find( 'a[href^="/wiki/Special:Entities/"]' ).exists() ).toBe( false );
 	} );
 
 	it.each<[ string, { edit?: boolean; create?: boolean; delete?: boolean; createSubjectPages?: boolean }, string[] ]>( [

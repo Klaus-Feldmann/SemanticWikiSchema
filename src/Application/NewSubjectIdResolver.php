@@ -21,6 +21,8 @@ readonly class NewSubjectIdResolver {
 		private SubjectIdParser $subjectIdParser,
 		private IdGenerator $idGenerator,
 		private PageIdentifiersLookup $pageIdentifiersLookup,
+		private ?\ProfessionalWiki\SWS\Application\Identity\IdentityRegistry $identities = null,
+		private string $owner = '',
 	) {
 	}
 
@@ -31,6 +33,10 @@ readonly class NewSubjectIdResolver {
 	 */
 	public function resolve( ?string $suppliedId ): SubjectId {
 		if ( $suppliedId === null ) {
+			if ( $this->identities !== null ) {
+				$id = $this->identities->reserveForOwner( \ProfessionalWiki\SWS\Domain\Identity\IdentityKind::Entity, bin2hex( random_bytes( 16 ) ), $this->owner );
+				return new SubjectId( $id->text );
+			}
 			return SubjectId::createNew( $this->idGenerator );
 		}
 
@@ -40,17 +46,17 @@ readonly class NewSubjectIdResolver {
 			throw new InvalidArgumentException( "Subjects can only be created in the local Source: '$suppliedId'" );
 		}
 
+		if ( $this->identities !== null && !$this->isInUse( $subjectId ) ) {
+			if ( !$subjectId->isSequential() || !$this->identities->canCreate( new \ProfessionalWiki\SWS\Domain\Identity\EntityId( $subjectId->text ), $this->owner ) ) {
+				throw new InvalidArgumentException( 'New entity IDs must be reserved by the current author' );
+			}
+		}
 		return $subjectId;
 	}
 
 	/**
-	 * Best-effort global uniqueness check: the subject -> page index is read from a replica, so this
-	 * can miss a Subject another request just created; ID entropy carries the rest (same posture as
-	 * relation IDs). Worth asking only of an id a caller supplied — a freshly minted one is nobody's.
-	 *
-	 * Reads the unfiltered index on purpose, not SubjectHostingPageResolver: a collision with a Subject
-	 * on a page the caller cannot read is still a collision, and a read-gated check would let a client
-	 * mint an id that shadows a hidden Subject.
+	 * Early unfiltered index check; the page-save index enforces unique hosts for E IDs on the
+	 * primary database. A replica miss is not relied on as proof of availability.
 	 */
 	public function isInUse( SubjectId $id ): bool {
 		return $this->pageIdentifiersLookup->getPageIdOfSubject( $id ) !== null;

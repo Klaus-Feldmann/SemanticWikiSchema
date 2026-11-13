@@ -27,7 +27,7 @@ final class InternalPageProcessor {
         return (bool)( $services->getPageProps()->getProperties( $title, self::MANAGED )[$title->getArticleID()] ?? false );
     }
 
-    public function prepare( Title $title ): ProcessingResult {
+    public function prepare( Title $title, bool $captureSources = false ): ProcessingResult {
         $services = MediaWikiServices::getInstance();
         $revision = $services->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
         if ( !$revision ) { throw new ProcessingIncomplete( 'SemanticWikiSchema: page no longer exists.' ); }
@@ -41,7 +41,8 @@ final class InternalPageProcessor {
         }
         $options = ParserOptions::newFromUser( $user );
         $context = new ProcessingContext( $title );
-        return $context->run( function () use ( $services, $revision, $title, $user, $options, $context ): ProcessingResult {
+        $context->useStoredSources = \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore();
+        return $context->run( function () use ( $services, $revision, $title, $user, $options, $context, $captureSources ): ProcessingResult {
             $dependencies = [];
             $schema = null;
             $content = SubjectSlotReader::read( $revision );
@@ -50,6 +51,7 @@ final class InternalPageProcessor {
             }
             $raw = $content ? json_decode( $content->getText(), true, 512, JSON_THROW_ON_ERROR ) : [];
             $subjects = $content?->getPageSubjects();
+            $context->subjects = $subjects;
             if ( !is_array( $raw ) || count( $raw['subjects'] ?? [] ) !== count( $subjects?->getAllSubjects()->asArray() ?? [] ) ) {
                 throw new ProcessingIncomplete( 'SemanticWikiSchema: invalid/incomplete subject slot.' );
             }
@@ -59,7 +61,7 @@ final class InternalPageProcessor {
             }
             $schemas = [];
             $resolveSchema = static function ( \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference ) use ( $services, $user, &$dependencies, &$schemas ): \ProfessionalWiki\SWS\Domain\Schema\Schema {
-                $key = $reference->getText();
+                $key = json_encode( $reference->toJson(), JSON_THROW_ON_ERROR );
                 if ( isset( $schemas[$key] ) ) {
                     return $schemas[$key];
                 }
@@ -106,12 +108,24 @@ final class InternalPageProcessor {
             $rendered = $services->getRevisionRenderer()->getRenderedRevision( $revision, $options, $user,
                 [ 'audience' => RevisionRecord::FOR_THIS_USER, 'use-master' => true ] );
             $output = $rendered->getRevisionParserOutput( [ 'generate-html' => true ] );
-            $html = $output->getContentHolderText();
-            $sortWarning = $context->parser?->msg( 'duplicate-defaultsort', ParserFailureCheck::OLD_KEY, ParserFailureCheck::NEW_KEY )->text();
-            if ( $context->failure !== null || ParserFailureCheck::hasFailure( $html, $sortWarning ) ) {
-                throw new ProcessingIncomplete( 'SemanticWikiSchema: parser or source resolution failed; previous derived data retained.' );
+            // Article/template presentation messages belong to their own producers. Only
+            // explicit failures from SWS orchestration may stop this processing stage.
+            if ( $context->failure !== null ) {
+                throw new ProcessingIncomplete( 'SemanticWikiSchema: SWS processing failed: ' . $context->failure );
             }
-            if ( $subject !== null && $schema !== null && $services->hasService( 'SMW.ParserDataFactory' ) ) {
+            if ( $subjects !== null ) {
+                ( new UserWikitextProcessor() )->apply( $title, $output, $subjects, $user, $resolveSchema, $revision->getId() );
+            }
+            // Identity registration may have been produced only by this full parse. Collect
+            // after it, before annotations, including every Subject and every configured binding.
+            $context->output = $output;
+            $sourceSnapshots = $captureSources && $context->useStoredSources && $subjects !== null
+                ? ( new SourceSnapshotCapture() )->capture( $title, $revision, $subjects, $user, $resolveSchema ) : [];
+            $sourcePreparation = $sourceSnapshots !== [];
+            if ( $subject !== null && $schema !== null ) {
+                ( new CategoryAssignments() )->apply( $output, $schema, $subjects, $subject, $resolveSchema );
+            }
+            if ( !$sourcePreparation && $subject !== null && $schema !== null && $services->hasService( 'SMW.ParserDataFactory' ) ) {
                 ( new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations() )->apply(
                     $title, $output, $context->parser, $schema, $subjects, $subject, $user, $resolveSchema
                 );
@@ -130,22 +144,39 @@ final class InternalPageProcessor {
             }
             $stamp = ProcessingResult::seal( [ 'page' => $title->getArticleID(), 'revision' => $revision->getId(),
                 'sha1' => $revision->getSha1(), 'dependencies' => $dependencies,
+                'stage' => $sourcePreparation ? 'sources' : 'complete',
+                'sourceDataMode' => \ProfessionalWiki\SWS\Application\Source\SourceDataMode::current(),
+                'sourceSnapshotHash' => SourceSnapshotCapture::hash( $sourceSnapshots ),
                 'semanticHash' => ProcessingResult::semanticHash( $data ) ] );
             $output->setExtensionData( ProcessingResult::STAMP, $stamp );
             if ( $revision->hasSlot( 'sws' ) ) { $output->setPageProperty( self::MANAGED, '1' ); }
             // Even an accidental caller must not cache this privileged HTML.
             $output->updateCacheExpiry( 0 );
             if ( $data !== null ) { $data->setExtensionData( ProcessingResult::STAMP, $stamp ); }
-            $result = new ProcessingResult( $title, $revision, $output, $options, $stamp );
+            $result = new ProcessingResult( $title, $revision, $output, $options, $stamp, $sourceSnapshots, $sourcePreparation );
             $result->assertCurrent();
             return $result;
         } );
     }
 
-    public function refresh( Title $title, ?Title $movedFrom = null ): bool {
+    public function refresh( Title $title, ?Title $movedFrom = null, bool $refreshSources = false, bool $strictProjection = false ): bool {
         if ( !$title->exists( IDBAccessObject::READ_LATEST ) ) { return true; }
         ProcessingState::record( $title, 'pending', $title->getLatestRevID() );
-        try { $result = $this->prepare( $title ); $result->assertCurrent(); }
+        try {
+            $current = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
+            $result = $this->prepare( $title, \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() && ( $refreshSources || !SourceRefreshReceipt::isCurrent( $title, $current ) ) );
+            $result->assertCurrent();
+            if ( $result->isSourcePreparation ) {
+                // Write outside ProcessingContext: saving a revision renders it again.
+                ( new InternalSourceSnapshotWriter() )->save( $result );
+                // The final output and SMW plan must belong to the new stored revision.
+                $result = $this->prepare( $title );
+                $result->assertCurrent();
+                if ( !SourceRefreshReceipt::isCurrent( $title, $result->revision ) ) {
+                    throw new ProcessingIncomplete( 'Source revision or dependencies changed before final processing.', 'superseded' );
+                }
+            }
+        }
         catch ( \Throwable $e ) {
             ProcessingState::record( $title, $e instanceof ProcessingIncomplete ? $e->state : 'failed', $title->getLatestRevID() );
             throw $e;
@@ -163,7 +194,13 @@ final class InternalPageProcessor {
             throw $e;
         } finally { ProcessingHooks::$movedFrom = null; }
         // Preserve the original graph/index projection path and its publication policy.
-        SWSExtension::getInstance()->newHookPageRebuilder()->rebuild( $title );
+        $extension = SWSExtension::getInstance();
+        $outcome = ($strictProjection ? $extension->newMigrationPageRebuilder() : $extension->newHookPageRebuilder())->rebuild($title);
+        if ($strictProjection && !in_array($outcome,[\ProfessionalWiki\SWS\Application\PageRefreshOutcome::Refreshed,\ProfessionalWiki\SWS\Application\PageRefreshOutcome::Unpublished],true)) {
+            throw new ProcessingIncomplete('Current data projection was not completed');
+        }
+        // Schema-only category changes also invalidate the ordinary view parse.
+        $title->invalidateCache();
         if ( !MediaWikiServices::getInstance()->hasService( 'SMW.ParserDataFactory' ) ) {
             ProcessingState::record( $title, 'complete', $result->revision->getId() );
         }

@@ -73,6 +73,7 @@ class OntologyMappingProjector implements PageProjector {
 		private readonly RdfValueMapperRegistry $valueMappers,
 		private readonly SubjectIriResolver $subjectIris,
 		private readonly LoggerInterface $logger,
+        private readonly ?\Closure $canonicalSchema = null,
 	) {
 		$this->target = $mapping->name->getText();
 		$this->expander = new CurieExpander( $mapping->prefixes );
@@ -137,7 +138,7 @@ class OntologyMappingProjector implements PageProjector {
 			return null;
 		}
 
-		return $this->mapping->forSchema( $reference->name );
+		return $this->mapping->forSchema( $this->canonicalSchema === null ? $reference : ( $this->canonicalSchema )( $reference ) );
 	}
 
 	/**
@@ -237,7 +238,10 @@ class OntologyMappingProjector implements PageProjector {
 		}
 
 		$label = RdfLiteralFactory::typed( $displayName, 'string' );
-		$quads[] = new Quad( $subjectIri, $this->namespaces->rdfsLabel(), $label, $graph );
+		$identity = $subject->getIdentity();
+        $ownLabels = array_filter( $identity?->labels ?? [], static fn ( $text ) => trim( $text ) !== '' );
+        if ( $ownLabels !== [] ) { $quads = array_merge( $quads, IdentityRdfMetadata::quads( $subjectIri, $identity, $graph ) ); }
+        else { $quads[] = new Quad( $subjectIri, $this->namespaces->rdfsLabel(), $label, $graph ); }
 
 		if ( $subjectMapping->labelPredicate !== null && $subject->getLabel() !== null ) {
 			$predicate = $this->expander->expand( $subjectMapping->labelPredicate );
@@ -249,7 +253,8 @@ class OntologyMappingProjector implements PageProjector {
 				);
 			}
 			else {
-				$quads[] = new Quad( $subjectIri, $predicate, $label, $graph );
+				if ( $ownLabels === [] ) { $quads[] = new Quad( $subjectIri, $predicate, $label, $graph ); }
+                else { foreach ( $ownLabels as $lang=>$text ) { $quads[] = new Quad( $subjectIri, $predicate, RdfLiteralFactory::languageTagged( $text, $lang ), $graph ); } }
 			}
 		}
 

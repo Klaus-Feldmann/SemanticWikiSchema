@@ -19,7 +19,7 @@ describe( 'subjectLinkUrl', () => {
 	it( 'leads to the Subject itself on a subject-first wiki', () => {
 		onWiki( true );
 
-		expect( subjectLinkUrl( target() ) ).toBe( '/wiki/Special:Subject/' + SUBJECT_ID );
+		expect( subjectLinkUrl( target() ) ).toBe( '/wiki/Special:Entity/' + SUBJECT_ID );
 	} );
 
 	it( 'leads to the page the Subject is stored on on a page-first wiki', () => {
@@ -35,7 +35,7 @@ describe( 'subjectLinkUrlFromRow', () => {
 	it( 'leads to the Subject itself on a subject-first wiki', () => {
 		onWiki( true );
 
-		expect( subjectLinkUrlFromRow( target() ) ).toBe( '/wiki/Special:Subject/' + SUBJECT_ID );
+		expect( subjectLinkUrlFromRow( target() ) ).toBe( '/wiki/Special:Entity/' + SUBJECT_ID );
 	} );
 
 	it( 'leads to the Subject\'s own row on its page\'s Data tab on a page-first wiki', () => {

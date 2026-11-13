@@ -1,3 +1,5 @@
+import IdentityEditor from '@/components/common/IdentityEditor.vue';
+import { SchemaDeserializer } from '@/persistence/SchemaDeserializer';
 import { mount, VueWrapper, flushPromises } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, ref } from 'vue';
@@ -37,7 +39,7 @@ const SchemaEditorStub = defineComponent( {
 	methods: {
 		// Mirrors the real editor, which applies the host-owned description.
 		getSchema(): Schema {
-			return newSchema( { title: 'TestSchema', description: this.description, properties: new PropertyDefinitionList( [] ) } );
+			return ( this.initialSchema as Schema ).withDescription( this.description );
 		},
 		saveBlocker(): SaveBlocker | null {
 			return editorSaveBlocker;
@@ -78,10 +80,10 @@ describe( 'SchemaEditorDialog', () => {
 		CloseConfirmationDialog: CloseConfirmationDialogStub,
 	};
 
-	function mountComponent(): VueWrapper {
+	function mountComponent( initialSchema: Schema = mockSchema ): VueWrapper {
 		return mount( SchemaEditorDialog, {
 			props: {
-				initialSchema: mockSchema,
+				initialSchema,
 				open: true,
 				onSave,
 			},
@@ -91,6 +93,38 @@ describe( 'SchemaEditorDialog', () => {
 			},
 		} );
 	}
+
+	describe( 'S-ID and multilingual metadata editing', () => {
+		const terms = { identityLanguage: 'de', labels: { de: 'Person', en: 'Person' }, descriptions: { de: 'Mensch', en: 'Human' } };
+		function schema(): Schema {
+			return new SchemaDeserializer().deserialize( 'S1', { formatVersion: 2, id: 'S1', ...terms, propertyDefinitions: {} } );
+		}
+		it( 'renames by label while saving the same ID and retaining other translations', async () => {
+			const wrapper = mountComponent( schema() );
+			await wrapper.findComponent( IdentityEditor ).vm.$emit( 'update:modelValue', { ...terms, labels: { ...terms.labels, de: 'Persönlichkeit' } } );
+			await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'Rename' );
+			await flushPromises();
+			const saved = onSave.mock.calls[ 0 ][ 0 ];
+			expect( saved.getName() ).toBe( 'S1' );
+			expect( saved.getId() ).toBe( 'S1' );
+			expect( saved.getIdentity()?.labels ).toEqual( { de: 'Persönlichkeit', en: 'Person' } );
+			expect( saved.getIdentity()?.descriptions ).toEqual( terms.descriptions );
+		} );
+		it( 'blocks clearing every schema label', async () => {
+			const wrapper = mountComponent( schema() );
+			await wrapper.findComponent( IdentityEditor ).vm.$emit( 'update:modelValue', { ...terms, labels: {} } );
+			await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'Empty' );
+			await flushPromises();
+			expect( onSave ).not.toHaveBeenCalled();
+		} );
+		it( 'discards unsaved term edits on reopening', async () => {
+			const wrapper = mountComponent( schema() );
+			await wrapper.findComponent( IdentityEditor ).vm.$emit( 'update:modelValue', { ...terms, labels: { de: 'Discard me' } } );
+			await wrapper.setProps( { open: false } );
+			await wrapper.setProps( { open: true } );
+			expect( wrapper.findComponent( IdentityEditor ).props( 'modelValue' ).labels ).toEqual( terms.labels );
+		} );
+	} );
 
 	describe( 'Save button', () => {
 		it( 'disables save when there are no changes', async () => {

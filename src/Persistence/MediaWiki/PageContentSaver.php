@@ -9,6 +9,7 @@ use MediaWiki\Content\Content;
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
+use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\PageUpdater;
 use ProfessionalWiki\SWS\Domain\Page\PageId;
 use WikiPage;
@@ -37,6 +38,40 @@ class PageContentSaver {
 	 */
 	public function createPage( PageIdentity $page, array $contentBySlot, CommentStoreComment $comment ): PageContentSavingStatus {
 		return $this->save( $page, $contentBySlot, $comment, EDIT_NEW );
+	}
+
+	/**
+	 * Internal revision-bound transformation. grabParentRevision() opens MediaWiki's CAS bracket:
+	 * a concurrent save after this check is refused by PageUpdater at insertion time as well.
+	 * This is a storage primitive, not a public endpoint or a source-refresh hook.
+	 *
+	 * @param callable(RevisionRecord): array<string, Content> $update
+	 */
+	public function updateContentAtRevision(
+		PageId $page,
+		int $expectedRevisionId,
+		callable $update,
+		CommentStoreComment $comment
+	): PageContentSavingStatus {
+		if ( $expectedRevisionId < 1 ) {
+			throw new \InvalidArgumentException( 'Expected an existing base revision' );
+		}
+		$wikiPage = $this->wikiPageFromPageId( $page );
+		if ( $wikiPage === null ) {
+			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Page not found' );
+		}
+		if ( !$this->performer->authorizeRead( 'read', $wikiPage->getTitle() ) ||
+			!$this->performer->authorizeWrite( 'edit', $wikiPage->getTitle() ) ) {
+			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Source snapshot write not authorized' );
+		}
+		$updater = $wikiPage->newPageUpdater( $this->performer );
+		$parent = $updater->grabParentRevision();
+		if ( $parent === null || $parent->getId() !== $expectedRevisionId || $parent->getPageId() !== $page->id ) {
+			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Source snapshot base revision changed' );
+		}
+		$contentBySlot = $update( $parent );
+		$this->saveContentViaUpdater( $updater, $contentBySlot, $comment, 0 );
+		return $this->buildStatusFromUpdater( $updater );
 	}
 
 	/**

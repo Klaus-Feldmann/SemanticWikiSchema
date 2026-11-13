@@ -60,8 +60,10 @@
 </template>
 
 <script setup lang="ts">
+import type { SchemaReference } from '@/domain/SchemaReference';
 import { computed, ref, shallowRef } from 'vue';
-import { CdxField, CdxMessage, CdxSelect, CdxTextInput } from '@wikimedia/codex';
+import { CdxField, CdxMessage, CdxTextInput } from '@wikimedia/codex';
+import CdxSelect from '@/components/common/ContentWidthSelect.vue';
 import type { MenuItemData, ValidationStatusType } from '@wikimedia/codex';
 import { SWSServices } from '@/SWSServices.ts';
 import { Layout, type DisplayRule } from '@/domain/Layout.ts';
@@ -88,6 +90,7 @@ const nameError = ref( '' );
 const nameStatus = ref<ValidationStatusType>( 'default' );
 const nameInputRef = ref<InstanceType<typeof CdxTextInput> | null>( null );
 const selectedSchema = ref<string | null>( null );
+const selectedSchemaReference = shallowRef<SchemaReference | null>( null );
 const selectedViewType = ref<string | null>( DEFAULT_VIEW_TYPE );
 const schemaProperties = shallowRef<PropertyDefinition[]>( [] );
 const targetingDependentSubjects = shallowRef<PropertyName[]>( [] );
@@ -108,6 +111,7 @@ function onChange(): void {
 
 async function onSchemaSelected( schemaName: string ): Promise<void> {
 	selectedSchema.value = schemaName;
+	selectedSchemaReference.value = null;
 	schemaProperties.value = [];
 	targetingDependentSubjects.value = [];
 	schemaFetchFailed.value = false;
@@ -126,6 +130,7 @@ async function onSchemaSelected( schemaName: string ): Promise<void> {
 			return;
 		}
 
+		selectedSchemaReference.value = schema.getReference();
 		schemaProperties.value = [ ...schema.getPropertyDefinitions() ];
 		targetingDependentSubjects.value = propertiesTargetingDependentSubjects( schema, subjectsAreDependentIn( summaries ) )
 			.map( ( property ) => property.name );
@@ -225,7 +230,7 @@ function getLayout(): Layout | null {
 	}
 
 	const displayRules = [ ...currentDisplayRules.value ];
-	return new Layout( name, selectedSchema.value, selectedViewType.value, '', displayRules, {} );
+	return new Layout( name, selectedSchemaReference.value ?? selectedSchema.value, selectedViewType.value, '', displayRules, {} );
 }
 
 function reset(): void {
@@ -235,6 +240,7 @@ function reset(): void {
 	nameError.value = '';
 	nameStatus.value = 'default';
 	selectedSchema.value = null;
+	selectedSchemaReference.value = null;
 	selectedViewType.value = DEFAULT_VIEW_TYPE;
 	schemaProperties.value = [];
 	targetingDependentSubjects.value = [];

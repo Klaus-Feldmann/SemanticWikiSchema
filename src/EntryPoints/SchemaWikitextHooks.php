@@ -23,7 +23,8 @@ final class SchemaWikitextHooks {
 	private const MARKER = 'sws-schema-wikitext-visited';
 
 	public static function onParserBeforeInternalParse( Parser $parser, string &$text, $stripState ): void {
-		if ( $parser->getOutputType() !== Parser::OT_HTML || $parser->getOptions()->isMessage()
+		if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() || \ProfessionalWiki\SWS\EntryPoints\Processing\FieldWikitextContext::isActive()
+			|| $parser->getOutputType() !== Parser::OT_HTML || $parser->getOptions()->isMessage()
 			|| $parser->getOutput()->getExtensionData( self::MARKER ) ) { return; }
 		$parser->getOutput()->setExtensionData( self::MARKER, true );
 		$title = $parser->getTitle();
@@ -39,6 +40,22 @@ final class SchemaWikitextHooks {
 			( new ParserPageDependencyRecorder( $parser ) )->recordDependencyOnSchema( $reference );
 			$schema = $extension->getSchemaResolverFor( ParserAuthority::of( $parser ) )->getSchema( $reference );
 			if ( $schema === null ) { return; }
+			// Include schema categories in ordinary view parses as well as in the sealed worker output.
+			$authority = ParserAuthority::of( $parser );
+			$revision = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
+			if ( $revision && $revision->userCan( RevisionRecord::DELETED_TEXT, $authority ) ) {
+				$pageSubjects = SubjectSlotReader::read( $revision )?->getPageSubjects();
+				if ( $pageSubjects !== null && $pageSubjects->getMainSubject() == $subject ) {
+					$resolve = static function ( $ref ) use ( $extension, $authority, $parser ) {
+						( new ParserPageDependencyRecorder( $parser ) )->recordDependencyOnSchema( $ref );
+						return $extension->getSchemaResolverFor( $authority )->getSchema( $ref )
+							?? throw new \RuntimeException( 'Category schema unavailable' );
+					};
+					( new \ProfessionalWiki\SWS\EntryPoints\Processing\CategoryAssignments() )->apply(
+						$parser->getOutput(), $schema, $pageSubjects, $subject, $resolve
+					);
+				}
+			}
 			$text = SchemaWikitext::append( $text, SchemaWikitext::programs( $schema ) );
 		} catch ( Throwable $e ) {
 			if ( $context = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $context->failure = $e->getMessage(); }
@@ -48,7 +65,9 @@ final class SchemaWikitextHooks {
 	}
 
 	public static function onRevisionFromEditComplete( $wikiPage, RevisionRecord $revision, int|bool $originalRevId, $user, array &$tags ): void {
+        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
 		try {
+			if ( \ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt::isCurrent( $wikiPage->getTitle(), $revision ) ) { return; }
 			$old = $originalRevId ? MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionById( (int)$originalRevId ) : null;
 			$main = $revision->getContent( SlotRecord::MAIN );
 			$oldMain = $old?->getContent( SlotRecord::MAIN );
@@ -82,22 +101,20 @@ final class SchemaWikitextHooks {
 	}
 
 	private static function usesExecution( RevisionRecord $revision ): bool {
-		$subject = SubjectSlotReader::read( $revision )?->getPageSubjects()->getMainSubject();
-		if ( $subject === null || !$subject->getSchemaReference()->isLocal() ) { return false; }
-		$schema = SWSExtension::getInstance()->getSchemaResolver()->getSchema( $subject->getSchemaReference() );
-		return $schema !== null && SchemaWikitext::programs( $schema ) !== [];
-	}
-
-	private static function schemaPrograms( $content ): array {
-		if ( !$content instanceof SchemaContent ) { return []; }
-		$data = json_decode( $content->getText(), true );
-		$result = [];
-		foreach ( $data['propertyDefinitions'] ?? [] as $name => $definition ) {
-			if ( ( $definition['type'] ?? null ) === 'wikitext' && ( $definition['execute'] ?? false ) === true ) {
-				$result[$name] = $definition['wikitext'] ?? '';
+		$subjects = SubjectSlotReader::read( $revision )?->getPageSubjects();
+		foreach ( $subjects?->getAllSubjects()->asArray() ?? [] as $subject ) {
+			if ( !$subject->getSchemaReference()->isLocal() ) { continue; }
+			$schema = SWSExtension::getInstance()->getSchemaResolver()->getSchema( $subject->getSchemaReference() );
+			if ( $schema === null ) { continue; }
+			if ( SchemaWikitext::programs( $schema ) !== [] ) { return true; }
+			foreach ( $schema->getAllProperties()->asMap() as $property ) {
+				if ( $property->getExternalProperty() !== null
+                    || $property instanceof \ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty && $property->assignsCategories()
+					|| $property instanceof \ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty
+                    || ( $property->getFieldNotes()['type'] ?? null ) === 'wikitext' ) { return true; }
 			}
 		}
-		return $result;
+		return false;
 	}
 
 	public static function refreshPage( Title $title ): bool {

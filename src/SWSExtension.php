@@ -83,6 +83,7 @@ use ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
 use ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
 use ProfessionalWiki\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory;
 use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
+use ProfessionalWiki\SWS\Domain\Page\PageId;
 use ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
 use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
 use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
@@ -535,8 +536,13 @@ class SWSExtension {
 	 * {@see \ProfessionalWiki\SWS\Domain\Subject\SubjectId}s. The local Source key is the
 	 * MediaWiki Wiki ID (ADR 22), so an id naming this wiki explicitly canonicalizes to its bare form.
 	 */
-	public function getSubjectIdParser(): SubjectIdParser {
-		return new SubjectIdParser( $this->config->wikiId );
+	public function newIdentityBoundaryResolver(): \ProfessionalWiki\SWS\Application\Identity\IdentityBoundaryResolver {
+        return new \ProfessionalWiki\SWS\Application\Identity\IdentityBoundaryResolver( $this->newIdentityRegistry(), $this->config->wikiId );
+    }
+
+    public function getSubjectIdParser( bool $resolveAliases = false ): SubjectIdParser {
+        return new SubjectIdParser( $this->config->wikiId,
+            $resolveAliases ? fn ( $id ) => $this->newIdentityBoundaryResolver()->entity( $id ) : null );
 	}
 
 	/**
@@ -641,7 +647,8 @@ class SWSExtension {
 			$this->getSourceRegistry()->withLocalSource(
 				$this->newLocalSource( fn (): SubjectLookup => $this->getSubjectRepository(), $localSchemaLookup )
 			),
-			LoggerFactory::getInstance( 'SWS' )
+			LoggerFactory::getInstance( 'SWS' ),
+            fn ( $reference ) => $this->newIdentityBoundaryResolver()->schema( $reference )
 		);
 	}
 
@@ -669,7 +676,13 @@ class SWSExtension {
 	 */
 	public function getStoreContentUC(): OnRevisionCreatedHandler {
 		return $this->newStoreContentHandler(
-			$this->getIsolatingGraphDatabasePlugin(),
+			new \ProfessionalWiki\SWS\Infrastructure\AfterCommitGraphDatabasePlugin(
+				$this->getIsolatingGraphDatabasePlugin(),
+				static function ( \Closure $publish ): void {
+					MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
+						->onTransactionCommitOrIdle( $publish, __METHOD__ );
+				}
+			),
 			$this->newSubjectPageIndex(),
 			$this->newPublishedSubjectIndex(),
 			new FailureIsolatingPagePropertiesSource(
@@ -709,12 +722,23 @@ class SWSExtension {
 			$this->getRevisionPolicy(),
 			MediaWikiServices::getInstance()->getTitleFormatter(),
 			LoggerFactory::getInstance( 'SWS' ),
+            new \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex(
+                MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
+            ),
 		);
 	}
 
+    /** Migration writes still commit authoritative entity hosting with the revision, never graph output. */
+    public function indexMigrationRevision( \MediaWiki\Revision\RevisionRecord $revision ): void {
+        if ( !\ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { throw new \LogicException('Migration scope required'); }
+        $content = \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader::read($revision);
+        $this->newSubjectPageIndex()->setSubjectsOfPage(new PageId($revision->getPageId()),$content?->getSubjectIds() ?? []);
+    }
+
 	private function newSubjectPageIndex(): SubjectPageIndex {
 		return new DatabaseSubjectPageIndex(
-			MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
+			MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase(),
+			enforceSequentialIds: true
 		);
 	}
 
@@ -785,7 +809,8 @@ class SWSExtension {
 		return new SubjectIriResolver(
 			$this->getRdfNamespaces(),
 			$this->getSourceRegistry(),
-			LoggerFactory::getInstance( 'SWS' )
+			LoggerFactory::getInstance( 'SWS' ),
+            fn ( $id ) => $this->newIdentityBoundaryResolver()->entity( $id )
 		);
 	}
 
@@ -873,6 +898,7 @@ class SWSExtension {
 					$this->getRdfValueMapperRegistry(),
 					$this->newSubjectIriResolver(),
 					LoggerFactory::getInstance( 'SWS' ),
+                    fn ( $reference ) => $this->newIdentityBoundaryResolver()->schema( $reference ),
 				),
 				new HardfRdfSerializer( $this->ontologyPrefixMap( $mapping ), LoggerFactory::getInstance( 'SWS' ) ),
 			)
@@ -1260,7 +1286,7 @@ class SWSExtension {
 			)
 		);
 
-		return new SchemaResolver( $registry, LoggerFactory::getInstance( 'SWS' ) );
+		return new SchemaResolver( $registry, LoggerFactory::getInstance( 'SWS' ), fn ( $reference ) => $this->newIdentityBoundaryResolver()->schema( $reference ) );
 	}
 
 	private function buildNeo4jPlugin( SchemaResolver $schemaResolver ): Neo4jPlugin {
@@ -1271,6 +1297,7 @@ class SWSExtension {
 			valueBuilderRegistry: $this->getValueBuilderRegistry(),
 			logger: LoggerFactory::getInstance( 'SWS' ),
 			wikiId: $this->config->wikiId,
+            canonicalize: fn ( $id ) => $this->newIdentityBoundaryResolver()->entity( $id ),
 		);
 	}
 
@@ -1472,7 +1499,8 @@ class SWSExtension {
 
 	public function newViewHtmlBuilder(): ViewHtmlBuilder {
 		return new ViewHtmlBuilder(
-			subjectContentRepository: $this->newSubjectContentRepository( $this->getRequestAuthority() )
+			subjectContentRepository: $this->newSubjectContentRepository( $this->getRequestAuthority() ),
+            canonicalize: fn(string $id): string => $this->getSubjectIdParser(true)->parse($id)?->text ?? $id
 		);
 	}
 
@@ -1542,7 +1570,7 @@ class SWSExtension {
 			subjectLookup: $this->getSourceRoutingSubjectLookup( $this->getSubjectRepository() ),
 			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 			pageDependencyRecorder: new ParserPageDependencyRecorder( $parser ),
 			schemaResolver: $this->getSchemaResolverFor( $authority ),
 		);
@@ -1592,6 +1620,15 @@ class SWSExtension {
 	 * The page is indexed as an edit does it, which costs reads but no write where, as on the visibility
 	 * path, no Subject changed.
 	 */
+    public function withdrawDeletedDataPage(int $pageId):void {
+        $this->newRebuildStoreContentHandler()->onPageDelete($pageId);
+        $this->newSubjectPageIndex()->removePage(new PageId($pageId));
+    }
+
+    public function newMigrationPageRebuilder(): PageRebuilder {
+        return $this->newPageRebuilderWith($this->newRebuildStoreContentHandler());
+    }
+
 	public function newHookPageRebuilder(): PageRebuilder {
 		return $this->newPageRebuilderWith( $this->getStoreContentUC() );
 	}
@@ -1727,7 +1764,7 @@ class SWSExtension {
 		return new CreateSubjectAction(
 			presenter: $presenter,
 			subjectRepository: $this->getSubjectRepository(),
-			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			newSubjectIdResolver: $this->getNewSubjectIdResolver( $authority ),
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
 			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
 			statementListBuilder: $this->getStatementListBuilder(),
@@ -1735,19 +1772,21 @@ class SWSExtension {
 			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
 			pageIdentifiersResolver: $this->getPageIdentifiersResolver(),
 			schemaReferenceParser: $this->getSchemaReferenceParser(),
-			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder( $authority ),
 			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
 			validationEnforced: $this->isValidationEnforced(),
+			identityLanguage: MediaWikiServices::getInstance()->getContentLanguage()->getCode(),
 		);
 	}
 
-	private function newDependentSubjectBuilder(): DependentSubjectBuilder {
+	private function newDependentSubjectBuilder( ?Authority $authority = null ): DependentSubjectBuilder {
 		return new DependentSubjectBuilder(
-			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			newSubjectIdResolver: $this->getNewSubjectIdResolver( $authority ),
 			schemaReferenceParser: $this->getSchemaReferenceParser(),
 			schemaResolver: $this->getSchemaResolver(),
 			statementListBuilder: $this->getStatementListBuilder(),
 			dependentSubjectRules: $this->newDependentSubjectRules(),
+			identityLanguage: MediaWikiServices::getInstance()->getContentLanguage()->getCode(),
 		);
 	}
 
@@ -1755,11 +1794,13 @@ class SWSExtension {
 		return new DependentSubjectValidator( $this->newProposedSubjectValidator( $authority ) );
 	}
 
-	private function getNewSubjectIdResolver(): NewSubjectIdResolver {
+	private function getNewSubjectIdResolver( ?Authority $authority = null ): NewSubjectIdResolver {
 		return new NewSubjectIdResolver(
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 			idGenerator: $this->getIdGenerator(),
 			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
+			identities: $this->newIdentityRegistry(),
+			owner: $this->getIdentityOwner( $authority ),
 		);
 	}
 
@@ -1767,16 +1808,17 @@ class SWSExtension {
 		return new CreateSubjectPageAction(
 			presenter: $presenter,
 			subjectRepository: $this->getSubjectRepository(),
-			newSubjectIdResolver: $this->getNewSubjectIdResolver(),
+			newSubjectIdResolver: $this->getNewSubjectIdResolver( $authority ),
 			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
 			statementListBuilder: $this->getStatementListBuilder(),
 			schemaResolver: $this->getSchemaResolver(),
 			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
 			pageIdentifiersResolver: $this->getPageIdentifiersResolver(),
 			schemaReferenceParser: $this->getSchemaReferenceParser(),
-			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder( $authority ),
 			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
 			validationEnforced: $this->isValidationEnforced(),
+			identityLanguage: MediaWikiServices::getInstance()->getContentLanguage()->getCode(),
 			subjectFirst: $this->isSubjectFirst(),
 			subjectPageNamespace: $this->getSubjectPageNamespace(),
 		);
@@ -1788,8 +1830,22 @@ class SWSExtension {
 		);
 	}
 
+	/** Server-owned reservation scope; a label or ID itself grants no editing rights. */
+	public function getIdentityOwner( ?Authority $authority = null ): string {
+		$user = ( $authority ?? $this->getRequestAuthority() )->getUser();
+		$key = $user->getId() > 0 ? 'user:' . $user->getId() : 'anonymous:' . $user->getName();
+		return hash( 'sha256', $key );
+	}
+
+	public function newIdentityRegistry(): \ProfessionalWiki\SWS\Application\Identity\IdentityRegistry {
+		$db = MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase();
+		return new \ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry(
+			new \ProfessionalWiki\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection( $db )
+		);
+	}
+
 	public function newSubjectIdMinter(): SubjectIdMinter {
-		return new SubjectIdMinter( $this->getIdGenerator() );
+		return new SubjectIdMinter( $this->getIdGenerator(), $this->newIdentityRegistry(), $this->getIdentityOwner() );
 	}
 
 	public function getSubjectRepository(): SubjectRepository {
@@ -1839,7 +1895,7 @@ class SWSExtension {
 		return new StatementListBuilder(
 			propertyTypeLookup: $this->getPropertyTypeLookup(),
 			idGenerator: $this->getIdGenerator(),
-			subjectIdParser: $this->getSubjectIdParser()
+			subjectIdParser: $this->getSubjectIdParser( true )
 		);
 	}
 
@@ -1852,7 +1908,8 @@ class SWSExtension {
 			MediaWikiServices::getInstance()->getConnectionProvider()->getReplicaDatabase(),
 			$this->getRevisionPolicy(),
 			fn ( Authority $reader ): PageReadAuthorizer => $this->newPageReadAuthorizer( $reader ),
-			maxPages: 250
+			maxPages: 250,
+            canonicalize: fn(string $id): string => $this->getSubjectIdParser(true)->parse($id)?->text ?? $id
 		);
 
 		return $this->subjectInPlaceOfPageTitleLookup;
@@ -1879,7 +1936,7 @@ class SWSExtension {
 			subjectRepository: $this->getSubjectRepository(),
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
 			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 		);
 	}
 
@@ -1890,7 +1947,7 @@ class SWSExtension {
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
 			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
 			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 			dependentSubjectRules: $this->newDependentSubjectRules(),
 		);
 	}
@@ -1901,7 +1958,7 @@ class SWSExtension {
 			subjectRepository: $this->getSubjectRepository(),
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
 			writeAuthorizer: $this->newSubjectWriteAuthorizer( $authority ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 		);
 	}
 
@@ -1932,6 +1989,7 @@ class SWSExtension {
 		return new AuthorityBasedSubjectAuthorizer(
 			authority: $authority,
 			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
+			titleIsEligible: \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( ... ),
 		);
 	}
 
@@ -1939,7 +1997,8 @@ class SWSExtension {
 		return new GetSchemaQuery(
 			presenter: $presenter,
 			schemaLookup: $this->getSchemaLookup(),
-			serializer: $this->getSchemaPresentationSerializer()
+			serializer: $this->getSchemaPresentationSerializer(),
+            canonicalName: fn ( string $name ) => $this->newIdentityBoundaryResolver()->schema( $this->getSchemaReferenceParser()->localName( $name ) )->name
 		);
 	}
 
@@ -2130,6 +2189,10 @@ class SWSExtension {
 		);
 	}
 
+    public function newIdentityPresentationLookup( Authority $authority ): SubjectLookup {
+        return new ReadAuthorizedSubjectLookup( $this->newPublishedSubjectLookup(), $this->getPageIdentifiersLookup(), $this->newPageReadAuthorizer( $authority ) );
+    }
+
 	private function newPublishedSubjectLookup(): PublishedSubjectLookup {
 		return new PublishedSubjectLookup(
 			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
@@ -2147,7 +2210,7 @@ class SWSExtension {
 			pageIdentifiersLookup: $this->getPageIdentifiersLookup(),
 			responseItemFactory: $this->newSubjectResponseItemFactory( $publishedSubjectLookup ),
 			readAuthorizer: $this->newPageReadAuthorizer( $authority ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 			dependentSubjectRules: $this->newDependentSubjectRules(),
 		);
 	}
@@ -2183,7 +2246,7 @@ class SWSExtension {
 			subjectLookup: $this->getSourceRoutingSubjectLookup( $publishedSubjectLookup ),
 			hostingPageResolver: $this->newSubjectHostingPageResolver( $authority ),
 			responseItemFactory: $this->newSubjectResponseItemFactory( $publishedSubjectLookup ),
-			subjectIdParser: $this->getSubjectIdParser(),
+			subjectIdParser: $this->getSubjectIdParser( true ),
 		);
 	}
 
@@ -2211,7 +2274,7 @@ class SWSExtension {
 			statementListBuilder: $this->getStatementListBuilder(),
 			schemaResolver: $this->getSchemaResolver(),
 			proposedSubjectValidator: $this->newProposedSubjectValidator( $authority ),
-			dependentSubjectBuilder: $this->newDependentSubjectBuilder(),
+			dependentSubjectBuilder: $this->newDependentSubjectBuilder( $authority ),
 			dependentSubjectValidator: $this->newDependentSubjectValidator( $authority ),
 			responseItemFactory: $this->newSubjectResponseItemFactory( $this->newPageSubjectsLookup() ),
 			presenter: $presenter,
@@ -2278,6 +2341,7 @@ class SWSExtension {
 	public static function newMintSubjectIdsApi(): MintSubjectIdsApi {
 		return new MintSubjectIdsApi(
 			subjectIdMinter: self::getInstance()->newSubjectIdMinter(),
+			csrfValidator: self::getCsrfValidator(),
 		);
 	}
 
@@ -2347,8 +2411,22 @@ class SWSExtension {
 		return new SetSubjectsOrderingApi( csrfValidator: self::getCsrfValidator() );
 	}
 
-	public static function newGetSchemaApi(): GetSchemaApi {
+	public static function newResolveSchemaIdIriApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi( true ); }
+    public static function newResolveLegacySchemaIriApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi( false ); }
+    public static function newExportSchemaIdRdfApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi( true ); }
+    public static function newExportLegacySchemaRdfApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi( false ); }
+    public static function newGetSchemaByIdApi(): \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaByIdApi {
+        return new \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaByIdApi();
+    }
+    public static function newGetJsonSchemaByIdApi(): \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaByIdApi {
+        return new \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaByIdApi();
+    }
+    public static function newGetSchemaApi(): GetSchemaApi {
 		return new GetSchemaApi();
+	}
+
+	public static function newCreateSchemaApi(): \ProfessionalWiki\SWS\EntryPoints\REST\CreateSchemaApi {
+		return new \ProfessionalWiki\SWS\EntryPoints\REST\CreateSchemaApi( csrfValidator: self::getCsrfValidator() );
 	}
 
 	public static function newSaveSchemaApi(): SaveSchemaApi {

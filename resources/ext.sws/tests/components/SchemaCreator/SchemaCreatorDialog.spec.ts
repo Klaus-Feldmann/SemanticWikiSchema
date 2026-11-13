@@ -117,7 +117,24 @@ describe( 'SchemaCreatorDialog', () => {
 		setActivePinia( pinia );
 
 		schemaStore = useSchemaStore();
-		schemaStore.saveSchema = vi.fn().mockResolvedValue( undefined );
+		schemaStore.createSchema = vi.fn().mockResolvedValue( newSchema( { title: NEW_SCHEMA_NAME } ) );
+	} );
+
+	it( 'reuses its operation key after a lost response, but gives a reopened dialog a new key', async () => {
+		const repositoryResult = newSchema( { title: NEW_SCHEMA_NAME } );
+		schemaStore.createSchema = vi.fn().mockRejectedValueOnce( new Error( 'Lost response' ) ).mockResolvedValue( repositoryResult );
+		const wrapper = mountComponent();
+		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'First' );
+		await flushPromises();
+		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'Retry' );
+		await flushPromises();
+		const calls = ( schemaStore.createSchema as ReturnType<typeof vi.fn> ).mock.calls;
+		expect( calls[ 0 ][ 2 ] ).toBe( calls[ 1 ][ 2 ] );
+		await wrapper.setProps( { open: false } );
+		await wrapper.setProps( { open: true } );
+		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'Another schema' );
+		await flushPromises();
+		expect( calls[ 2 ][ 2 ] ).not.toBe( calls[ 1 ][ 2 ] );
 	} );
 
 	it( 'hands the creator a decision on whether the Subjects are dependent', () => {
@@ -186,7 +203,7 @@ describe( 'SchemaCreatorDialog', () => {
 		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', '' );
 		await flushPromises();
 
-		expect( schemaStore.saveSchema ).not.toHaveBeenCalled();
+		expect( schemaStore.createSchema ).not.toHaveBeenCalled();
 	} );
 
 	it( 'saves schema and emits created on success', async () => {
@@ -195,9 +212,10 @@ describe( 'SchemaCreatorDialog', () => {
 		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', 'My summary' );
 		await flushPromises();
 
-		expect( schemaStore.saveSchema ).toHaveBeenCalledWith(
+		expect( schemaStore.createSchema ).toHaveBeenCalledWith(
 			expect.any( Schema ),
 			'My summary',
+			expect.any( String ),
 		);
 
 		const createdEvents = wrapper.emitted( 'created' ) as Schema[][];
@@ -216,17 +234,18 @@ describe( 'SchemaCreatorDialog', () => {
 		await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', '' );
 		await flushPromises();
 
-		expect( schemaStore.saveSchema ).toHaveBeenCalledWith(
+		expect( schemaStore.createSchema ).toHaveBeenCalledWith(
 			expect.any( Schema ),
+			expect.any( String ),
 			expect.any( String ),
 		);
 
-		const usedSummary = ( schemaStore.saveSchema as ReturnType<typeof vi.fn> ).mock.calls[ 0 ][ 1 ];
+		const usedSummary = ( schemaStore.createSchema as ReturnType<typeof vi.fn> ).mock.calls[ 0 ][ 1 ];
 		expect( usedSummary ).not.toBe( '' );
 	} );
 
 	it( 'shows error notification on save failure', async () => {
-		schemaStore.saveSchema = vi.fn().mockRejectedValue( new Error( 'Server error' ) );
+		schemaStore.createSchema = vi.fn().mockRejectedValue( new Error( 'Server error' ) );
 
 		const wrapper = mountComponent();
 
@@ -333,8 +352,8 @@ describe( 'SchemaCreatorDialog', () => {
 			await wrapper.findComponent( SummaryAction ).vm.$emit( 'save', '' );
 			await flushPromises();
 
-			expect( schemaStore.saveSchema ).toHaveBeenCalledOnce();
-			expect( schemaStore.saveSchema ).toHaveBeenCalledWith( COMPANY.withName( 'Group' ), expect.any( String ) );
+			expect( schemaStore.createSchema ).toHaveBeenCalledOnce();
+			expect( schemaStore.createSchema ).toHaveBeenCalledWith( COMPANY.asNew( 'Group' ), expect.any( String ), expect.any( String ) );
 		} );
 	} );
 
@@ -370,7 +389,7 @@ describe( 'SchemaCreatorDialog', () => {
 
 			await save( wrapper );
 
-			expect( schemaStore.saveSchema ).not.toHaveBeenCalled();
+			expect( schemaStore.createSchema ).not.toHaveBeenCalled();
 			expect( wrapper.emitted( 'created' ) ).toBeUndefined();
 			expect( mw.notify ).toHaveBeenCalledWith(
 				'sws-field-invalid-number',
@@ -386,7 +405,7 @@ describe( 'SchemaCreatorDialog', () => {
 			creatorSaveBlocker = null;
 			await save( wrapper );
 
-			expect( schemaStore.saveSchema ).toHaveBeenCalledTimes( 1 );
+			expect( schemaStore.createSchema ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'reveals the errors of the creator', async () => {

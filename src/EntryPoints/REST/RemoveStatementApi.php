@@ -37,7 +37,7 @@ class RemoveStatementApi extends SimpleHandler {
 		try {
 			$extension = SWSExtension::getInstance();
 			$extension->newUpdateStatementAction( $presenter, $this->getAuthority() )->removeStatement(
-				$extension->getSubjectIdParser()->parseOrThrow( $subjectId ),
+				$extension->getSubjectIdParser( true )->parseOrThrow( $subjectId ),
 				new PropertyName( $propertyName ),
 				$body['comment'] ?? null
 			);
@@ -69,7 +69,7 @@ class RemoveStatementApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: 15 characters starting with "s" for a Subject of this wiki, or "sourceKey:localId" for one from another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'propertyName' => [
 				self::PARAM_SOURCE => 'path',
