@@ -115,6 +115,7 @@ const paneSize = usePaneSize( root, {
 } );
 
 const currentSchema = ref<Schema>( props.initialSchema );
+let originalKeys = new Map<string, string>();
 
 const subjectsAreDependent = computed( (): boolean =>
 	props.subjectsAreDependent ?? currentSchema.value.subjectsAreDependent() );
@@ -139,6 +140,7 @@ const createdPropertyName = ref<string | undefined>();
 
 watch( () => props.initialSchema, ( schema ) => {
 	currentSchema.value = schema;
+	originalKeys = new Map( [ ...schema.getPropertyDefinitions() ].map( p => [ p.name.toString(), p.name.toString() ] ) );
 	const firstProperty = [ ...schema.getPropertyDefinitions() ][ 0 ];
 	selectProperty( firstProperty?.name.toString() );
 }, { immediate: true } );
@@ -235,6 +237,7 @@ function isAddPropertyShortcut( event: KeyboardEvent ): boolean {
 }
 
 function onPropertyDeleted( name: PropertyName ): void {
+	originalKeys.delete( name.toString() );
 	currentSchema.value = currentSchema.value.withRemovedPropertyDefinition( name );
 
 	if ( selectedPropertyName.value === name.toString() ) {
@@ -253,6 +256,13 @@ function onPropertyReordered( names: PropertyName[] ): void {
 }
 
 function onPropertyUpdated( updatedProperty: PropertyDefinition ): void {
+	const prior = selectedPropertyName.value;
+	const next = updatedProperty.name.toString();
+	if ( prior !== undefined && prior !== next ) {
+		const original = originalKeys.get( prior );
+		originalKeys.delete( prior );
+		if ( original !== undefined ) { originalKeys.set( next, original ); }
+	}
 	currentSchema.value = buildUpdatedSchema( updatedProperty );
 
 	selectedPropertyName.value = updatedProperty.name.toString();
@@ -348,7 +358,12 @@ const revealErrors = (): void => {
 
 defineExpose<SchemaEditorExposes>( {
 	getSchema: function(): Schema {
-		const schema = currentSchema.value as Schema;
+		const current = currentSchema.value as Schema;
+		const changes = Object.fromEntries( [ ...current.getPropertyDefinitions() ].flatMap( property => {
+			const key = property.name.toString(); const original = originalKeys.get( key );
+			return original !== undefined && original !== key ? [ [ original, key ] ] : [];
+		} ) );
+		const schema = Object.keys( changes ).length === 0 ? current : current.withFieldKeyChanges( [ ...props.initialSchema.getFieldKeyChanges(), changes ] );
 
 		return props.description === undefined ? schema : schema.withDescription( props.description );
 	},

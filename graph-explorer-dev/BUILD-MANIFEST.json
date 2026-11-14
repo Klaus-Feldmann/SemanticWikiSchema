@@ -7,17 +7,17 @@
   },
   "changes": "Left 50px linked title thumbnail, own-image priority and current image snapshot; Schema-ordered derived values and configured links in expanded tables; Q-ID row below title and source-qualified descriptions below image/title; only resolved source-label/ID pairs; configurable endpoint/base; relative assets; unrelated demos omitted.",
   "generated": {
-    "helperName": "sws-qids-51a894f52603.js",
-    "commonName": "common-qids-d57208f51919.js",
-    "entryName": "envendpoint-qids-5d05705fa345.js"
+    "helperName": "sws-qids-b4293f9fcb57.js",
+    "commonName": "common-qids-0c4f0669368a.js",
+    "entryName": "envendpoint-qids-1ef2e5cc828c.js"
   },
   "assets": {
     "common-BzxewltY.css": "a3b13868eb0fc86d4f9dabb6946e8e63247b917fee2268144d3735f96a7504d1",
-    "common-qids-d57208f51919.js": "f1937740bf39d267fcd7a07a7d0303b3d3f3d23077d8b388bee8901c894ddf00",
-    "common-qids-d57208f51919.js.map": "4b3f91b0c84c3a41816ead65deda582e41a489971593bf0d3e66d22f2dc96e43",
-    "envendpoint-qids-5d05705fa345.js": "d8f68bbf8db0c9287af667195a699854eedc322b1e4cb33e81ad2aa17c90feac",
-    "envendpoint-qids-5d05705fa345.js.map": "bcef1ae964c9eeb0d9659e7c275bfb89eae8dc078b6bd542a3edc46fbd2b2890",
-    "sws-qids-51a894f52603.js": "cddecb5d2419a47e139666ab0d4e83a08556d17aa52f32d30029417e0ae19e69",
-    "sws-qids-51a894f52603.js.map": "cba88b1e2d294e6cfef14abbf85350ace216ebb58e06b3e31b4107db6489c932"
+    "common-qids-0c4f0669368a.js": "2bfce334ba9d88ebb4dab12aec975beae41bf4b579204f862c502cc3cceef189",
+    "common-qids-0c4f0669368a.js.map": "987ae0c3bfc81856108e68d3b9dafa81dc069bb722311baf926b569f2ba3c7f5",
+    "envendpoint-qids-1ef2e5cc828c.js": "3187d0eb2140ba435faf57e2a6a2dca65f6cd037ed0d5f248806a343b0c20abc",
+    "envendpoint-qids-1ef2e5cc828c.js.map": "0b80ea444757ec4f46c703e83c6f2dad04505a0d4a1be4e24ce534ac583647ff",
+    "sws-qids-b4293f9fcb57.js": "b18262c6d1337138b4bbc9491a1fae516bc1d118bfb0f980cb816ddc20ce521d",
+    "sws-qids-b4293f9fcb57.js.map": "04c778f165d188294217e0ddae3c3cf3efa1b0a595995cb40ff5da969a68b6cc"
   }
 }

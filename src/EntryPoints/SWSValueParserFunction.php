@@ -27,16 +27,15 @@ class SWSValueParserFunction {
 	}
 
 	/**
-	 * @return array{0: string, noparse: true, isHTML: true}|string
+	 * @return array{0: string, noparse: true, isHTML: false}|string
 	 */
 	public function handle( Parser $parser, string ...$args ): string|array {
-		$propertyName = trim( $args[0] ?? '' );
-
-		if ( $propertyName === '' ) {
+		$call = self::parseCall( $args );
+		if ( $call === null ) { return ''; }
+		[ $propertyName, $params ] = $call;
+		if ( ( isset( $params['subject'] ) || isset( $params['page'] ) ) && !$parser->incrementExpensiveFunctionCount() ) {
 			return '';
 		}
-
-		$params = self::parseNamedParams( array_slice( $args, 1 ) );
 		if ( $this->fields !== null && ( ( $params['origin'] ?? 'all' ) !== 'own' || isset( $params['part'] ) ) ) {
 			return $this->effective( $parser, $propertyName, $params );
 		}
@@ -61,10 +60,10 @@ class SWSValueParserFunction {
 			return '';
 		}
 
-		return [ htmlspecialchars( $formatted ), 'noparse' => true, 'isHTML' => true ];
+		return [ wfEscapeWikiText( $formatted ), 'noparse' => true, 'isHTML' => false ];
 	}
 
-	/** Always return escaped text: data and notes cannot inject parser functions or categories here. */
+	/** Return core-escaped Wikitext text, without HTML strip markers: caller links remain composable. */
 	private function effective( Parser $parser, string $name, array $params ): string|array {
 		$part = $params['part'] ?? 'value';
 		if ( !in_array( $part, [ 'value', 'authorNote', 'sourceNote', 'origin', 'status', 'sourceStatus' ], true ) ) { return ''; }
@@ -72,7 +71,6 @@ class SWSValueParserFunction {
 		if ( $title === null ) { return ''; }
 		$options = array_intersect_key( $params, array_flip( [ 'page', 'subject', 'language', 'origin' ] ) );
 		$options['field'] = $name;
-		if ( ( isset( $params['page'] ) || isset( $params['subject'] ) ) && !$parser->incrementExpensiveFunctionCount() ) { return ''; }
 		try { $result = $this->fields->read( $title, $options ); }
 		catch ( \RuntimeException|\InvalidArgumentException $e ) {
 			if ( $processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
@@ -85,24 +83,39 @@ class SWSValueParserFunction {
 			'origin' => implode( $params['separator'] ?? self::DEFAULT_SEPARATOR, array_values( array_unique( array_column( $field['values'], 'origin' ) ) ) ),
 			default => $field[$part] ?? '',
 		};
-		return [ htmlspecialchars( (string)$text ), 'noparse' => true, 'isHTML' => true ];
+		return [ wfEscapeWikiText( (string)$text ), 'noparse' => true, 'isHTML' => false ];
 	}
 
 	/**
+	 * Public syntax: field [| options] or E-ID | field [| options].
+	 * `subject` below is an internal lookup option, never an accepted public argument.
+	 * Reject invalid/ambiguous calls before any lookup, including the removed subject= spelling.
 	 * @param string[] $args
-	 * @return array<string, string>
+	 * @return array{string, array<string, string>}|null
 	 */
-	private static function parseNamedParams( array $args ): array {
+	private static function parseCall( array $args ): ?array {
+		$field = trim( $args[0] ?? '' );
+		if ( $field === '' ) { return null; }
 		$params = [];
-
-		foreach ( $args as $arg ) {
-			$parts = explode( '=', $arg, 2 );
-			if ( count( $parts ) === 2 ) {
-				$params[trim( $parts[0] )] = trim( $parts[1] );
-			}
+		$rest = array_slice( $args, 1 );
+		if ( isset( $rest[0] ) && !str_contains( $rest[0], '=' ) ) {
+			if ( preg_match( '/^E[1-9][0-9]{0,17}\z/', $field ) !== 1 ) { return null; }
+			$params['subject'] = $field;
+			$field = trim( array_shift( $rest ) );
+			if ( $field === '' ) { return null; }
 		}
-
-		return $params;
+		foreach ( $rest as $arg ) {
+			$parts = explode( '=', $arg, 2 );
+			if ( count( $parts ) !== 2 ) { return null; }
+			$key = trim( $parts[0] );
+			if ( !in_array( $key, [ 'page', 'separator', 'language', 'origin', 'part' ], true ) || array_key_exists( $key, $params ) ) {
+				return null;
+			}
+			$params[$key] = trim( $parts[1] );
+		}
+		if ( isset( $params['page'] ) && ( $params['page'] === '' || isset( $params['subject'] ) ) ) { return null; }
+		if ( isset( $params['origin'] ) && !in_array( $params['origin'], [ 'all', 'own', 'external' ], true ) ) { return null; }
+		return [ $field, $params ];
 	}
 
 	/**

@@ -43,6 +43,7 @@ class SchemaPersistenceDeserializer {
 			description: $json['description'] ?? '',
 			properties: $this->propertiesFromJson( $json ),
 			subjectsAreDependent: ( $json['subjectsAreDependent'] ?? false ) === true,
+			fieldKeyChanges: \ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::validateHistory( $json['fieldKeyChanges'] ?? [] ),
 		);
 	}
 

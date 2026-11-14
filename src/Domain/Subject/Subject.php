@@ -19,6 +19,7 @@ class Subject {
         private array $fieldNotes = [],
 		private ?SourceSnapshot $sourceSnapshot = null,
 		private ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity = null,
+		private int $fieldKeyVersion = 0,
 	) {
 		$this->setSourceSnapshot( $sourceSnapshot );
 		if ( $identity !== null ) { $this->setIdentity( $identity ); }
@@ -70,6 +71,9 @@ class Subject {
 		$this->label = SubjectLabel::fromText( $identity->labels[$identity->language] ?? null );
 	}
 
+	public function getFieldKeyVersion(): int { return $this->fieldKeyVersion; }
+	public function setFieldKeyVersion( int $version ): void { if ( $version < 0 ) { throw new \InvalidArgumentException( "Invalid field-key version" ); } $this->fieldKeyVersion = $version; }
+
 	public function getSourceSnapshot(): ?SourceSnapshot {
 		return $this->sourceSnapshot;
 	}
@@ -112,6 +116,7 @@ class Subject {
 			statements: $statements,
             fieldNotes: $this->fieldNotes,
 			sourceSnapshot: $this->sourceSnapshot,
+			fieldKeyVersion: $this->fieldKeyVersion,
 			identity: $this->identity,
 		);
 	}

@@ -45,7 +45,8 @@ class ReplaceSubjectApi extends SimpleHandler {
 				$body['comment'] ?? null,
 				$body['dependentSubjects'] ?? [],
                 $body['fieldNotes'] ?? null,
-				$this->identityFromBody( $body )
+				$this->identityFromBody( $body ),
+				$body['fieldKeyVersion'] ?? null
 			);
 		} catch ( InvalidArgumentException $e ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
@@ -92,6 +93,7 @@ class ReplaceSubjectApi extends SimpleHandler {
 					. 'passing an empty string, leaves the Subject with no label, just as an omitted property name '
 					. 'deletes its Statement.',
 			],
+			'fieldKeyVersion' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'integer', ParamValidator::PARAM_REQUIRED => false ],
 			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
             'statements' => [
 				self::PARAM_SOURCE => 'body',

@@ -1,0 +1,8 @@
+{
+  "swsVersion": "0.5.0",
+  "mcpBaseVersion": "0.21.0",
+  "upstreamCommit": "34d772b03afd4e4104cc0f5c8a1ce3db7c9e5ea4",
+  "patchRevision": 1,
+  "runtimeFiles": 24,
+  "sourceFiles": 46
+}

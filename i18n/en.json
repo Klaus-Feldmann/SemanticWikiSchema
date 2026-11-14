@@ -1,6 +1,10 @@
 {
+	"sws-property-editor-labels": "Field labels",
+	"sws-property-editor-labels-description": "One label per language. The technical field key stays unchanged.",
+	"sws-field-number-unique": "The field key must be unique within this schema.",
 	"@metadata": {
 		"authors": [
+			"Klaus Feldmann",
 			"Jeroen De Dauw",
 			"Karsten Hoffmeyer",
 			"Morne Alberts",
@@ -65,7 +69,7 @@
 	"sws-page-tools-edit-json": "View or edit JSON",
 	"sws-page-tools-view-json": "View JSON",
 	"sws-page-tools-rdf": "View RDF",
-	"sws-property-editor-name": "Name",
+	"sws-property-editor-name": "field key",
 	"sws-property-editor-name-required": "Please enter a property name.",
 	"sws-property-editor-name-taken": "A property named \"$1\" already exists.",
 	"sws-property-editor-type": "Type",
@@ -176,6 +180,7 @@
 	"sws-schema-editor-delete-property": "Delete property definition",
 	"sws-schema-editor-subject-label": "Label",
 	"sws-schema-editor-subject-label-help": "Each entity has an optional label for its name or title, so you do not need a Name or Title property.",
+	"sws-schema-editor-optional-property-type": "$1 · Optional",
 	"sws-schema-editor-optional": "Optional",
 	"sws-schema-editor-description": "Description",
 	"sws-schema-editor-resize-property-list": "Resize property list",
@@ -503,7 +508,7 @@
 	"sws-managesubjects-export-projection-format": "$1 · $2",
 	"sws-managesubjects-export-native": "Native",
 	"action-subjects": "manage entities on this page",
-	"sws-config-invalid": "The Semantic WikiSchema settings were not saved because they are invalid:",
+	"sws-config-invalid": "Invalid SWS settings: $2",
 	"sws-config-error-not-object": "The page must contain a JSON object.",
 	"sws-config-error-unknown-key": "Unknown setting \"$1\".",
 	"sws-config-error-invalid-boolean": "\"$1\" must be true or false.",

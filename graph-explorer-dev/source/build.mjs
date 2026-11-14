@@ -63,7 +63,7 @@ if(!tableCalls.length){
 }
 if(tableCalls.length!==1)throw new Error('Expected one expanded property table');
 const table=tableCalls[0];
-const replacement=`${expr}((__swsFields??=createSWSFields(${react})),{iri:this.props.iri,nativeProps:${table.arguments[0].getText(file)},fallback:${table.getText(file)},onChange:()=>${context}.view.model.getElement(this.props.elementId)?.redraw()})`;
+const replacement=`${expr}((__swsFields??=createSWSFields(${react})),{iri:this.props.iri,language:${context}.view.getLanguage?.(),nativeProps:${table.arguments[0].getText(file)},fallback:${table.getText(file)},onChange:()=>${context}.view.model.getElement(this.props.elementId)?.redraw()})`;
 const thumbCalls=[];
 function findThumbnail(n){if(ts.isCallExpression(n)&&n.expression.getText(file)==='this.renderThumbnail')thumbCalls.push(n);ts.forEachChild(n,findThumbnail);}
 findThumbnail(method);if(thumbCalls.length!==1)throw new Error('Expected exactly one thumbnail in the standard header');
@@ -113,7 +113,7 @@ const source = standard.replace('const FOAF_NAME',
   'import { createSWSFields, createSWSThumbnail } from \"./swsFields\";\nconst SWSFields = createSWSFields(React);\nconst SWSThumbnail = createSWSThumbnail(React);\n\nimport { createSWSQIdRow, createSWSDescriptionRow } from "./swsQIds";\nconst SWSQIdRow = createSWSQIdRow(React);\nconst SWSDescriptionRow = createSWSDescriptionRow(React);\n\nconst FOAF_NAME')
   .replace('            {pinnedProperties ? (', '            <SWSDescriptionRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />\n            {pinnedProperties ? (')
   .replace(needle, needle + '\n                <SWSQIdRow iri={iri} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />');
-fs.writeFileSync(path.join(root, 'source/standard.tsx'), source.replace('{this.renderThumbnail()}', '{<SWSThumbnail iri={iri} fallback={this.renderThumbnail()} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}').replace('{this.renderProperties(propsAsList)}', '{<SWSFields iri={iri} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}'));
+fs.writeFileSync(path.join(root, 'source/standard.tsx'), source.replace('{this.renderThumbnail()}', '{<SWSThumbnail iri={iri} fallback={this.renderThumbnail()} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}').replace('{this.renderProperties(propsAsList)}', '{<SWSFields iri={iri} language={context.view.getLanguage()} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}'));
 const manifest = {
   baseline: {'envendpoint.html': hash(read('envendpoint.html')), 'assets/envendpoint-Qu3prYG8.js': hash(entryOriginal),
     'assets/common-CPcN3Iil.js': hash(original), 'assets/common-BzxewltY.css': hash(read('common-BzxewltY.css'))},

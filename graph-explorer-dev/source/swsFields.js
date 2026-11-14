@@ -32,6 +32,9 @@ export function readPresentation(data, pageId, subjectId, origin) {
   const names = new Set();
   for (const def of meta.definitions) {
     if (typeof def.name !== 'string' || !def.name || names.has(def.name) || typeof def.type !== 'string' || typeof def.predicateLocalName !== 'string') throw new Error('Invalid field definition');
+    if (def.predicatePath !== undefined && (typeof def.predicatePath !== 'string' || !/^\/(?:prop\/[A-Za-z0-9%._~-]+|schema(?:-id|-source|-source-id)?\/[A-Za-z0-9%._~-]+(?:\/[A-Za-z0-9%._~-]+)?\/field\/[A-Za-z0-9%._~-]+)$/.test(def.predicatePath))) throw new Error('Invalid field predicate path');
+    if (def.displayLabel !== undefined && typeof def.displayLabel !== 'string') throw new Error('Invalid field display label');
+    if (def.labels !== undefined && (!def.labels || typeof def.labels !== 'object' || Array.isArray(def.labels) || Object.entries(def.labels).some(([tag,label])=>! /^[a-z]{1,8}(-[a-z0-9]{1,8})*$/.test(tag) || typeof label!=='string'))) throw new Error('Invalid field labels');
     names.add(def.name);
     if (def.ownPages !== undefined && (def.type !== 'page' || !Array.isArray(def.ownPages) || def.ownPages.some(v=>typeof v!=='string'))) throw new Error('Invalid own page snapshot');
     if (def.execute !== undefined && (def.type !== 'wikitext' || typeof def.execute !== 'boolean')) throw new Error('Invalid execution marker');
@@ -81,7 +84,7 @@ export function createPresentationLoader({origin, fetchImpl = globalThis.fetch, 
       return data;
     } finally { clearTimeout(timer); }
   }
-  async function load(iri, sid) {
+  async function load(iri, sid, language) {
     const base = globalThis.SWSGraphConfig?.baseIri || origin + '/';
     const sparql = new URL(globalThis.SWSGraphConfig?.sparqlUrl || '/graph-explorer/sparql', origin);
     if (!sparql.searchParams.has('default-graph-uri')) sparql.searchParams.set('default-graph-uri','urn:x-arq:UnionGraph');
@@ -91,19 +94,20 @@ export function createPresentationLoader({origin, fetchImpl = globalThis.fetch, 
     const pageId = readPageId(graph.results.bindings, origin);
     if (pageId === null) return null;
     const api = new URL(globalThis.SWSGraphConfig?.apiUrl || '/w/api.php', origin);
-    const language = new URLSearchParams(globalThis.location?.search || '').get('uselang') || globalThis.SWSGraphConfig?.language || globalThis.document?.documentElement?.lang || 'de';
     api.search = new URLSearchParams({action:'swsbasevalues', pageid:String(pageId), subject:sid, language,
       presentation:'1', format:'json', formatversion:'2'}).toString();
     return readPresentation((await json(api.href)).swsbasevalues, pageId, sid, origin);
   }
-  return iri => {
+  return (iri, requestedLanguage) => {
+    const language = requestedLanguage || new URLSearchParams(globalThis.location?.search || '').get('uselang') || globalThis.SWSGraphConfig?.language || globalThis.document?.documentElement?.lang || 'de';
+    const key = iri + '\u0000' + language;
     const sid = localSubjectId(iri, origin);
     if (!sid) return Promise.resolve(null);
-    const previous = cache.get(iri);
+    const previous = cache.get(key);
     if (previous && previous.expires > now()) return previous.promise;
     const entry = {expires:now()+60000, promise:null};
-    entry.promise = load(iri,sid).catch(error => {cache.delete(iri);throw error;});
-    cache.set(iri,entry);
+    entry.promise = load(iri,sid,language).catch(error => {cache.delete(key);throw error;});
+    cache.set(key,entry);
     return entry.promise;
   };
 }
@@ -118,7 +122,7 @@ export function orderedRows(presentation, nativeProps, origin) {
   const base = globalThis.SWSGraphConfig?.baseIri || origin + '/';
   const rows = [];
   for (const def of presentation.definitions) {
-    const predicate = base.replace(/\/$/, '') + '/prop/' + def.predicateLocalName;
+    const predicate = base.replace(/\/$/, '') + (def.predicatePath ?? '/prop/' + def.predicateLocalName);
     const native = nativeProps.filter(p => p.id === predicate);
     native.forEach(p => used.add(p));
     if (def.type === 'wikitext' && def.execute === true) continue;
@@ -138,7 +142,7 @@ export function orderedRows(presentation, nativeProps, origin) {
     if (def.type==='url' && Array.isArray(def.ownUrls) && own.length) {
       for (const entry of def.ownUrls) {
         const caption = entry.caption?.trim();
-        rows.push({name:caption || def.name,
+        rows.push({name:caption || def.displayLabel || def.name,
           labelHref:caption ? (entry.captionPage ? localPageUrl(entry.captionPage,'',presentation.pageUrlTemplate,origin) : null) : (def.wikiLink?.label === false ? null : localPageUrl(def.wikiLink?.labelTarget || def.name,'',presentation.pageUrlTemplate,origin)),
           own:[{text:entry.label || entry.url,href:/^https?:\/\//i.test(entry.url)?safeUrl(entry.url,origin):null}],values:[]});
       }
@@ -146,7 +150,7 @@ export function orderedRows(presentation, nativeProps, origin) {
 
     }
     if (!own.length && !values.length) continue;
-    rows.push({namespace:def.wikiLink?.namespace || '', yearLinks:def.wikiLink?.values!==false,image:def.type==='image',name:def.name, labelHref:def.wikiLink?.label === false ? null : localPageUrl(def.wikiLink?.labelTarget || def.name, '', presentation.pageUrlTemplate, origin),
+    rows.push({namespace:def.wikiLink?.namespace || '', yearLinks:def.wikiLink?.values!==false,image:def.type==='image',name:def.displayLabel || def.name, fieldKey:def.name, labelHref:def.wikiLink?.label === false ? null : localPageUrl(def.wikiLink?.labelTarget || def.name, '', presentation.pageUrlTemplate, origin),
       own:own.map((text,ownIndex) => def.type==='url' && typeof text==='object' ? {text:text.label || text.url,href:/^https?:\/\//i.test(text.url)?safeUrl(text.url,origin):null,caption:text.caption || text.captionPage || '',captionHref:text.captionPage?localPageUrl(text.captionPage,'',presentation.pageUrlTemplate,origin):null} : ({parts:def.type==='historicalDate' && validDateParts(def.ownDateParts?.[ownIndex]) ? def.ownDateParts[ownIndex] : null,reference:def.type==='image'?text:null,text:def.type==='image'?(parseImageReference(text)?.filename||text):text, href:(def.type!=='page' && def.wikiLink?.values === false) || (def.externalProperty && text === def.externalProperty.id) ? null :
         (def.type==='page' ? localPageUrl(text,'',presentation.pageUrlTemplate,origin,true) : ['text','select'].includes(def.type) ? localPageUrl(text,def.wikiLink?.namespace || '',presentation.pageUrlTemplate,origin) : null)})),
       values, source:external?.source, status:external?.status});
@@ -165,14 +169,14 @@ export function createSWSFields(React, options = {}) {
     constructor(props) { super(props); this.state={presentation:null}; this.generation=0; }
     componentDidMount() { this.load(); }
     componentDidUpdate(previous, oldState) {
-      if (previous.iri !== this.props.iri) this.load();
+      if (previous.iri !== this.props.iri || previous.language !== this.props.language) this.load();
       else if (oldState.presentation !== this.state.presentation) this.props.onChange?.();
     }
     componentWillUnmount() { this.generation++; }
     load() {
       const generation=++this.generation;
       this.setState({presentation:null});
-      load(this.props.iri).then(presentation=>{if(generation===this.generation)this.setState({presentation});})
+      load(this.props.iri,this.props.language).then(presentation=>{if(generation===this.generation)this.setState({presentation});})
         .catch(()=>{if(generation===this.generation)this.setState({presentation:null});});
     }
     render() {

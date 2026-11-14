@@ -62,7 +62,8 @@ readonly class ReplaceSubjectAction {
 		?string $comment,
 		array $dependentSubjects = [],
         ?array $fieldNotes = null,
-		?array $identity = null
+		?array $identity = null,
+		?int $fieldKeyVersion = null
 	): void {
 		$pageIdentifiers = $this->hostingPageResolver->resolveReadableHostingPage( $subjectId );
 
@@ -78,6 +79,19 @@ readonly class ReplaceSubjectAction {
 
 		if ( $subject === null ) {
 			throw SubjectNotFoundException::forId( $subjectId );
+		}
+
+		$keySchema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );
+		if ( $keySchema !== null ) {
+			if ( $subject->getFieldKeyVersion() !== $keySchema->getFieldKeyVersion() ||
+				( $fieldKeyVersion !== null && $fieldKeyVersion !== $keySchema->getFieldKeyVersion() ) ) {
+				throw new InvalidArgumentException( 'SWS field keys changed; wait for processing and reload the editor' );
+			}
+			if ( $keySchema->getFieldKeyVersion() > 0 ) {
+				foreach ( array_keys( $statements ) as $key ) {
+					if ( !$keySchema->hasProperty( (string)$key ) ) { throw new InvalidArgumentException( 'Unknown field key after schema change: ' . $key ); }
+				}
+			}
 		}
 
 		$pageSubjects = $dependentSubjects === [] ?

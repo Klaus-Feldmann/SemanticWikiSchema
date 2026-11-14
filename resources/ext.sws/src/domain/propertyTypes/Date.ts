@@ -132,6 +132,7 @@ export function newDateProperty( attributes: DatePropertyAttributes = {} ): Date
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Date' ),
 		type: DateType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		minimum: attributes.minimum,

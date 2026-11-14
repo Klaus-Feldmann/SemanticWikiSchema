@@ -32,6 +32,18 @@ class SubjectLabelHtml {
 		$out->addModuleStyles( [ self::STYLE_MODULE ] );
 	}
 
+	/** Replace only the title portion, preserving the action's localized wording. */
+	public static function nameInHeading( OutputPage $out, \MediaWiki\Title\Title $title, string $label ): void {
+		$replacement = Html::element( 'bdi', [], $label );
+		$heading = strtr( $out->getPageTitle(), [
+			htmlspecialchars( $title->getPrefixedText() ) => $replacement,
+			\MediaWiki\Parser\Parser::formatPageTitle(
+				str_replace( '_', ' ', (string)$title->getNsText() ), ':', $title->getText()
+			) => $replacement,
+		] );
+		if ( $heading !== $out->getPageTitle() ) { $out->setPageTitle( $heading ); }
+	}
+
 	/**
 	 * Each part isolated, so a label in one script direction does not reorder the id beside it.
 	 */

@@ -16,6 +16,7 @@ export class SchemaDeserializer {
 			identityFromJson( schema ),
 			schema.id ?? null,
 			schema.swsImport ?? null,
+			schema.fieldKeyChanges ?? [],
 		);
 	}
 

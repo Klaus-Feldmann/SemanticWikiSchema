@@ -22,6 +22,7 @@ readonly class PropertyCore {
 		public ?array $wikiLink = null,
 		public ?ExternalProperty $externalProperty = null,
 		public ?array $fieldNotes = null,
+		public array $labels = [],
 	) {
 	}
 

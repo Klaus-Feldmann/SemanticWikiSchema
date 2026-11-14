@@ -89,15 +89,15 @@ namespace {
     foreach(['Scribunto','json','javascript','css']as $model){
         $title=new Title('Metadaten/'.$model,$model);
         $out=apply($title,null,$schema,subject('geprüft'));
-        check($out->getExtensionData('smwdata')->rows===['Status=geprüft'],'Non-wikitext annotation without main parser: '.$model);
+        check($out->getExtensionData('smwdata')->rows===['Verwaltung:Status=geprüft'],'Non-wikitext annotation without main parser: '.$model);
         check(count($out->dependencies)===2,'Schema and property dependencies: '.$model);
         $out=apply($title,null,$schema,subject('geändert'));
-        check($out->getExtensionData('smwdata')->rows===['Status=geändert'],'Fresh output replaces previous value: '.$model);
+        check($out->getExtensionData('smwdata')->rows===['Verwaltung:Status=geändert'],'Fresh output replaces previous value: '.$model);
         $out=apply($title,null,$schema,subject(''));
         check($out->getExtensionData('smwdata')->rows===[],'Fresh empty field removes previous annotation: '.$model);
     }
     $title=new Title('Vorlage:Metadaten','wikitext');
-    check(apply($title,new Parser($title),$schema,subject('Vorlage'))->getExtensionData('smwdata')->rows===['Status=Vorlage'],'Wikitext path retained');
+    check(apply($title,new Parser($title),$schema,subject('Vorlage'))->getExtensionData('smwdata')->rows===['Verwaltung:Status=Vorlage'],'Wikitext path retained');
     foreach([[$title,null],[new Title('Modul:Metadaten','Scribunto'),new Parser(new Title('Andere Seite'))]]as [$title,$parser]){
         try{apply($title,$parser,$schema,subject('abgelehnt'));check(false,'Invalid parser context accepted');}catch(\ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete){check(true,'Incomplete/wrong parser remains refused');}
     }

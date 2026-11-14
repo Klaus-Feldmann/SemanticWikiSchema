@@ -31,13 +31,13 @@ check($calls===1,'One shared external snapshot, not an extra request for notes')
 check($result['fields'][0]['status']==='unavailable'&&$result['fields'][0]['values']===[],'Failed source is an empty field outcome');
 check($result['fields'][1]['status']==='own'&&$result['fields'][1]['values'][0]['value']==='Händischer Wert','Own value survives other source failure and own binding outage');
 $planner=new AnnotationPlanner(['properties'=>[]]);$plan=$planner->build($result);
-check($plan->rows===['Eigen=Händischer Wert'],'Only failed derived value omitted, manual annotation remains');
+check($plan->rows===['Person:Eigen=Händischer Wert'],'Only failed derived value omitted, manual annotation remains');
 $notes=(new FieldNoteAnnotations)->build($result,['properties'=>['Person'=>['Geburtsort'=>'Geboren in']]]);
-check($notes===['Geboren in (AM)=[[Brünn]] gemäß Quelle.','Geboren in (AM)=Wikidata P19 derzeit nicht abrufbar.','Leer (AM)=Noch nicht erforscht.'],'Mapped note name, author note, source note and note for empty field');
+check($notes===['Geboren in (AM)=[[Brünn]] gemäß Quelle.','Geboren in (AM)=Wikidata P19 derzeit nicht abrufbar.','Person:Leer (AM)=Noch nicht erforscht.'],'Mapped note name, author note, source note and note for empty field');
 check($calls===1,'Note projection made no lookup');
 $reader->collect();check($calls===1,'Subsequent reads share the same captured snapshot');
 $state='resolved';$fresh=(new FieldValues($schema,$subject,$read))->collectForAnnotations();
-check($planner->build($fresh)->rows===['Geburtsort=Brünn','Eigen=Händischer Wert'],'Recovery restores source annotation without affecting manual value');
+check($planner->build($fresh)->rows===['Person:Geburtsort=Brünn','Person:Eigen=Händischer Wert'],'Recovery restores source annotation without affecting manual value');
 check(count((new FieldNoteAnnotations)->build($fresh,['properties'=>[]]))===2,'Recovery removes only automatic error note');
 $state='missing';$missing=(new FieldValues($schema,$subject,$read))->collectForAnnotations();check($missing['fields'][0]['status']==='missing'&&$missing['fields'][0]['values']===[],'Missing claim is distinct and never consumes stale payload');
 $state='unsupported';check((new FieldValues($schema,$subject,$read))->collectForAnnotations()['fields'][0]['status']==='unsupported','Unsupported source type remains a field outcome');
@@ -51,7 +51,7 @@ $serialized=json_decode((new SubjectContentDataSerializer)->serialize(new PageSu
 check($serialized['subjects']['s11111111111111']['fieldNotes']===['Leer'=>'[[Brno]]']&&$serialized['subjects']['s11111111111111']['statements']===[],'Note-only subject persists independently of empty values');
 $plainSchema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Leer'=>TextProperty::fromPartialJson(new PropertyCore('',false,null,fieldNotes:['type'=>'wikitext','annotate'=>true]),[])]),false);
 $snap=FieldSnapshot::reader($plainSchema,$domain,static fn()=>throw new RuntimeException('No source lookup allowed'))->collectForAnnotations();
-check((new FieldNoteAnnotations)->build($snap,['properties'=>[]])===['Leer (AM)=[[Brno]]'],'Author-only notes work without source reads');
+check((new FieldNoteAnnotations)->build($snap,['properties'=>[]])===['Person:Leer (AM)=[[Brno]]'],'Author-only notes work without source reads');
 check(FieldNotes::forSchema(['Leer'=>'Neu'],[], $plainSchema)===['Leer'=>'Neu'],'Enabled field accepts author note');
 check(FieldNotes::forSchema(['Alt'=>'Bestehend'],['Alt'=>'Bestehend'],null)===['Alt'=>'Bestehend'],'Unknown/disabled existing notes are retained');
 check(FieldNotes::forSchema([],['Alt'=>'Bestehend'],null)===[],'Explicit removal remains possible after schema changes');
@@ -63,7 +63,7 @@ check($definition->toJson()['fieldNotes']===['type'=>'wikitext','annotate'=>true
 try{PropertyDefinition::fromJson(['type'=>'text','fieldNotes'=>['type'=>'html']],$registry);check(false,'Invalid note type accepted');}catch(InvalidArgumentException){check(true,'Unsupported note mode rejected');}
 $imageSchema=['name'=>'Person','properties'=>[['name'=>'Bild','type'=>'image','externalProperty'=>['source'=>'wikidata','id'=>'P18'],'fieldNotes'=>['type'=>'text','annotate'=>true]]]];
 $imageResult=(new FieldValues($imageSchema,['id'=>'s11111111111111','statements'=>[],'fieldNotes'=>['Bild'=>'Bild prüfen']],static fn()=>throw new RuntimeException('Additional image request forbidden')))->collectForAnnotations();
-check((new FieldNoteAnnotations)->build($imageResult,['properties'=>[]])===['Bild (AM)=Bild prüfen'],'Image note does not add an external lookup solely for its status');
+check((new FieldNoteAnnotations)->build($imageResult,['properties'=>[]])===['Person:Bild (AM)=Bild prüfen'],'Image note does not add an external lookup solely for its status');
 $imageResult['sourceFields']=['Bild'=>['source'=>'wikidata','propertyId'=>'P18','status'=>'unavailable','values'=>[]]];
 check(count((new FieldNoteAnnotations)->build($imageResult,['properties'=>[]]))===2,'An already-read image source failure is reused without a lookup');
 echo "$n notes/manual-values/source-failure/recovery/persistence checks passed (controlled source and localization inputs).\n";

@@ -45,7 +45,7 @@ const getSchemaMock = vi.fn();
 let pinia: ReturnType<typeof createPinia>;
 
 function mountComponent( schema: Schema ): VueWrapper {
-	setupMwMock( { functions: [ 'msg', 'util' ] } );
+	setupMwMock( { functions: [ 'msg', 'util', 'config', 'language' ] } );
 
 	return mount( SchemaDisplay, {
 		props: { schema },
@@ -143,6 +143,15 @@ describe( 'SchemaDisplay', () => {
 		await flushPromises();
 
 		expect( wrapper.findComponent( SubjectCreatorDialog ).exists() ).toBe( false );
+	} );
+
+	it( 'D6 displays a translated field label alongside its stable key', () => {
+		const schema = newSchema( { properties: new PropertyDefinitionList( [
+			createPropertyDefinitionFromJson( 'F4', { type: TextType.typeName, labels: { en: 'Date of birth' } } ),
+		] ) } );
+		const wrapper = mountComponent( schema );
+		expect( wrapper.find( 'tbody tr' ).text() ).toContain( 'Date of birth' );
+		expect( wrapper.find( '.ext-sws-field-key' ).text() ).toBe( '(F4)' );
 	} );
 
 	it( 'renders property names, types, and required status', () => {

@@ -1,9 +1,7 @@
-# SWS 0.4.03 installieren
+# Install Semantic WikiSchema 0.5.0
 
-Die aktuelle Anleitung beginnt bei einer Erstinstallation von SWS in ein vorhandenes MediaWiki:
+For a first installation into an existing MediaWiki, use the [English guide](docs/operations/install/README.md) or [deutsche Anleitung](docs/operations/install/de/README.md). The release includes a pinned Composer first-installation helper and a separate complete source archive with built browser assets.
 
-**[Installation auf Deutsch](docs/operations/install/de/README.md)** · **[English installation guide](docs/operations/install/README.md)**
+Existing SWS or NeoWiki installation: contact [Klaus Feldmann / AufEinWort](mailto:info@aufeinwort.info) before switching. Updates and migrations are handled separately; the first-installation helper refuses existing installations.
 
-Die Seiten behandeln Voraussetzungen, Installer, LocalSettings, Datenbank und Jobs, Funktionsprüfung sowie optionale Quellen-/SMW- und Graph-Anbindung getrennt.
-
-Bei einer vorhandenen SWS- oder NeoWiki-Installation bitte wegen einer Übernahme an [info@aufeinwort.info](mailto:info@aufeinwort.info) wenden. Der Erstinstallations-Installer führt keine Migration durch.
+The [MCP 0.5.0 patch](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) targets MediaWiki MCP Server 0.21.0 and is installed separately.

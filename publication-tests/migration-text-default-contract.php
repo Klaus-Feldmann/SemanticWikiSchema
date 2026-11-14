@@ -18,7 +18,7 @@ defaultCheck($result['fields'][0]['values'][0]['value']==='SWS Migration Feld er
 defaultCheck(!$result['fields'][0]['hasStoredValues']&&serialize($subject)===$before,'Default does not create author statements');
 defaultCheck($reader->collect('Neu','own')['fields'][0]['values']===[],'Own-only read excludes schema default');
 defaultCheck($reader->collect('Neu','external')['fields'][0]['values']===[],'External-only read excludes schema default');
-$plan=(new AnnotationPlanner(['properties'=>[]]))->build($reader->collectForAnnotations());defaultCheck($plan->rows===['Neu=SWS Migration Feld ergänzt'],'Default is available to SMW lists');
+$plan=(new AnnotationPlanner(['properties'=>[]]))->build($reader->collectForAnnotations());defaultCheck($plan->rows===['S2:Neu=SWS Migration Feld ergänzt'],'Default is available to SMW lists');
 $own=$subject->withStatements(new StatementList([new ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Neu'),'text',new ProfessionalWiki\SWS\Domain\Value\StringValue('Forschungswert'))]));
 defaultCheck(FieldSnapshot::reader($schema,$own,$noFetch)->collect('Neu')['fields'][0]['values'][0]['value']==='Forschungswert','Author value overrides placeholder');
 $view=SWSBaseBridge\DataViewAssembler::subject($subject,$schema,[],static fn()=>null,'store');

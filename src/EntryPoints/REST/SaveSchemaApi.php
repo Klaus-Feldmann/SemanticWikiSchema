@@ -35,7 +35,11 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 	 */
 	protected function getSchemaJson(): string {
 		if ( $this->schemaJson === null ) {
-			$body = json_decode( UtfNormalValidator::cleanUp( (string)$this->getRequest()->getBody() ) );
+			$raw = UtfNormalValidator::cleanUp( (string)$this->getRequest()->getBody() );
+			if ( \ProfessionalWiki\SWS\Domain\Schema\DuplicateFieldNumbers::find( $raw ) !== [] ) {
+				throw new LocalizedHttpException( new MessageValue( 'sws-field-number-unique' ), 400 );
+			}
+			$body = json_decode( $raw );
 			$this->schemaJson = (string)json_encode( is_object( $body ) ? $body->schema ?? null : null );
 		}
 

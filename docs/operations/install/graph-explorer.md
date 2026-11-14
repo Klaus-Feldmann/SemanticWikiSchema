@@ -51,6 +51,6 @@ globalThis.SWSGraphConfig = Object.freeze({
 });
 ```
 
-Adapt `/w/api.php` if `$wgScriptPath` differs. `baseIri` must match `$wgSWSRdfBaseUri` (default: the wiki's canonical server plus its base slash). SWS 0.4.03's graph queries recognize `/schema-id/S…` and display stored schema labels.
+Adapt `/w/api.php` if `$wgScriptPath` differs. `baseIri` must match `$wgSWSRdfBaseUri` (default: the wiki's canonical server plus its base slash). SWS 0.5.0's graph queries recognize `/schema-id/S…` and display stored schema labels.
 
 Open `/w/extensions/SemanticWikiSchema/graph-explorer/envendpoint.html` on a `/w` wiki. Select classes and instances to add nodes to the canvas. A new canvas does not automatically contain all entities. Test an entity link such as `/entity/E1` and a schema link such as `/schema-id/S1`.

@@ -56,7 +56,7 @@ final class EffectiveFieldLookup {
 		$schema = $extension->getSchemaResolverFor( $this->context->getAuthority() )->getSchema( $subject->getSchemaReference() );
 		$this->dependencies?->recordDependencyOnSchema( $schema?->getReference() ?? $subject->getSchemaReference() );
 		if ( $schema === null ) { throw new \RuntimeException( 'Schema unavailable' ); }
-        if ( isset($options['field']) && $schema->getId() !== null && !array_key_exists($options['field'],$schema->getAllProperties()->asMap()) ) {
+        if ( isset($options['field']) && $schema->getId() !== null && $schema->getFieldReference($options['field']) === null ) {
             \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationFieldRepairScope::record(
                 $schema->getId()->text,$options['field'],$title->getPrefixedText(),$currentTitle->getPrefixedText()
             );

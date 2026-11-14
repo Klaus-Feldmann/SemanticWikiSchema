@@ -23,7 +23,7 @@ final class AnnotationPlanner {
             $occupied=$field['values']!==[] || $field['hasStoredValues'];
             if($occupied && !in_array($field['type'],['page','text','select','url','number','boolean','historicalDate','date','dateTime'],true)) { throw new InvalidArgumentException('Unsupported occupied field: '.$field['name']); }
             if($field['values']===[]) { continue; }
-            $property=$names[$field['name']] ?? $field['name'];
+            $property=FieldAnnotationName::resolve($result,$field['name'],$this->config);
             if(!is_string($property)) { throw new InvalidArgumentException('Invalid property mapping'); }
             $property=trim($property);
             $this->validateName($property,'property');

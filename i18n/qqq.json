@@ -1,4 +1,8 @@
 {
+	"sws-property-editor-labels": "Heading of the multilingual field-label editor.",
+	"sws-property-editor-labels-description": "Explains the distinction between labels and technical field keys.",
+	"sws-field-number-unique": "Error shown when a numbered technical field key occurs more than once in one schema.",
+	"sws-schema-editor-optional-property-type": "Optional property type: $1 is the translated type name.",
 	"@metadata": {
 		"authors": [
 			"Jeroen De Dauw",
@@ -458,7 +462,7 @@
 	"sws-managesubjects-export-projection-format": "RDF export menu item, when the menu offers several projections. A projection is a named RDF rendering of the data, e.g. EDM or CIDOC-CRM.\n\nParameters:\n* $1 - the projection: {{msg-sws|sws-managesubjects-export-native}}, or the name of an ontology Mapping\n* $2 - the serialization format: {{msg-sws|sws-managesubjects-export-format-turtle}} or {{msg-sws|sws-managesubjects-export-format-trig}}",
 	"sws-managesubjects-export-native": "Display name of the native (SWS-vocabulary) RDF projection, $1 of {{msg-sws|sws-managesubjects-export-projection-format}}.",
 	"action-subjects": "Description of the Subject management action used by MediaWiki when generating action descriptions.",
-	"sws-config-invalid": "Heading shown above the list of errors when an edit to the MediaWiki:SWS JSON configuration page is rejected.",
+	"sws-config-invalid": "Configuration validation error. $1 is the error count; $2 is the localized list of errors.",
 	"sws-config-error-not-object": "Error shown when the content of the MediaWiki:SWS configuration page is not a JSON object.",
 	"sws-config-error-unknown-key": "Error shown when the configuration contains a setting that is not exposed on-wiki. $1 is the unknown key.",
 	"sws-config-error-invalid-boolean": "Error shown when a setting that must be a boolean is not. $1 is the setting key. The words \"true\" and \"false\" are literal JSON values and must not be translated.",

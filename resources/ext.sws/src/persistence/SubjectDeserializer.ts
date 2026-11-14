@@ -26,7 +26,7 @@ export class SubjectDeserializer {
 
 		const pageIdentifiers = new PageIdentifiers( json.pageId, json.pageTitle );
 		const parsed = this.deserializeStatements( json.statements );
-		const statementList = new StatementList( [ ...parsed ], json.fieldNotes || {} );
+		const statementList = new StatementList( [ ...parsed ], json.fieldNotes || {}, false, json.fieldKeyVersion );
 
 		return new Subject(
 			id,

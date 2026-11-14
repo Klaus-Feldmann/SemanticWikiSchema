@@ -94,7 +94,8 @@ readonly class StatementList {
 	}
 
 	public function getStatement( PropertyName $property ): ?Statement {
-		return $this->statements[$property->text] ?? null;
+		$key = \ProfessionalWiki\SWS\Domain\Schema\FieldNameResolver::resolve( $property, $this->statements );
+		return $key === null ? null : $this->statements[$key];
 	}
 
 	/**

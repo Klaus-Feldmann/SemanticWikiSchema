@@ -1,4 +1,5 @@
-# Install SWS 0.4.03
+# Install SWS 0.5.0
+
 
 For the operator adding SWS to a configured MediaWiki for the first time. [Deutsch](de/README.md).
 

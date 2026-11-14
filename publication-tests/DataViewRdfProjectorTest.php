@@ -46,17 +46,17 @@ final class DataViewRdfProjectorTest extends TestCase {
  }
  public function testOnlyEffectiveValuesAreDirectAssertions():void {
   $quads=(new DataViewRdfProjector(new RdfNamespaces(self::BASE)))->project($this->view())->asArray();
-  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B'&&$q->predicate->value===self::BASE.'/prop/Ort'));
+  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B'&&$q->predicate->value===self::BASE.'/schema/Person/field/Ort'));
   self::assertCount(1,$direct);self::assertSame('Eigener Ort',$direct[0]->object->lexicalForm);
   self::assertNotEmpty(array_filter($quads,static fn($q)=>$q->predicate->value===RdfNamespaces::RDF.'object'&&$q->object instanceof Iri&&$q->object->value==='http://www.wikidata.org/entity/Q2'));
  }
  public function testTypesLabelsDatesAndDistinctSourceIds():void {
   $quads=(new DataViewRdfProjector(new RdfNamespaces(self::BASE)))->project($this->view())->asArray();$values=[];
   foreach($quads as$q)if($q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B')$values[$q->predicate->value]=$q->object;
-  self::assertSame('0',$values[self::BASE.'/prop/Zahl']->lexicalForm);self::assertSame('false',$values[self::BASE.'/prop/Wahr']->lexicalForm);
-  self::assertSame('-0347',$values[self::BASE.'/prop/Sterbedatum']->lexicalForm);self::assertSame('2026-11-03T14:00:00+02:00',$values[self::BASE.'/prop/Zeit']->lexicalForm);
-  self::assertSame('Abhandlung',$values[self::BASE.'/prop/Auswahl']->lexicalForm);self::assertSame('http://www.wikidata.org/entity/Q5',$values[self::BASE.'/prop/Klassenzuordnung']->value);
-  self::assertSame('https://example.org/wiki/Q5',$values[self::BASE.'/prop/Lokale_Klasse']->value);
+  self::assertSame('0',$values[self::BASE.'/schema/Person/field/Zahl']->lexicalForm);self::assertSame('false',$values[self::BASE.'/schema/Person/field/Wahr']->lexicalForm);
+  self::assertSame('-0347',$values[self::BASE.'/schema/Person/field/Sterbedatum']->lexicalForm);self::assertSame('2026-11-03T14:00:00+02:00',$values[self::BASE.'/schema/Person/field/Zeit']->lexicalForm);
+  self::assertSame('Abhandlung',$values[self::BASE.'/schema/Person/field/Auswahl']->lexicalForm);self::assertSame('http://www.wikidata.org/entity/Q5',$values[self::BASE.'/schema/Person/field/Klassenzuordnung']->value);
+  self::assertSame('https://example.org/wiki/Q5',$values[self::BASE.'/schema/Person/field/Lokale%20Klasse']->value);
  }
 
  public function testLanguageTaggedSourceTextRemainsAnRdfLanguageLiteral():void {
@@ -65,7 +65,7 @@ final class DataViewRdfProjectorTest extends TestCase {
    'source'=>'wikidata','propertyId'=>'P1477','values'=>[['kind'=>'text','value'=>'Avram Noam Chomsky','language'=>'en','rank'=>'normal']]
   ]);
   $quads=(new DataViewRdfProjector(new RdfNamespaces(self::BASE)))->project($view)->asArray();
-  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B'&&$q->predicate->value===self::BASE.'/prop/Geburtsname'));
+  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B'&&$q->predicate->value===self::BASE.'/schema/Person/field/Geburtsname'));
   self::assertCount(1,$direct);
   self::assertInstanceOf(Literal::class,$direct[0]->object);
   self::assertSame('Avram Noam Chomsky',$direct[0]->object->lexicalForm);
@@ -77,7 +77,7 @@ final class DataViewRdfProjectorTest extends TestCase {
   $view['subjects'][]=['id'=>$target,'displayName'=>'Ziel','schema'=>'Person','isMainSubject'=>false,'fields'=>[]];
   $view['subjects'][0]['fields'][]=$this->field('Bezug','relation',[[ 'kind'=>'relation','value'=>['id'=>'rF16iHXBMTQdHDY','target'=>$target], 'target'=>['id'=>$target,'label'=>'Ziel','status'=>'resolved'] ]]);
   $quads=(new DataViewRdfProjector(new RdfNamespaces(self::BASE)))->project($view)->asArray();
-  $links=array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B' && $q->predicate->value===self::BASE.'/prop/Bezug');
+  $links=array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B' && $q->predicate->value===self::BASE.'/schema/Person/field/Bezug');
   self::assertCount(1,$links);self::assertSame(self::BASE.'/entity/'.$target,array_values($links)[0]->object->value);
   $graphs=array_unique(array_map(static fn($q)=>$q->graph->value,$quads));
   self::assertTrue(count(array_filter($graphs,static fn($g)=>str_ends_with($g,'/graph/own')))===1);
@@ -88,7 +88,7 @@ final class DataViewRdfProjectorTest extends TestCase {
  public function testLocalConceptUrisComeFromTheRepositoryCallback():void {
   $projector=new DataViewRdfProjector(new RdfNamespaces(self::BASE),static fn(string $source,string $id):?string=>$source==='wikibase-local'?'https://local-repo.example/concept/'.$id:null);
   $quads=$projector->project($this->view())->asArray();
-  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B' && $q->predicate->value===self::BASE.'/prop/Lokale_Klasse'));
+  $direct=array_values(array_filter($quads,static fn($q)=>$q->subject->value===self::BASE.'/entity/sF1FCQPNcwQdw4B' && $q->predicate->value===self::BASE.'/schema/Person/field/Lokale%20Klasse'));
   self::assertSame('https://local-repo.example/concept/Q5',$direct[0]->object->value);
  }
 }

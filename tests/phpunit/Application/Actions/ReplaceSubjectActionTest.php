@@ -73,6 +73,24 @@ class ReplaceSubjectActionTest extends TestCase {
 		$this->pageIdentifiersLookup = new InMemoryPageIdentifiersLookup();
 	}
 
+	public function testD8RejectsAStaleSchemaKeyVersionBeforeChangingSubjectData(): void {
+		$subject = TestSubject::build( id: self::SUBJECT_ID, schemaName: new SchemaName( self::SCHEMA_NAME ) );
+		$subject->setFieldKeyVersion( 1 );
+		$this->subjectRepository->updateSubject( $subject );
+		$this->schemaLookup->updateSchema( new \ProfessionalWiki\SWS\Domain\Schema\Schema( new SchemaName( self::SCHEMA_NAME ), '', new PropertyDefinitions( [] ), false, fieldKeyChanges: [ [ 'A' => 'N1' ] ] ) );
+		$before = serialize( $subject );
+		try { $this->newAction()->replace( $subject->id, 'Should not save', [], null, fieldKeyVersion: 0 ); $this->fail( 'Stale edit admitted' ); }
+		catch ( \InvalidArgumentException ) { $this->assertSame( $before, serialize( $subject ) ); }
+	}
+
+	public function testD8RejectsAnEntityWithPendingTransferBeforeReplacingIt(): void {
+		$subject = TestSubject::build( id: self::SUBJECT_ID, schemaName: new SchemaName( self::SCHEMA_NAME ) );
+		$this->subjectRepository->updateSubject( $subject );
+		$this->schemaLookup->updateSchema( new \ProfessionalWiki\SWS\Domain\Schema\Schema( new SchemaName( self::SCHEMA_NAME ), '', new PropertyDefinitions( [] ), false, fieldKeyChanges: [ [ 'A' => 'N1' ] ] ) );
+		$this->expectException( \InvalidArgumentException::class );
+		$this->newAction()->replace( $subject->id, null, [], null );
+	}
+
 	private function newAction(
 		?SubjectWriteAuthorizer $authorizer = null,
 		bool $validationEnforced = false,
@@ -366,7 +384,7 @@ class ReplaceSubjectActionTest extends TestCase {
 
 		$this->assertFalse( $this->presenterSpy->validationFailed );
 		$this->assertSame(
-			[ 'not a url' ],
+			[ [ 'url' => 'not a url' ] ],
 			$this->subjectRepository
 				->getSubject( new SubjectId( self::SUBJECT_ID ) )
 				->getStatements()

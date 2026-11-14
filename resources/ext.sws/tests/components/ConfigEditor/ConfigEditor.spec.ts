@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import ConfigEditor from '@/components/ConfigEditor/ConfigEditor.vue';
 import type { ConfigValues, PageValues } from '@/components/ConfigEditor/configEditing.ts';
 import type { PageRevisionSaver, RevisionSaveStatus } from '@/persistence/PageSaver.ts';
-import { listedLanguages, setupMwMock } from '../../VueTestHelpers.ts';
+import { listedLanguages, setupMwMock, stubUpdateTooltipAccessKeys } from '../../VueTestHelpers.ts';
 
 interface Save {
 	pageName: string;
@@ -65,9 +65,11 @@ describe( 'ConfigEditor', () => {
 	let wrapper: VueWrapper | undefined;
 
 	beforeEach( () => {
+		stubUpdateTooltipAccessKeys();
 		setupMwMock( {
 			config: { wgUserLanguage: 'en', wgContentLanguage: 'en' },
 			messages: {
+				'accesskey-save': 's',
 				'sws-config-setting-subject-first': 'Wiki type',
 				'sws-config-setting-subject-first-page-first': 'Page-first',
 				'sws-config-setting-subject-first-page-first-help': 'A new Subject goes on the page it is created from.',
@@ -172,6 +174,11 @@ describe( 'ConfigEditor', () => {
 	function savedJson( pageSaver: SpyPageSaver ): unknown {
 		return JSON.parse( pageSaver.saves[ 0 ].source );
 	}
+
+	it( 'offers the configured save key on the editable settings form', () => {
+		const editor = newEditor();
+		expect( editor.get( '[accesskey="s"]' ).text() ).toContain( 'Save settings' );
+	} );
 
 	it( 'shows a setting with its label and help text', () => {
 		const editor = newEditor();

@@ -151,6 +151,7 @@ namespace ProfessionalWiki\SWS {
 		public static ?\Closure $resolver = null;
 		public function getDataLanguages(): array { return []; }
 		public function getRevisionPolicy(): mixed { return self::$policy; }
+		public function getPersistenceSchemaDeserializer(): mixed { return new \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \ProfessionalWiki\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
 		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schema; } }; }
 		public function newSubjectResolver( mixed $parser ): mixed { return ( self::$resolver )(); }
 		public function newHookPageRebuilder(): mixed { return new class { public function rebuild( mixed $title ): void {} }; }

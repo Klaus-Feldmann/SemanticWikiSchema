@@ -60,6 +60,7 @@ class SWSValueParserFunctionTest extends TestCase {
 
 		$parser = $this->createStub( Parser::class );
 		$parser->method( 'getTitle' )->willReturn( $title );
+		$parser->method( 'incrementExpensiveFunctionCount' )->willReturn( true );
 
 		return $parser;
 	}
@@ -136,11 +137,11 @@ class SWSValueParserFunctionTest extends TestCase {
 		return $pageIdentifiersLookup;
 	}
 
-	private function assertNoParseHtml( string $expectedHtml, string|array $result ): void {
+	private function assertEscapedText( string $expectedHtml, string|array $result ): void {
 		$this->assertIsArray( $result );
-		$this->assertSame( $expectedHtml, $result[0] );
+		$this->assertSame( wfEscapeWikiText( $expectedHtml ), $result[0] );
 		$this->assertTrue( $result['noparse'] );
-		$this->assertTrue( $result['isHTML'] );
+		$this->assertFalse( $result['isHTML'] );
 	}
 
 	// --- String values ---
@@ -153,7 +154,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'City' );
 
-		$this->assertNoParseHtml( 'Berlin', $result );
+		$this->assertEscapedText( 'Berlin', $result );
 	}
 
 	public function testReturnsEmptyWhenTheSubjectsPageIsNotReadable(): void {
@@ -188,7 +189,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Tags' );
 
-		$this->assertNoParseHtml( 'alpha, beta, gamma', $result );
+		$this->assertEscapedText( 'alpha, beta, gamma', $result );
 	}
 
 	public function testReturnsMultiValueStringWithCustomSeparator(): void {
@@ -199,7 +200,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Tags', 'separator=;' );
 
-		$this->assertNoParseHtml( 'alpha;beta', $result );
+		$this->assertEscapedText( 'alpha;beta', $result );
 	}
 
 	public function testTrimsWhitespaceAroundSeparatorParam(): void {
@@ -210,7 +211,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Tags', ' separator = ; ' );
 
-		$this->assertNoParseHtml( 'alpha;beta', $result );
+		$this->assertEscapedText( 'alpha;beta', $result );
 	}
 
 	public function testEmptySeparatorConcatenatesValues(): void {
@@ -221,7 +222,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Tags', 'separator=' );
 
-		$this->assertNoParseHtml( 'abc', $result );
+		$this->assertEscapedText( 'abc', $result );
 	}
 
 	// --- Select values ---
@@ -234,7 +235,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Status' );
 
-		$this->assertNoParseHtml( 'In review, Published', $result );
+		$this->assertEscapedText( 'In review, Published', $result );
 	}
 
 	// --- Monolingual text values ---
@@ -243,14 +244,14 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $this->subjectWithOriginalTitle() ) )
 			->handle( $this->createMockParser(), 'Original title' );
 
-		$this->assertNoParseHtml( 'Zinema, Cine', $result );
+		$this->assertEscapedText( 'Zinema, Cine', $result );
 	}
 
 	public function testJoinsTheTextsOfAMonolingualTextValueWithTheGivenSeparator(): void {
 		$result = $this->createPF( $this->repositoryWithSubject( $this->subjectWithOriginalTitle() ) )
 			->handle( $this->createMockParser(), 'Original title', 'separator=;' );
 
-		$this->assertNoParseHtml( 'Zinema;Cine', $result );
+		$this->assertEscapedText( 'Zinema;Cine', $result );
 	}
 
 	private function subjectWithOriginalTitle(): Subject {
@@ -274,7 +275,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Age' );
 
-		$this->assertNoParseHtml( '42', $result );
+		$this->assertEscapedText( '42', $result );
 	}
 
 	public function testReturnsFloatNumberValue(): void {
@@ -285,7 +286,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Price' );
 
-		$this->assertNoParseHtml( '19.99', $result );
+		$this->assertEscapedText( '19.99', $result );
 	}
 
 	// --- Boolean values ---
@@ -298,7 +299,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Active' );
 
-		$this->assertNoParseHtml( 'true', $result );
+		$this->assertEscapedText( 'true', $result );
 	}
 
 	public function testReturnsFalseBooleanValue(): void {
@@ -309,7 +310,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Active' );
 
-		$this->assertNoParseHtml( 'false', $result );
+		$this->assertEscapedText( 'false', $result );
 	}
 
 	// --- Relation values ---
@@ -340,7 +341,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $repo, $this->placeOnOwnPages( $repo, $targetSubject ) )
 			->handle( $this->createMockParser(), 'Process owner' );
 
-		$this->assertNoParseHtml( 'Sarah Naumann', $result );
+		$this->assertEscapedText( 'Sarah Naumann', $result );
 	}
 
 	public function testReturnsRelationIdWhenTargetNotFound(): void {
@@ -360,7 +361,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Process owner' );
 
-		$this->assertNoParseHtml( self::TARGET_SUBJECT_ID, $result );
+		$this->assertEscapedText( self::TARGET_SUBJECT_ID, $result );
 	}
 
 	public function testMultipleRelationLabels(): void {
@@ -399,7 +400,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $repo, $this->placeOnOwnPages( $repo, $target1, $target2 ) )
 			->handle( $this->createMockParser(), 'Members' );
 
-		$this->assertNoParseHtml( 'Alice, Bob', $result );
+		$this->assertEscapedText( 'Alice, Bob', $result );
 	}
 
 	public function testReturnsEmptyStringForEmptyRelationValue(): void {
@@ -476,12 +477,13 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), '  City  ' );
 
-		$this->assertNoParseHtml( 'Berlin', $result );
+		$this->assertEscapedText( 'Berlin', $result );
 	}
 
-	public function testSubjectIdParam(): void {
+	public function testEntityThenField(): void {
 		$targetSubject = new Subject(
-			id: new SubjectId( self::TARGET_SUBJECT_ID ),
+			id: new SubjectId( 'E2' ),
+			identity: new \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity( 'en', [ 'en' => 'Other Subject' ] ),
 			label: new SubjectLabel( 'Other Subject' ),
 			schema: SchemaReference::local( new SchemaName( 'TestSchema' ) ),
 			statements: new StatementList( [
@@ -492,9 +494,9 @@ class SWSValueParserFunctionTest extends TestCase {
 		$repo = new InMemorySubjectContentRepository();
 		$pf = $this->createPF( $repo, $this->placeOnOwnPages( $repo, $targetSubject ) );
 
-		$result = $pf->handle( $this->createMockParser(), 'City', 'subject=' . self::TARGET_SUBJECT_ID );
+		$result = $pf->handle( $this->createMockParser(), 'E2', 'City' );
 
-		$this->assertNoParseHtml( 'Munich', $result );
+		$this->assertEscapedText( 'Munich', $result );
 	}
 
 	public function testInvalidSubjectIdReturnsEmptyString(): void {
@@ -515,10 +517,10 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $repo )
 			->handle( $this->createMockParser(), 'City', 'page=Other Page' );
 
-		$this->assertNoParseHtml( 'Hamburg', $result );
+		$this->assertEscapedText( 'Hamburg', $result );
 	}
 
-	public function testSubjectParamTakesPrecedenceOverPageParam(): void {
+	public function testEntityAndPageAreRejectedAsAmbiguous(): void {
 		$subjectViaId = new Subject(
 			id: new SubjectId( self::TARGET_SUBJECT_ID ),
 			label: new SubjectLabel( 'Via ID' ),
@@ -535,12 +537,12 @@ class SWSValueParserFunctionTest extends TestCase {
 		$repo = $this->repositoryWithSubject( $subjectViaPage );
 		$result = $this->createPF( $repo, $this->placeOnOwnPages( $repo, $subjectViaId ) )->handle(
 			$this->createMockParser(),
+			'E2',
 			'City',
-			'subject=' . self::TARGET_SUBJECT_ID,
 			'page=Some Page'
 		);
 
-		$this->assertNoParseHtml( 'FromSubject', $result );
+		$this->assertSame( '', $result );
 	}
 
 	public function testReturnsCorrectPropertyFromMultipleStatements(): void {
@@ -553,7 +555,7 @@ class SWSValueParserFunctionTest extends TestCase {
 		$result = $this->createPF( $this->repositoryWithSubject( $subject ) )
 			->handle( $this->createMockParser(), 'Country' );
 
-		$this->assertNoParseHtml( 'Germany', $result );
+		$this->assertEscapedText( 'Germany', $result );
 	}
 
 	// --- HTML escaping ---
@@ -567,9 +569,9 @@ class SWSValueParserFunctionTest extends TestCase {
 			->handle( $this->createMockParser(), 'Name' );
 
 		$this->assertIsArray( $result );
-		$this->assertSame( '&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quoted&quot;', $result[0] );
+		$this->assertSame( wfEscapeWikiText( '<b>bold</b> & "quoted"' ), $result[0] );
 		$this->assertTrue( $result['noparse'] );
-		$this->assertTrue( $result['isHTML'] );
+		$this->assertFalse( $result['isHTML'] );
 	}
 
 }

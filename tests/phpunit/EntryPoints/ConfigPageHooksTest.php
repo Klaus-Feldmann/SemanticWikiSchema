@@ -16,7 +16,7 @@ use SkinTemplate;
 
 /**
  * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onContentHandlerDefaultModelFor
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onEditFilter
+ * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onJsonValidateSave
  * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSkinTemplateNavigationUniversal
  * @group Database
  */
@@ -35,10 +35,9 @@ class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {
 	}
 
 	private function editFilterError( Title $title, string $text ): string {
-		$error = '';
-		SWSHooks::onEditFilter( $this->newEditPage( $title ), $text, '', $error, '' );
-
-		return $error;
+		$status = \StatusValue::newGood();
+		SWSHooks::onJsonValidateSave( new \MediaWiki\Content\JsonContent( $text ), $title, $status );
+		return $status->isOK() ? '' : \MediaWiki\Status\Status::wrap( $status )->getMessage()->text();
 	}
 
 	public function testConfigPageGetsTheJsonContentModel(): void {

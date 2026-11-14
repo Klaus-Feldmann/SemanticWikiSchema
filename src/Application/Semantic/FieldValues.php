@@ -12,7 +12,10 @@ use ProfessionalWiki\SWS\Domain\HistoricalCalendar;
  */
 final class FieldValues {
     private ?array $external = null;
-    public function __construct(private array $schema, private array $subject, private \Closure $readExternal) {}
+    private array $definitionsByName = [];
+    public function __construct(private array $schema, private array $subject, private \Closure $readExternal) {
+        foreach ($schema['properties'] as $definition) { $this->definitionsByName[$definition['name']] = $definition; }
+    }
 
     public function collect(?string $name = null, string $origin = 'all', string $language = 'de', bool $includeImages = false): array {
         return $this->collectInternal($name,$origin,$language,$includeImages,false);
@@ -31,15 +34,20 @@ final class FieldValues {
     private function collectInternal(?string $name, string $origin, string $language, bool $includeImages, bool $forAnnotations): array {
         if (!in_array($origin, ['all','own','external'], true)) { throw new InvalidArgumentException('Unknown origin'); }
         $fields = []; $found = false;
-        foreach ($this->schema['properties'] as $definition) {
-            if ($name !== null && $definition['name'] !== $name) { continue; }
+        $definitions = $this->schema['properties'];
+        if ($name !== null) {
+            $key = \ProfessionalWiki\SWS\Domain\Schema\FieldNameResolver::resolve($name, $this->definitionsByName);
+            if ($key === null) { throw new InvalidArgumentException('Field not found: '.$name); }
+            $definitions = [$this->definitionsByName[$key]];
+        }
+        foreach ($definitions as $definition) {
             $type = $definition['type'];
             if ($type === 'wikitext' || $forAnnotations && $type === 'wikitextValue' || $type === 'image' && !$includeImages) { continue; }
             $found = true;
             $stored = $this->subject['statements'][$definition['name']]['values'] ?? [];
             if ($forAnnotations && $type === 'relation') {
                 // Do not resolve targets or publish relation annotations in this processing stage.
-                $fields[] = ['name'=>$definition['name'],'type'=>$type,'values'=>[],
+                $fields[] = (empty($definition['labels']) ? [] : ['labels'=>$definition['labels']]) + ['name'=>$definition['name'],'type'=>$type,'values'=>[],
                     'hasStoredValues'=>$stored !== [],'status'=>'deferred-relation',
                     'externalProperty'=>$definition['externalProperty'] ?? null,
                     'targetSchemas'=>$definition['targetSchemas'] ?? [],
@@ -114,7 +122,7 @@ final class FieldValues {
                 if(is_array($defaults)){foreach($defaults as$value){if(is_string($value)&&trim($value)!==''){$add($value,'schema',['raw'=>$value,'default'=>true]);}}}
                 if($values!==[]){$status='default';}
             }
-            $fields[] = (isset($remote['sourceStatus']) ? ['sourceStatus'=>$remote['sourceStatus']] : []) + ($type === 'page' && ($definition['assignCategories'] ?? false) ? ['assignCategories'=>true] : []) + ['name'=>$definition['name'],'type'=>$type,'values'=>$values,'hasStoredValues'=>$stored !== [],'status'=>$status,'externalProperty'=>$binding,'rawStatement'=>$this->subject['statements'][$definition['name']] ?? null,'reason'=>$remote['reason'] ?? null, 'external'=>$remote,
+            $fields[] = (empty($definition['labels']) ? [] : ['labels'=>$definition['labels']]) + (isset($remote['sourceStatus']) ? ['sourceStatus'=>$remote['sourceStatus']] : []) + ($type === 'page' && ($definition['assignCategories'] ?? false) ? ['assignCategories'=>true] : []) + ['name'=>$definition['name'],'type'=>$type,'values'=>$values,'hasStoredValues'=>$stored !== [],'status'=>$status,'externalProperty'=>$binding,'rawStatement'=>$this->subject['statements'][$definition['name']] ?? null,'reason'=>$remote['reason'] ?? null, 'external'=>$remote,
                 'authorNote'=>$this->subject['fieldNotes'][$definition['name']] ?? null];
         }
         if ($name !== null && !$found) { throw new InvalidArgumentException('Field not found: '.$name); }

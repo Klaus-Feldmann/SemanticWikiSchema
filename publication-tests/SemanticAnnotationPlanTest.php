@@ -21,10 +21,10 @@ final class SemanticAnnotationPlanTest extends TestCase {
         $subject = new Subject(new SubjectId('sF1FCQPNcwQdw4B'),null,SchemaReference::local(new SchemaName('Person')),new StatementList([new Statement(new PropertyName('Art'),'select',new StringValue('o1'))]));
         $result = FieldSnapshot::reader($schema,$subject,fn()=>throw new RuntimeException('No fetch expected'))->collect();
         self::assertSame('Abhandlung',$result['fields'][0]['values'][0]['value']);
-        self::assertSame(['Art=Abhandlung'],(new AnnotationPlanner($this->fixture('empty')['config']))->build($result)->rows);
+        self::assertSame(['Person:Art=Abhandlung'],(new AnnotationPlanner($this->fixture('empty')['config']))->build($result)->rows);
     }
     public function testZeroAndFalseSurvive(): void {
-        foreach (['number-3'=>'Feld=0','boolean-5'=>'Feld=0','boolean-6'=>'Feld=1'] as $name=>$expected) {
+        foreach (['number-3'=>'Person:Feld=0','boolean-5'=>'Person:Feld=0','boolean-6'=>'Person:Feld=1'] as $name=>$expected) {
             self::assertSame([$expected],(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($this->fixture($name))->collect())->rows);
         }
     }
@@ -40,7 +40,7 @@ final class SemanticAnnotationPlanTest extends TestCase {
     }
     public function testDatePrecisionCalendarAndOffset(): void {
         $planner=new AnnotationPlanner($this->fixture('empty')['config']);
-        foreach (['historical--0347'=>'Feld=347 BC Jl','historical-1582-10-04'=>'Feld=4 October 1582 Jl','historical-1582-10-15'=>'Feld=15 October 1582 Gr','datetime-2026-11-04T00:15:00+05:45'=>'Feld=3 November 2026 18:30:00+00:00 Gr','datetime-2026-12-31T23:59:59.123456789-02:00'=>'Feld=1 January 2027 01:59:59+00:00 .123456789 Gr'] as $name=>$expected) {
+        foreach (['historical--0347'=>'Person:Feld=347 BC Jl','historical-1582-10-04'=>'Person:Feld=4 October 1582 Jl','historical-1582-10-15'=>'Person:Feld=15 October 1582 Gr','datetime-2026-11-04T00:15:00+05:45'=>'Person:Feld=3 November 2026 18:30:00+00:00 Gr','datetime-2026-12-31T23:59:59.123456789-02:00'=>'Person:Feld=1 January 2027 01:59:59+00:00 .123456789 Gr'] as $name=>$expected) {
             self::assertSame([$expected],$planner->build($this->reader($this->fixture($name))->collect())->rows);
         }
     }
@@ -55,7 +55,7 @@ final class SemanticAnnotationPlanTest extends TestCase {
         array_unshift($c['schema']['properties'],['name'=>'Vorher','type'=>'text']);
         $c['subject']['statements']['Vorher']=['values'=>['Gut']];
         $plan=(new AnnotationPlanner($this->fixture('empty')['config']))->build($this->reader($c)->collect());
-        self::assertSame(['Vorher=Gut'],$plan->rows);
+        self::assertSame(['Person:Vorher=Gut'],$plan->rows);
     }
     public function testExistingMappingsPreserved(): void {
         foreach (['Leserschaft','Leserschaftziel','Werkausgabe'] as $name) {
@@ -75,7 +75,7 @@ final class SemanticAnnotationPlanTest extends TestCase {
         $result=$this->reader($case)->collect();
         self::assertSame('  ',$result['fields'][0]['values'][0]['value']);
         // Planner rows are parser input; preserving raw text is not proof SMW stores an empty value.
-        self::assertSame(['Feld=  '],(new AnnotationPlanner($case['config']))->build($result)->rows);
+        self::assertSame(['Person:Feld=  '],(new AnnotationPlanner($case['config']))->build($result)->rows);
     }
     public function testSnapshotIsNotChangedByCollecting(): void {
         $c=$this->fixture('url-structured');$before=$c;$this->reader($c)->collect();self::assertSame($before,$c);

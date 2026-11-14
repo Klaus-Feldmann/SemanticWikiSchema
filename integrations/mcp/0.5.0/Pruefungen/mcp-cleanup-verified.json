@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "namespace": "0",
+      "prefix": "MCP-Test-SWS-0.5.0-",
+      "remaining": 0
+    },
+    {
+      "namespace": "2",
+      "prefix": "Sophos/MCP-Test-SWS-0.5.0-",
+      "remaining": 0
+    }
+  ]
+}

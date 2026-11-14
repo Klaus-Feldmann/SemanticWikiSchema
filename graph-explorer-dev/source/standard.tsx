@@ -92,7 +92,7 @@ export class StandardTemplate extends Component<TemplateProps, {}> {
             {this.renderPhoto()}
             <div className={`${CLASS_NAME}__dropdown-content`}>
               {this.renderIri(context)}
-              {<SWSFields iri={iri} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
+              {<SWSFields iri={iri} language={context.view.getLanguage()} nativeProps={propsAsList} fallback={this.renderProperties(propsAsList)} onChange={() => context.view.model.getElement(this.props.elementId)?.redraw()} />}
               {editor.inAuthoringMode ? (
                 <hr className={`${CLASS_NAME}__hr`} />
               ) : null}

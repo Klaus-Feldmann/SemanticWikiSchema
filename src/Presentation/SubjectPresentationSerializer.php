@@ -39,6 +39,7 @@ class SubjectPresentationSerializer {
 
 		// An empty PHP array encodes as `[]`, which is not the object keyed by property name that
 		// the Subject format specifies, and that a Subject holding Statements already serves.
+		if ( $item->fieldKeyVersion !== 0 ) { $entry['fieldKeyVersion'] = $item->fieldKeyVersion; }
 		if ( $item->fieldNotes !== [] ) { $entry['fieldNotes'] = (object)$item->fieldNotes; }
         $entry['statements'] = $item->statements === [] ? new stdClass() : $item->statements;
 

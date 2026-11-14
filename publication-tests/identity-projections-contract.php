@@ -86,7 +86,7 @@ d4check( count( $labels ) === 2, 'Native RDF contains every own entity label' );
 d4check( $labels[0]->object->languageTag === 'de' && $labels[1]->object->languageTag === 'en', 'Native labels carry language tags' );
 d4check( count( $find( $quads, 'https://wiki.example/entity/E1', RdfNamespaces::RDFS . 'comment' ) ) === 2, 'Own descriptions are RDF comments in both languages' );
 d4check( count( $find( $quads, 'https://wiki.example/schema-id/S1', RdfNamespaces::RDFS . 'label' ) ) === 2, 'Stable schema class carries its own multilingual labels' );
-$links = $find( $quads, 'https://wiki.example/entity/E1', 'https://wiki.example/prop/Kennt' );
+$links = $find( $quads, 'https://wiki.example/entity/E1', 'https://wiki.example/schema-id/S1/field/Kennt' );
 d4check( $links[0]->object->value === 'https://wiki.example/entity/E2', 'Relation target aliases use canonical entity IRI' );
 $relationLabel = $find( $quads, 'https://wiki.example/relation/r11111111111111', RdfNamespaces::RDFS . 'label' );
 d4check( count( $relationLabel ) === 1 && str_contains( $relationLabel[0]->object->lexicalForm, 'Gödel — Kennt' ), 'Reified relation has readable source and predicate' );

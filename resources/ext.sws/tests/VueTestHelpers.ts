@@ -477,7 +477,8 @@ export function setupMwMock(
 
 	const implementations: Record<string, any> = {
 		config: () => ( {
-			get: vi.fn( ( key: string ) => customConfig[ key ] ),
+			get: vi.fn( ( key: string ) => Object.prototype.hasOwnProperty.call( customConfig, key ) ? customConfig[ key ] :
+				( { wgContentLanguage: 'en', wgUserLanguage: 'en' } as Record<string, unknown> )[ key ] ),
 		} ),
 		message: () => vi.fn( ( key: string, ...params: any[] ) => ( {
 			text: () => resolveMessage( key, params ),
@@ -511,7 +512,7 @@ export function setupMwMock(
 			// MediaWiki's own chain starts at the interface language and ends at English, which every
 			// wiki falls back to; the fake carries just that, so a spec setting a user language gets a
 			// chain of its own without configuring one.
-			getFallbackLanguageChain: vi.fn( () => [ customConfig.wgUserLanguage, 'en' ] ),
+			getFallbackLanguageChain: vi.fn( () => [ customConfig.wgUserLanguage ?? 'en', 'en' ] ),
 			// MediaWiki formats a number the way the interface language writes it; the fake groups its digits the
 			// English way, so a spec can tell a formatted number from a bare one.
 			convertNumber: vi.fn( ( number: number ) => number.toLocaleString( 'en-US' ) ),

@@ -25,3 +25,5 @@ __pycache__/
 
 # Also exclude dependency symlinks used only for local checks.
 node_modules
+
+.DS_Store

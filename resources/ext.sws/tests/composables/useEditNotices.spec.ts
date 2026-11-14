@@ -20,6 +20,15 @@ describe( 'useEditNotices', () => {
 		expect( notices.value ).toStrictEqual( [ notice ] );
 	} );
 
+	it( 'clears previous notices while the next request is pending', async () => {
+		let call = 0;
+		const api = useEditNotices( () => ( { getNotices: () => ++call === 1 ?
+			Promise.resolve( [ { key: 'old', html: 'Old notice' } ] ) : new Promise( () => {} ) } ) );
+		await api.loadNotices( PAGE_ID );
+		void api.loadNotices( PAGE_ID );
+		expect( api.notices.value ).toStrictEqual( [] );
+	} );
+
 	it( 'starts with no notices', () => {
 		expect( useEditNotices( () => repositoryReturning( [] ) ).notices.value ).toStrictEqual( [] );
 	} );

@@ -109,11 +109,11 @@ foreach ( [ 'missing', 'unavailable', 'unsupported', 'manual' ] as $status ) {
 }
 
 resetD2( true ); $processor->refresh( $title );
-d2check( S::$plans === [ [ 'Quelle=Quellenwert', 'Name=Eigene Angabe', 'Quelle (AM)=Forschungsnotiz' ] ] ||
-	S::$plans === [ [ 'Quelle (AM)=Forschungsnotiz', 'Quelle=Quellenwert', 'Name=Eigene Angabe' ] ], 'SMW plan uses persisted source data and own-value precedence' );
+d2check( S::$plans === [ [ 'Person:Quelle=Quellenwert', 'Person:Name=Eigene Angabe', 'Person:Quelle (AM)=Forschungsnotiz' ] ] ||
+	S::$plans === [ [ 'Person:Quelle (AM)=Forschungsnotiz', 'Person:Quelle=Quellenwert', 'Person:Name=Eigene Angabe' ] ], 'SMW plan uses persisted source data and own-value precedence' );
 d2check( count( S::$collected ) === 1, 'SMW final stage makes no second collection' );
 editedD2(); S::$statuses['Quelle'] = 'unavailable'; $processor->refresh( $title );
-d2check( in_array( 'Quelle=Quellenwert', S::$plans[1], true ) && in_array( 'Quelle (AM)=sws-notes-source-unavailable', S::$plans[1], true ), 'Retained source value and error note coexist in SMW plan' );
+d2check( in_array( 'Person:Quelle=Quellenwert', S::$plans[1], true ) && in_array( 'Person:Quelle (AM)=sws-notes-source-unavailable', S::$plans[1], true ), 'Retained source value and error note coexist in SMW plan' );
 
 $oldSchema = S::$schemaRevision;
 S::$schemaRevision = new RevisionRecord( 200, 901, [ 'main' => new SchemaContent( '{"propertyDefinitions":{"Kategorie":{"type":"wikitext","wikitext":"[[Kategorie:D2-Test]]","execute":true}}}' ) ], 100 );
@@ -170,10 +170,10 @@ d2check( $rights === [ 'read' ], 'Processor rights restriction remains unchanged
 
 resetD2( true ); S::$mode = 'cache'; $processor->refresh( $title );
 d2check( S::$collected === [] && S::$page->saveCalls === 0 && S::$liveReads === 1, 'Cache mode retains existing cached source lookup and performs no source-store write' );
-d2check( in_array( 'Quelle=Live-Wert', S::$plans[0], true ), 'Cache mode SMW uses live lookup result' );
+d2check( in_array( 'Person:Quelle=Live-Wert', S::$plans[0], true ), 'Cache mode SMW uses live lookup result' );
 S::$mode = 'store'; $processor->refresh( $title );
 $preservedStore = S::$page->revision->getContent( 'sws' )->getPageSubjects()->getMainSubject()->getSourceSnapshot()->toJson();
-d2check( count( S::$collected ) === 1 && S::$liveReads === 1 && in_array( 'Quelle=Quellenwert', S::$plans[1], true ), 'Switch to store collects once then uses persistent values' );
+d2check( count( S::$collected ) === 1 && S::$liveReads === 1 && in_array( 'Person:Quelle=Quellenwert', S::$plans[1], true ), 'Switch to store collects once then uses persistent values' );
 S::$mode = 'cache'; $processor->refresh( $title );
 d2check( S::$page->revision->getContent( 'sws' )->getPageSubjects()->getMainSubject()->getSourceSnapshot()->toJson() === $preservedStore && S::$liveReads === 2, 'Switch back to cache retains persistent source data' );
 S::$mode = 'store'; $sealed = $processor->prepare( $title, true ); S::$mode = 'cache';
@@ -210,7 +210,7 @@ d2check( $denied->status === 'error' && S::$page->revision->getContent( 'main' )
 resetD2( true ); $processor->refresh( $title ); editedD2(); S::$bridge = false; $processor->refresh( $title );
 $withoutBridge = S::$page->revision->getContent( 'sws' )->getPageSubjects()->getMainSubject()->getSourceSnapshot()->forLanguage( 'de' );
 d2check( count( S::$collected ) === 1 && $withoutBridge['fields']['Quelle']['lastAttempt']['reason'] === 'bridge-unavailable', 'Missing bridge is recorded as field outcome without attempting its collector' );
-d2check( $withoutBridge['fields']['Quelle']['lastSuccess']['result']['values'][0]['value'] === 'Quellenwert' && in_array( 'Name=Eigene Angabe', S::$plans[1], true ), 'Missing bridge retains previous source data and manual annotations' );
+d2check( $withoutBridge['fields']['Quelle']['lastSuccess']['result']['values'][0]['value'] === 'Quellenwert' && in_array( 'Person:Name=Eigene Angabe', S::$plans[1], true ), 'Missing bridge retains previous source data and manual annotations' );
 
 resetD2(); $staged = $processor->prepare( $title, true ); S::$readOnly = true;
 d2refuses( fn () => ( new InternalSourceSnapshotWriter() )->save( $staged ), 'Internal source writer respects wiki-wide read-only mode' );

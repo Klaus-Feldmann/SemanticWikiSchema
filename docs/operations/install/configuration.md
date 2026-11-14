@@ -3,7 +3,7 @@
 For the operator enabling the newly installed extension. Add this to the existing LocalSettings.php; do not replace the file:
 
 ```php
-// SWS 0.4.03 is qualified with the legacy parser.
+// SWS 0.5.0 is qualified with the legacy parser.
 $wgUseParsoidParser = false;
 $wgUseParsoidLinksUpdate = false;
 

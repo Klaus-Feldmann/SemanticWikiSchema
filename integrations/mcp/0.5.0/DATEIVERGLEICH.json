@@ -1,0 +1,98 @@
+{
+  "dist/auth/privateWikiProbe.js": {
+    "before": null,
+    "after": "778b07f39c754e20d480a1a63d27c4e32b3df9e4fb2d11610efe5ce56812eff8"
+  },
+  "dist/tools/extensions/index.js": {
+    "before": "38555767d5eb095e381803c343fa94e6eedf159892166e9324b71a9b6b7b131e",
+    "after": "2b4cf2dcc7d3074d5eb51177a13947c2eed6f7d8486d220da632c1678fd880f4"
+  },
+  "dist/tools/extensions/sws/index.js": {
+    "before": null,
+    "after": "bba3461180e2937eafda14934cf1fa01e112e49916a2564de4ec7d525e4c0478"
+  },
+  "dist/tools/extensions/sws/pageId.js": {
+    "before": null,
+    "after": "0b797315756948cd123aadc010fad4ee91401f68d5900167d0940c4336a88b55"
+  },
+  "dist/tools/extensions/sws/statements.js": {
+    "before": null,
+    "after": "80272de628567c6a4a8594851ca4dfc6fc49e7f9a45c3244dbc629cebe4e245e"
+  },
+  "dist/tools/extensions/sws/subjects.js": {
+    "before": null,
+    "after": "de93a337cb7cf3db61f6825183fb3c749dac5cac730264f66d6bbf622b6ed6ec"
+  },
+  "dist/tools/extensions/sws/sws-create-subject.js": {
+    "before": null,
+    "after": "75c76c74f83de070c253efbb42f27ef9050af82352755833df64dbb00c95994f"
+  },
+  "dist/tools/extensions/sws/sws-cypher-query.js": {
+    "before": null,
+    "after": "352f15398ff34c96e7a71139d6b7e9ac9aff219800d72939d0866a0dfb936eda"
+  },
+  "dist/tools/extensions/sws/sws-delete-subject.js": {
+    "before": null,
+    "after": "1278afd4161479c3c6afc84be8c07abb09d1854eca1bb29311146cef147d5fc9"
+  },
+  "dist/tools/extensions/sws/sws-get-page-subjects.js": {
+    "before": null,
+    "after": "47ae90036f9c94964d315827403136d7aad9f2914b2b1f388827053726d2e994"
+  },
+  "dist/tools/extensions/sws/sws-get-schema.js": {
+    "before": null,
+    "after": "45e70f6fd6f34c3ad79dce8eab91ba9fc546f2ee5249792ab28b008320b47f38"
+  },
+  "dist/tools/extensions/sws/sws-get-subject.js": {
+    "before": null,
+    "after": "d77aea8e227ad65dc61baebe89b81136713a41cf16bf11d2b86207fc0a990865"
+  },
+  "dist/tools/extensions/sws/sws-list-schemas.js": {
+    "before": null,
+    "after": "11ddf304c7ee2cf568ef0aa6627d81a8280b1e8b252edaa828a7eff59761bc38"
+  },
+  "dist/tools/extensions/sws/sws-mint-subject-ids.js": {
+    "before": null,
+    "after": "52cb6ec4a9a572b298d5b8cfa61335c78068be919069bae6513c579cf8d34e36"
+  },
+  "dist/tools/extensions/sws/sws-search-subjects.js": {
+    "before": null,
+    "after": "7695329f051d273a0e384d87d8ff072d56381c30ae9a62ff51a27465618a5ab2"
+  },
+  "dist/tools/extensions/sws/sws-set-main-subject.js": {
+    "before": null,
+    "after": "2b7615973519792856718fd294e16df3ebc8391a42b8d678e6bf5369d6073411"
+  },
+  "dist/tools/extensions/sws/sws-update-subject.js": {
+    "before": null,
+    "after": "6e16923c210d3023a94d3f4a134b73e99f6a01d4662b7ea0b591a43b04cea58c"
+  },
+  "dist/tools/extensions/sws/sws-validate-subject.js": {
+    "before": null,
+    "after": "3164bf602e73d23989320fd684b7fa109cd901d016afb8a2e45db035b62f2880"
+  },
+  "dist/tools/extensions/sws/swsRequest.js": {
+    "before": null,
+    "after": "edd32b58d99e3a638e38096c30777400775692d025bfe18ec79d5b31d67a34e0"
+  },
+  "dist/tools/extensions/sws/writeIdentity.js": {
+    "before": null,
+    "after": "0f4ace1fded95eeaecd480f4cfa98bd49fa39271e508e6a279a8d974799aa4df"
+  },
+  "dist/tools/extensions/swsbase/index.js": {
+    "before": null,
+    "after": "f6dae6153340ce5477b2c1656762c3217c734c3a39d8489b77ca455875efef73"
+  },
+  "dist/tools/extensions/swsbase/swsbase-get-data-view.js": {
+    "before": null,
+    "after": "f14a1b3f076e1d21f2e72cdc7ea5b0265f241978c7d290f29adc9d1d6777d141"
+  },
+  "dist/transport/stdio.js": {
+    "before": "1a3ac47f7fd063a100d352acf44a55388d2b664ab070365a6962eb660e16e13c",
+    "after": "3beebb3d48a7da205d1852a4f5aca3f2b5eecdfc8f80fcfbe54c5c2d38a0adf1"
+  },
+  "sws-patch.json": {
+    "before": null,
+    "after": "450a521f57dac4f03e958d44b0984830b4b9e82c06f41e2ad6975de52d5e7586"
+  }
+}

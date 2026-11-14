@@ -7,7 +7,11 @@ sys.dont_write_bytecode = True
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--php',default='php');parser.add_argument('--composer',default='composer');args=parser.parse_args()
+    parser.add_argument('--published-vcs',action='store_true');parser.add_argument('--php',default='php');parser.add_argument('--composer',default='composer');args=parser.parse_args()
+    candidate=Path(__file__).resolve().parents[2]/'SEMANTICWIKISCHEMA-VERSION.json'
+    if candidate.is_file() and json.loads(candidate.read_text()).get('publicationAllowed') is False:
+        print('SKIPPED: unpublished candidate; no Composer/GitHub first installation attempted.')
+        return
     php=shutil.which(args.php);composer=shutil.which(args.composer)
     if not php or not composer:raise RuntimeError('PHP and Composer required')
     source=Path(__file__).resolve().parents[2]
@@ -22,7 +26,8 @@ def main():
         package=base/'package';shutil.copytree(source,package,ignore=shutil.ignore_patterns('.git','vendor','node_modules','__pycache__','.DS_Store'))
         spec=importlib.util.spec_from_file_location('sws_install',source/'installer/install.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         # The release tag need not be public for a candidate check. Use the actual candidate files.
-        module.REPOSITORY={'type':'path','url':str(package),'options':{'symlink':False,'versions':{module.PACKAGE:module.VERSION}}}
+        if not args.published_vcs:
+            module.REPOSITORY={'type':'path','url':str(package),'options':{'symlink':False,'versions':{module.PACKAGE:module.VERSION}}}
         root,changes=module.prepare(root);module.apply(root,changes,php,composer,base/'private-backups')
         local=json.loads((root/'composer.local.json').read_text());assert local['extra']['unrelated-setting']=='preserved';assert local['require']['psr/log']=='^3'
         assert (root/'LocalSettings.php').read_text()=='<?php /* controlled layout, no running wiki */'
@@ -32,7 +37,7 @@ def main():
         assert versions[module.PACKAGE]==module.VERSION
         assert all(versions[name]==version for name,version in before_versions.items())
         assert (root/'extensions/SemanticWikiSchema/graph-explorer/envendpoint.html').is_file()
-        print(json.dumps({'result':'passed','version':versions[module.PACKAGE],'packages':len(versions),'unrelatedConfig':'preserved','existingPackageVersions':'preserved','LocalSettings':'unchanged','autoload':'S1/E1 and runtime dependencies','scope':'Actual Composer; controlled MediaWiki directory layout, no core runtime/database test'},indent=2))
+        print(json.dumps({'result':'passed','repository':'published-vcs' if args.published_vcs else 'candidate-path','version':versions[module.PACKAGE],'packages':len(versions),'unrelatedConfig':'preserved','existingPackageVersions':'preserved','LocalSettings':'unchanged','autoload':'S1/E1 and runtime dependencies','scope':'Actual Composer; controlled MediaWiki directory layout, no core runtime/database test'},indent=2))
 
 
 if __name__=='__main__':main()
