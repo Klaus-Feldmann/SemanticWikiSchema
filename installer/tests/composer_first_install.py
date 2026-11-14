@@ -34,7 +34,7 @@ def main():
         check=r'require "vendor/autoload.php"; if(!class_exists("Opis\\JsonSchema\\Validator")||!class_exists("Laudis\\Neo4j\\ClientBuilder"))exit(2);echo (new ProfessionalWiki\SWS\Domain\Identity\SchemaId("S1"))->text," ",(new ProfessionalWiki\SWS\Domain\Identity\EntityId("E1"))->text,"\n";'
         subprocess.run([php,'-r',check],cwd=root,check=True)
         lock=json.loads((root/'composer.lock').read_text());versions={p['name']:p['version']for p in lock['packages']}
-        assert versions[module.PACKAGE]==module.VERSION
+        assert versions[module.PACKAGE].removeprefix('v')==module.VERSION
         assert all(versions[name]==version for name,version in before_versions.items())
         assert (root/'extensions/SemanticWikiSchema/graph-explorer/envendpoint.html').is_file()
         print(json.dumps({'result':'passed','repository':'published-vcs' if args.published_vcs else 'candidate-path','version':versions[module.PACKAGE],'packages':len(versions),'unrelatedConfig':'preserved','existingPackageVersions':'preserved','LocalSettings':'unchanged','autoload':'S1/E1 and runtime dependencies','scope':'Actual Composer; controlled MediaWiki directory layout, no core runtime/database test'},indent=2))
