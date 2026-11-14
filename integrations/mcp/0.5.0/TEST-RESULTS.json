@@ -1,0 +1,21 @@
+{
+  "mcpVersion": "0.21.0",
+  "patchForSWS": "0.5.0",
+  "testedSWSVersion": "0.5.00-alpha.8",
+  "automatedTests": 2631,
+  "testFiles": 182,
+  "preflightPassed": true,
+  "runtimeInstallerChecks": 9,
+  "sourcePatchCleanApply": true,
+  "liveChecks": 22,
+  "livePassed": true,
+  "liveCleanupVerified": true,
+  "readOnlyGatePassed": true,
+  "cypherLive": "not applicable: no Neo4j endpoint on target wiki; mocked request/error tests passed",
+  "upstreamNeoWikiToolsRetained": true,
+  "configurationPreserved": true,
+  "credentialsPreserved": "existing store reused; normal OAuth refresh allowed",
+  "packagedLockfileCleanInstallPassed": true,
+  "finalProgramPathFreshConnectionPassed": true,
+  "releaseTag": "mcp-sws-0.5.0"
+}

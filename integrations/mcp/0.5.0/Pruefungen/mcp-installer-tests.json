@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "dry-run does not modify files",
+    "clean official 0.21.0 installation matches all patch hashes",
+    "repeated application is idempotent",
+    "rollback restores original files and removes new files",
+    "rollback is repeatable",
+    "unknown target changes rejected before mutation",
+    "corrupt patch rejected before mutation",
+    "symlinked target paths rejected",
+    "partial installation failure rolls back every changed file"
+  ]
+}

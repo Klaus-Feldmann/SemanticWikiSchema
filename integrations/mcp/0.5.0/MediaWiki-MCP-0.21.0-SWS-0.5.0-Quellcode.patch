@@ -1,0 +1,3791 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index ba1929c..5d769a9 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+ 
+ ## [Unreleased]
+ 
++### Added
++
++- SWS 0.5.0 Subject and Schema tools, plus the SchemaBaseBridge data view. Supports field annotations, own multilingual identity and field-key versions. Original NeoWiki tools remain available on NeoWiki wikis.
++
++### Fixed
++
++- SWS ID allocation sends a CSRF token and is treated as a write, matching persistent ID reservations in SWS 0.5.0.
++
++- Stdio extension discovery on private OAuth wikis signs in before checking which tools are available.
++
++
+ ## [0.21.0] - 2026-11-05
+ 
+ ### Breaking changes
+diff --git a/README.md b/README.md
+index 5101247..96c1f8b 100644
+--- a/README.md
++++ b/README.md
+@@ -187,6 +187,32 @@ Tools marked 🔐 require authentication. Write tools (including extension-pack
+ 
+ `cargo-query` needs the **`Create, query and delete data through the Cargo extension`** grant on a bot password or OAuth consumer, even on a wiki that lets every user run Cargo queries. The Cargo extension is also detected on wiki.gg wikis, which run `LIBRARIAN`, wiki.gg's fork of Cargo.
+ 
++
++## SemanticWikiSchema (SWS 0.5.0)
++
++This patch adds SWS and SchemaBaseBridge alongside the original NeoWiki tools. Each group requires its own extension. Existing authentication and per-wiki read-only controls apply.
++
++| Tool | Purpose |
++|---|---|
++| `sws-list-schemas` | Discover Schemas with pagination. |
++| `sws-get-schema` | Read property definitions and persistent Schema identity. |
++| `sws-search-subjects` | Resolve names to Subject IDs. |
++| `sws-get-subject` | Read a Subject; latest=true selects the editable revision. |
++| `sws-get-page-subjects` | Read a page's Subjects. |
++| `sws-cypher-query` | Run read-only graph queries. |
++| `sws-validate-subject` | Validate statement values without saving. |
++| `sws-mint-subject-ids` | Reserve unused Subject IDs; requires edit access. |
++| `sws-create-subject` | Create a Subject on an existing page; requires edit access. |
++| `sws-update-subject` | Replace a Subject's label and statements; requires edit access. |
++| `sws-delete-subject` | Delete a Subject and dependent Subjects; requires edit access. |
++| `sws-set-main-subject` | Set or clear the main Subject; requires edit access. |
++| `swsbase-get-data-view` | Read the SchemaBaseBridge data view and source states. |
++
++Create and update accept fieldNotes separately from statements, including dependent Subject notes. On update, omission preserves notes, a supplied map replaces them, and {} clears them. Own localized identity uses identityLanguage, labels and descriptions. Pass back fieldKeyVersion from a current read when updating renamed fields. Read results retain identity metadata and field-key versions.
++
++Private OAuth wikis acquire their own session before stdio extension discovery. Credentials and wiki settings stay in their existing locations. SWS tools use `/rest.php/sws/v0`; SchemaBaseBridge uses `action=swsbasedataview`.
++
++
+ ## Installation
+ 
+ Pick your client below, or use the [standard configuration](#standard-configuration) if it is not listed. `CONFIG` is optional; without it the server targets English Wikipedia. To point it at your own wiki and set up authentication for writes, see [docs/configuration.md](docs/configuration.md).
+diff --git a/scripts/bundle.cjs b/scripts/bundle.cjs
+index 78485bd..b93e0ec 100644
+--- a/scripts/bundle.cjs
++++ b/scripts/bundle.cjs
+@@ -26,7 +26,7 @@ function cleanupManifest() {
+ 
+ function buildBundle() {
+ 	console.log('Running mcpb pack...');
+-	execSync('npx mcpb pack', { stdio: 'inherit' });
++	execSync(`npx mcpb pack . ${MCPB_FILE}`, { stdio: 'inherit' });
+ }
+ 
+ function cleanBundle() {
+diff --git a/src/auth/privateWikiProbe.ts b/src/auth/privateWikiProbe.ts
+new file mode 100644
+index 0000000..77f2820
+--- /dev/null
++++ b/src/auth/privateWikiProbe.ts
+@@ -0,0 +1,45 @@
++import { usesOAuthSignIn } from '../runtime/authShape.ts';
++import { getRuntimeToken, withRequestFields } from '../runtime/requestContext.ts';
++import type { WikiProbe, WikiInspection } from '../wikis/wikiProbe.ts';
++import type { WikiRegistry } from '../wikis/wikiRegistry.ts';
++import type { StdioSignIn } from './stdioSignIn.ts';
++
++/** Supplies the private wiki's own OAuth session before extension discovery. */
++export class PrivateWikiProbe implements WikiProbe {
++	public constructor(
++		private readonly probe: WikiProbe,
++		private readonly wikis: WikiRegistry,
++		private readonly signIn: Pick<StdioSignIn, 'acquire'> | null,
++	) {}
++
++	public async inspect(wikiKey: string): Promise<WikiInspection> {
++		const config = this.wikis.get(wikiKey);
++		if (
++			config?.private !== true ||
++			!usesOAuthSignIn(config) ||
++			this.signIn === null ||
++			getRuntimeToken(wikiKey) !== undefined
++		) {
++			return this.probe.inspect(wikiKey);
++		}
++		try {
++			const token = await this.signIn.acquire(wikiKey, {
++				wiki: { server: config.server, scriptpath: config.scriptpath },
++				oauth2ClientId: config.oauth2ClientId,
++				callbackPort:
++					typeof config.oauth2CallbackPort === 'number' ? config.oauth2CallbackPort : undefined,
++			});
++			return await withRequestFields({ runtimeToken: { value: token, wikiKey } }, () =>
++				this.probe.inspect(wikiKey),
++			);
++		} catch {
++			// WikiProbe is total: a failed sign-in must not reject discovery for
++			// the other wikis or expose details of an authentication failure.
++			return { reachable: false, extensions: new Set() };
++		}
++	}
++
++	public invalidate(wikiKey: string): void {
++		this.probe.invalidate(wikiKey);
++	}
++}
+diff --git a/src/tools/extensions/index.ts b/src/tools/extensions/index.ts
+index 56ee98f..970539a 100644
+--- a/src/tools/extensions/index.ts
++++ b/src/tools/extensions/index.ts
+@@ -2,6 +2,8 @@ import type { ExtensionPack } from './types.ts';
+ import { smwPack } from './smw/index.ts';
+ import { bucketPack } from './bucket/index.ts';
+ import { cargoPack } from './cargo/index.ts';
++import { swsPack } from './sws/index.ts';
++import { swsBasePack } from './swsbase/index.ts';
+ import { neowikiPack } from './neowiki/index.ts';
+ import { wikibasePack } from './wikibase/index.ts';
+ 
+@@ -96,6 +98,8 @@ export const extensionPacks: readonly ExtensionPack[] = [
+ 	bucketPack,
+ 	cargoPack,
+ 	neowikiPack,
++	swsPack,
++	swsBasePack,
+ 	wikibasePack,
+ ];
+ 
+diff --git a/src/tools/extensions/sws/index.ts b/src/tools/extensions/sws/index.ts
+new file mode 100644
+index 0000000..fe52c91
+--- /dev/null
++++ b/src/tools/extensions/sws/index.ts
+@@ -0,0 +1,32 @@
++import type { ExtensionPack } from '../types.ts';
++import { swsListSchemas } from './sws-list-schemas.ts';
++import { swsGetSchema } from './sws-get-schema.ts';
++import { swsCypherQuery } from './sws-cypher-query.ts';
++import { swsSearchSubjects } from './sws-search-subjects.ts';
++import { swsGetSubject } from './sws-get-subject.ts';
++import { swsGetPageSubjects } from './sws-get-page-subjects.ts';
++import { swsCreateSubject } from './sws-create-subject.ts';
++import { swsUpdateSubject } from './sws-update-subject.ts';
++import { swsDeleteSubject } from './sws-delete-subject.ts';
++import { swsSetMainSubject } from './sws-set-main-subject.ts';
++import { swsValidateSubject } from './sws-validate-subject.ts';
++import { swsMintSubjectIds } from './sws-mint-subject-ids.ts';
++
++export const swsPack: ExtensionPack = {
++	id: 'sws',
++	extensionNames: ['SemanticWikiSchema'],
++	tools: [
++		swsListSchemas,
++		swsGetSchema,
++		swsCypherQuery,
++		swsSearchSubjects,
++		swsGetSubject,
++		swsGetPageSubjects,
++		swsCreateSubject,
++		swsUpdateSubject,
++		swsDeleteSubject,
++		swsSetMainSubject,
++		swsValidateSubject,
++		swsMintSubjectIds,
++	],
++};
+diff --git a/src/tools/extensions/sws/pageId.ts b/src/tools/extensions/sws/pageId.ts
+new file mode 100644
+index 0000000..84a9c59
+--- /dev/null
++++ b/src/tools/extensions/sws/pageId.ts
+@@ -0,0 +1,43 @@
++import type { Mwn } from 'mwn';
++
++interface PageInfoResponse {
++	query?: { pages?: Array<{ pageid?: number; missing?: boolean; title?: string }> };
++}
++
++/** True when exactly one of `title` / `pageId` is provided. */
++export function hasOnePageRef(ref: { title?: string; pageId?: number }): boolean {
++	return (ref.title === undefined) !== (ref.pageId === undefined);
++}
++
++/**
++ * Resolves a page reference to a numeric page id. A passed `pageId` is returned
++ * as-is (no API call); a `title` is resolved via the action API. Returns `null`
++ * when the title does not exist. Callers should validate the reference with
++ * `hasOnePageRef` first; with that guard, `null` means "title not found".
++ */
++export async function resolvePageId(
++	mwn: Mwn,
++	ref: { title?: string; pageId?: number },
++): Promise<number | null> {
++	if (ref.pageId !== undefined) {
++		// A caller-supplied pageId is trusted and passed through unverified (no
++		// existence check) — the round-trip is skipped and a bad id surfaces as the
++		// downstream endpoint's 404. Only the title path resolves via the API.
++		return ref.pageId;
++	}
++	if (ref.title === undefined) {
++		return null;
++	}
++	const info = (await mwn.request({
++		action: 'query',
++		titles: ref.title,
++		formatversion: 2,
++		format: 'json',
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- action=query info response shape; trusted at this boundary
++	})) as PageInfoResponse;
++	const page = info.query?.pages?.[0];
++	if (page === undefined || page.missing === true || typeof page.pageid !== 'number') {
++		return null;
++	}
++	return page.pageid;
++}
+diff --git a/src/tools/extensions/sws/statements.ts b/src/tools/extensions/sws/statements.ts
+new file mode 100644
+index 0000000..b2ba889
+--- /dev/null
++++ b/src/tools/extensions/sws/statements.ts
+@@ -0,0 +1,68 @@
++import { z } from 'zod';
++
++const VALUE_FORMATS =
++	'text/url/date/dateTime → array of strings (date "2020-12-31", dateTime "2020-12-31T14:30:00Z", with Z or an offset); select → array of option IDs (resolve labels via sws-get-schema); number → a number; boolean → a boolean; relation → array of { target: "<subjectId>" }; monolingualText → array of { text, language }';
++
++// The write API reads `propertyType` (NOT the `type` key read tools return) and
++// silently drops entries without it, so require it here — a malformed statement
++// becomes an input error, not a no-op.
++const statementSchema = z.object({
++	propertyType: z
++		.string()
++		.min(1)
++		.describe(
++			"The property's type. The key is propertyType, NOT the `type` key read tools return.",
++		),
++	value: z.unknown().describe(`Value shaped by propertyType: ${VALUE_FORMATS}.`),
++});
++
++export const statementsSchema = z.record(z.string(), statementSchema);
++
++export const fieldNotesSchema = z.record(z.string().min(1), z.string());
++
++export const identityFields = {
++	identityLanguage: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Language code of the own default identity, e.g. de.'),
++	labels: z
++		.record(z.string().min(1), z.string())
++		.optional()
++		.describe('Own labels keyed by language code. Omit to preserve existing labels on update.'),
++	descriptions: z
++		.record(z.string().min(1), z.string())
++		.optional()
++		.describe(
++			'Own descriptions keyed by language code. Omit to preserve existing descriptions on update.',
++		),
++} as const;
++
++export const dependentSubjectsSchema = z.array(
++	z.object({
++		id: z
++			.string()
++			.min(1)
++			.describe(
++				'An unused Subject ID from sws-mint-subject-ids, creating the Dependent Subject, or the ID of a Dependent Subject this Subject reaches, replacing it.',
++			),
++		...identityFields,
++		fieldKeyVersion: z
++			.number()
++			.int()
++			.nonnegative()
++			.optional()
++			.describe(
++				'Field-key version returned by reading this Dependent Subject; pass it back on replacement.',
++			),
++		schema: z.string().min(1).describe('Name of a Schema whose Subjects are dependent.'),
++		fieldNotes: fieldNotesSchema
++			.optional()
++			.describe(
++				'Author notes keyed by exact Schema field name. Omit to preserve existing notes; {} clears them. Requires SWS 0.2.02 or later.',
++			),
++		statements: statementsSchema.describe(
++			"The Dependent Subject's statement map, shaped as for the Subject itself.",
++		),
++	}),
++);
+diff --git a/src/tools/extensions/sws/subjects.ts b/src/tools/extensions/sws/subjects.ts
+new file mode 100644
+index 0000000..0e3ec6f
+--- /dev/null
++++ b/src/tools/extensions/sws/subjects.ts
+@@ -0,0 +1,91 @@
++interface SubjectStatement {
++	propertyType?: string;
++	value?: unknown;
++}
++
++export interface SubjectData {
++	formatVersion?: number;
++	identityLanguage?: string;
++	labels?: Record<string, string>;
++	descriptions?: Record<string, string>;
++	fieldKeyVersion?: number;
++	displayNameIsGenerated?: boolean;
++	pageNamespaceId?: number;
++
++	id?: string;
++	label?: string | null;
++	displayName?: string;
++	schema?: string | { id: string };
++	hostSubject?: unknown;
++	pageId?: number;
++	pageTitle?: string;
++	statements?: Record<string, SubjectStatement>;
++	fieldNotes?: Record<string, string>;
++}
++
++export function flattenSubject(
++	subject: SubjectData,
++	fallbackId: string,
++): {
++	formatVersion?: number;
++	identityLanguage?: string;
++	labels?: Record<string, string>;
++	descriptions?: Record<string, string>;
++	fieldKeyVersion?: number;
++	displayNameIsGenerated?: boolean;
++	pageNamespaceId?: number;
++	id: string;
++	label: string;
++	displayName: string;
++	schema: string | { id: string };
++	hostSubject?: unknown;
++	pageId?: number;
++	pageTitle?: string;
++	fieldNotes?: Record<string, string>;
++	statements: Array<{ property: string; type: string; value: unknown }>;
++} {
++	const statements = Object.entries(subject.statements ?? {}).map(([property, statement]) => ({
++		property,
++		type: typeof statement.propertyType === 'string' ? statement.propertyType : '',
++		value: statement.value,
++	}));
++	return {
++		id: subject.id ?? fallbackId,
++		label: subject.label ?? '',
++		displayName: subject.displayName ?? '',
++		schema: subject.schema ?? '',
++		...(subject.hostSubject !== undefined ? { hostSubject: subject.hostSubject } : {}),
++		...(subject.pageId !== undefined ? { pageId: subject.pageId } : {}),
++		...(subject.pageTitle !== undefined ? { pageTitle: subject.pageTitle } : {}),
++		...(subject.formatVersion !== undefined ? { formatVersion: subject.formatVersion } : {}),
++		...(subject.identityLanguage !== undefined
++			? { identityLanguage: subject.identityLanguage }
++			: {}),
++		...(subject.labels !== undefined ? { labels: subject.labels } : {}),
++		...(subject.descriptions !== undefined ? { descriptions: subject.descriptions } : {}),
++		...(subject.fieldKeyVersion !== undefined ? { fieldKeyVersion: subject.fieldKeyVersion } : {}),
++		...(subject.displayNameIsGenerated !== undefined
++			? { displayNameIsGenerated: subject.displayNameIsGenerated }
++			: {}),
++		...(subject.pageNamespaceId !== undefined ? { pageNamespaceId: subject.pageNamespaceId } : {}),
++		statements,
++		...(subject.fieldNotes !== undefined ? { fieldNotes: subject.fieldNotes } : {}),
++	};
++}
++
++export interface SubjectWriteResponse {
++	status?: string;
++	subjectId?: string;
++	violations?: unknown[];
++	subject?: SubjectData;
++}
++
++export function writeResult(
++	data: SubjectWriteResponse,
++	subjectId: string,
++): { violations: unknown[]; subject?: ReturnType<typeof flattenSubject> } {
++	return {
++		violations: Array.isArray(data.violations) ? data.violations : [],
++		...(data.subject !== undefined ? { subject: flattenSubject(data.subject, subjectId) } : {}),
++	};
++}
+diff --git a/src/tools/extensions/sws/sws-create-subject.ts b/src/tools/extensions/sws/sws-create-subject.ts
+new file mode 100644
+index 0000000..6b6068e
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-create-subject.ts
+@@ -0,0 +1,144 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { formatEditComment } from '../../../wikis/utils.ts';
++import { resolvePageId, hasOnePageRef } from './pageId.ts';
++import { writeResult, type SubjectWriteResponse } from './subjects.ts';
++import {
++	dependentSubjectsSchema,
++	fieldNotesSchema,
++	identityFields,
++	statementsSchema,
++} from './statements.ts';
++
++const inputSchema = {
++	...identityFields,
++	id: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Unused Subject ID from sws-mint-subject-ids. Omit to let SWS allocate it.'),
++	title: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Wiki page title to attach the Subject to. Provide this OR pageId.'),
++	pageId: z
++		.number()
++		.int()
++		.positive()
++		.optional()
++		.describe('Numeric MediaWiki page ID. Provide this OR title.'),
++	isMain: z
++		.boolean()
++		.optional()
++		.describe(
++			"When true, create the page's Main Subject (at most one per page) instead of one of its other Subjects. Defaults to false.",
++		),
++	label: z
++		.string()
++		.optional()
++		.describe(
++			'Display label for the new Subject. Omit, or pass an empty string, for a Subject without one: a Main Subject is then shown under its page title, any other Subject under its Schema name.',
++		),
++	schema: z
++		.string()
++		.min(1)
++		.describe(
++			'Name of an existing Schema (entity type) the Subject instantiates. Discover names with sws-list-schemas.',
++		),
++	statements: statementsSchema.describe(
++		'Map of property name → { propertyType, value }. Validate first with sws-validate-subject.',
++	),
++	fieldNotes: fieldNotesSchema
++		.optional()
++		.describe(
++			'Author notes keyed by exact Schema field name, separate from statements. Omission preserves existing notes on update; a supplied map replaces all notes, and {} clears them. Plain text or Wikitext follows the Schema setting. Requires SWS 0.2.02 or later.',
++		),
++	dependentSubjects: dependentSubjectsSchema
++		.optional()
++		.describe(
++			'Dependent Subjects to create in the same revision, each the target of a relation in statements or in another item of this list.',
++		),
++	comment: z.string().optional().describe('Optional edit summary.'),
++} as const;
++
++export const swsCreateSubject: Tool<typeof inputSchema> = {
++	name: 'sws-create-subject',
++	description:
++		'Creates a new SWS Subject on an existing wiki page and returns its ID, the violations of its Schema it was saved with, and the Subject as saved. Enabled only when the wiki has SWS installed. Set isMain to make it the page\'s Main Subject (a page has at most one); otherwise it joins the page\'s other Subjects. Requires the edit right. A statement whose value is empty is dropped. A write that breaks a rule for Dependent Subjects is refused; other violations are warnings unless the wiki enforces validation, which refuses a write that introduces an error-severity one. A Dependent Subject, of a Schema with subjectsAreDependent in sws-get-schema, is created with the Subject that points at it: its ID comes from sws-mint-subject-ids, a relation targets it ({ target: "<id>" }), and the Dependent Subject goes in dependentSubjects. Field annotations use fieldNotes; omission preserves existing notes on update. Pre-validate statement values with sws-validate-subject. Pre-1.0: the SWS API may change without notice.',
++	inputSchema,
++	annotations: {
++		title: 'Create SWS subject',
++		readOnlyHint: false,
++		destructiveHint: false,
++		idempotentHint: false,
++		openWorldHint: true,
++	},
++	failureVerb: 'create SWS subject',
++	target: (a) => a.label || a.schema,
++
++	async handle(
++		{
++			id,
++			identityLanguage,
++			labels,
++			descriptions,
++			title,
++			pageId,
++			isMain,
++			label,
++			schema,
++			statements,
++			fieldNotes,
++			dependentSubjects,
++			comment,
++		},
++		ctx: ToolContext,
++	): Promise<CallToolResult> {
++		if (!hasOnePageRef({ title, pageId })) {
++			return ctx.format.invalidInput('Provide exactly one of title or pageId.');
++		}
++
++		const mwn = await ctx.mwn();
++		const editComment = formatEditComment(ctx, 'sws-create-subject', comment);
++		const language = identityLanguage ?? (await ctx.wikiProbe.inspect(ctx.wiki.key)).lang ?? 'en';
++		const identity = {
++			identityLanguage: language,
++			labels: labels ?? (label !== undefined && label.trim() !== '' ? { [language]: label } : {}),
++			descriptions: descriptions ?? {},
++		};
++		const resolvedPageId = await resolvePageId(mwn, { title, pageId });
++		if (resolvedPageId === null) {
++			return ctx.format.notFound(`Page "${title}" not found`);
++		}
++
++		const segment = isMain === true ? 'mainSubject' : 'subjects';
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS create response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'POST',
++			path: `/page/${resolvedPageId}/${segment}`,
++			csrf: true,
++			body: {
++				...(id !== undefined ? { id } : {}),
++				label,
++				schema,
++				...identity,
++				statements,
++				...(fieldNotes !== undefined ? { fieldNotes } : {}),
++				dependentSubjects,
++				...(editComment !== undefined ? { comment: editComment } : {}),
++			},
++		})) as SubjectWriteResponse;
++
++		const subjectId = data.subjectId ?? '';
++		return ctx.format.ok({
++			subjectId,
++			status: data.status ?? 'created',
++			pageId: resolvedPageId,
++			...writeResult(data, subjectId),
++		});
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-cypher-query.ts b/src/tools/extensions/sws/sws-cypher-query.ts
+new file mode 100644
+index 0000000..8a165f4
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-cypher-query.ts
+@@ -0,0 +1,77 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import type { TruncationInfo } from '../../../results/truncation.ts';
++import { swsRequest } from './swsRequest.ts';
++
++const inputSchema = {
++	cypher: z
++		.string()
++		.min(1)
++		.describe(
++			'A single read-only Cypher statement. Backtick-escape names with spaces, and names that are Cypher keywords such as Show: s.`Birth year`, -[:`Main product`]->.',
++		),
++	parameters: z
++		.record(z.string(), z.unknown())
++		.optional()
++		.describe(
++			'Parameter map referenced as $name in the query. Prefer this over string concatenation.',
++		),
++} as const;
++
++interface CypherResponse {
++	columns?: unknown[];
++	rows?: unknown[];
++	resultCount?: number;
++	durationMs?: number;
++	truncated?: boolean;
++}
++
++export const swsCypherQuery: Tool<typeof inputSchema> = {
++	name: 'sws-cypher-query',
++	description:
++		"Runs a read-only Cypher query against the wiki's SWS knowledge graph (Neo4j) and returns rows. Enabled only when the wiki has SWS installed; the query endpoint exists only where SWS has a Neo4j backend.\n\nDiscover the data model first — the graph CANNOT be introspected from Cypher (CALL db.labels(), db.schema.* and all procedure calls are rejected as not-read-only). Use sws-list-schemas for the entity types, then sws-get-schema for a type's properties and relations.\n\nGraph model:\n- Subjects are nodes labelled `:Subject` plus a per-schema label, e.g. (s:Subject:Person). Subject node properties are the schema's properties plus `id` and `name`. `name` is the Subject's label, or a Main Subject's page title when it has no label, and is absent otherwise.\n- Pages are (:Page) nodes linked by (:Page)-[:HasSubject {isMain, isDependent}]->(:Subject). Subject-to-subject relations are edges typed by the relation property's name (see sws-get-schema): (c:Subject:Company)-[:`Main product`]->(p:Subject:Product).\n- A node labelled only `:Subject` is a stub: the target of a relation whose Subject was deleted or not yet created.\n- Statement values are lists, except `number` and `boolean` values, which are single: match with 'Germany' IN s.Country, not s.Country = 'Germany'. `select` parts are opaque option IDs (e.g. o1abc…), not labels — decode them with sws-get-schema. `date` and `dateTime` parts are Neo4j dates and datetimes; `monolingualText` parts are `text@language` strings.\n\nGotchas:\n- Whole nodes come back as { id, labels, properties }, where id is Neo4j's internal node ID and the Subject ID is properties.id; projecting the properties needed keeps rows small.\n- Plain list values (labels(n), collect(...)) come back as 1-indexed JSON objects ({\"1\":…,\"2\":…}), not arrays.\n- Read-only only; write clauses are rejected.\n\nLimits: ~5,000 rows / 30s by default (50,000 / 300s with the apihighlimits right). When `truncated` is true, narrow with WHERE or add LIMIT/SKIP. Pre-1.0: the SWS API may change without notice.\n\nExample:\n  cypher: MATCH (s:Subject:Person) WHERE s.`Birth year` > $minYear RETURN s.name AS name, s.`Birth year` AS year ORDER BY year\n  parameters: { \"minYear\": 2000 }",
++	inputSchema,
++	annotations: {
++		title: 'Run SWS Cypher query',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'run SWS Cypher query',
++	target: (a) => a.cypher,
++
++	async handle({ cypher, parameters }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /query/cypher response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'POST',
++			path: '/query/cypher',
++			body: { cypher, ...(parameters !== undefined ? { parameters } : {}) },
++		})) as CypherResponse;
++
++		const columns = Array.isArray(data.columns) ? data.columns : [];
++		const rows = Array.isArray(data.rows) ? data.rows : [];
++		const truncation: TruncationInfo | null =
++			data.truncated === true
++				? {
++						reason: 'capped-no-continuation',
++						returnedCount: rows.length,
++						limit: rows.length,
++						itemNoun: 'rows',
++						narrowHint:
++							'narrow with WHERE, add LIMIT/SKIP to paginate, or use an account with the apihighlimits right for a higher cap.',
++					}
++				: null;
++
++		return ctx.format.ok({
++			columns,
++			rows,
++			resultCount: typeof data.resultCount === 'number' ? data.resultCount : rows.length,
++			...(typeof data.durationMs === 'number' ? { durationMs: data.durationMs } : {}),
++			...(truncation !== null ? { truncation } : {}),
++		});
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-delete-subject.ts b/src/tools/extensions/sws/sws-delete-subject.ts
+new file mode 100644
+index 0000000..926383b
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-delete-subject.ts
+@@ -0,0 +1,44 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { formatEditComment } from '../../../wikis/utils.ts';
++
++const inputSchema = {
++	id: z
++		.string()
++		.min(1)
++		.describe('Subject ID to delete (starts with s…). Resolve one with sws-search-subjects.'),
++	comment: z.string().optional().describe('Optional edit summary.'),
++} as const;
++
++export const swsDeleteSubject: Tool<typeof inputSchema> = {
++	name: 'sws-delete-subject',
++	description:
++		'Deletes one SWS Subject by ID from its page, together with its Dependent Subjects. Enabled only when the wiki has SWS installed. Relations that other Subjects hold to a standalone Subject stay, pointing at a Subject that no longer exists; deleting a Dependent Subject removes the relations to it, editing its Host Subject. Requires the edit right. Pre-1.0: the SWS API may change without notice.',
++	inputSchema,
++	annotations: {
++		title: 'Delete SWS subject',
++		readOnlyHint: false,
++		destructiveHint: true,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'delete SWS subject',
++	target: (a) => a.id,
++
++	async handle({ id, comment }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		const editComment = formatEditComment(ctx, 'sws-delete-subject', comment);
++		// The endpoint returns an empty 200 body on success; ignore it.
++		await swsRequest(mwn, {
++			method: 'DELETE',
++			path: `/subject/${encodeURIComponent(id)}`,
++			csrf: true,
++			...(editComment !== undefined ? { body: { comment: editComment } } : {}),
++		});
++
++		return ctx.format.ok({ subjectId: id, status: 'deleted' });
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-get-page-subjects.ts b/src/tools/extensions/sws/sws-get-page-subjects.ts
+new file mode 100644
+index 0000000..4370ba0
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-get-page-subjects.ts
+@@ -0,0 +1,73 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { flattenSubject, type SubjectData } from './subjects.ts';
++import { resolvePageId, hasOnePageRef } from './pageId.ts';
++
++const inputSchema = {
++	title: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Wiki page title. Provide this OR pageId, not both.'),
++	pageId: z
++		.number()
++		.int()
++		.positive()
++		.optional()
++		.describe('Numeric MediaWiki page ID. Provide this OR title, not both.'),
++} as const;
++
++interface PageSubjectsResponse {
++	pageId?: number;
++	mainSubjectId?: string | null;
++	subjects?: Record<string, SubjectData>;
++}
++
++export const swsGetPageSubjects: Tool<typeof inputSchema> = {
++	name: 'sws-get-page-subjects',
++	description:
++		"Lists the SWS Subjects attached to a wiki page — each with full structured data — and identifies the page's Main Subject. Enabled only when the wiki has SWS installed. This is the bridge from a wiki page (which you may already have from get-page) into its knowledge-graph data: one call returns every subject's statements, so you don't need to resolve subject IDs first. Dependent Subjects are listed with the hostSubject they belong to. Accepts a page title or a numeric page ID. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Get SWS page subjects',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'get SWS page subjects',
++	target: (a) => a.title ?? (a.pageId !== undefined ? String(a.pageId) : ''),
++
++	async handle({ title, pageId }, ctx: ToolContext): Promise<CallToolResult> {
++		if (!hasOnePageRef({ title, pageId })) {
++			return ctx.format.invalidInput('Provide exactly one of title or pageId.');
++		}
++
++		const mwn = await ctx.mwn();
++		const resolvedPageId = await resolvePageId(mwn, { title, pageId });
++		if (resolvedPageId === null) {
++			return ctx.format.notFound(`Page "${title}" not found`);
++		}
++
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /page/{id}/subjects response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'GET',
++			path: `/page/${resolvedPageId}/subjects`,
++		})) as PageSubjectsResponse;
++
++		const mainSubjectId = data.mainSubjectId ?? null;
++		const subjects = Object.entries(data.subjects ?? {}).map(([id, subject]) => ({
++			...flattenSubject(subject, id),
++			isMain: id === mainSubjectId,
++		}));
++
++		return ctx.format.ok({
++			pageId: data.pageId ?? resolvedPageId,
++			mainSubjectId,
++			subjects,
++		});
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-get-schema.ts b/src/tools/extensions/sws/sws-get-schema.ts
+new file mode 100644
+index 0000000..bb998e0
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-get-schema.ts
+@@ -0,0 +1,78 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++
++const inputSchema = {
++	name: z.string().min(1).describe('Schema name. Use sws-list-schemas to discover names.'),
++} as const;
++
++interface GetSchemaResponse {
++	schema?: {
++		formatVersion?: number;
++		id?: string;
++		identityLanguage?: string;
++		labels?: Record<string, string>;
++		descriptions?: Record<string, string>;
++		fieldKeyChanges?: unknown[];
++
++		description?: string;
++		subjectsAreDependent?: boolean;
++		propertyDefinitions?: Record<string, Record<string, unknown>>;
++	};
++}
++
++export const swsGetSchema: Tool<typeof inputSchema> = {
++	name: 'sws-get-schema',
++	description:
++		"Returns one SWS Schema's property definitions: each property's name, type (text/number/boolean/url/date/dateTime/select/relation/monolingualText), and type-specific attributes. Enabled only when the wiki has SWS installed. A `relation` property's name is its graph edge type, and `targetSchemas` lists the Schemas its targets follow — this is the relationship vocabulary for sws-cypher-query. `select` properties carry `options`, the list of { id, label } needed to decode select values returned by queries. A constraint (`required`, `minimum`, `options`, …) is a bare value, or an object carrying its severity: { value, severity }, or { severity } for a boolean constraint that is true; it only warns unless its severity is `error` and the wiki enforces validation. `subjectsAreDependent: true` marks a Schema whose Subjects are Dependent Subjects: unlabelled, never a page's Main Subject, each reached through one relation from its Host Subject on the same page. Use sws-list-schemas to discover schema names. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Get SWS schema',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'get SWS schema',
++	target: (a) => a.name,
++
++	async handle({ name }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /schema response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'GET',
++			path: `/schema/${encodeURIComponent(name)}`,
++		})) as GetSchemaResponse;
++
++		if (data.schema === undefined || data.schema === null) {
++			return ctx.format.notFound(`SWS schema "${name}" not found`);
++		}
++
++		const definitions = data.schema.propertyDefinitions ?? {};
++		const properties = Object.entries(definitions).map(([propName, def]) => ({
++			name: propName,
++			...def,
++		}));
++
++		return ctx.format.ok({
++			name,
++			...(data.schema.formatVersion !== undefined
++				? { formatVersion: data.schema.formatVersion }
++				: {}),
++			...(data.schema.id !== undefined ? { id: data.schema.id } : {}),
++			...(data.schema.identityLanguage !== undefined
++				? { identityLanguage: data.schema.identityLanguage }
++				: {}),
++			...(data.schema.labels !== undefined ? { labels: data.schema.labels } : {}),
++			...(data.schema.descriptions !== undefined ? { descriptions: data.schema.descriptions } : {}),
++			...(data.schema.fieldKeyChanges !== undefined
++				? { fieldKeyChanges: data.schema.fieldKeyChanges }
++				: {}),
++			description: data.schema.description ?? '',
++			...(data.schema.subjectsAreDependent === true ? { subjectsAreDependent: true } : {}),
++			properties,
++		});
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-get-subject.ts b/src/tools/extensions/sws/sws-get-subject.ts
+new file mode 100644
+index 0000000..9287b9b
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-get-subject.ts
+@@ -0,0 +1,59 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { flattenSubject, type SubjectData } from './subjects.ts';
++
++const inputSchema = {
++	latest: z
++		.boolean()
++		.optional()
++		.describe(
++			'Read the current editable revision, including an unpublished revision visible to this user. Use before updates.',
++		),
++	id: z
++		.string()
++		.min(1)
++		.describe(
++			'Persistent Subject ID (E-number, existing legacy s-ID, or sourceKey:localId). Use sws-search-subjects to resolve one from a label.',
++		),
++} as const;
++
++interface GetSubjectResponse {
++	requestedId?: string;
++	subjects?: Record<string, SubjectData>;
++}
++
++export const swsGetSubject: Tool<typeof inputSchema> = {
++	name: 'sws-get-subject',
++	description:
++		'Fetches one SWS Subject by ID — its label, display name, schema, the wiki page holding it, and statements with typed values. Enabled only when the wiki has SWS installed. Richer than a flattened Cypher node: it preserves multi-part values and per-statement types. `select` values are option IDs — decode them with sws-get-schema. A Dependent Subject has no label and carries hostSubject, the Subject it belongs to, and is named after its Schema and that Host Subject ("Birth of Pablo Picasso"). Get an ID from sws-search-subjects or a Cypher query. Pre-1.0: the SWS API may change without notice.',
++	inputSchema,
++	annotations: {
++		title: 'Get SWS subject',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'get SWS subject',
++	target: (a) => a.id,
++
++	async handle({ id, latest }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /subject response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'GET',
++			path: `/subject/${encodeURIComponent(id)}`,
++			query: { expand: 'page', ...(latest === true ? { latest: '1' } : {}) },
++		})) as GetSubjectResponse;
++
++		const subject = data.subjects?.[id];
++		if (subject === undefined) {
++			return ctx.format.notFound(`SWS subject "${id}" not found`);
++		}
++
++		return ctx.format.ok(flattenSubject(subject, id));
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-list-schemas.ts b/src/tools/extensions/sws/sws-list-schemas.ts
+new file mode 100644
+index 0000000..630748f
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-list-schemas.ts
+@@ -0,0 +1,74 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import type { TruncationInfo } from '../../../results/truncation.ts';
++import { swsRequest } from './swsRequest.ts';
++
++// The /schemas endpoint caps `limit` at 50 (rejects higher with a 400).
++const PAGE_LIMIT = 50;
++
++const inputSchema = {
++	continueFrom: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Opaque cursor from a previous response; omit on first call.'),
++} as const;
++
++interface SchemaSummary {
++	name?: string;
++	description?: string;
++	propertyCount?: number;
++	subjectsAreDependent?: boolean;
++}
++
++interface ListSchemasResponse {
++	schemas?: SchemaSummary[];
++	nextCursor?: string | null;
++}
++
++export const swsListSchemas: Tool<typeof inputSchema> = {
++	name: 'sws-list-schemas',
++	description:
++		"Lists the Schemas (entity types, e.g. Person, Company) defined in the wiki's SWS knowledge graph, each with its description and property count; subjectsAreDependent is present, as true, only on a Schema whose Subjects are Dependent Subjects. Enabled only when the wiki has SWS installed. Start here to discover what types exist, then use sws-get-schema for one type's properties, or sws-cypher-query to query the graph. Paginate with continueFrom. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'List SWS schemas',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'list SWS schemas',
++
++	async handle({ continueFrom }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /schemas response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'GET',
++			path: '/schemas',
++			query: {
++				limit: String(PAGE_LIMIT),
++				...(continueFrom !== undefined ? { cursor: continueFrom } : {}),
++			},
++		})) as ListSchemasResponse;
++
++		const schemas = (Array.isArray(data.schemas) ? data.schemas : []).map(
++			({ subjectsAreDependent, ...summary }) =>
++				subjectsAreDependent === true ? { ...summary, subjectsAreDependent } : summary,
++		);
++		const truncation: TruncationInfo | null =
++			typeof data.nextCursor === 'string'
++				? {
++						reason: 'more-available',
++						returnedCount: schemas.length,
++						itemNoun: 'schemas',
++						toolName: 'sws-list-schemas',
++						continueWith: { param: 'continueFrom', value: data.nextCursor },
++					}
++				: null;
++
++		return ctx.format.ok({ schemas, ...(truncation !== null ? { truncation } : {}) });
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-mint-subject-ids.ts b/src/tools/extensions/sws/sws-mint-subject-ids.ts
+new file mode 100644
+index 0000000..df7b144
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-mint-subject-ids.ts
+@@ -0,0 +1,41 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++
++const inputSchema = {
++	count: z.number().int().min(1).max(1000).describe('Number of Subject IDs to mint.'),
++} as const;
++
++interface MintResponse {
++	subjectIds?: string[];
++}
++
++export const swsMintSubjectIds: Tool<typeof inputSchema> = {
++	name: 'sws-mint-subject-ids',
++	description:
++		'Mints unused SWS Subject IDs and returns them as subjectIds, reserving them for subsequent writes. Requires edit access. Enabled only when the wiki has SWS installed. A minted ID lets a relation target a Subject in the same write that creates it: the ID of each Dependent Subject passed in the dependentSubjects of sws-create-subject or sws-update-subject. Pre-1.0: the SWS API may change without notice.',
++	inputSchema,
++	annotations: {
++		title: 'Mint SWS subject IDs',
++		readOnlyHint: false,
++		destructiveHint: false,
++		idempotentHint: false,
++		openWorldHint: true,
++	},
++	failureVerb: 'mint SWS subject IDs',
++
++	async handle({ count }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /subject-ids response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'POST',
++			path: '/subject-ids',
++			csrf: true,
++			body: { count },
++		})) as MintResponse;
++
++		return ctx.format.ok({ subjectIds: Array.isArray(data.subjectIds) ? data.subjectIds : [] });
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-search-subjects.ts b/src/tools/extensions/sws/sws-search-subjects.ts
+new file mode 100644
+index 0000000..8816159
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-search-subjects.ts
+@@ -0,0 +1,70 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import type { TruncationInfo } from '../../../results/truncation.ts';
++import { swsRequest } from './swsRequest.ts';
++
++// The /subject-labels endpoint caps `limit` at 50 and has no continuation.
++const RESULT_LIMIT = 50;
++
++const inputSchema = {
++	schema: z
++		.string()
++		.min(1)
++		.optional()
++		.describe(
++			'Limits matches to Subjects of this Schema, named exactly, with matching case. Omit to search every Schema. Use sws-list-schemas to discover names.',
++		),
++	search: z.string().min(1).describe('Name prefix to match, case-insensitively.'),
++} as const;
++
++interface SubjectLabel {
++	id?: string;
++	label?: string;
++	pageTitle?: string;
++}
++
++export const swsSearchSubjects: Tool<typeof inputSchema> = {
++	name: 'sws-search-subjects',
++	description:
++		"Finds SWS Subjects whose name starts with the given text, returning each match's persistent Subject ID, its name as `label`, and the page title of the wiki page holding it. Enabled only when the wiki has SWS installed. A Subject's name is its label, or for a Main Subject without one, its page title; Dependent Subjects and other Subjects without a label are not found. Subject IDs are not human-readable, so use this to resolve a name to an ID for sws-get-subject or a parameterized sws-cypher-query. Returns at most 50 matches. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Search SWS subjects',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'search SWS subjects',
++	target: (a) => a.search,
++
++	async handle({ schema, search }, ctx: ToolContext): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS /subject-labels response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'GET',
++			path: '/subject-labels',
++			query: {
++				search,
++				limit: String(RESULT_LIMIT),
++				...(schema !== undefined ? { schema } : {}),
++			},
++		})) as SubjectLabel[];
++
++		const subjects = Array.isArray(data) ? data : [];
++		const truncation: TruncationInfo | null =
++			subjects.length >= RESULT_LIMIT
++				? {
++						reason: 'capped-no-continuation',
++						returnedCount: subjects.length,
++						limit: RESULT_LIMIT,
++						itemNoun: 'subjects',
++						narrowHint: 'lengthen the search prefix or pass a schema',
++					}
++				: null;
++
++		return ctx.format.ok({ subjects, ...(truncation !== null ? { truncation } : {}) });
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-set-main-subject.ts b/src/tools/extensions/sws/sws-set-main-subject.ts
+new file mode 100644
+index 0000000..75e306f
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-set-main-subject.ts
+@@ -0,0 +1,70 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { formatEditComment } from '../../../wikis/utils.ts';
++import { resolvePageId, hasOnePageRef } from './pageId.ts';
++
++const inputSchema = {
++	title: z.string().min(1).optional().describe('Wiki page title. Provide this OR pageId.'),
++	pageId: z
++		.number()
++		.int()
++		.positive()
++		.optional()
++		.describe('Numeric MediaWiki page ID. Provide this OR title.'),
++	subjectId: z
++		.string()
++		.min(1)
++		.nullable()
++		.describe(
++			'Persistent Subject ID on this page to promote to Main Subject, or null to clear the Main Subject.',
++		),
++	comment: z.string().optional().describe('Optional edit summary.'),
++} as const;
++
++interface SetMainResponse {
++	status?: string;
++}
++
++export const swsSetMainSubject: Tool<typeof inputSchema> = {
++	name: 'sws-set-main-subject',
++	description:
++		"Sets which existing Subject on a wiki page is its Main Subject, or clears it. Enabled only when the wiki has SWS installed. Pass subjectId to promote one of the page's other Subjects, or null to clear the Main Subject. A Dependent Subject cannot be a Main Subject. This differs from sws-create-subject with isMain, which creates a NEW main Subject. Requires the edit right. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Set SWS main subject',
++		readOnlyHint: false,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'set SWS main subject',
++	target: (a) => a.subjectId ?? '',
++
++	async handle({ title, pageId, subjectId, comment }, ctx: ToolContext): Promise<CallToolResult> {
++		if (!hasOnePageRef({ title, pageId })) {
++			return ctx.format.invalidInput('Provide exactly one of title or pageId.');
++		}
++
++		const mwn = await ctx.mwn();
++		const editComment = formatEditComment(ctx, 'sws-set-main-subject', comment);
++		const resolvedPageId = await resolvePageId(mwn, { title, pageId });
++		if (resolvedPageId === null) {
++			return ctx.format.notFound(`Page "${title}" not found`);
++		}
++
++		// Always send the subjectId key: omitting it is a 400 upstream, whereas
++		// an explicit null is the documented way to clear the Main Subject.
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS set-main response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'PUT',
++			path: `/page/${resolvedPageId}/mainSubject`,
++			csrf: true,
++			body: { subjectId, ...(editComment !== undefined ? { comment: editComment } : {}) },
++		})) as SetMainResponse;
++
++		return ctx.format.ok({ pageId: resolvedPageId, status: data.status ?? 'changed' });
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-update-subject.ts b/src/tools/extensions/sws/sws-update-subject.ts
+new file mode 100644
+index 0000000..8e70351
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-update-subject.ts
+@@ -0,0 +1,113 @@
++import { z } from 'zod';
++import { updateIdentity } from './writeIdentity.ts';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { formatEditComment } from '../../../wikis/utils.ts';
++import { writeResult, type SubjectWriteResponse } from './subjects.ts';
++import {
++	dependentSubjectsSchema,
++	fieldNotesSchema,
++	identityFields,
++	statementsSchema,
++} from './statements.ts';
++
++const inputSchema = {
++	...identityFields,
++	fieldKeyVersion: z
++		.number()
++		.int()
++		.nonnegative()
++		.optional()
++		.describe(
++			'Field-key version returned by sws-get-subject. Pass it back when replacing statements after a field rename.',
++		),
++	id: z
++		.string()
++		.min(1)
++		.describe('Subject ID to replace (starts with s…). Resolve one with sws-search-subjects.'),
++	label: z
++		.string()
++		.optional()
++		.describe(
++			'New display label. Omit it, or pass an empty string, to clear the label, as a Dependent Subject (one with hostSubject) requires.',
++		),
++	statements: statementsSchema.describe(
++		'Full replacement statement map (property name → { propertyType, value }). Property names absent from this map are deleted; pass {} to clear all statements.',
++	),
++	fieldNotes: fieldNotesSchema
++		.optional()
++		.describe(
++			'Author notes keyed by exact Schema field name, separate from statements. Omission preserves existing notes on update; a supplied map replaces all notes, and {} clears them. Plain text or Wikitext follows the Schema setting. Requires SWS 0.2.02 or later.',
++		),
++	dependentSubjects: dependentSubjectsSchema
++		.optional()
++		.describe(
++			'Dependent Subjects to create or replace in the same revision, each the target of a relation in statements or in another item of this list.',
++		),
++	comment: z.string().optional().describe('Optional edit summary.'),
++} as const;
++
++export const swsUpdateSubject: Tool<typeof inputSchema> = {
++	name: 'sws-update-subject',
++	description:
++		"Replaces a SWS Subject's label and statements — a FULL replace: an omitted or empty label is cleared, property names absent from `statements` are deleted, and {} clears all statements. Returns the violations of its Schema the Subject was saved with, and the Subject as saved. Enabled only when the wiki has SWS installed. The Subject's id, schema and page are immutable. Requires the edit right. Read the current state with sws-get-subject (latest=true) first and pass back fieldKeyVersion if returned. Dependent Subjects are written through dependentSubjects as with sws-create-subject, and passing the ID of one this Subject reaches replaces it; dropping the last relation to a Dependent Subject deletes it. A write that breaks a rule for Dependent Subjects is refused; other violations are warnings unless the wiki enforces validation, which refuses a write that introduces an error-severity one. Field annotations use fieldNotes; omission preserves existing notes on update. Pre-validate statement values with sws-validate-subject. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Update SWS subject',
++		readOnlyHint: false,
++		destructiveHint: true,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'update SWS subject',
++	target: (a) => a.id,
++
++	async handle(
++		{
++			id,
++			identityLanguage,
++			labels,
++			descriptions,
++			fieldKeyVersion,
++			label,
++			statements,
++			fieldNotes,
++			dependentSubjects,
++			comment,
++		},
++		ctx: ToolContext,
++	): Promise<CallToolResult> {
++		const mwn = await ctx.mwn();
++		const editComment = formatEditComment(ctx, 'sws-update-subject', comment);
++		const identity = await updateIdentity(
++			mwn,
++			id,
++			{ identityLanguage, labels, descriptions },
++			label,
++		);
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS replace response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'PUT',
++			path: `/subject/${encodeURIComponent(id)}`,
++			csrf: true,
++			body: {
++				...(fieldKeyVersion !== undefined ? { fieldKeyVersion } : {}),
++				label,
++				...identity,
++				statements,
++				...(fieldNotes !== undefined ? { fieldNotes } : {}),
++				dependentSubjects,
++				...(editComment !== undefined ? { comment: editComment } : {}),
++			},
++		})) as SubjectWriteResponse;
++
++		const subjectId = data.subjectId ?? id;
++		return ctx.format.ok({
++			subjectId,
++			status: data.status ?? 'updated',
++			...writeResult(data, subjectId),
++		});
++	},
++};
+diff --git a/src/tools/extensions/sws/sws-validate-subject.ts b/src/tools/extensions/sws/sws-validate-subject.ts
+new file mode 100644
+index 0000000..a57ded8
+--- /dev/null
++++ b/src/tools/extensions/sws/sws-validate-subject.ts
+@@ -0,0 +1,69 @@
++import { z } from 'zod';
++import type { CallToolResult } from '@modelcontextprotocol/server';
++import type { Tool } from '../../../runtime/tool.ts';
++import type { ToolContext } from '../../../runtime/context.ts';
++import { swsRequest } from './swsRequest.ts';
++import { statementsSchema } from './statements.ts';
++
++const inputSchema = {
++	id: z
++		.string()
++		.min(1)
++		.optional()
++		.describe(
++			'Subject ID to validate an UPDATE against (its schema is used). Omit to validate a NEW subject and pass schema instead.',
++		),
++	schema: z
++		.string()
++		.min(1)
++		.optional()
++		.describe(
++			'Schema name to validate a NEW subject against. Required when id is omitted; ignored when id is given.',
++		),
++	statements: statementsSchema.describe(
++		'Proposed statement map (property name → { propertyType, value }).',
++	),
++} as const;
++
++interface ValidateResponse {
++	violations?: unknown[];
++}
++
++export const swsValidateSubject: Tool<typeof inputSchema> = {
++	name: 'sws-validate-subject',
++	description:
++		"Dry-runs validation of a proposed SWS Subject's statements against its Schema and returns any violations WITHOUT writing. Enabled only when the wiki has SWS installed. Provide id to validate an update to an existing Subject (its schema is used), or omit id and provide schema to validate a new Subject. Use before sws-create-subject / sws-update-subject to catch type mismatches, missing required properties, and the propertyType-vs-type footgun. Returns { violations: [] } when valid; each violation carries a stable code, the propertyName it concerns, and a severity of error or warning. The rules for Dependent Subjects are checked only when a write runs. Pre-1.0: the SWS API may change without notice.",
++	inputSchema,
++	annotations: {
++		title: 'Validate SWS subject',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'validate SWS subject',
++	target: (a) => a.id ?? a.schema ?? '',
++
++	async handle({ id, schema, statements }, ctx: ToolContext): Promise<CallToolResult> {
++		if (id === undefined && schema === undefined) {
++			return ctx.format.invalidInput(
++				'Provide schema to validate a new subject, or id to validate an update.',
++			);
++		}
++
++		const mwn = await ctx.mwn();
++		const spec =
++			id !== undefined
++				? { path: `/subject/${encodeURIComponent(id)}/validate`, body: { statements } }
++				: { path: '/subject/validate', body: { schema, statements } };
++
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS validate response shape; trusted at this boundary
++		const data = (await swsRequest(mwn, {
++			method: 'POST',
++			path: spec.path,
++			body: spec.body,
++		})) as ValidateResponse;
++
++		return ctx.format.ok({ violations: Array.isArray(data.violations) ? data.violations : [] });
++	},
++};
+diff --git a/src/tools/extensions/sws/swsRequest.ts b/src/tools/extensions/sws/swsRequest.ts
+new file mode 100644
+index 0000000..d2f6347
+--- /dev/null
++++ b/src/tools/extensions/sws/swsRequest.ts
+@@ -0,0 +1,161 @@
++import type { Mwn } from 'mwn';
++import { ClassifiedError, type ErrorCategory } from '../../../errors/classifyError.ts';
++import { WikiTimeoutError } from '../../../errors/wikiTimeoutError.ts';
++import { errorMessage } from '../../../errors/errorMessage.ts';
++import { wikiAuthorization } from '../../../wikis/wikiAuthorization.ts';
++
++export interface SWSRequestSpec {
++	readonly method: 'GET' | 'POST' | 'PUT' | 'DELETE';
++	/** Path under `/sws/v0`, already URL-encoded, e.g. `/subject/s1`. */
++	readonly path: string;
++	readonly query?: Record<string, string>;
++	readonly body?: unknown;
++	/**
++	 * When true, fetch a CSRF token via `mwn.getCsrfToken()` and send it as the
++	 * `X-CSRF-TOKEN` header SWS requires on every mutating endpoint. Omit for
++	 * reads and the `validate` dry-runs, which take no token.
++	 */
++	readonly csrf?: boolean;
++}
++
++// SWS's `errorType` strings are stable across releases (per query-api docs);
++// branch on them, never on the translated `message`.
++const ERROR_TYPE_TO_CATEGORY: Record<string, ErrorCategory> = {
++	emptyQuery: 'invalid_input',
++	parameterMissing: 'invalid_input',
++	cypherSyntaxError: 'invalid_input',
++	writeQueryRejected: 'invalid_input',
++	queryTimeout: 'upstream_failure',
++	rateLimitExceeded: 'rate_limited',
++	permissionDenied: 'permission_denied',
++	backendUnavailable: 'upstream_failure',
++	internalError: 'upstream_failure',
++};
++
++// The write endpoints (create/replace/delete/set-main) use a different error
++// envelope than the read endpoints — `{ status: "error", message }` with no
++// `errorType`. Map those by HTTP status; 5xx and unknown fall through to
++// upstream_failure so the internal-exception sanitisation below is preserved.
++function categoryForStatus(status: number | undefined): ErrorCategory | undefined {
++	switch (status) {
++		case 400:
++			return 'invalid_input';
++		case 403:
++			return 'permission_denied';
++		case 404:
++			return 'not_found';
++		case 409:
++			return 'conflict';
++		case 422:
++			return 'invalid_input';
++		case 429:
++			return 'rate_limited';
++		default:
++			return undefined;
++	}
++}
++
++function restBaseFrom(apiUrl: string): string {
++	// apiUrl is `${server}${scriptpath}/api.php`; SWS REST lives at
++	// `${server}${scriptpath}/rest.php/sws/v0` — same origin, so the bearer
++	// and cookies that reach the action API also reach here.
++	return `${apiUrl.replace(/\/api\.php$/, '/rest.php')}/sws/v0`;
++}
++
++export async function swsRequest(mwn: Mwn, spec: SWSRequestSpec): Promise<unknown> {
++	const apiUrl = mwn.options.apiUrl;
++	if (typeof apiUrl !== 'string' || !/\/api\.php$/.test(apiUrl)) {
++		throw new ClassifiedError(
++			'upstream_failure',
++			'Cannot derive the SWS REST base from the wiki API URL.',
++		);
++	}
++
++	let url = `${restBaseFrom(apiUrl)}${spec.path}`;
++	if (spec.query !== undefined && Object.keys(spec.query).length > 0) {
++		url += `?${new URLSearchParams(spec.query).toString()}`;
++	}
++
++	const headers: Record<string, string> = {
++		Accept: 'application/json',
++		...wikiAuthorization(mwn, url),
++	};
++	if (spec.body !== undefined) {
++		headers['Content-Type'] = 'application/json';
++	}
++	if (spec.csrf === true) {
++		headers['X-CSRF-TOKEN'] = await mwn.getCsrfToken();
++	}
++
++	try {
++		const response = await mwn.rawRequest({
++			url,
++			method: spec.method,
++			headers,
++			...(spec.body !== undefined ? { data: JSON.stringify(spec.body) } : {}),
++		});
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- axios response body at this boundary
++		return (response as { data: unknown }).data;
++	} catch (err: unknown) {
++		// The server's own verdict, not the wiki's: relabelling it as a pack error
++		// would lose the code and, on writes, the dispatcher's caveat.
++		if (err instanceof WikiTimeoutError) {
++			throw err;
++		}
++		throw classifySWSError(err);
++	}
++}
++
++function classifySWSError(err: unknown): ClassifiedError {
++	// axios throws on non-2xx with `err.response.{status,data}`.
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- axios error shape at this boundary
++	const response = (err as { response?: { status?: number; data?: unknown } }).response;
++	const status = response?.status;
++	const data = response?.data;
++
++	if (data !== null && typeof data === 'object') {
++		// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- verified non-null object above; narrow to inspect keys
++		const record = data as Record<string, unknown>;
++
++		const errorType = record.errorType;
++		if (typeof errorType === 'string') {
++			const category = ERROR_TYPE_TO_CATEGORY[errorType] ?? 'upstream_failure';
++			const message = typeof record.message === 'string' ? record.message : errorType;
++			return new ClassifiedError(category, message, status);
++		}
++
++		// MediaWiki REST envelope, from parameter validation or a read denial:
++		// { error, messageTranslations?: { en } }.
++		if (typeof record.error === 'string') {
++			const translations = record.messageTranslations;
++			// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- messageTranslations sub-object shape at this boundary
++			const en =
++				translations !== null && typeof translations === 'object'
++					? (translations as { en?: unknown }).en
++					: undefined;
++			const message = typeof en === 'string' ? en : record.error;
++			return new ClassifiedError(categoryForStatus(status) ?? 'invalid_input', message, status);
++		}
++
++		// Internal RuntimeException: { message, exception: {…backtrace…} }.
++		// Surface the message only — never the backtrace. A refused write also
++		// lists its violations, which say what to fix.
++		if (typeof record.message === 'string') {
++			const message = Array.isArray(record.violations)
++				? `${record.message}: ${JSON.stringify(record.violations)}`
++				: record.message;
++			return new ClassifiedError(categoryForStatus(status) ?? 'upstream_failure', message, status);
++		}
++	}
++
++	// Bodyless / unrecognised-shape responses: map by HTTP status the same way as
++	// the message-bearing branch above, so the two paths can't disagree.
++	const statusCategory = categoryForStatus(status);
++	if (statusCategory !== undefined) {
++		return new ClassifiedError(statusCategory, `SWS request failed (HTTP ${status}).`, status);
++	}
++
++	// Covers both axios network errors (no .response — timeout, ECONNREFUSED) and unrecognised body shapes.
++	const message = errorMessage(err);
++	return new ClassifiedError('upstream_failure', message, status);
++}
+diff --git a/src/tools/extensions/sws/writeIdentity.ts b/src/tools/extensions/sws/writeIdentity.ts
+new file mode 100644
+index 0000000..c8d688e
+--- /dev/null
++++ b/src/tools/extensions/sws/writeIdentity.ts
+@@ -0,0 +1,46 @@
++import type { Mwn } from 'mwn';
++import { ClassifiedError } from '../../../errors/classifyError.ts';
++import { swsRequest } from './swsRequest.ts';
++import type { SubjectData } from './subjects.ts';
++
++interface IdentityInput {
++	identityLanguage?: string;
++	labels?: Record<string, string>;
++	descriptions?: Record<string, string>;
++}
++
++/** Keep omitted localized metadata while SWS validates a complete v2 identity. */
++export async function updateIdentity(
++	mwn: Mwn,
++	id: string,
++	input: IdentityInput,
++	label?: string,
++): Promise<IdentityInput> {
++	if (
++		input.identityLanguage !== undefined &&
++		input.labels !== undefined &&
++		input.descriptions !== undefined
++	)
++		return input;
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- SWS response boundary
++	const data = (await swsRequest(mwn, {
++		method: 'GET',
++		path: `/subject/${encodeURIComponent(id)}`,
++		query: { latest: '1' },
++	})) as { requestedId?: string; subjects?: Record<string, SubjectData> };
++	const current = data.subjects?.[data.requestedId ?? id];
++	if (current === undefined)
++		throw new ClassifiedError('not_found', `SWS subject "${id}" not found`);
++	if (current.identityLanguage === undefined) return input;
++	const language = input.identityLanguage ?? current.identityLanguage;
++	const labels = { ...(input.labels ?? current.labels ?? {}) };
++	if (input.labels === undefined) {
++		if (label === undefined || label.trim() === '') delete labels[language];
++		else labels[language] = label;
++	}
++	return {
++		identityLanguage: language,
++		labels,
++		descriptions: input.descriptions ?? current.descriptions ?? {},
++	};
++}
+diff --git a/src/tools/extensions/swsbase/index.ts b/src/tools/extensions/swsbase/index.ts
+new file mode 100644
+index 0000000..60c2f78
+--- /dev/null
++++ b/src/tools/extensions/swsbase/index.ts
+@@ -0,0 +1,9 @@
++import type { ExtensionPack } from '../types.ts';
++import { swsGetDataView } from './swsbase-get-data-view.ts';
++
++/** Optional read model; ordinary SWS installations keep their existing tool set. */
++export const swsBasePack: ExtensionPack = {
++	id: 'swsbase',
++	extensionNames: ['SchemaBaseBridge'],
++	tools: [swsGetDataView],
++};
+diff --git a/src/tools/extensions/swsbase/swsbase-get-data-view.ts b/src/tools/extensions/swsbase/swsbase-get-data-view.ts
+new file mode 100644
+index 0000000..0a10b95
+--- /dev/null
++++ b/src/tools/extensions/swsbase/swsbase-get-data-view.ts
+@@ -0,0 +1,121 @@
++import { z } from 'zod';
++import type { Tool } from '../../../runtime/tool.ts';
++import { resolvePageId, hasOnePageRef } from '../sws/pageId.ts';
++import { contentMaxBytes } from '../../../results/truncation.ts';
++
++const inputSchema = {
++	title: z
++		.string()
++		.min(1)
++		.optional()
++		.describe('Wiki page title. Provide this OR pageId, not both.'),
++	pageId: z
++		.number()
++		.int()
++		.positive()
++		.optional()
++		.describe('Numeric page ID. Provide this OR title.'),
++	subject: z.string().min(1).optional().describe('Restrict to this Subject on the selected page.'),
++	language: z
++		.string()
++		.regex(/^[a-z]{2,12}(?:-[a-z0-9]{1,12})*$/)
++		.optional()
++		.describe('Data language, e.g. de or en. Omit to use the wiki API context language.'),
++	fields: z
++		.array(z.string().min(1))
++		.min(1)
++		.optional()
++		.describe(
++			'Optional exact Schema field names to return. Omit for all fields. Useful for narrowing an oversized response.',
++		),
++} as const;
++
++// Validate the read-model envelope while preserving every typed field, value and source attribute.
++const viewSchema = z
++	.object({
++		version: z.literal(1),
++		readOnly: z.literal(true),
++		page: z.object({ id: z.number().int().positive() }).passthrough(),
++		subjects: z.array(
++			z
++				.object({ id: z.string(), fields: z.array(z.object({ name: z.string() }).passthrough()) })
++				.passthrough(),
++		),
++	})
++	.passthrough();
++
++export const swsGetDataView: Tool<typeof inputSchema> = {
++	name: 'swsbase-get-data-view',
++	description:
++		'Reads the complete current SWS Data view: own and automatically retrieved values, effective-value precedence, source-qualified Q/P identities, descriptions, calendars, images and relations. Requires SWSBaseBridge with action=swsbasedataview (read-model version 1). Unlike sws-get-page-subjects this includes derived source values. It never stores fetched values, executes wikitext or writes SMW annotations. Preserve own/external distinctions; do not submit this read model to subject replacement APIs. An oversized response is refused explicitly; narrow by subject or exact field names. No silent truncation.',
++	inputSchema,
++	annotations: {
++		title: 'Get complete SWS data view',
++		readOnlyHint: true,
++		destructiveHint: false,
++		idempotentHint: true,
++		openWorldHint: true,
++	},
++	failureVerb: 'get SWS data view',
++	target: (a) => a.title ?? String(a.pageId ?? ''),
++	async handle(args, ctx) {
++		if (!hasOnePageRef(args))
++			return ctx.format.invalidInput('Provide exactly one of title or pageId.');
++		const mwn = await ctx.mwn();
++		const pageId = await resolvePageId(mwn, args);
++		if (pageId === null) return ctx.format.notFound(`Page "${args.title}" not found`);
++		const response: unknown = await mwn.request({
++			action: 'swsbasedataview',
++			pageid: pageId,
++			...(args.subject === undefined ? {} : { subject: args.subject }),
++			...(args.language === undefined ? {} : { language: args.language }),
++			format: 'json',
++			formatversion: 2,
++		});
++		const envelope = z.object({ swsbasedataview: viewSchema }).safeParse(response);
++		if (!envelope.success)
++			return ctx.format.error(
++				'upstream_failure',
++				'SWSBaseBridge did not return data-view version 1. Check that the swsbasedataview API is installed and compatible.',
++			);
++		const view = envelope.data.swsbasedataview;
++		if (
++			view.page.id !== pageId ||
++			(args.subject !== undefined &&
++				(view.subjects.length !== 1 || view.subjects[0]?.id !== args.subject))
++		) {
++			return ctx.format.error(
++				'upstream_failure',
++				'The data view does not match the requested page or Subject.',
++			);
++		}
++		if (args.fields !== undefined) {
++			const names = new Set(args.fields);
++			const available = new Set(view.subjects.flatMap((s) => s.fields.map((f) => f.name)));
++			const missing = [...names].filter((n) => !available.has(n));
++			if (missing.length)
++				return ctx.format.invalidInput(`Unknown field names: ${missing.join(', ')}`);
++			view.subjects = view.subjects.map((s) => ({
++				...s,
++				fields: s.fields.filter((f) => names.has(f.name)),
++			}));
++		}
++		const payload = {
++			...view,
++			selection: { subject: args.subject ?? null, fields: args.fields ?? null },
++		};
++		const result = ctx.format.ok(payload);
++		const bytes = Math.max(
++			Buffer.byteLength(JSON.stringify(payload), 'utf8'),
++			result.content.reduce(
++				(sum, c) => sum + (c.type === 'text' ? Buffer.byteLength(c.text, 'utf8') : 0),
++				0,
++			),
++		);
++		if (bytes > contentMaxBytes())
++			return ctx.format.invalidInput(
++				`Data view exceeds the ${contentMaxBytes()}-byte response budget. Nothing was truncated. Retry with subject and/or exact fields; a single oversized field requires a larger MCP_CONTENT_MAX_BYTES setting.`,
++			);
++		return result;
++	},
++};
+diff --git a/src/transport/stdio.ts b/src/transport/stdio.ts
+index 10d3e24..1c3a1cc 100644
+--- a/src/transport/stdio.ts
++++ b/src/transport/stdio.ts
+@@ -9,13 +9,18 @@ import { registerShutdownHandlers } from '../runtime/shutdown.ts';
+ import { loadConfigFromFile } from '../config/loadConfig.ts';
+ import { createAppState } from '../wikis/state.ts';
+ import { readAuthPolicy } from '../runtime/authShape.ts';
++import { PrivateWikiProbe } from '../auth/privateWikiProbe.ts';
+ import { StdioSignIn } from '../auth/stdioSignIn.ts';
+ import { readMetrics } from '../runtime/metrics.ts';
+ 
+ async function main(): Promise<void> {
+ 	const config = loadConfigFromFile();
+-	const state = createAppState(config);
++	const baseState = createAppState(config);
+ 	const auth = readAuthPolicy(process.env, 'stdio', null, new StdioSignIn());
++	const state = {
++		...baseState,
++		wikiProbe: new PrivateWikiProbe(baseState.wikiProbe, baseState.wikiRegistry, auth.stdioSignIn),
++	};
+ 	emitStartupBanner(
+ 		{ transport: 'stdio' },
+ 		{
+diff --git a/tests/auth/privateWikiProbe.test.ts b/tests/auth/privateWikiProbe.test.ts
+new file mode 100644
+index 0000000..3fe246f
+--- /dev/null
++++ b/tests/auth/privateWikiProbe.test.ts
+@@ -0,0 +1,82 @@
++import { describe, it, expect, vi } from 'vitest';
++import { PrivateWikiProbe } from '../../src/auth/privateWikiProbe.ts';
++import { getRuntimeToken, withRequestFields } from '../../src/runtime/requestContext.ts';
++import { WikiRegistryImpl } from '../../src/wikis/wikiRegistry.ts';
++
++const config = {
++	sitename: 'Test',
++	server: 'https://test.wiki',
++	scriptpath: '/w',
++	articlepath: '/wiki',
++	private: true,
++	oauth2ClientId: 'client',
++};
++function setup(extra = {}) {
++	const wikis = new WikiRegistryImpl({ test: { ...config, ...extra } }, false);
++	const inspect = vi.fn(async (key: string) => ({
++		reachable: true,
++		extensions: new Set([getRuntimeToken(key) ?? 'anonymous']),
++	}));
++	const invalidate = vi.fn();
++	const acquire = vi.fn().mockResolvedValue('test-token');
++	return {
++		inspect,
++		invalidate,
++		acquire,
++		probe: new PrivateWikiProbe({ inspect, invalidate }, wikis, { acquire }),
++	};
++}
++describe('private wiki OAuth discovery', () => {
++	it('binds discovery to its own wiki and restores the surrounding context', async () => {
++		const { probe, acquire } = setup();
++		const r = await probe.inspect('test');
++		expect(r.extensions.has('test-token')).toBe(true);
++		expect(acquire).toHaveBeenCalledWith(
++			'test',
++			expect.objectContaining({
++				oauth2ClientId: 'client',
++				wiki: { server: 'https://test.wiki', scriptpath: '/w' },
++			}),
++		);
++		expect(getRuntimeToken('test')).toBeUndefined();
++	});
++	it('does not sign in to public wikis', async () => {
++		const { probe, acquire } = setup({ private: false });
++		await probe.inspect('test');
++		expect(acquire).not.toHaveBeenCalled();
++	});
++	it('leaves non-OAuth credentials to the underlying probe', async () => {
++		const { probe, acquire } = setup({ oauth2ClientId: undefined });
++		await probe.inspect('test');
++		expect(acquire).not.toHaveBeenCalled();
++	});
++	it('reuses the current wiki token', async () => {
++		const { probe, acquire } = setup();
++		const r = await withRequestFields({ runtimeToken: { value: 'current', wikiKey: 'test' } }, () =>
++			probe.inspect('test'),
++		);
++		expect(r.extensions.has('current')).toBe(true);
++		expect(acquire).not.toHaveBeenCalled();
++	});
++	it('never reuses another wiki token', async () => {
++		const { probe, acquire } = setup();
++		const r = await withRequestFields(
++			{ runtimeToken: { value: 'other-secret', wikiKey: 'other' } },
++			() => probe.inspect('test'),
++		);
++		expect(acquire).toHaveBeenCalledOnce();
++		expect(r.extensions.has('test-token')).toBe(true);
++		expect(r.extensions.has('other-secret')).toBe(false);
++	});
++	it('reports an unreachable wiki on sign-in failure without leaking details', async () => {
++		const { probe, acquire, inspect } = setup();
++		acquire.mockRejectedValue(new Error('secret'));
++		expect(await probe.inspect('test')).toEqual({ reachable: false, extensions: new Set() });
++		expect(inspect).not.toHaveBeenCalled();
++	});
++	it('delegates cache invalidation', () => {
++		const { probe, invalidate } = setup();
++		probe.invalidate('test');
++		expect(invalidate).toHaveBeenCalledWith('test');
++	});
++});
+diff --git a/tests/runtime/wikiCapability.test.ts b/tests/runtime/wikiCapability.test.ts
+index 1fcab3c..4ce770d 100644
+--- a/tests/runtime/wikiCapability.test.ts
++++ b/tests/runtime/wikiCapability.test.ts
+@@ -231,6 +231,11 @@ describe('WRITE_TOOL_NAMES', () => {
+ 				'update-page',
+ 				'upload-file',
+ 				'upload-file-from-url',
++				'sws-mint-subject-ids',
++				'sws-create-subject',
++				'sws-update-subject',
++				'sws-delete-subject',
++				'sws-set-main-subject',
+ 				'neowiki-create-subject',
+ 				'neowiki-delete-subject',
+ 				'neowiki-set-main-subject',
+diff --git a/tests/tools/extensions/index.test.ts b/tests/tools/extensions/index.test.ts
+index c1d80b2..5690795 100644
+--- a/tests/tools/extensions/index.test.ts
++++ b/tests/tools/extensions/index.test.ts
+@@ -11,12 +11,14 @@ import type { ExtensionPack } from '../../../src/tools/extensions/types.ts';
+ import type { Tool } from '../../../src/runtime/tool.ts';
+ 
+ describe('extensionPacks', () => {
+-	it('contains smw, bucket, cargo, neowiki, and wikibase in registration order', () => {
++	it('contains the original and SWS extension packs in registration order', () => {
+ 		expect(extensionPacks.map((p) => p.id)).toEqual([
+ 			'smw',
+ 			'bucket',
+ 			'cargo',
+ 			'neowiki',
++			'sws',
++			'swsbase',
+ 			'wikibase',
+ 		]);
+ 	});
+diff --git a/tests/tools/extensions/sws/fieldNotes.test.ts b/tests/tools/extensions/sws/fieldNotes.test.ts
+new file mode 100644
+index 0000000..d66eb33
+--- /dev/null
++++ b/tests/tools/extensions/sws/fieldNotes.test.ts
+@@ -0,0 +1,88 @@
++import { describe, it, expect, vi } from 'vitest';
++import { z } from 'zod';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsCreateSubject } from '../../../../src/tools/extensions/sws/sws-create-subject.ts';
++import { swsUpdateSubject } from '../../../../src/tools/extensions/sws/sws-update-subject.ts';
++import { flattenSubject } from '../../../../src/tools/extensions/sws/subjects.ts';
++
++const notes = { Name: 'Author note' };
++function context() {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('csrf'),
++		rawRequest: vi.fn().mockImplementation(async (spec) =>
++			spec.method === 'GET'
++				? { data: { subjects: { test: { id: 'test' } } } }
++				: {
++						data: {
++							status: 'saved',
++							subjectId: 'test',
++							subject: { id: 'test', fieldNotes: notes },
++						},
++					},
++		),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++describe('SWS field annotations', () => {
++	it('sends and returns field annotations when creating', async () => {
++		const { mock, ctx } = context();
++		const result = await swsCreateSubject.handle(
++			{ pageId: 7, schema: 'Test', statements: {}, fieldNotes: notes },
++			ctx,
++		);
++		expect(JSON.parse(mock.rawRequest.mock.calls.at(-1)![0].data as string).fieldNotes).toEqual(
++			notes,
++		);
++		expect(result.structuredContent).toMatchObject({ subject: { fieldNotes: notes } });
++	});
++	it('preserves omitted annotations and distinguishes explicit clearing', async () => {
++		for (const fieldNotes of [undefined, {}, notes]) {
++			const { mock, ctx } = context();
++			await swsUpdateSubject.handle(
++				{ id: 'test', statements: {}, ...(fieldNotes === undefined ? {} : { fieldNotes }) },
++				ctx,
++			);
++			const body = JSON.parse(mock.rawRequest.mock.calls.at(-1)![0].data as string) as Record<
++				string,
++				unknown
++			>;
++			expect(Object.hasOwn(body, 'fieldNotes')).toBe(fieldNotes !== undefined);
++			if (fieldNotes !== undefined) expect(body.fieldNotes).toEqual(fieldNotes);
++		}
++	});
++	it('passes dependent annotations in the host write', async () => {
++		const { mock, ctx } = context();
++		await swsCreateSubject.handle(
++			{
++				pageId: 7,
++				schema: 'Test',
++				statements: {},
++				dependentSubjects: [
++					{ id: 'dependent', schema: 'Detail', statements: {}, fieldNotes: notes },
++				],
++			},
++			ctx,
++		);
++		expect(
++			JSON.parse(mock.rawRequest.mock.calls.at(-1)![0].data as string).dependentSubjects[0]
++				.fieldNotes,
++		).toEqual(notes);
++	});
++	it('rejects malformed annotation values before a request', () => {
++		expect(
++			z
++				.object(swsUpdateSubject.inputSchema)
++				.safeParse({ id: 'test', statements: {}, fieldNotes: { Name: 42 } }).success,
++		).toBe(false);
++		expect(
++			z
++				.object(swsUpdateSubject.inputSchema)
++				.safeParse({ id: 'test', statements: {}, fieldNotes: { '': 'note' } }).success,
++		).toBe(false);
++	});
++	it('preserves empty and missing note maps distinctly in read results', () => {
++		expect(flattenSubject({ fieldNotes: {} }, 'test')).toHaveProperty('fieldNotes', {});
++		expect(flattenSubject({}, 'test')).not.toHaveProperty('fieldNotes');
++	});
++});
+diff --git a/tests/tools/extensions/sws/identity.test.ts b/tests/tools/extensions/sws/identity.test.ts
+new file mode 100644
+index 0000000..a9dd945
+--- /dev/null
++++ b/tests/tools/extensions/sws/identity.test.ts
+@@ -0,0 +1,129 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsUpdateSubject } from '../../../../src/tools/extensions/sws/sws-update-subject.ts';
++import { swsCreateSubject } from '../../../../src/tools/extensions/sws/sws-create-subject.ts';
++import { swsGetSubject } from '../../../../src/tools/extensions/sws/sws-get-subject.ts';
++import { swsGetSchema } from '../../../../src/tools/extensions/sws/sws-get-schema.ts';
++import { flattenSubject } from '../../../../src/tools/extensions/sws/subjects.ts';
++const identity = {
++	identityLanguage: 'de',
++	labels: { de: 'Eigener Name', en: 'Own name' },
++	descriptions: { de: 'Eigene Beschreibung' },
++};
++function context(data: unknown) {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('csrf'),
++		rawRequest: vi.fn().mockResolvedValue({ data }),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++describe('SWS 0.5.0 identity and field-key contract', () => {
++	it('retains identity and field-key metadata in a read', () => {
++		expect(
++			flattenSubject(
++				{
++					id: 'E123',
++					...identity,
++					fieldKeyVersion: 3,
++					displayNameIsGenerated: false,
++					pageNamespaceId: 7480,
++				},
++				'E123',
++			),
++		).toMatchObject({
++			id: 'E123',
++			...identity,
++			fieldKeyVersion: 3,
++			displayNameIsGenerated: false,
++			pageNamespaceId: 7480,
++		});
++	});
++	it('sends the read field-key version and own identity on replacement', async () => {
++		const { mock, ctx } = context({ status: 'saved' });
++		await swsUpdateSubject.handle(
++			{ id: 'E123', statements: {}, fieldKeyVersion: 3, ...identity },
++			ctx,
++		);
++		expect(JSON.parse(mock.rawRequest.mock.calls[0][0].data as string)).toMatchObject({
++			fieldKeyVersion: 3,
++			...identity,
++		});
++	});
++	it('supports creating a preallocated persistent Subject ID', async () => {
++		const { mock, ctx } = context({ status: 'created', subjectId: 'E123' });
++		await swsCreateSubject.handle(
++			{ id: 'E123', pageId: 7, schema: 'S1', statements: {}, ...identity },
++			ctx,
++		);
++		expect(JSON.parse(mock.rawRequest.mock.calls[0][0].data as string)).toMatchObject({
++			id: 'E123',
++			...identity,
++		});
++	});
++	it('requests the latest editable revision explicitly', async () => {
++		const { mock, ctx } = context({ subjects: { E123: { id: 'E123' } } });
++		await swsGetSubject.handle({ id: 'E123', latest: true }, ctx);
++		expect(mock.rawRequest.mock.calls[0][0].url).toContain('latest=1');
++	});
++	it('preserves Schema identity and field rename metadata', async () => {
++		const schema = {
++			formatVersion: 2,
++			id: 'S1',
++			...identity,
++			fieldKeyChanges: [{ from: 'Old', to: 'New' }],
++			propertyDefinitions: { New: { type: 'text' } },
++		};
++		const { ctx } = context({ schema });
++		const result = await swsGetSchema.handle({ name: 'S1' }, ctx);
++		expect(result.structuredContent).toMatchObject({
++			id: 'S1',
++			...identity,
++			fieldKeyChanges: schema.fieldKeyChanges,
++		});
++	});
++});
++
++describe('SWS identity preservation during partial updates', () => {
++	it('reads the latest identity before changing a label, retaining other languages', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('csrf'),
++			rawRequest: vi
++				.fn()
++				.mockResolvedValueOnce({ data: { subjects: { E123: { id: 'E123', ...identity } } } })
++				.mockResolvedValueOnce({ data: { status: 'saved' } }),
++		});
++		await swsUpdateSubject.handle(
++			{ id: 'E123', label: 'Neuer Name', statements: {} },
++			contextOn(mock),
++		);
++		const body = JSON.parse(mock.rawRequest.mock.calls[1][0].data as string);
++		expect(body).toMatchObject({
++			identityLanguage: 'de',
++			labels: { de: 'Neuer Name', en: 'Own name' },
++			descriptions: identity.descriptions,
++		});
++		expect(mock.rawRequest.mock.calls[0][0].url).toContain('latest=1');
++	});
++	it('does not write if the preservation read fails', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(new Error('network failure')),
++		});
++		await expect(
++			swsUpdateSubject.handle({ id: 'E123', statements: {} }, contextOn(mock)),
++		).rejects.toThrow();
++		expect(mock.rawRequest).toHaveBeenCalledOnce();
++	});
++});
++
++describe('SWS identity defaults on create', () => {
++	it('supplies complete identity metadata when the caller provides only a label', async () => {
++		const { mock, ctx } = context({ status: 'created', subjectId: 'E123' });
++		await swsCreateSubject.handle({ pageId: 7, schema: 'S1', label: 'Test', statements: {} }, ctx);
++		expect(JSON.parse(mock.rawRequest.mock.calls[0][0].data as string)).toMatchObject({
++			identityLanguage: 'en',
++			labels: { en: 'Test' },
++			descriptions: {},
++		});
++	});
++});
+diff --git a/tests/tools/extensions/sws/pageId.test.ts b/tests/tools/extensions/sws/pageId.test.ts
+new file mode 100644
+index 0000000..0c5279d
+--- /dev/null
++++ b/tests/tools/extensions/sws/pageId.test.ts
+@@ -0,0 +1,34 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { resolvePageId, hasOnePageRef } from '../../../../src/tools/extensions/sws/pageId.ts';
++
++describe('hasOnePageRef', () => {
++	it('is true for exactly one of title/pageId', () => {
++		expect(hasOnePageRef({ title: 'A' })).toBe(true);
++		expect(hasOnePageRef({ pageId: 1 })).toBe(true);
++		expect(hasOnePageRef({})).toBe(false);
++		expect(hasOnePageRef({ title: 'A', pageId: 1 })).toBe(false);
++	});
++});
++
++describe('resolvePageId', () => {
++	it('returns a passed pageId without calling the API', async () => {
++		const mock = createMockMwn();
++		expect(await resolvePageId(mock as never, { pageId: 42 })).toBe(42);
++		expect(mock.request).not.toHaveBeenCalled();
++	});
++
++	it('resolves a title to its page id', async () => {
++		const mock = createMockMwn({
++			request: vi.fn().mockResolvedValue({ query: { pages: [{ pageid: 7, title: 'Berlin' }] } }),
++		});
++		expect(await resolvePageId(mock as never, { title: 'Berlin' })).toBe(7);
++	});
++
++	it('returns null for a missing page', async () => {
++		const mock = createMockMwn({
++			request: vi.fn().mockResolvedValue({ query: { pages: [{ missing: true, title: 'Nope' }] } }),
++		});
++		expect(await resolvePageId(mock as never, { title: 'Nope' })).toBeNull();
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-create-subject.test.ts b/tests/tools/extensions/sws/sws-create-subject.test.ts
+new file mode 100644
+index 0000000..57c5628
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-create-subject.test.ts
+@@ -0,0 +1,227 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn, type MockMwn } from '../../../helpers/mock-mwn.ts';
++import { withoutEditAttribution, contextOn } from '../../../helpers/fakeContext.ts';
++import type { ToolContext } from '../../../../src/runtime/context.ts';
++import { swsCreateSubject } from '../../../../src/tools/extensions/sws/sws-create-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++import { dispatch } from '../../../../src/runtime/dispatcher.ts';
++
++const stmts = { Country: { propertyType: 'text', value: ['Germany'] } };
++
++const birth = {
++	id: 's1demo6sssssss1',
++	schema: 'Birth',
++	statements: { Year: { propertyType: 'number', value: 1881 } },
++};
++
++const created = { status: 'created', subjectId: 's1' };
++
++function contextWith(data: unknown): { mock: MockMwn; ctx: ToolContext } {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('tok'),
++		rawRequest: vi.fn().mockResolvedValue({ data }),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++
++function sentBody(mock: MockMwn): Record<string, unknown> {
++	const { data } = mock.rawRequest.mock.calls[0][0] as { data: string };
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- JSON body the tool sent
++	return JSON.parse(data) as Record<string, unknown>;
++}
++
++describe('sws-create-subject', () => {
++	it('resolves a title and posts another subject of the page with a CSRF token', async () => {
++		const mock = createMockMwn({
++			request: vi.fn().mockResolvedValue({ query: { pages: [{ pageid: 7, title: 'Berlin' }] } }),
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'created', subjectId: 's1demo' } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsCreateSubject.handle(
++			{ title: 'Berlin', label: 'Berlin', schema: 'City', statements: stmts },
++			ctx,
++		);
++		const call = mock.rawRequest.mock.calls[0][0] as {
++			url: string;
++			method: string;
++			data: string;
++			headers: Record<string, string>;
++		};
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/page/7/subjects');
++		expect(call.method).toBe('POST');
++		expect(call.headers['X-CSRF-TOKEN']).toBe('tok');
++		expect(JSON.parse(call.data)).toMatchObject({
++			label: 'Berlin',
++			schema: 'City',
++			statements: stmts,
++		});
++		expect(result.structuredContent).toMatchObject({
++			subjectId: 's1demo',
++			status: 'created',
++			pageId: 7,
++		});
++	});
++
++	it('posts to /mainSubject when isMain is true', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'created', subjectId: 's1' } }),
++		});
++		const ctx = contextOn(mock);
++		await swsCreateSubject.handle(
++			{ pageId: 7, isMain: true, label: 'X', schema: 'City', statements: stmts },
++			ctx,
++		);
++		expect((mock.rawRequest.mock.calls[0][0] as { url: string }).url).toContain(
++			'/page/7/mainSubject',
++		);
++	});
++
++	it('reports a page that already has a main subject as a conflict', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(httpError(409, { status: 'error', message: 'Subject already exists' })),
++		});
++		const ctx = contextOn(mock);
++		const result = await dispatch(
++			swsCreateSubject,
++			ctx,
++		)({ pageId: 7, isMain: true, label: 'X', schema: 'City', statements: stmts });
++		assertStructuredError(result, 'conflict');
++	});
++
++	it('writes dependent subjects in the same request', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle(
++			{ pageId: 7, schema: 'Person', statements: stmts, dependentSubjects: [birth] },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toMatchObject({ dependentSubjects: [birth] });
++	});
++
++	it('takes an empty label as no label', () => {
++		expect(swsCreateSubject.inputSchema.label.safeParse('').success).toBe(true);
++	});
++
++	it('creates a subject without a label when none is given', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle({ pageId: 7, schema: 'City', statements: stmts }, ctx);
++
++		expect(sentBody(mock)).not.toHaveProperty('label');
++	});
++
++	it('returns the violations the write reported and the subject as saved', async () => {
++		const violation = {
++			propertyName: 'Country',
++			code: 'min-length',
++			args: [3],
++			severity: 'warning',
++			valuePartIndex: 0,
++		};
++		const { ctx } = contextWith({
++			status: 'created',
++			subjectId: 's1demo',
++			violations: [violation],
++			subject: {
++				id: 's1demo',
++				label: 'Berlin',
++				displayName: 'Berlin',
++				schema: 'City',
++				pageId: 7,
++				pageTitle: 'Berlin',
++				statements: { Country: { propertyType: 'text', value: ['DE'] } },
++			},
++		});
++		const result = await swsCreateSubject.handle(
++			{ pageId: 7, label: 'Berlin', schema: 'City', statements: stmts },
++			ctx,
++		);
++
++		expect(result.structuredContent).toMatchObject({
++			violations: [violation],
++			subject: {
++				displayName: 'Berlin',
++				statements: [{ property: 'Country', type: 'text', value: ['DE'] }],
++			},
++		});
++	});
++
++	it('rejects when neither title nor pageId is given', async () => {
++		const ctx = contextOn(createMockMwn());
++		const result = await swsCreateSubject.handle(
++			{ label: 'X', schema: 'City', statements: stmts },
++			ctx,
++		);
++		assertStructuredError(result, 'invalid_input');
++	});
++
++	it('returns not_found for an unknown title', async () => {
++		const mock = createMockMwn({
++			request: vi.fn().mockResolvedValue({ query: { pages: [{ missing: true, title: 'Nope' }] } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsCreateSubject.handle(
++			{ title: 'Nope', label: 'X', schema: 'City', statements: stmts },
++			ctx,
++		);
++		assertStructuredError(result, 'not_found');
++	});
++
++	it('attributes the write to the tool that made it, after the caller comment', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle(
++			{ pageId: 7, label: 'X', schema: 'City', statements: stmts, comment: 'seed the city' },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toMatchObject({
++			label: 'X',
++			schema: 'City',
++			statements: stmts,
++			comment: 'seed the city (via sws-create-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('attributes a write the caller gave no comment for', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle(
++			{ pageId: 7, label: 'X', schema: 'City', statements: stmts },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toMatchObject({
++			comment: 'Automated edit (via sws-create-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('drops the attribution for a wiki that opts out of it', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle(
++			{ pageId: 7, label: 'X', schema: 'City', statements: stmts, comment: 'seed the city' },
++			withoutEditAttribution(ctx),
++		);
++
++		expect(sentBody(mock)).toMatchObject({ comment: 'seed the city' });
++	});
++
++	it('sends no comment at all when a wiki opts out and the caller gave none', async () => {
++		const { mock, ctx } = contextWith(created);
++
++		await swsCreateSubject.handle(
++			{ pageId: 7, label: 'X', schema: 'City', statements: stmts },
++			withoutEditAttribution(ctx),
++		);
++
++		expect(sentBody(mock)).not.toHaveProperty('comment');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-cypher-query.test.ts b/tests/tools/extensions/sws/sws-cypher-query.test.ts
+new file mode 100644
+index 0000000..9bd68ae
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-cypher-query.test.ts
+@@ -0,0 +1,77 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsCypherQuery } from '../../../../src/tools/extensions/sws/sws-cypher-query.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++import { dispatch } from '../../../../src/runtime/dispatcher.ts';
++
++describe('sws-cypher-query', () => {
++	it('posts cypher + parameters and returns the result envelope', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({
++				data: {
++					columns: ['name'],
++					rows: [{ name: 'ACME Inc' }],
++					resultCount: 1,
++					durationMs: 11,
++					truncated: false,
++				},
++			}),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsCypherQuery.handle(
++			{ cypher: 'MATCH (s:Subject:Company) RETURN s.name AS name', parameters: { x: 1 } },
++			ctx,
++		);
++		const call = mock.rawRequest.mock.calls[0][0] as { url: string; data: string };
++		expect(call.url).toContain('/query/cypher');
++		expect(JSON.parse(call.data)).toEqual({
++			cypher: 'MATCH (s:Subject:Company) RETURN s.name AS name',
++			parameters: { x: 1 },
++		});
++		expect(result.structuredContent).toMatchObject({
++			columns: ['name'],
++			rows: [{ name: 'ACME Inc' }],
++		});
++		expect(result.structuredContent).not.toHaveProperty('truncation');
++	});
++
++	it('omits parameters from the body when not provided', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockResolvedValue({ data: { columns: [], rows: [], resultCount: 0, truncated: false } }),
++		});
++		const ctx = contextOn(mock);
++		await swsCypherQuery.handle({ cypher: 'RETURN 1' }, ctx);
++		const call = mock.rawRequest.mock.calls[0][0] as { data: string };
++		expect(JSON.parse(call.data)).toEqual({ cypher: 'RETURN 1' });
++	});
++
++	it('emits a capped truncation when the server truncated the result', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({
++				data: { columns: ['n'], rows: [{ n: 1 }], resultCount: 1, durationMs: 5, truncated: true },
++			}),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsCypherQuery.handle({ cypher: 'MATCH (s) RETURN s.name AS n' }, ctx);
++		expect(result.structuredContent).toMatchObject({
++			truncation: { reason: 'capped-no-continuation' },
++		});
++	});
++
++	it('maps a writeQueryRejected error to invalid_input', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(
++					httpError(422, { errorType: 'writeQueryRejected', message: 'Query is not read-only.' }),
++				),
++		});
++		const ctx = contextOn(mock);
++		const result = await dispatch(swsCypherQuery, ctx)({ cypher: 'CREATE (x)' });
++		assertStructuredError(result, 'invalid_input');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-delete-subject.test.ts b/tests/tools/extensions/sws/sws-delete-subject.test.ts
+new file mode 100644
+index 0000000..589535d
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-delete-subject.test.ts
+@@ -0,0 +1,88 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn, type MockMwn } from '../../../helpers/mock-mwn.ts';
++import { withoutEditAttribution, contextOn } from '../../../helpers/fakeContext.ts';
++import type { ToolContext } from '../../../../src/runtime/context.ts';
++import { swsDeleteSubject } from '../../../../src/tools/extensions/sws/sws-delete-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++import { dispatch } from '../../../../src/runtime/dispatcher.ts';
++
++function contextWith(): { mock: MockMwn; ctx: ToolContext } {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('tok'),
++		rawRequest: vi.fn().mockResolvedValue({ data: '' }),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++
++function sentBody(mock: MockMwn): Record<string, unknown> | undefined {
++	const { data } = mock.rawRequest.mock.calls[0][0] as { data?: string };
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- JSON body the tool sent
++	return data === undefined ? undefined : (JSON.parse(data) as Record<string, unknown>);
++}
++
++describe('sws-delete-subject', () => {
++	it('DELETEs with a CSRF token and reports deleted', async () => {
++		const { mock, ctx } = contextWith();
++		const result = await swsDeleteSubject.handle({ id: 's1demo', comment: 'spam' }, ctx);
++		const call = mock.rawRequest.mock.calls[0][0] as {
++			url: string;
++			method: string;
++			headers: Record<string, string>;
++		};
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/s1demo');
++		expect(call.method).toBe('DELETE');
++		expect(call.headers['X-CSRF-TOKEN']).toBe('tok');
++		expect(result.structuredContent).toMatchObject({ subjectId: 's1demo', status: 'deleted' });
++	});
++
++	it('attributes the write to the tool that made it, after the caller comment', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsDeleteSubject.handle({ id: 's1demo', comment: 'spam' }, ctx);
++
++		expect(sentBody(mock)).toEqual({
++			comment: 'spam (via sws-delete-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('attributes a write the caller gave no comment for', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsDeleteSubject.handle({ id: 's1demo' }, ctx);
++
++		expect(sentBody(mock)).toEqual({
++			comment: 'Automated edit (via sws-delete-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('drops the attribution for a wiki that opts out of it', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsDeleteSubject.handle({ id: 's1demo', comment: 'spam' }, withoutEditAttribution(ctx));
++
++		expect(sentBody(mock)).toEqual({ comment: 'spam' });
++	});
++
++	it('omits the body when a wiki opts out and the caller gave no comment', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsDeleteSubject.handle({ id: 's1demo' }, withoutEditAttribution(ctx));
++
++		expect(sentBody(mock)).toBeUndefined();
++	});
++
++	it('reports a 403 as a permission_denied failure of the delete', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockRejectedValue(httpError(403, { status: 'error', message: 'nope' })),
++		});
++		const ctx = contextOn(mock);
++
++		const result = await dispatch(swsDeleteSubject, ctx)({ id: 's1demo' });
++
++		expect(assertStructuredError(result, 'permission_denied').message).toBe(
++			'Failed to delete SWS subject: nope',
++		);
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-get-page-subjects.test.ts b/tests/tools/extensions/sws/sws-get-page-subjects.test.ts
+new file mode 100644
+index 0000000..c0de429
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-get-page-subjects.test.ts
+@@ -0,0 +1,86 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsGetPageSubjects } from '../../../../src/tools/extensions/sws/sws-get-page-subjects.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++
++const pageSubjectsBody = {
++	data: {
++		pageId: 65,
++		mainSubjectId: 'sMain',
++		subjects: {
++			sMain: {
++				id: 'sMain',
++				label: 'Rijksmuseum',
++				schema: 'Museum',
++				statements: { Founded: { propertyType: 'number', value: 1800 } },
++			},
++			sChild: { id: 'sChild', label: 'Rijksmuseum 2024', schema: 'Attendance', statements: {} },
++		},
++	},
++};
++
++describe('sws-get-page-subjects', () => {
++	it('resolves a title to a pageId, then flattens subjects with isMain', async () => {
++		const mock = createMockMwn({
++			request: vi
++				.fn()
++				.mockResolvedValue({ query: { pages: [{ pageid: 65, title: 'Rijksmuseum' }] } }),
++			rawRequest: vi.fn().mockResolvedValue(pageSubjectsBody),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetPageSubjects.handle({ title: 'Rijksmuseum' }, ctx);
++
++		expect((mock.request.mock.calls[0][0] as Record<string, unknown>).titles).toBe('Rijksmuseum');
++		expect((mock.rawRequest.mock.calls[0][0] as { url: string }).url).toContain(
++			'/page/65/subjects',
++		);
++		expect(result.structuredContent).toMatchObject({
++			pageId: 65,
++			mainSubjectId: 'sMain',
++			subjects: [
++				{
++					id: 'sMain',
++					isMain: true,
++					schema: 'Museum',
++					statements: [{ property: 'Founded', type: 'number', value: 1800 }],
++				},
++				{ id: 'sChild', isMain: false, schema: 'Attendance' },
++			],
++		});
++	});
++
++	it('uses a numeric pageId directly without a title lookup', async () => {
++		const mock = createMockMwn({
++			request: vi.fn(),
++			rawRequest: vi
++				.fn()
++				.mockResolvedValue({ data: { pageId: 65, mainSubjectId: null, subjects: {} } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetPageSubjects.handle({ pageId: 65 }, ctx);
++		expect(mock.request).not.toHaveBeenCalled();
++		expect(result.structuredContent).toMatchObject({ subjects: [] });
++	});
++
++	it('rejects when neither title nor pageId is given', async () => {
++		const ctx = contextOn(createMockMwn());
++		const result = await swsGetPageSubjects.handle({}, ctx);
++		assertStructuredError(result, 'invalid_input');
++	});
++
++	it('rejects when both title and pageId are given', async () => {
++		const ctx = contextOn(createMockMwn());
++		const result = await swsGetPageSubjects.handle({ title: 'X', pageId: 1 }, ctx);
++		assertStructuredError(result, 'invalid_input');
++	});
++
++	it('returns not_found for a missing title', async () => {
++		const mock = createMockMwn({
++			request: vi.fn().mockResolvedValue({ query: { pages: [{ title: 'Nope', missing: true }] } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetPageSubjects.handle({ title: 'Nope' }, ctx);
++		assertStructuredError(result, 'not_found');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-get-schema.test.ts b/tests/tools/extensions/sws/sws-get-schema.test.ts
+new file mode 100644
+index 0000000..b5bf809
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-get-schema.test.ts
+@@ -0,0 +1,76 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { contextReturning } from '../../../helpers/rawRequest.ts';
++import { swsGetSchema } from '../../../../src/tools/extensions/sws/sws-get-schema.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++
++describe('sws-get-schema', () => {
++	it('normalizes propertyDefinitions to a properties array, preserving relation/select metadata', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({
++				data: {
++					schema: {
++						description: 'A company.',
++						propertyDefinitions: {
++							'Main product': {
++								type: 'relation',
++								targetSchemas: ['Product'],
++								multiple: false,
++							},
++							Status: { type: 'select', required: true, options: [{ id: 'o1', label: 'Active' }] },
++						},
++					},
++				},
++			}),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetSchema.handle({ name: 'Company' }, ctx);
++
++		expect((mock.rawRequest.mock.calls[0][0] as { url: string }).url).toContain('/schema/Company');
++		expect(result.structuredContent).toMatchObject({
++			name: 'Company',
++			description: 'A company.',
++			properties: [
++				{
++					name: 'Main product',
++					type: 'relation',
++					targetSchemas: ['Product'],
++				},
++				{ name: 'Status', type: 'select', options: [{ id: 'o1', label: 'Active' }] },
++			],
++		});
++	});
++
++	it('says when the schema describes Dependent Subjects', async () => {
++		const { ctx } = contextReturning({
++			schema: { subjectsAreDependent: true, propertyDefinitions: {} },
++		});
++		const result = await swsGetSchema.handle({ name: 'Birth' }, ctx);
++
++		expect(result.structuredContent).toMatchObject({ subjectsAreDependent: true });
++	});
++
++	it('leaves a schema of standalone subjects unflagged', async () => {
++		const { ctx } = contextReturning({ schema: { propertyDefinitions: {} } });
++		const result = await swsGetSchema.handle({ name: 'Person' }, ctx);
++
++		expect(result.structuredContent).not.toHaveProperty('subjectsAreDependent');
++	});
++
++	it('returns not_found when the response has no schema', async () => {
++		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: {} }) });
++		const ctx = contextOn(mock);
++		const result = await swsGetSchema.handle({ name: 'Nope' }, ctx);
++		assertStructuredError(result, 'not_found');
++	});
++
++	it('URL-encodes the schema name', async () => {
++		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: { schema: {} } }) });
++		const ctx = contextOn(mock);
++		await swsGetSchema.handle({ name: 'Schema Name' }, ctx);
++		expect((mock.rawRequest.mock.calls[0][0] as { url: string }).url).toContain(
++			'/schema/Schema%20Name',
++		);
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-get-subject.test.ts b/tests/tools/extensions/sws/sws-get-subject.test.ts
+new file mode 100644
+index 0000000..0988536
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-get-subject.test.ts
+@@ -0,0 +1,91 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn, type MockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { requestedUrl } from '../../../helpers/rawRequest.ts';
++import { swsGetSubject } from '../../../../src/tools/extensions/sws/sws-get-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++
++function mockReturningSubject(fields: Record<string, unknown>): MockMwn {
++	return createMockMwn({
++		rawRequest: vi.fn().mockResolvedValue({
++			data: {
++				requestedId: 's1demo1aaaaaaa1',
++				subjects: {
++					s1demo1aaaaaaa1: { id: 's1demo1aaaaaaa1', schema: 'Company', statements: {}, ...fields },
++				},
++			},
++		}),
++	});
++}
++
++describe('sws-get-subject', () => {
++	it('unwraps the subject envelope and flattens statements', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({
++				data: {
++					requestedId: 's1demo1aaaaaaa1',
++					subjects: {
++						s1demo1aaaaaaa1: {
++							id: 's1demo1aaaaaaa1',
++							label: 'ACME Inc',
++							schema: 'Company',
++							statements: { Status: { propertyType: 'select', value: ['o1demo1aaaaaaa1'] } },
++						},
++					},
++				},
++			}),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetSubject.handle({ id: 's1demo1aaaaaaa1' }, ctx);
++
++		expect((mock.rawRequest.mock.calls[0][0] as { url: string }).url).toContain(
++			'/subject/s1demo1aaaaaaa1',
++		);
++		expect(result.structuredContent).toMatchObject({
++			id: 's1demo1aaaaaaa1',
++			label: 'ACME Inc',
++			schema: 'Company',
++			statements: [{ property: 'Status', type: 'select', value: ['o1demo1aaaaaaa1'] }],
++		});
++	});
++
++	it('asks for the page fields and returns where the subject lives', async () => {
++		const mock = mockReturningSubject({ pageId: 42, pageTitle: 'ACME Inc', pageNamespaceId: 0 });
++		const ctx = contextOn(mock);
++		const result = await swsGetSubject.handle({ id: 's1demo1aaaaaaa1' }, ctx);
++
++		expect(requestedUrl(mock).searchParams.get('expand')).toBe('page');
++		expect(result.structuredContent).toMatchObject({ pageId: 42, pageTitle: 'ACME Inc' });
++	});
++
++	it('shows a subject without a label under its display name', async () => {
++		const mock = mockReturningSubject({ label: null, displayName: 'ACME Inc' });
++		const ctx = contextOn(mock);
++		const result = await swsGetSubject.handle({ id: 's1demo1aaaaaaa1' }, ctx);
++
++		expect(result.structuredContent).toMatchObject({ label: '', displayName: 'ACME Inc' });
++	});
++
++	it('names the Host Subject of a Dependent Subject', async () => {
++		const hostSubject = {
++			id: 's1demo5sssssss1',
++			displayName: 'Pablo Picasso',
++			displayNameIsGenerated: false,
++			schema: 'Person',
++		};
++		const mock = mockReturningSubject({ label: null, displayName: 'Birth', hostSubject });
++		const ctx = contextOn(mock);
++		const result = await swsGetSubject.handle({ id: 's1demo1aaaaaaa1' }, ctx);
++
++		expect(result.structuredContent).toMatchObject({ hostSubject });
++	});
++
++	it('returns not_found when the subject is absent', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({ data: { requestedId: 'sX', subjects: {} } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsGetSubject.handle({ id: 'sX' }, ctx);
++		assertStructuredError(result, 'not_found');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-list-schemas.test.ts b/tests/tools/extensions/sws/sws-list-schemas.test.ts
+new file mode 100644
+index 0000000..e684999
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-list-schemas.test.ts
+@@ -0,0 +1,64 @@
++import { describe, it, expect } from 'vitest';
++import { contextReturning, requestedUrl } from '../../../helpers/rawRequest.ts';
++import { swsListSchemas } from '../../../../src/tools/extensions/sws/sws-list-schemas.ts';
++import { assertStructuredSuccess } from '../../../helpers/structuredResult.ts';
++
++describe('sws-list-schemas', () => {
++	it('requests the first page of /schemas and returns the schema summaries', async () => {
++		const { mock, ctx } = contextReturning({
++			schemas: [{ name: 'Company', description: '', propertyCount: 10 }],
++			nextCursor: null,
++		});
++		const result = await swsListSchemas.handle({}, ctx);
++
++		const url = requestedUrl(mock);
++		expect(url.pathname).toBe('/w/rest.php/sws/v0/schemas');
++		expect(url.searchParams.get('limit')).toBe('50');
++		expect(url.searchParams.has('cursor')).toBe(false);
++		expect(assertStructuredSuccess(result)).toContain('Company');
++		expect(result.structuredContent).toMatchObject({
++			schemas: [{ name: 'Company', propertyCount: 10 }],
++		});
++		expect(result.structuredContent).not.toHaveProperty('truncation');
++	});
++
++	it('flags only the schemas whose subjects are dependent', async () => {
++		const { ctx } = contextReturning({
++			schemas: [
++				{ name: 'Person', description: '', propertyCount: 3, subjectsAreDependent: false },
++				{ name: 'Birth', description: '', propertyCount: 2, subjectsAreDependent: true },
++			],
++			nextCursor: null,
++		});
++		const result = await swsListSchemas.handle({}, ctx);
++
++		expect(result.structuredContent).toEqual({
++			schemas: [
++				{ name: 'Person', description: '', propertyCount: 3 },
++				{ name: 'Birth', description: '', propertyCount: 2, subjectsAreDependent: true },
++			],
++		});
++	});
++
++	it('hands back the next cursor as continueFrom while more schemas remain', async () => {
++		const { ctx } = contextReturning({
++			schemas: [{ name: 'A', description: '', propertyCount: 1 }],
++			nextCursor: '1462',
++		});
++		const result = await swsListSchemas.handle({}, ctx);
++
++		expect(result.structuredContent).toMatchObject({
++			truncation: {
++				reason: 'more-available',
++				continueWith: { param: 'continueFrom', value: '1462' },
++			},
++		});
++	});
++
++	it('passes continueFrom back as the cursor', async () => {
++		const { mock, ctx } = contextReturning({ schemas: [], nextCursor: null });
++		await swsListSchemas.handle({ continueFrom: '1462' }, ctx);
++
++		expect(requestedUrl(mock).searchParams.get('cursor')).toBe('1462');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-mint-subject-ids.test.ts b/tests/tools/extensions/sws/sws-mint-subject-ids.test.ts
+new file mode 100644
+index 0000000..a4c8abb
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-mint-subject-ids.test.ts
+@@ -0,0 +1,33 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsMintSubjectIds } from '../../../../src/tools/extensions/sws/sws-mint-subject-ids.ts';
++
++describe('sws-mint-subject-ids', () => {
++	it('mints the requested number of subject IDs with a CSRF token and write classification', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('csrf-token'),
++			rawRequest: vi
++				.fn()
++				.mockResolvedValue({ data: { subjectIds: ['s1demo6sssssss1', 's1demo6sssssss2'] } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsMintSubjectIds.handle({ count: 2 }, ctx);
++
++		const call = mock.rawRequest.mock.calls[0][0] as {
++			url: string;
++			method: string;
++			data: string;
++			headers: Record<string, string>;
++		};
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject-ids');
++		expect(call.method).toBe('POST');
++		expect(JSON.parse(call.data)).toEqual({ count: 2 });
++		expect(call.headers['X-CSRF-TOKEN']).toBe('csrf-token');
++		expect(swsMintSubjectIds.annotations?.readOnlyHint).toBe(false);
++		expect(swsMintSubjectIds.annotations?.idempotentHint).toBe(false);
++		expect(result.structuredContent).toEqual({
++			subjectIds: ['s1demo6sssssss1', 's1demo6sssssss2'],
++		});
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-search-subjects.test.ts b/tests/tools/extensions/sws/sws-search-subjects.test.ts
+new file mode 100644
+index 0000000..767afe4
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-search-subjects.test.ts
+@@ -0,0 +1,59 @@
++import { describe, it, expect } from 'vitest';
++import { contextReturning, requestedUrl } from '../../../helpers/rawRequest.ts';
++import { swsSearchSubjects } from '../../../../src/tools/extensions/sws/sws-search-subjects.ts';
++
++function matches(count: number): Array<{ id: string; label: string }> {
++	return Array.from({ length: count }, (_, i) => ({ id: `s${i}`, label: `A${i}` }));
++}
++
++describe('sws-search-subjects', () => {
++	it('passes schema and search and returns matches', async () => {
++		const { mock, ctx } = contextReturning([{ id: 's1demo1aaaaaaa1', label: 'ACME Inc' }]);
++		const result = await swsSearchSubjects.handle({ schema: 'Company', search: 'a' }, ctx);
++
++		const url = requestedUrl(mock);
++		expect(url.pathname).toBe('/w/rest.php/sws/v0/subject-labels');
++		expect(url.searchParams.get('schema')).toBe('Company');
++		expect(url.searchParams.get('search')).toBe('a');
++		expect(result.structuredContent).toMatchObject({
++			subjects: [{ id: 's1demo1aaaaaaa1', label: 'ACME Inc' }],
++		});
++	});
++
++	it('searches every schema when none is given', async () => {
++		const { mock, ctx } = contextReturning([]);
++		await swsSearchSubjects.handle({ search: 'a' }, ctx);
++
++		expect(requestedUrl(mock).searchParams.has('schema')).toBe(false);
++	});
++
++	it("asks for the endpoint's maximum of 50 matches", async () => {
++		const { mock, ctx } = contextReturning([]);
++		await swsSearchSubjects.handle({ search: 'a' }, ctx);
++
++		expect(requestedUrl(mock).searchParams.get('limit')).toBe('50');
++	});
++
++	it('does not mark a result below the limit as capped', async () => {
++		const { ctx } = contextReturning(matches(49));
++		const result = await swsSearchSubjects.handle({ search: 'a' }, ctx);
++
++		expect(result.structuredContent).not.toHaveProperty('truncation');
++	});
++
++	it('marks a result that fills the limit as capped', async () => {
++		const { ctx } = contextReturning(matches(50));
++		const result = await swsSearchSubjects.handle({ search: 'a' }, ctx);
++
++		expect(result.structuredContent).toMatchObject({
++			truncation: { reason: 'capped-no-continuation', returnedCount: 50, limit: 50 },
++		});
++	});
++
++	it('returns an empty list when the response is not an array', async () => {
++		const { ctx } = contextReturning({});
++		const result = await swsSearchSubjects.handle({ schema: 'Company', search: 'zzz' }, ctx);
++
++		expect(result.structuredContent).toMatchObject({ subjects: [] });
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-set-main-subject.test.ts b/tests/tools/extensions/sws/sws-set-main-subject.test.ts
+new file mode 100644
+index 0000000..47c2e38
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-set-main-subject.test.ts
+@@ -0,0 +1,113 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn, type MockMwn } from '../../../helpers/mock-mwn.ts';
++import { withoutEditAttribution, contextOn } from '../../../helpers/fakeContext.ts';
++import type { ToolContext } from '../../../../src/runtime/context.ts';
++import { swsSetMainSubject } from '../../../../src/tools/extensions/sws/sws-set-main-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++import { dispatch } from '../../../../src/runtime/dispatcher.ts';
++
++function contextWith(): { mock: MockMwn; ctx: ToolContext } {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('tok'),
++		rawRequest: vi.fn().mockResolvedValue({ data: { status: 'changed' } }),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++
++function sentBody(mock: MockMwn): Record<string, unknown> {
++	const { data } = mock.rawRequest.mock.calls[0][0] as { data: string };
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- JSON body the tool sent
++	return JSON.parse(data) as Record<string, unknown>;
++}
++
++describe('sws-set-main-subject', () => {
++	it('promotes a subject and returns changed', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'changed' } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsSetMainSubject.handle({ pageId: 7, subjectId: 's1demo' }, ctx);
++		const call = mock.rawRequest.mock.calls[0][0] as { url: string; method: string; data: string };
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/page/7/mainSubject');
++		expect(call.method).toBe('PUT');
++		expect(JSON.parse(call.data)).toMatchObject({ subjectId: 's1demo' });
++		expect(result.structuredContent).toMatchObject({ pageId: 7, status: 'changed' });
++	});
++
++	it('sends subjectId:null to clear the main subject', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'changed' } }),
++		});
++		const ctx = contextOn(mock);
++		await swsSetMainSubject.handle({ pageId: 7, subjectId: null }, ctx);
++		expect(JSON.parse((mock.rawRequest.mock.calls[0][0] as { data: string }).data)).toMatchObject({
++			subjectId: null,
++		});
++	});
++
++	it('attributes the write to the tool that made it, after the caller comment', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsSetMainSubject.handle(
++			{ pageId: 7, subjectId: 's1demo', comment: 'promote Berlin' },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toEqual({
++			subjectId: 's1demo',
++			comment: 'promote Berlin (via sws-set-main-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('attributes a write the caller gave no comment for', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsSetMainSubject.handle({ pageId: 7, subjectId: 's1demo' }, ctx);
++
++		expect(sentBody(mock)).toMatchObject({
++			comment: 'Automated edit (via sws-set-main-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('drops the attribution for a wiki that opts out of it', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsSetMainSubject.handle(
++			{ pageId: 7, subjectId: 's1demo', comment: 'promote Berlin' },
++			withoutEditAttribution(ctx),
++		);
++
++		expect(sentBody(mock)).toMatchObject({ comment: 'promote Berlin' });
++	});
++
++	it('sends no comment at all when a wiki opts out and the caller gave none', async () => {
++		const { mock, ctx } = contextWith();
++
++		await swsSetMainSubject.handle({ pageId: 7, subjectId: 's1demo' }, withoutEditAttribution(ctx));
++
++		expect(sentBody(mock)).not.toHaveProperty('comment');
++	});
++
++	it('rejects when neither title nor pageId is given', async () => {
++		const ctx = contextOn(createMockMwn());
++		const result = await swsSetMainSubject.handle({ subjectId: 's1' }, ctx);
++		assertStructuredError(result, 'invalid_input');
++	});
++
++	it('maps a 404 (subject not on page) to not_found', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(
++					httpError(404, { status: 'error', message: 'Subject not found on this page' }),
++				),
++		});
++		const ctx = contextOn(mock);
++		const result = await dispatch(swsSetMainSubject, ctx)({ pageId: 7, subjectId: 'sX' });
++		assertStructuredError(result, 'not_found');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-update-subject.test.ts b/tests/tools/extensions/sws/sws-update-subject.test.ts
+new file mode 100644
+index 0000000..0f0bc5b
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-update-subject.test.ts
+@@ -0,0 +1,177 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn, type MockMwn } from '../../../helpers/mock-mwn.ts';
++import { withoutEditAttribution, contextOn } from '../../../helpers/fakeContext.ts';
++import type { ToolContext } from '../../../../src/runtime/context.ts';
++import { swsUpdateSubject } from '../../../../src/tools/extensions/sws/sws-update-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++import { dispatch } from '../../../../src/runtime/dispatcher.ts';
++
++const stmts = { Founded: { propertyType: 'number', value: 2019 } };
++
++const birth = {
++	id: 's1demo6sssssss1',
++	schema: 'Birth',
++	statements: { Year: { propertyType: 'number', value: 1881 } },
++};
++
++const updated = { status: 'updated', subjectId: 's1demo' };
++
++function contextWith(data: unknown): { mock: MockMwn; ctx: ToolContext } {
++	const mock = createMockMwn({
++		getCsrfToken: vi.fn().mockResolvedValue('tok'),
++		rawRequest: vi
++			.fn()
++			.mockImplementation(async (spec) =>
++				spec.method === 'GET' ? { data: { subjects: { s1demo: { id: 's1demo' } } } } : { data },
++			),
++	});
++	return { mock, ctx: contextOn(mock) };
++}
++
++function sentBody(mock: MockMwn): Record<string, unknown> {
++	const { data } = mock.rawRequest.mock.calls.at(-1)![0] as { data: string };
++	// oxlint-disable-next-line typescript/no-unsafe-type-assertion -- JSON body the tool sent
++	return JSON.parse(data) as Record<string, unknown>;
++}
++
++describe('sws-update-subject', () => {
++	it('PUTs a full replace with a CSRF token', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi
++				.fn()
++				.mockImplementation(async (spec) =>
++					spec.method === 'GET'
++						? { data: { subjects: { s1demo: { id: 's1demo' } } } }
++						: { data: { status: 'updated', subjectId: 's1demo' } },
++				),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsUpdateSubject.handle(
++			{ id: 's1demo', label: 'ACME', statements: stmts, comment: 'tidy' },
++			ctx,
++		);
++		const call = mock.rawRequest.mock.calls.at(-1)![0] as {
++			url: string;
++			method: string;
++			data: string;
++			headers: Record<string, string>;
++		};
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/s1demo');
++		expect(call.method).toBe('PUT');
++		expect(call.headers['X-CSRF-TOKEN']).toBe('tok');
++		expect(JSON.parse(call.data)).toMatchObject({ label: 'ACME', statements: stmts });
++		expect(result.structuredContent).toMatchObject({ subjectId: 's1demo', status: 'updated' });
++	});
++
++	it('attributes the write to the tool that made it, after the caller comment', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle(
++			{ id: 's1demo', label: 'ACME', statements: stmts, comment: 'tidy' },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toEqual({
++			label: 'ACME',
++			statements: stmts,
++			comment: 'tidy (via sws-update-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('attributes a write the caller gave no comment for', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle({ id: 's1demo', label: 'ACME', statements: stmts }, ctx);
++
++		expect(sentBody(mock)).toMatchObject({
++			comment: 'Automated edit (via sws-update-subject on MediaWiki MCP Server)',
++		});
++	});
++
++	it('drops the attribution for a wiki that opts out of it', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle(
++			{ id: 's1demo', label: 'ACME', statements: stmts, comment: 'tidy' },
++			withoutEditAttribution(ctx),
++		);
++
++		expect(sentBody(mock)).toMatchObject({ comment: 'tidy' });
++	});
++
++	it('sends no comment at all when a wiki opts out and the caller gave none', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle(
++			{ id: 's1demo', label: 'ACME', statements: stmts },
++			withoutEditAttribution(ctx),
++		);
++
++		expect(sentBody(mock)).not.toHaveProperty('comment');
++	});
++
++	it('writes dependent subjects in the same request', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle(
++			{ id: 's1demo', statements: stmts, dependentSubjects: [birth] },
++			ctx,
++		);
++
++		expect(sentBody(mock)).toMatchObject({ dependentSubjects: [birth] });
++	});
++
++	it('takes back the empty label a read returns for a subject without one', () => {
++		expect(swsUpdateSubject.inputSchema.label.safeParse('').success).toBe(true);
++	});
++
++	it('omits the label when none is given, which clears it', async () => {
++		const { mock, ctx } = contextWith(updated);
++
++		await swsUpdateSubject.handle({ id: 's1demo', statements: stmts }, ctx);
++
++		expect(sentBody(mock)).not.toHaveProperty('label');
++	});
++
++	it('returns the violations the write reported and the subject as saved', async () => {
++		const violation = {
++			propertyName: 'Founded',
++			code: 'max-value',
++			args: [2000],
++			severity: 'warning',
++		};
++		const { ctx } = contextWith({
++			status: 'updated',
++			subjectId: 's1demo',
++			violations: [violation],
++			subject: {
++				id: 's1demo',
++				label: 'ACME',
++				displayName: 'ACME',
++				schema: 'Company',
++				statements: { Founded: { propertyType: 'number', value: 2019 } },
++			},
++		});
++		const result = await swsUpdateSubject.handle(
++			{ id: 's1demo', label: 'ACME', statements: stmts },
++			ctx,
++		);
++
++		expect(result.structuredContent).toMatchObject({
++			violations: [violation],
++			subject: { statements: [{ property: 'Founded', type: 'number', value: 2019 }] },
++		});
++	});
++
++	it('maps a 404 to not_found', async () => {
++		const mock = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('tok'),
++			rawRequest: vi.fn().mockRejectedValue(httpError(404, { status: 'error', message: 'gone' })),
++		});
++		const ctx = contextOn(mock);
++		const result = await dispatch(swsUpdateSubject, ctx)({ id: 'sX', label: 'X', statements: {} });
++		assertStructuredError(result, 'not_found');
++	});
++});
+diff --git a/tests/tools/extensions/sws/sws-validate-subject.test.ts b/tests/tools/extensions/sws/sws-validate-subject.test.ts
+new file mode 100644
+index 0000000..d863646
+--- /dev/null
++++ b/tests/tools/extensions/sws/sws-validate-subject.test.ts
+@@ -0,0 +1,49 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsValidateSubject } from '../../../../src/tools/extensions/sws/sws-validate-subject.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++
++const stmts = { Founded: { propertyType: 'number', value: 2019 } };
++
++describe('sws-validate-subject', () => {
++	it('validates a new subject against a schema (no CSRF token)', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({ data: { violations: [] } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsValidateSubject.handle({ schema: 'Company', statements: stmts }, ctx);
++		const call = mock.rawRequest.mock.calls[0][0] as {
++			url: string;
++			data: string;
++			headers: Record<string, string>;
++		};
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/validate');
++		expect(JSON.parse(call.data)).toEqual({ schema: 'Company', statements: stmts });
++		expect(call.headers['X-CSRF-TOKEN']).toBeUndefined();
++		expect(mock.getCsrfToken).not.toHaveBeenCalled();
++		expect(result.structuredContent).toMatchObject({ violations: [] });
++	});
++
++	it('validates an update when id is given', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockResolvedValue({ data: { violations: [{ property: 'Founded', message: 'bad' }] } }),
++		});
++		const ctx = contextOn(mock);
++		const result = await swsValidateSubject.handle({ id: 's1demo', statements: stmts }, ctx);
++		const call = mock.rawRequest.mock.calls[0][0] as { url: string; data: string };
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/s1demo/validate');
++		expect(JSON.parse(call.data)).toEqual({ statements: stmts });
++		expect(result.structuredContent).toMatchObject({
++			violations: [{ property: 'Founded', message: 'bad' }],
++		});
++	});
++
++	it('rejects a new-subject validation with no schema', async () => {
++		const ctx = contextOn(createMockMwn());
++		const result = await swsValidateSubject.handle({ statements: stmts }, ctx);
++		assertStructuredError(result, 'invalid_input');
++	});
++});
+diff --git a/tests/tools/extensions/sws/swsRequest.test.ts b/tests/tools/extensions/sws/swsRequest.test.ts
+new file mode 100644
+index 0000000..804bda5
+--- /dev/null
++++ b/tests/tools/extensions/sws/swsRequest.test.ts
+@@ -0,0 +1,265 @@
++import { describe, it, expect, vi } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { swsRequest } from '../../../../src/tools/extensions/sws/swsRequest.ts';
++import { ClassifiedError } from '../../../../src/errors/classifyError.ts';
++import { WikiTimeoutError } from '../../../../src/errors/wikiTimeoutError.ts';
++import { rejectionOf } from '../../../helpers/rejectionOf.ts';
++import { httpError } from '../../../helpers/httpError.ts';
++
++describe('swsRequest', () => {
++	it('derives the REST base from apiUrl and sends a GET with query string', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({ data: { schemas: [], totalRows: 0 } }),
++		});
++		await swsRequest(mock as never, {
++			method: 'GET',
++			path: '/schemas',
++			query: { limit: '500', offset: '0' },
++		});
++		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/schemas?limit=500&offset=0');
++		expect(call.method).toBe('GET');
++	});
++
++	it('lets an expired call budget through instead of relabelling it', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(new WikiTimeoutError(150_000, 'calling')),
++		});
++
++		const err = await rejectionOf(swsRequest(mock as never, { method: 'GET', path: '/schemas' }));
++
++		// Converted, the tool returns it as a RESULT the dispatcher never sees,
++		// losing the code and the write caveat.
++		expect(err).toBeInstanceOf(WikiTimeoutError);
++		expect(err).not.toBeInstanceOf(ClassifiedError);
++	});
++
++	it('JSON-encodes a POST body and sets Content-Type', async () => {
++		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: { rows: [] } }) });
++		await swsRequest(mock as never, {
++			method: 'POST',
++			path: '/query/cypher',
++			body: { cypher: 'RETURN 1' },
++		});
++		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/query/cypher');
++		expect(call.method).toBe('POST');
++		expect(call.data).toBe(JSON.stringify({ cypher: 'RETURN 1' }));
++		expect((call.headers as Record<string, string>)['Content-Type']).toBe('application/json');
++	});
++
++	it('injects the bearer when using OAuth2, and omits it otherwise', async () => {
++		const withTok = createMockMwn({
++			usingOAuth2: true,
++			options: { apiUrl: 'https://test.wiki/w/api.php', OAuth2AccessToken: 'tok' },
++			rawRequest: vi.fn().mockResolvedValue({ data: {} }),
++		});
++		await swsRequest(withTok as never, { method: 'GET', path: '/schemas' });
++		const h1 = (withTok.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
++		expect(h1.Authorization).toBe('Bearer tok');
++
++		const noTok = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: {} }) });
++		await swsRequest(noTok as never, { method: 'GET', path: '/schemas' });
++		const h2 = (noTok.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
++		expect(h2.Authorization).toBeUndefined();
++	});
++
++	it('maps an errorType envelope to the right category', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(
++					httpError(422, { errorType: 'writeQueryRejected', message: 'Query is not read-only.' }),
++				),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
++		).rejects.toMatchObject({ category: 'invalid_input', message: 'Query is not read-only.' });
++	});
++
++	it('maps permission/rate/backend errorTypes', async () => {
++		const cases: Array<[string, string]> = [
++			['permissionDenied', 'permission_denied'],
++			['rateLimitExceeded', 'rate_limited'],
++			['backendUnavailable', 'upstream_failure'],
++		];
++		for (const [errorType, category] of cases) {
++			const mock = createMockMwn({
++				rawRequest: vi.fn().mockRejectedValue(httpError(500, { errorType, message: 'x' })),
++			});
++			await expect(
++				swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
++			).rejects.toMatchObject({ category });
++		}
++	});
++
++	it('maps a REST param-validation envelope to invalid_input with the English message', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(
++				httpError(400, {
++					error: 'parameter-validation-failed',
++					messageTranslations: { en: 'The "schema" parameter must be set.' },
++				}),
++			),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'GET', path: '/subject-labels' }),
++		).rejects.toMatchObject({
++			category: 'invalid_input',
++			message: 'The "schema" parameter must be set.',
++		});
++	});
++
++	it('maps a read-denied envelope to permission_denied', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(
++					httpError(403, { error: 'rest-read-denied', httpCode: 403, httpReason: 'Forbidden' }),
++				),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'GET', path: '/schemas' }),
++		).rejects.toMatchObject({ category: 'permission_denied' });
++	});
++
++	it('records the HTTP status the wiki answered with', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(httpError(409, { status: 'error', message: 'taken' })),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'POST', path: '/subject', body: {} }),
++		).rejects.toMatchObject({ upstreamStatus: 409 });
++	});
++
++	it('maps a refused write to invalid_input and carries its violations', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(
++				httpError(422, {
++					status: 'error',
++					message: 'Validation failed',
++					violations: [
++						{
++							propertyName: null,
++							code: 'dependent-subject-without-host',
++							args: [],
++							severity: 'error',
++							subjectId: 's1demo6sssssss1',
++						},
++					],
++				}),
++			),
++		});
++		const err = await rejectionOf(
++			swsRequest(mock as never, { method: 'PUT', path: '/subject/s1', body: {}, csrf: true }),
++		);
++		expect(err).toMatchObject({ category: 'invalid_input' });
++		expect((err as Error).message).toContain('dependent-subject-without-host');
++		expect((err as Error).message).toContain('s1demo6sssssss1');
++	});
++
++	it('maps a 404 to not_found', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(httpError(404, { error: 'not-found' })),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'GET', path: '/schema/Nope' }),
++		).rejects.toMatchObject({ category: 'not_found' });
++	});
++
++	it('sanitizes an internal-exception body to message only', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockRejectedValue(
++				httpError(500, {
++					message: 'Error: Unsupported Cypher value type: DateTime',
++					exception: { backtrace: ['secret/path.php:67'] },
++				}),
++			),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
++		).rejects.toMatchObject({
++			category: 'upstream_failure',
++			message: 'Error: Unsupported Cypher value type: DateTime',
++		});
++	});
++
++	it('throws upstream_failure when apiUrl is not set', async () => {
++		const mock = createMockMwn({ options: { apiUrl: '' } });
++		await expect(
++			swsRequest(mock as never, { method: 'GET', path: '/schemas' }),
++		).rejects.toMatchObject({ category: 'upstream_failure' });
++	});
++
++	it('falls back to upstream_failure for an unknown errorType', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi
++				.fn()
++				.mockRejectedValue(httpError(500, { errorType: 'someFutureType', message: 'x' })),
++		});
++		await expect(
++			swsRequest(mock as never, { method: 'POST', path: '/query/cypher', body: {} }),
++		).rejects.toMatchObject({ category: 'upstream_failure' });
++	});
++
++	it('sends a PUT to the right URL', async () => {
++		const mock = createMockMwn({
++			rawRequest: vi.fn().mockResolvedValue({ data: { status: 'updated', subjectId: 's1' } }),
++		});
++		await swsRequest(mock as never, {
++			method: 'PUT',
++			path: '/subject/s1',
++			body: { label: 'X', statements: {} },
++		});
++		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
++		expect(call.url).toBe('https://test.wiki/w/rest.php/sws/v0/subject/s1');
++		expect(call.method).toBe('PUT');
++	});
++
++	it('sends a DELETE and tolerates an empty body', async () => {
++		const mock = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: '' }) });
++		const out = await swsRequest(mock as never, { method: 'DELETE', path: '/subject/s1' });
++		const call = mock.rawRequest.mock.calls[0][0] as Record<string, unknown>;
++		expect(call.method).toBe('DELETE');
++		expect(out).toBe('');
++	});
++
++	it('injects X-CSRF-TOKEN when csrf is set, and omits it otherwise', async () => {
++		const withCsrf = createMockMwn({
++			getCsrfToken: vi.fn().mockResolvedValue('csrf-tok'),
++			rawRequest: vi.fn().mockResolvedValue({ data: {} }),
++		});
++		await swsRequest(withCsrf as never, { method: 'DELETE', path: '/subject/s1', csrf: true });
++		const h1 = (withCsrf.rawRequest.mock.calls[0][0] as { headers: Record<string, string> })
++			.headers;
++		expect(h1['X-CSRF-TOKEN']).toBe('csrf-tok');
++		expect(withCsrf.getCsrfToken).toHaveBeenCalledTimes(1);
++
++		const noCsrf = createMockMwn({ rawRequest: vi.fn().mockResolvedValue({ data: {} }) });
++		await swsRequest(noCsrf as never, { method: 'GET', path: '/schemas' });
++		const h2 = (noCsrf.rawRequest.mock.calls[0][0] as { headers: Record<string, string> }).headers;
++		expect(h2['X-CSRF-TOKEN']).toBeUndefined();
++		expect(noCsrf.getCsrfToken).not.toHaveBeenCalled();
++	});
++
++	it('maps the write {status:error,message} envelope by HTTP status', async () => {
++		const cases: Array<[number, string]> = [
++			[400, 'invalid_input'],
++			[403, 'permission_denied'],
++			[404, 'not_found'],
++			[409, 'conflict'],
++			[429, 'rate_limited'],
++			[500, 'upstream_failure'],
++		];
++		for (const [status, category] of cases) {
++			const mock = createMockMwn({
++				rawRequest: vi
++					.fn()
++					.mockRejectedValue(httpError(status, { status: 'error', message: 'bad' })),
++			});
++			await expect(
++				swsRequest(mock as never, { method: 'PUT', path: '/subject/s1', body: {}, csrf: true }),
++			).rejects.toMatchObject({ category, message: 'bad' });
++		}
++	});
++});
+diff --git a/tests/tools/extensions/swsbase/swsbase-get-data-view.test.ts b/tests/tools/extensions/swsbase/swsbase-get-data-view.test.ts
+new file mode 100644
+index 0000000..c8e5fde
+--- /dev/null
++++ b/tests/tools/extensions/swsbase/swsbase-get-data-view.test.ts
+@@ -0,0 +1,137 @@
++import { describe, it, expect, vi, afterEach } from 'vitest';
++import { createMockMwn } from '../../../helpers/mock-mwn.ts';
++import { contextOn } from '../../../helpers/fakeContext.ts';
++import { swsGetDataView as tool } from '../../../../src/tools/extensions/swsbase/swsbase-get-data-view.ts';
++import { swsBasePack } from '../../../../src/tools/extensions/swsbase/index.ts';
++import { assertStructuredError } from '../../../helpers/structuredResult.ts';
++import { z } from 'zod';
++
++const view = () => ({
++	version: 1,
++	readOnly: true,
++	complete: true,
++	page: { id: 42, title: 'Person' },
++	identities: { wikidata: { id: 'Q5' } },
++	subjects: [
++		{
++			id: 'sMain',
++			fields: [
++				{
++					name: 'Klasse',
++					ownValues: [],
++					external: { source: 'wikidata', values: [{ id: 'Q5', label: 'Mensch' }] },
++					effectiveValues: [{ id: 'Q5', label: 'Mensch' }],
++				},
++				{ name: 'Datum', ownValues: [{ value: '-0347', calendar: 'julian', precision: 'year' }] },
++				{ name: 'Zahl', ownValues: [{ value: 0 }, { value: false }] },
++			],
++		},
++	],
++});
++function setup(data: unknown = { swsbasedataview: view() }) {
++	const mock = createMockMwn({ request: vi.fn().mockResolvedValue(data) });
++	return { mock, ctx: contextOn(mock) };
++}
++afterEach(() => vi.unstubAllEnvs());
++describe('swsbase-get-data-view', () => {
++	it('preserves the complete typed payload without writes', async () => {
++		const { mock, ctx } = setup();
++		const r = await tool.handle({ pageId: 42, language: 'de' }, ctx);
++		expect(r.structuredContent).toEqual({ ...view(), selection: { subject: null, fields: null } });
++		expect(mock.request).toHaveBeenCalledExactlyOnceWith({
++			action: 'swsbasedataview',
++			pageid: 42,
++			language: 'de',
++			format: 'json',
++			formatversion: 2,
++		});
++	});
++	it('resolves titles using the existing authenticated context', async () => {
++		const { mock, ctx } = setup();
++		mock.request.mockResolvedValueOnce({ query: { pages: [{ pageid: 42 }] } });
++		const r = await tool.handle({ title: 'Person' }, ctx);
++		expect(r.isError).not.toBe(true);
++		expect(mock.request).toHaveBeenCalledTimes(2);
++	});
++	it.each([{}, { title: 'X', pageId: 42 }])(
++		'rejects ambiguous/missing page references',
++		async (args) => {
++			const { mock, ctx } = setup();
++			assertStructuredError(await tool.handle(args, ctx), 'invalid_input');
++			expect(mock.request).not.toHaveBeenCalled();
++		},
++	);
++	it('reports a missing title', async () => {
++		const { ctx } = setup({ query: { pages: [{ missing: true }] } });
++		assertStructuredError(await tool.handle({ title: 'Missing' }, ctx), 'not_found');
++	});
++	it('preserves incomplete status and supports field projection', async () => {
++		const v = { ...view(), complete: false };
++		const { ctx } = setup({ swsbasedataview: v });
++		const r = await tool.handle({ pageId: 42, fields: ['Datum'] }, ctx);
++		expect(r.structuredContent).toMatchObject({
++			complete: false,
++			selection: { fields: ['Datum'] },
++			subjects: [{ fields: [v.subjects[0]!.fields[1]] }],
++		});
++	});
++	it('rejects unknown fields instead of silently returning nothing', async () => {
++		const { ctx } = setup();
++		assertStructuredError(
++			await tool.handle({ pageId: 42, fields: ['Typo'] }, ctx),
++			'invalid_input',
++		);
++	});
++	it('passes source/authentication failures to the central dispatcher', async () => {
++		const { mock, ctx } = setup();
++		mock.request.mockRejectedValueOnce(new Error('permissiondenied'));
++		await expect(tool.handle({ pageId: 42 }, ctx)).rejects.toThrow('permissiondenied');
++	});
++	it.each([
++		{},
++		{ swsbasedataview: { ...view(), version: 2 } },
++		{ swsbasedataview: { ...view(), page: { id: 99 } } },
++	])('rejects incompatible or mismatched results', async (data) => {
++		const { ctx } = setup(data);
++		assertStructuredError(await tool.handle({ pageId: 42 }, ctx), 'upstream_failure');
++	});
++	it('checks subject selection against the response', async () => {
++		const { ctx } = setup();
++		expect((await tool.handle({ pageId: 42, subject: 'sMain' }, ctx)).isError).not.toBe(true);
++		assertStructuredError(
++			await tool.handle({ pageId: 42, subject: 'sOther' }, ctx),
++			'upstream_failure',
++		);
++	});
++	it('refuses oversized data explicitly and allows a narrower retry', async () => {
++		vi.stubEnv('MCP_CONTENT_MAX_BYTES', '1000');
++		const v = view();
++		v.subjects[0]!.fields[0]!.ownValues = [];
++		const huge = {
++			...v,
++			subjects: [
++				{
++					id: 'sMain',
++					fields: [
++						{ name: 'Long', ownValues: [{ value: 'ä'.repeat(2000) }] },
++						{ name: 'Small', ownValues: [{ value: 0 }] },
++					],
++				},
++			],
++		};
++		const { ctx } = setup({ swsbasedataview: huge });
++		assertStructuredError(await tool.handle({ pageId: 42 }, ctx), 'invalid_input');
++		expect((await tool.handle({ pageId: 42, fields: ['Small'] }, ctx)).isError).not.toBe(true);
++	});
++	it('validates language and input types at registration boundary', () => {
++		const schema = z.object(tool.inputSchema);
++		expect(schema.safeParse({ pageId: 0 }).success).toBe(false);
++		expect(schema.safeParse({ language: '../../' }).success).toBe(false);
++		expect(schema.safeParse({ language: 'en-gb' }).success).toBe(true);
++	});
++	it('gates only the new tool on Bridge availability', () => {
++		expect(swsBasePack.extensionNames).toEqual(['SchemaBaseBridge']);
++		expect(swsBasePack.tools).toEqual([tool]);
++		expect(tool.annotations?.readOnlyHint).toBe(true);
++	});
++});

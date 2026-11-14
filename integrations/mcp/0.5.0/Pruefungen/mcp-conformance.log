@@ -1,0 +1,14 @@
+
+> @professional-wiki/mediawiki-mcp-server@0.21.0 check:mcp
+> node scripts/mcp-checks.cjs
+
+
+Running MCPJam server doctor (stdio)...
+✓ Doctor ready: 29 tools, 1 resources
+
+Starting HTTP transport on port 3117...
+Running MCP protocol conformance (2026-07-28)...
+✓ Conformance: 21/36 checks passed, 0 failed, 3 could not run, 12 not applicable, 9 pending (unscored by profile mcp-protocol@2026-08-21.1)
+  Tolerated as unrunnable, so not asserted: modern-undeclared-capability-error, modern-tool-output-schema-conformant, modern-logs-require-log-level, modern-log-level-filtering, modern-subscription-graceful-close
+
+✓ MCP checks passed

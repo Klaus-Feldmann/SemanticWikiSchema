@@ -25,3 +25,6 @@ __pycache__/
 
 # Also exclude dependency symlinks used only for local checks.
 node_modules
+
+# Pinned installation for the standalone MCP integration.
+!integrations/mcp/0.5.0/Installation/package-lock.json
