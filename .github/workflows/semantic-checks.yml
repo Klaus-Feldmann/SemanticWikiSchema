@@ -1,9 +1,9 @@
 name: SemanticWikiSchema candidate checks
 on:
   push:
-    branches: [master, "publication/sws-0.5.0"]
+    branches: [master, "publication/sws-0.5.0*"]
   pull_request:
-    branches: [master, "publication/sws-0.5.0"]
+    branches: [master, "publication/sws-0.5.0*"]
   workflow_dispatch:
 permissions:
   contents: read
