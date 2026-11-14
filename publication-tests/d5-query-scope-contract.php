@@ -1,0 +1,31 @@
+<?php
+require __DIR__.'/d2-query-syntax-contract.php';
+use CollectorHarness\State as H;
+use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinition,PropertyDefinitions};
+use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use ProfessionalWiki\SWS\Domain\Statement;
+use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue};
+use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use ProfessionalWiki\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
+use ProfessionalWiki\SWS\SWSExtension;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Revision\RevisionRecord;
+$count=0;function xcheck($ok,$why){global $count;$count++;if(!$ok)throw new RuntimeException($why);}
+$a=new Schema(new SchemaName('S11'),'',new PropertyDefinitions(['F4'=>PropertyDefinition::fromJson(['type'=>'text'],$registry)]),false,new SchemaId('S11'),new LocalizedIdentity('de',['de'=>'Gleicher Titel']));
+$b=new Schema(new SchemaName('S12'),'',new PropertyDefinitions(['F4'=>PropertyDefinition::fromJson(['type'=>'number'],$registry)]),false,new SchemaId('S12'),new LocalizedIdentity('de',['de'=>'Gleicher Titel']));
+SWSExtension::$schemaById=['S11'=>$a,'S12'=>$b];
+$ea=new Subject(new SubjectId('E31'),null,$a->getReference(),new StatementList([new Statement(new PropertyName('F4'),'text',new StringValue('Schema A'))]),[],null,new LocalizedIdentity('de',['de'=>'A']));
+$eb=new Subject(new SubjectId('E32'),null,$b->getReference(),new StatementList([new Statement(new PropertyName('F4'),'number',new NumberValue(42))]),[],null,new LocalizedIdentity('de',['de'=>'B']));
+H::$revision=new RevisionRecord(401,943,['sws'=>SubjectContent::newFromData(new PageSubjects($ea,new SubjectMap($eb)))]);H::$revisions[401]=H::$revision;H::$mode='store';H::$requests=[];
+$p=new Parser();$fn=new SWSValueParserFunction($ownResolver,ParserFieldLookup::create($p));
+xcheck($fn->handle($p,'E31','F4')[0]==='Schema A','First entity selects its own schema field');
+xcheck($fn->handle($p,'E32','F4')[0]==='42','Second entity selects different schema and datatype');
+xcheck($fn->handle($p,'F4')[0]==='Schema A','One-field call selects main entity only');
+xcheck($fn->handle($p,'E31','f4')==='','Case is not guessed');
+xcheck($fn->handle($p,'E999','F4')==='','Missing entity is not replaced by a matching field elsewhere');
+xcheck($fn->handle($p,'E32','F5')==='','No field fallback across schemas');
+xcheck(H::$requests===[],'No external requests for local own data');
+echo "$count D5 actual E-ID/field/schema/datatype selection checks passed (controlled host).\n";

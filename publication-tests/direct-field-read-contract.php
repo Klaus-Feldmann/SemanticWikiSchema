@@ -93,15 +93,15 @@ $view=(new \SWSBaseBridge\DataViewLookup($context))->read($title,'de');$vf=array
 dcheck($vf['Ort']['effectiveValues'][0]['value']===$fields['Ort']['values'][0]['value'],'View and direct field agree');
 $reader=FieldSnapshot::reader(SWSExtension::$schema,$subject,fn()=>SourceFieldLookup::read($context,$title,$subject,SWSExtension::$schema,'de'));
 $smw=$reader->collectForAnnotations();$plan=(new AnnotationPlanner(['properties'=>[]]))->build($smw);
-dcheck(in_array('Ort=Gespeicherter Ort',$plan->rows,true)&&!str_contains(implode('\n',$plan->rows),'unavailable'),'SMW uses value not error');
+dcheck(in_array('Person:Ort=Gespeicherter Ort',$plan->rows,true)&&!str_contains(implode('\n',$plan->rows),'unavailable'),'SMW uses value not error');
 $notes=(new FieldNoteAnnotations())->build($smw,['properties'=>[]]);
-dcheck(in_array('Ort (AM)=Forschungsnotiz',$notes,true)&&count(array_filter($notes,fn($v)=>str_contains($v,'unavailable')))===1,'SMW separate notes once');
+dcheck(in_array('Person:Ort (AM)=Forschungsnotiz',$notes,true)&&count(array_filter($notes,fn($v)=>str_contains($v,'unavailable')))===1,'SMW separate notes once');
 
 $user=new \MediaWiki\User\User();
 (new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
  new \ProfessionalWiki\SWS\Domain\Page\PageSubjects($subject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap()),$subject,$user,fn()=>SWSExtension::$schema);
 $automatic=\ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
-dcheck(in_array('Ort=Gespeicherter Ort',$automatic->rows,true)&&in_array('Ort (AM)=Forschungsnotiz',$automatic->rows,true),'Actual AutomaticAnnotations uses shared local reader and note planner');
+dcheck(in_array('Person:Ort=Gespeicherter Ort',$automatic->rows,true)&&in_array('Person:Ort (AM)=Forschungsnotiz',$automatic->rows,true),'Actual AutomaticAnnotations uses shared local reader and note planner');
 $manual=$subject->withStatements(new StatementList([new Statement(new PropertyName('Ort'),'text',new StringValue('Forschungsstand'))]));setStorePage($manual);
 $m=(new EffectiveFieldLookup($context))->read($title,['field'=>'Ort'])['fields'][0];
 dcheck($m['values'][0]['value']==='Forschungsstand'&&$m['values'][0]['origin']==='own'&&$m['sourceStatus']==='unavailable','Own wins without hiding source status');
@@ -121,7 +121,7 @@ dcheck($ml->getAll('Name')===[[1=>'Erster',2=>'Zweiter']],'All scalar values ret
 $mf=new SWSValueParserFunction($legacy,ParserFieldLookup::create($mp));
 dcheck($mf->handle($mp,'Name','separator= / ')[0]==='Erster/Zweiter','Parser separator controls multiple values');
 $escaped=$mf->handle($mp,'Freitext');
-dcheck(str_contains($escaped[0],'&lt;script&gt;')&&$escaped['noparse']&&$escaped['isHTML'],'Free Wikitext remains escaped in scalar query output');
+dcheck($escaped[0]===wfEscapeWikiText('<script>unsafe</script>[[Kategorie:Test]]')&&$escaped['noparse']&&!$escaped['isHTML'],'Free Wikitext remains escaped in scalar query output');
 $pin=new EffectiveFieldLookup($context);$before=$pin->read($title,['field'=>'Name']);
 setStorePage($manual,104);
 dcheck($pin->read($title,['field'=>'Name'])['fields'][0]['values']===$before['fields'][0]['values'],'One reader retains one published snapshot despite later revision');
@@ -141,7 +141,7 @@ $imageSubject=readStoreSnapshot(storedAttempt([$badImage],[], $initial,103));
 (new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
  new \ProfessionalWiki\SWS\Domain\Page\PageSubjects($imageSubject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap()),$imageSubject,$user,fn()=>SWSExtension::$schema);
 $imagePlan=\ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
-dcheck(count($imagePlan->rows)===1&&str_starts_with($imagePlan->rows[0],'Bild (AM)=')&&str_contains($imagePlan->rows[0],'unavailable'),'Image-only source warning from local stock without scalar image annotation');
+dcheck(count($imagePlan->rows)===1&&str_starts_with($imagePlan->rows[0],'Person:Bild (AM)=')&&str_contains($imagePlan->rows[0],'unavailable'),'Image-only source warning from local stock without scalar image annotation');
 dcheck(D::$requests===[]&&D::$identityLookups===0,'Zero D4 store source/identity requests');
 
 // Optional cache operation still resolves sources; an own-only projection never does.

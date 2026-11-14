@@ -45,6 +45,7 @@ readonly class GetSubjectResponseItem {
 		public ?HostSubject $hostSubject,
         public array $fieldNotes = [],
 		public ?array $identity = null,
+		public int $fieldKeyVersion = 0,
 	) {
 	}
 
@@ -75,6 +76,7 @@ readonly class GetSubjectResponseItem {
 			pageNamespaceId: $pageIdentifiers?->getNamespaceId(),
 			hostSubject: $hostSubject,
             fieldNotes: $subject->getFieldNotes(),
+			fieldKeyVersion: $subject->getFieldKeyVersion(),
 			identity: $subject->getIdentity()?->toJson(),
 		);
 	}

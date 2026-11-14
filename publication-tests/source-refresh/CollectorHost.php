@@ -33,7 +33,7 @@ namespace MediaWiki\Context {
 	class DerivativeContext extends TestContext {
 		private mixed $request;
 		private mixed $authority = null;
-		public function __construct( mixed $context ) {}
+		public function __construct( mixed $context ) { $this->request = $context->getRequest(); }
 		public function setRequest( mixed $request ): void { $this->request = $request; }
 		public function getRequest(): mixed { return $this->request; }
 		public function setUser( mixed $user ): void { $this->authority = $user; }
@@ -142,9 +142,11 @@ namespace ProfessionalWiki\SWS {
 		public const NS_SCHEMA = 7480;
 		public static mixed $resolver;
 		public static mixed $schema;
+        public static array $schemaById = [];
 		public static mixed $deserializer;
 		public static function getInstance(): self { return new self(); }
-		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schema; } }; }
+		public function getPersistenceSchemaDeserializer(): mixed { return new \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \ProfessionalWiki\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
+		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schemaById[$ref->id?->text ?? ''] ?? SWSExtension::$schema; } }; }
 		public function newSubjectResolver(mixed $parser): mixed { return self::$resolver; }
         public function newIdentityBoundaryResolver(): mixed { return new class { public function entity($id) { return $id; } }; }
         public function newSubjectHostingPageResolver(mixed $authority): mixed { return new class($authority) {

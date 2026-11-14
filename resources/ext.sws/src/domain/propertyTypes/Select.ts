@@ -63,6 +63,7 @@ export function newSelectProperty( attributes: SelectPropertyAttributes = {} ): 
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Select' ),
 		type: SelectType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		options: attributes.options ?? [],

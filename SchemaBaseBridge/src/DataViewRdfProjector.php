@@ -45,6 +45,7 @@ final class DataViewRdfProjector {
 			if ( $subject['isMainSubject'] ?? false ) {
 				$this->add( $page, $this->namespaces->baseUri . '/ontology/mainSubject', $subjectIri, $this->metadataGraph );
 			}
+            $reference = null;
             try {
                 $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::fromJson( $subject['schema'], 'local' );
                 if ( isset( $subject['schemaIdentity']['id'] ) ) { $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $subject['schemaIdentity']['id'] ), $reference->source ); }
@@ -64,10 +65,15 @@ final class DataViewRdfProjector {
 					$view['displayDescription']['language'] ?? null ), $effectiveGraph );
 			}
 			foreach ( $subject['fields'] as $fi => $field ) {
-				$property = $this->namespaces->property( $field['name'] );
+				if ( $reference === null ) { throw new \InvalidArgumentException( 'Schema reference required for a field' ); }
+				$property = $this->namespaces->propertyForSchema( $field['name'], $reference );
 				$fieldNode = $this->node( [ 'k:subjects', 'i:' . $si, 'k:fields', 'i:' . $fi ] );
 				$this->add( $subjectIri, $this->vocabulary . 'field', $fieldNode, $this->metadataGraph );
+				if ( ( $field['labels'] ?? [] ) === [] ) {
 				$this->add( $property, RdfNamespaces::RDFS . 'label', $this->literal( $field['name'] ), $this->metadataGraph );
+				} else {
+					foreach ( $field['labels'] as $language => $label ) { $this->add( $property, RdfNamespaces::RDFS . 'label', $this->literal( $label, $language ), $this->metadataGraph ); }
+				}
 				foreach ( $field['effectiveValues'] as $value ) {
 					$object = $this->valueTerm( $field['type'], $value, $field['effectiveOrigin'] === 'external' ? ( $field['external']['source'] ?? null ) : null );
 					if ( $object !== null ) {

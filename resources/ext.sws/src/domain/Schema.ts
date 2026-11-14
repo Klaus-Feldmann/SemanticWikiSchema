@@ -1,3 +1,4 @@
+import type { SchemaFieldReference } from './SchemaFieldReference';
 import { type LocalizedIdentity, identityLabel, identityDescription } from './LocalizedIdentity';
 import type { SchemaReference } from './SchemaReference';
 import { cloneInitialValue } from './Value';
@@ -20,10 +21,16 @@ export class Schema {
 		private readonly identity: LocalizedIdentity | null = null,
 		private readonly id: string | null = null,
 		private readonly importOrigin: Record<string, unknown> | null = null,
+		private readonly fieldKeyChanges: readonly Readonly<Record<string, string>>[] = [],
 	) {
 		if ( id !== null && ( !/^S[1-9][0-9]{0,17}$/.test( id ) || id !== name || identity === null ) ) {
 			throw new Error( 'Schema ID, page key and identity metadata must agree' );
 		}
+	}
+
+	public getFieldKeyChanges(): readonly Readonly<Record<string, string>>[] { return this.fieldKeyChanges; }
+	public withFieldKeyChanges( changes: readonly Readonly<Record<string, string>>[] ): Schema {
+		return new Schema( this.name, this.description, this.properties, this.subjectsDependent, this.identity, this.id, this.importOrigin, changes );
 	}
 
 	public getImportOrigin(): Record<string, unknown> | null {
@@ -47,11 +54,11 @@ export class Schema {
 	}
 
 	public withIdentity( identity: LocalizedIdentity | null ): Schema {
-		return new Schema( this.name, this.description, this.properties, this.subjectsDependent, identity, this.id, this.importOrigin );
+		return new Schema( this.name, this.description, this.properties, this.subjectsDependent, identity, this.id, this.importOrigin, this.fieldKeyChanges );
 	}
 
 	public withPropertyDefinitions( properties: PropertyDefinitionList ): Schema {
-		return new Schema( this.name, this.description, properties, this.subjectsDependent, this.identity, this.id, this.importOrigin );
+		return new Schema( this.name, this.description, properties, this.subjectsDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges );
 	}
 
 	public asNew( label: string ): Schema {
@@ -82,16 +89,21 @@ export class Schema {
 		);
 	}
 
+	public getFieldReference( name: string | PropertyName ): SchemaFieldReference | null {
+		const key = this.properties.resolveName( name );
+		return key === undefined ? null : Object.freeze( { schema: this.getReference(), field: key } );
+	}
+
 	public withName( name: SchemaName ): Schema {
-		return new Schema( name, this.description, this.properties, this.subjectsDependent, this.identity, this.id, this.importOrigin );
+		return new Schema( name, this.description, this.properties, this.subjectsDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges );
 	}
 
 	public withDescription( description: string ): Schema {
-		return new Schema( this.name, description, this.properties, this.subjectsDependent, this.identity === null ? null : { ...this.identity, descriptions: { ...this.identity.descriptions, [ this.identity.identityLanguage ]: description } }, this.id, this.importOrigin );
+		return new Schema( this.name, description, this.properties, this.subjectsDependent, this.identity === null ? null : { ...this.identity, descriptions: { ...this.identity.descriptions, [ this.identity.identityLanguage ]: description } }, this.id, this.importOrigin, this.fieldKeyChanges );
 	}
 
 	public withSubjectsAreDependent( subjectsAreDependent: boolean ): Schema {
-		return new Schema( this.name, this.description, this.properties, subjectsAreDependent, this.identity, this.id, this.importOrigin );
+		return new Schema( this.name, this.description, this.properties, subjectsAreDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges );
 	}
 
 	public withAddedPropertyDefinition( property: PropertyDefinition ): Schema {
@@ -99,7 +111,7 @@ export class Schema {
 			this.name,
 			this.description,
 			new PropertyDefinitionList( [ ...this.properties, property ] ),
-			this.subjectsDependent, this.identity, this.id, this.importOrigin,
+			this.subjectsDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges,
 		);
 	}
 
@@ -108,7 +120,7 @@ export class Schema {
 			this.name,
 			this.description,
 			this.properties.reordered( names ),
-			this.subjectsDependent, this.identity, this.id, this.importOrigin,
+			this.subjectsDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges,
 		);
 	}
 
@@ -117,7 +129,7 @@ export class Schema {
 			this.name,
 			this.description,
 			this.properties.withoutNames( [ propertyName ] ),
-			this.subjectsDependent, this.identity, this.id, this.importOrigin,
+			this.subjectsDependent, this.identity, this.id, this.importOrigin, this.fieldKeyChanges,
 		);
 	}
 
@@ -127,7 +139,7 @@ export class Schema {
 				existing.has( definition.name ) ?
 					existing.get( definition.name ) :
 					new Statement( definition.name, definition.type, undefined ),
-			), existing.fieldNotes, existing.notesEdited,
+			), existing.fieldNotes, existing.notesEdited, existing.fieldKeyVersion,
 		);
 	}
 

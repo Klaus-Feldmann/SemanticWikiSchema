@@ -30,6 +30,7 @@ class SchemaPresentationSerializer {
 	 */
 	public function toArray( Schema $schema ): array {
 		return ( $schema->getId() !== null ? [ 'formatVersion'=>2, 'id'=>$schema->getId()->text ] + $schema->getIdentity()->toJson() : [] )
+			+ ( $schema->getFieldKeyChanges() === [] ? [] : [ 'fieldKeyChanges' => $schema->getFieldKeyChanges() ] )
 			+ [ 'description' => $schema->getDescription() ]
 			+ ( $schema->subjectsAreDependent() ? [ 'subjectsAreDependent' => true ] : [] )
 			+ [ 'propertyDefinitions' => $this->propertiesToJson( $schema->getAllProperties() ) ];

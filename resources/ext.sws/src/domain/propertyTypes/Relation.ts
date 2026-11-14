@@ -105,6 +105,7 @@ export function newRelationProperty( attributes: RelationPropertyAttributes = {}
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Relation' ),
 		type: RelationType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		targetSchemas: attributes.targetSchemas ?? [ 'MyTargetSchema' ],

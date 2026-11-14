@@ -38,6 +38,7 @@ export interface PropertyDefinition {
 	readonly name: PropertyName;
 	readonly type: string;
 	readonly description: string;
+	readonly labels?: Readonly<Record<string, string>>;
 	readonly required: boolean;
 	readonly default?: Value;
 	readonly externalProperty?: ExternalProperty;
@@ -152,6 +153,7 @@ export class PropertyDefinitionDeserializer {
 			type: json.type as string,
             ...( values.fieldNotes ? { fieldNotes: values.fieldNotes as PropertyDefinition['fieldNotes'] } : {} ),
 			description: values.description as string ?? '',
+			...( normalizedLabels( values.labels ) === undefined ? {} : { labels: normalizedLabels( values.labels ) } ),
 			required: values.required as boolean ?? false,
 			...( values.externalProperty !== undefined ? { externalProperty: values.externalProperty as ExternalProperty } : {} ),
 			...( values.wikiLink !== undefined ? { wikiLink: values.wikiLink as PropertyDefinition['wikiLink'] } : {} ),
@@ -174,4 +176,11 @@ export class PropertyDefinitionDeserializer {
 		return this.registry.getType( json.type ).createPropertyDefinitionFromJson( base, values );
 	}
 
+}
+
+function normalizedLabels( value: unknown ): Record<string, string> | undefined {
+	if ( value === null || typeof value !== 'object' || Array.isArray( value ) ) { return undefined; }
+	const entries = Object.entries( value ).filter( ( [ tag, label ] ) => /^[a-z]{1,8}(-[a-z0-9]{1,8})*$/i.test( tag ) && typeof label === 'string' && label.trim() !== '' )
+		.map( ( [ tag, label ] ) => [ tag.toLowerCase(), ( label as string ).trim() ] );
+	return entries.length === 0 ? undefined : Object.fromEntries( entries );
 }

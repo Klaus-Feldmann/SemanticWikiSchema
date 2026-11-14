@@ -1,6 +1,6 @@
 # SWS Documentation
 
-[Install SWS 0.4.03](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
+[Install SWS 0.5.0](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 
@@ -75,3 +75,10 @@ For the people who operate the server.
 * [Performance](operations/performance.md) — measured write throughput
 * [Restricted content](operations/restricted-content.md) — wikis where some content is readable only by certain
   users or groups
+
+## Local test candidate
+
+* [Testinstallation und Praxistest](operations/test-candidate-de.md)
+* [Optionales HDTO-Mapping](examples/hdto.md)
+
+* [Schemaeigene Feldkennungen](authoring/field-identifiers.md)

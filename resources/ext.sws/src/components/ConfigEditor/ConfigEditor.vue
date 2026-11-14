@@ -128,6 +128,8 @@
 				/>
 			</CdxField>
 			<CdxButton
+				ref="saveButton"
+				v-bind="saveKeyAttributes"
 				action="progressive"
 				weight="primary"
 				:disabled="!changed || saving || changedMeanwhile"
@@ -155,6 +157,8 @@
 import { computed, nextTick, ref } from 'vue';
 import type { WritableComputedRef } from 'vue';
 import { CdxButton, CdxCheckbox, CdxField, CdxMessage, CdxRadio, CdxTextInput } from '@wikimedia/codex';
+import { useSaveKey } from '@/composables/useSaveKey';
+import { useDialogStack } from '@/composables/useDialogStack';
 import LanguageListInput from '@/components/ConfigEditor/LanguageListInput.vue';
 import {
 	type ConfigEditorJsConfig,
@@ -164,6 +168,11 @@ import {
 	sameJson
 } from '@/components/ConfigEditor/configEditing.ts';
 import type { PageRevisionSaver } from '@/persistence/PageSaver.ts';
+
+const saveButton = ref<InstanceType<typeof CdxButton> | null>( null );
+const inFront = useDialogStack( true );
+const saveKeyAttributes = useSaveKey( saveButton, () => mw.msg( 'sws-config-editor-save' ),
+	() => inFront.value && props.canEdit );
 
 const props = defineProps<ConfigEditorJsConfig & {
 	canEdit: boolean;

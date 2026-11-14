@@ -10,3 +10,6 @@ spl_autoload_register(static function(string $class)use($root): void {
   }
  }
 },true,true);
+
+// Use the exact target-core encoder in standalone tests; never replace a loaded core function.
+if ( !function_exists( 'wfEscapeWikiText' ) ) { require __DIR__ . '/mediawiki-wikitext-escape.php'; }

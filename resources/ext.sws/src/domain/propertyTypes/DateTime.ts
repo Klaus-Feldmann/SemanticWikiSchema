@@ -149,6 +149,7 @@ export function newDateTimeProperty( attributes: DateTimePropertyAttributes = {}
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'DateTime' ),
 		type: DateTimeType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		minimum: attributes.minimum,

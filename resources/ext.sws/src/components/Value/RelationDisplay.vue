@@ -5,7 +5,7 @@
 			:key="table.schema.getName()"
 			:schema="table.schema"
 			:subjects="table.subjects"
-			:property-name="props.property.name.toString()"
+			:property-name="propertyDisplayName( props.property )"
 			:shows-schema-name="showsSchemaNames"
 		/>
 		<template v-for="( value, key ) in valuesOneByOne">
@@ -48,6 +48,7 @@
 </template>
 
 <script setup lang="ts">
+import { propertyDisplayName } from '@/presentation/propertyDisplayName';
 import {
 	EnclosingSubjectIdsKey,
 	RelationTargetCreationKey,

@@ -174,6 +174,14 @@ class CreateSubjectActionTest extends TestCase {
 		return $value;
 	}
 
+	public function testD8NewEntityStartsAtTheCurrentSchemaKeyVersion(): void {
+		$this->subjectRepository->savePageSubjects( PageSubjects::newEmpty(), new PageId( 1 ) );
+		$this->schemaLookup->updateSchema( new \ProfessionalWiki\SWS\Domain\Schema\Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [] ), false, fieldKeyChanges: [ [ 'Alt' => 'N1' ] ] ) );
+		$this->newCreateSubjectAction()->createSubject( new CreateSubjectRequest( pageId: 1, isMainSubject: true, label: 'Test', schemaName: 'Person', statements: [] ) );
+		$subject = $this->subjectRepository->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $this->presenterSpy->result ) );
+		$this->assertSame( 1, $subject->getFieldKeyVersion() );
+	}
+
 	public function testCreateMainSubject(): void {
 		$this->subjectRepository->savePageSubjects( PageSubjects::newEmpty(), new PageId( 1 ) );
 

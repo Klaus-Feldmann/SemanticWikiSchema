@@ -55,6 +55,7 @@ export function newMonolingualTextProperty(
 			new PropertyName( attributes.name || 'Monolingual text' ),
 		type: MonolingualTextType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		multiple: attributes.multiple ?? false,

@@ -16,6 +16,13 @@ class InstallerTests(unittest.TestCase):
   self.write('composer.json',self.main);self.write('composer.local.json',self.local);self.write('composer.lock',{'packages':[],'content-hash':'original'})
  def write(self,name,data):(self.root/name).write_text(json.dumps(data))
  def snap(self):return {str(p.relative_to(self.root)):p.read_bytes()for p in self.root.rglob('*')if p.is_file()}
+ def test_release_apply_uses_the_verified_first_installation_path(self):
+  before=self.snap()
+  with patch.object(sys,'argv',['install.py','--mediawiki-root',str(self.root),'--apply']),patch.object(m,'executable',return_value='/bin/true'),patch.object(m.subprocess,'run',return_value=SimpleNamespace(returncode=0)),patch.object(m,'apply')as apply:
+   m.main()
+   apply.assert_called_once()
+   self.assertEqual(apply.call_args.args[0],self.root.resolve())
+  self.assertEqual(self.snap(),before)
  def test_preview_preserves_unrelated_settings_and_writes_nothing(self):
   before=self.snap();root,changes=m.prepare(self.root)
   self.assertEqual(self.snap(),before);self.assertEqual(changes[root/'composer.local.json']['require']['other/extension'],'^2');self.assertEqual(changes[root/'composer.local.json']['require'][m.PACKAGE],m.VERSION);self.assertTrue(changes[root/'composer.json']['config']['allow-plugins']['other/plugin'])

@@ -94,6 +94,8 @@ class SWSHooks {
 
 		if ( self::isContentPage( $out ) ) {
 			self::handleContentPage( $out, $skin );
+		} elseif ( $out->getActionName() !== 'view' ) {
+			self::nameActionPage( $out );
 		} elseif ( self::isSchemaPage( $out ) && $out->isArticle() ) {
 			self::handleSchemaPage( $out, $skin );
 		} elseif ( self::isLayoutPage( $out ) && $out->isArticle() ) {
@@ -119,6 +121,29 @@ class SWSHooks {
 	private static function isContentPage( OutputPage $out ): bool {
 		return $out->isArticle()
 			&& \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $out->getTitle() );
+	}
+
+	/** Change display headings only; authorization and technical page identities remain core-owned. */
+	private static function nameActionPage( OutputPage $out ): void {
+		$title = $out->getTitle();
+		if ( !$out->getAuthority()->probablyCan( 'read', $title ) ) { return; }
+		$extension = SWSExtension::getInstance();
+		$label = null;
+		$id = null;
+		if ( $title->getNamespace() === SWSExtension::NS_SCHEMA && preg_match( '/^S[1-9][0-9]*$/D', $title->getText() ) ) {
+			$schema = $extension->getSchemaLookupFor( $out->getAuthority() )->getSchema(
+				new \ProfessionalWiki\SWS\Domain\Schema\SchemaName( $title->getText() )
+			);
+			if ( $schema === null ) { return; }
+			$id = $title->getText();
+			$label = $schema->getIdentity()?->label( $out->getLanguage()->getCode() );
+		} elseif ( \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title ) ) {
+			$subject = $extension->newViewHtmlBuilder()->subjectInPlaceOfPageTitle( $title, null );
+			if ( $subject === null ) { return; }
+			$id = $subject->getId()->text;
+			$label = $subject->getLabel()?->text;
+		}
+		if ( $id !== null ) { SubjectLabelHtml::nameInHeading( $out, $title, $label ?? '[' . $id . ']' ); }
 	}
 
 	private static function handleContentPage( OutputPage $out, Skin $skin ): void {
@@ -1329,37 +1354,27 @@ class SWSHooks {
 		}
 	}
 
-	/**
-	 * Validates the on-wiki configuration page on save, blocking the edit with precise per-field errors
-	 * when the configuration is invalid. A JSON syntax error is left to the JSON content model itself.
-	 */
-	public static function onEditFilter( EditPage $editor, string $text, string $section, string &$error, string $summary ): void {
+	public static function onJsonValidateSave( \MediaWiki\Content\JsonContent $content, \MediaWiki\Page\PageIdentity $page, \StatusValue $status ): void {
 		$extension = SWSExtension::getInstance();
 
-		if ( !$extension->isConfigPage( $editor->getTitle() ) ) {
+		if ( !$extension->isConfigPage( Title::newFromPageIdentity( $page ) ) ) {
 			return;
 		}
 
-		$errors = $extension->getConfigValidator()->validate( $text );
+		$errors = $extension->getConfigValidator()->validate( $content->getText() );
 
 		if ( $errors !== [] ) {
-			$error = self::formatConfigErrors( $errors, $editor->getContext() );
+			$errorMessages = array_map(
+				static fn ( array $error ) => \Wikimedia\Message\MessageValue::new( $error[0] )->plaintextParams( ...array_slice( $error, 1 ) ),
+				$errors
+			);
+
+			$status->fatal(
+				'sws-config-invalid',
+				count( $errors ),
+				\MediaWiki\Message\Message::listParam( $errorMessages, \Wikimedia\Message\ListType::SEMICOLON )
+			);
 		}
-	}
-
-	/**
-	 * @param array[] $errors A list of message specs, each [ messageKey, ...params ].
-	 */
-	private static function formatConfigErrors( array $errors, MessageLocalizer $localizer ): string {
-		$items = '';
-
-		foreach ( $errors as $errorSpec ) {
-			$items .= Html::rawElement( 'li', [], $localizer->msg( ...$errorSpec )->escaped() );
-		}
-
-		return Html::errorBox(
-			$localizer->msg( 'sws-config-invalid' )->escaped() . Html::rawElement( 'ul', [], $items )
-		);
 	}
 
 	public static function onAlternateEdit( EditPage $editPage ): void {

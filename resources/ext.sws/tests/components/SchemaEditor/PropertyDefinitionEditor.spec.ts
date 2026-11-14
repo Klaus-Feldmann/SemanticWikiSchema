@@ -54,6 +54,16 @@ describe( 'PropertyDefinitionEditor', () => {
 		await wrapper.findComponent( CdxSelect ).vm.$emit( 'update:selected', type );
 	}
 
+	it( 'D6 changes labels without renaming F4 and preserves them on a type change', async () => {
+		const wrapper = newWrapper( newTextProperty( { name: 'F4', labels: { en: 'Birth date' } } ) );
+		await wrapper.findComponent( { name: 'PropertyLabelsInput' } ).vm.$emit( 'update:labels', { de: 'Geburtsdatum' } );
+		expect( lastEmittedProperty( wrapper ).name.toString() ).toBe( 'F4' );
+		expect( lastEmittedProperty( wrapper ).labels ).toEqual( { de: 'Geburtsdatum' } );
+		await changeTypeTo( wrapper, 'number' );
+		expect( lastEmittedProperty( wrapper ).name.toString() ).toBe( 'F4' );
+		expect( lastEmittedProperty( wrapper ).labels ).toEqual( { de: 'Geburtsdatum' } );
+	} );
+
 	it( 'initializes the type-specific fields when the type changes to Select', async () => {
 		const wrapper = newWrapper( newTextProperty( { name: 'Status' } ) );
 
@@ -346,13 +356,19 @@ describe( 'PropertyDefinitionEditor', () => {
 			expect( lastEmittedProperty( wrapper ).name.toString() ).toBe( 'State' );
 		} );
 
+		it( 'reports duplicate field numbers while editing and keeps the previous key', async () => {
+			const wrapper = newWrapper( newTextProperty( { name: 'F5' } ), { otherPropertyNames: [ 'F4' ] } );
+			await typeName( wrapper, 'F4' );
+			expect( nameFieldProps( wrapper ).messages ).toEqual( { error: 'sws-field-number-unique' } );
+		} );
+
 		it( 'says the name is taken when another property has it, even with spaces around it', async () => {
 			const wrapper = newWrapper( newTextProperty( { name: 'Status' } ), { otherPropertyNames: [ 'Title' ] } );
 
 			await typeName( wrapper, ' Title ' );
 
 			expect( nameFieldProps( wrapper ).status ).toBe( 'error' );
-			expect( nameFieldProps( wrapper ).messages ).toEqual( { error: 'sws-property-editor-name-takenTitle' } );
+			expect( nameFieldProps( wrapper ).messages ).toEqual( { error: 'sws-field-number-unique' } );
 		} );
 
 		it( 'keeps the last name it could take while the name typed is taken', async () => {
@@ -466,7 +482,7 @@ describe( 'PropertyDefinitionEditor', () => {
 
 			await typeName( wrapper, 'Title' );
 
-			expect( unparseableInputMessage( wrapper ) ).toBe( 'sws-property-editor-name-takenTitle' );
+			expect( unparseableInputMessage( wrapper ) ).toBe( 'sws-field-number-unique' );
 		} );
 	} );
 } );

@@ -22,7 +22,7 @@ final class FieldNoteAnnotations {
             $name = $definition['name'];
             $suffix ??= wfMessage( 'sws-notes-property-suffix' )->inContentLanguage()->text();
             if ( trim( $suffix ) === '' ) { throw new \InvalidArgumentException( 'The note property suffix must not be empty' ); }
-            $target = trim( ( $mapping[$name] ?? $name ) . $suffix );
+            $target = trim( FieldAnnotationName::resolve( $result, $name, $config ) . $suffix );
             // Use exactly the same validation as ordinary mapped property names.
             SmwMappingConfig::resolve( [ 'properties' => [ 'notes' => [ 'note' => $target ] ] ] );
             $values = [];

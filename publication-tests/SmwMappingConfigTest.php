@@ -9,7 +9,7 @@ final class SmwMappingConfigTest extends TestCase {
         self::assertSame('WikiSchema-Feld', $config['urlEntries']['field']);
         self::assertSame('WikiSchema-Subjekt', $config['urlEntries']['subject']);
         foreach (['Leserschaft','Leserschaftziel','Werkausgabe'] as $field) {
-            self::assertSame([$field.'=Person'], (new AnnotationPlanner($config))->build([
+            self::assertSame(['Werk:'.$field.'=Person'], (new AnnotationPlanner($config))->build([
                 'schema'=>['name'=>'Werk'], 'subject'=>['id'=>'s1'],
                 'fields'=>[['name'=>$field,'type'=>'text','values'=>[['value'=>'Person']],'hasStoredValues'=>true]],
             ])->rows);

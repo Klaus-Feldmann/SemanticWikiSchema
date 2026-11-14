@@ -45,7 +45,7 @@
 				/>
 				<span class="ext-sws-property-list__item__text">
 					<span class="ext-sws-property-list__item__text__label">
-						{{ property.name.toString() }}
+						{{ propertyDisplayName( property ) }}<small v-if="propertyDisplayName( property ) !== property.name.toString()"> ({{ property.name }})</small>
 					</span>
 					<span
 						v-if="describeType( property.type, property.required )"
@@ -94,6 +94,7 @@
 </template>
 
 <script setup lang="ts">
+import { propertyDisplayName } from '@/presentation/propertyDisplayName';
 import { ref, computed, nextTick } from 'vue';
 import { CdxButton, CdxIcon } from '@wikimedia/codex';
 import { cdxIconAdd, cdxIconDraggable, cdxIconTag, cdxIconTrash } from '@wikimedia/codex-icons';
@@ -150,7 +151,7 @@ function getPropertyIcon( property: PropertyDefinition ): Icon | undefined {
 
 function describeType( type: string, required: boolean ): string {
 	const typeLabel = mw.msg( componentRegistry.getLabel( type ) );
-	return required ? typeLabel : `${ typeLabel }・${ mw.msg( 'sws-schema-editor-optional' ) }`;
+	return required ? typeLabel : mw.msg( 'sws-schema-editor-optional-property-type', typeLabel );
 }
 
 // Indexes below are into the properties, with the Label row before them as -1. Without a Label row, -1

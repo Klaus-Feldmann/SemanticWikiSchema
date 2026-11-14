@@ -11,6 +11,7 @@ class SchemaLuaSerializer {
 
 	public function toLuaTable( Schema $schema ): array {
 		$result = [ 'name' => $schema->getName()->getText(),
+            ...( $schema->getFieldKeyChanges() === [] ? [] : [ 'fieldKeyChanges' => $schema->getFieldKeyChanges() ] ),
             ...( $schema->getId() === null ? [] : [ 'id'=>$schema->getId()->text, 'reference'=>$schema->getReference()->toJson(), 'label'=>$schema->getIdentity()->label() ] + $schema->getIdentity()->toJson() ) ];
 
 		$result = json_decode( json_encode( $result, JSON_THROW_ON_ERROR ), true, 512, JSON_THROW_ON_ERROR );
@@ -36,6 +37,7 @@ class SchemaLuaSerializer {
 	private function propertyToLuaTable( string $name, PropertyDefinition $property ): array {
 		$entry = [
 			'name' => $name,
+			...( $property->getLabels() === [] ? [] : [ 'labels' => $property->getLabels() ] ),
 			'type' => $property->getPropertyType(),
             ...( $property->getFieldNotes() === null ? [] : [ 'fieldNotes' => $property->getFieldNotes() ] ),
 			'required' => $property->isRequired(),

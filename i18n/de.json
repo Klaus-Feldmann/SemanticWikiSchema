@@ -1,6 +1,10 @@
 {
+	"sws-property-editor-labels": "Feldbenennungen",
+	"sws-property-editor-labels-description": "Je Sprache eine Benennung. Die technische Feldkennung bleibt unverändert.",
+	"sws-field-number-unique": "Die Feldkennung muss innerhalb dieses Schemas eindeutig sein.",
 	"@metadata": {
 		"authors": [
+			"Klaus Feldmann",
 			"Jeroen De Dauw",
 			"Karsten Hoffmeyer",
 			"Morne Alberts",
@@ -65,7 +69,7 @@
 	"sws-page-tools-edit-json": "JSON ansehen oder bearbeiten",
 	"sws-page-tools-view-json": "JSON ansehen",
 	"sws-page-tools-rdf": "RDF ansehen",
-	"sws-property-editor-name": "Name",
+	"sws-property-editor-name": "Feldkennung",
 	"sws-property-editor-name-required": "gebe bitte den Eigenschaftsnamen ein.",
 	"sws-property-editor-name-taken": "Eine Eigenschaft mit dem Namen \"$1\" ist bereits vorhanden.",
 	"sws-property-editor-type": "Typ",
@@ -176,6 +180,7 @@
 	"sws-schema-editor-delete-property": "Eigenschaftsdefinition löschen",
 	"sws-schema-editor-subject-label": "Bezeichnung",
 	"sws-schema-editor-subject-label-help": "Jede Entität hat eine optionale Benennung für ihren Namen oder Titel. Daher ist keine Eigenschaft für den Namen oder Titel erforderlich.",
+	"sws-schema-editor-optional-property-type": "$1 · Optional",
 	"sws-schema-editor-optional": "Optional",
 	"sws-schema-editor-description": "Beschreibung",
 	"sws-schema-editor-resize-property-list": "Größe der Eigenschaftsliste ändern",
@@ -494,7 +499,7 @@
 	"sws-managesubjects-export-projection-format": "$1 · $2",
 	"sws-managesubjects-export-native": "Nativ",
 	"action-subjects": "Entitäten auf dieser Seite verwalten",
-	"sws-config-invalid": "Die Semantic WikiSchema-Einstellungen wurden nicht gespeichert, da sie ungültig sind:",
+	"sws-config-invalid": "Ungültige SWS-Einstellungen: $2",
 	"sws-config-error-not-object": "Die Seite muss ein JSON-Objekt enthalten.",
 	"sws-config-error-unknown-key": "Unbekannte Einstellung \"$1\".",
 	"sws-config-error-invalid-boolean": "\"$1\" muss true oder false sein.",

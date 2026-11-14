@@ -59,6 +59,20 @@ readonly class RdfNamespaces {
 		return new Iri( $this->baseUri . '/prop/' . self::localName( $propertyName ) );
 	}
 
+	/** Relative predicate path shared by native export and Graph presentation. */
+	public static function fieldPropertyPath( string $name, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): string {
+		$path = $schema->id !== null ? '/schema-id/' : '/schema/';
+		if ( $schema->source !== null ) {
+			$path = $schema->id !== null ? '/schema-source-id/' : '/schema-source/';
+			$path .= rawurlencode( $schema->source ) . '/';
+		}
+		return $path . rawurlencode( $schema->id?->text ?? $schema->name->getText() ) . '/field/' . rawurlencode( $name );
+	}
+
+	public function propertyForSchema( string $name, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): Iri {
+		return new Iri( $this->baseUri . self::fieldPropertyPath( $name, $schema ) );
+	}
+
 	public function schemaClass( SchemaName $schemaName, ?string $source = null ): Iri {
         $prefix = $source === null ? '/schema/' : '/schema-source/' . self::localName( $source ) . '/';
         return new Iri( $this->baseUri . $prefix . self::localName( $schemaName->getText() ) );

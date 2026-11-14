@@ -89,3 +89,64 @@ test('executable schema fields hide even stale native values without executing t
  data.presentation.definitions[0].execute=false;
  assert.equal(rows(data,[native('Verarbeitung','{{NichtAusfuehren}}')])[0].own[0].text,'{{NichtAusfuehren}}');
 });
+test('D5 graph uses schema-qualified predicates and never confuses another schema field',()=>{
+ const p={definitions:[{name:'F4',type:'text',predicateLocalName:'F4',predicatePath:'/schema-id/S1/field/F4',externalProperty:null}],fields:new Map()};
+ const own=[{id:origin+'/schema-id/S2/field/F4',property:{type:'string',values:[{value:'Other schema'}]}},{id:origin+'/schema-id/S1/field/F4',property:{type:'string',values:[{value:'Correct schema'}]}}];
+ const result=orderedRows(p,own,origin);
+ assert.equal(result[0].name,'F4');
+ assert.match(JSON.stringify(result[0]),/Correct schema/);
+ assert.doesNotMatch(JSON.stringify(result[0]),/Other schema/);
+});
+test('D5 rejects non-local predicate paths in presentation metadata',()=>{
+ const d=response();d.presentation.definitions[0].predicatePath='//external.example/field/F4';
+ assert.throws(()=>readPresentation(d,12,sid,origin),/predicate path/);
+});
+
+ test('D6 translated captions retain technical matching and link destinations',()=>{
+ const d=response(); const def=d.presentation.definitions[0];
+ def.labels={de:'Klasse',en:'Class'};def.displayLabel='Class';
+ const out=rows(d);assert.equal(out[0].name,'Class');assert.equal(out[0].fieldKey,'Klassifizierung');
+ assert.equal(out[0].labelHref,origin+'/wiki/Konzept%3AKlassifizierung');
+ assert.equal(out[0].values[0].text,'Mensch');
+ delete def.displayLabel;assert.equal(rows(d)[0].name,'Klassifizierung');
+ });
+ test('D6 rejects malformed label metadata',()=>{
+ const d=response();d.presentation.definitions[0].labels={de:42};
+ assert.throws(()=>readPresentation(d,12,sid,origin));
+ });
+
+test('D7 presentation cache isolates data languages and reuses only the same language',async()=>{
+ let calls=0;const languages=[];
+ const load=createPresentationLoader({origin,fetchImpl:async(url)=>{
+  calls++;const u=new URL(url);
+  if(u.searchParams.get('action')==='swsbasevalues'){
+   const language=u.searchParams.get('language');languages.push(language);
+   const d=response();d.presentation.language=language;d.presentation.definitions[0].displayLabel=language==='en'?'Class':'Klasse';
+   return {ok:true,json:async()=>({swsbasevalues:d})};
+  }
+  return {ok:true,json:async()=>({results:{bindings:[{page:{type:'uri',value:origin+'/page/12'}}]}})};
+ }});
+ const de=await load(iri,'de'),en=await load(iri,'en');
+ assert.equal(de.definitions[0].displayLabel,'Klasse');assert.equal(en.definitions[0].displayLabel,'Class');
+ await load(iri,'de');assert.deepEqual(languages,['de','en']);assert.equal(calls,4);
+});
+test('D7 language changes reload field presentation and ignore a late previous-language response',async()=>{
+ const React={Component:class{constructor(props){this.props=props;}setState(s){this.state={...this.state,...s};}}};
+ const finish={};const requested=[];
+ const Row=createSWSFields(React,{origin,load:(id,language)=>{requested.push([id,language]);return new Promise(resolve=>finish[language]=resolve);}});
+ const row=new Row({iri,language:'de',fallback:'native'});row.componentDidMount();
+ const before=row.props;row.props={...before,language:'en'};row.componentDidUpdate(before,row.state);
+ finish.en({language:'en'});await new Promise(r=>setImmediate(r));
+ finish.de({language:'de'});await new Promise(r=>setImmediate(r));
+ assert.equal(row.state.presentation.language,'en');assert.deepEqual(requested,[[iri,'de'],[iri,'en']]);
+ row.componentWillUnmount();
+});
+
+test('D8 every key spelling uses its own schema-qualified predicate',()=>{
+ for(const key of ['F1','N1','Z1','Klassenzuordnung','Änderung','Ort:Name','Has author']){
+  const d=response();d.fields=[];d.presentation.definitions=[{name:key,type:'text',predicateLocalName:key,predicatePath:'/schema-id/S1/field/'+encodeURIComponent(key),externalProperty:null}];
+  const own=[{id:origin+'/schema-id/S2/field/'+encodeURIComponent(key),property:{values:[{value:'Other schema'}]}},{id:origin+d.presentation.definitions[0].predicatePath,property:{values:[{value:'Correct'}]}}];
+  const parsed=readPresentation(d,12,sid,origin);const out=orderedRows(parsed,own,origin);
+  assert.equal(out[0].own[0].text,'Correct');assert.equal(out[0].fieldKey,key);
+ }
+});

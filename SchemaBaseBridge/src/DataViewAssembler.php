@@ -66,7 +66,8 @@ final class DataViewAssembler {
 				isset( $v['target'] ) && ( $v['target']['status'] ?? '' ) !== 'resolved' );
 			$status = $ownProblem !== [] ? 'unresolved' : ( $effectiveOrigin !== null ? 'resolved' : ( $remote['status'] ?? 'empty' ) );
 			if ( $schema === null ) { $status = 'schema-unavailable'; }
-			$fields[] = [ 'name' => $name, 'type' => $type, 'order' => count( $fields ),
+			$fields[] = [ 'name' => $name,
+				...( $property === null || $property->getLabels() === [] ? [] : [ 'labels' => $property->getLabels() ] ), 'type' => $type, 'order' => count( $fields ),
 				'schemaDefined' => $property !== null, 'description' => $property?->getDescription(),
 				'wikiLink' => $property?->getWikiLink(), 'externalProperty' => $property?->getExternalProperty()?->toJson(), 'ownValues' => $own,
 				'external' => $remote, 'effectiveOrigin' => $effectiveOrigin,

@@ -49,6 +49,7 @@ export function newPageProperty( attributes: PagePropertyAttributes = {} ): Page
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Page' ),
 		type: PageType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		multiple: attributes.multiple ?? false,

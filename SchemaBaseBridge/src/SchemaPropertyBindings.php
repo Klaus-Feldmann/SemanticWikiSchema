@@ -26,7 +26,11 @@ final class SchemaPropertyBindings {
 			if ( $binding === null ) {
 				continue;
 			}
-			$old = $previous['propertyDefinitions'][$name] ?? [];
+			$oldName = $name;
+			$before = count( $previous['fieldKeyChanges'] ?? [] );
+			$history = $schema['fieldKeyChanges'] ?? [];
+			if ( count( $history ) === $before + 1 ) { $oldName = array_search( $name, $history[$before], true ) ?: $name; }
+			$old = $previous['propertyDefinitions'][$oldName] ?? [];
 			if ( ( $old['externalProperty'] ?? null ) === $binding && ( $old['type'] ?? null ) === $definition['type'] ) {
 				continue;
 			}

@@ -15,11 +15,15 @@ readonly class Schema {
 		private bool $subjectsAreDependent,
 		private ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId $id = null,
 		private ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity = null,
+		private array $fieldKeyChanges = [],
 	) {
 		if ( $id !== null && ( $name->getText() !== $id->text || $identity === null ) ) {
 			throw new \InvalidArgumentException( 'Schema ID must match its ID page and have identity metadata' );
 		}
 	}
+
+	public function getFieldKeyChanges(): array { return $this->fieldKeyChanges; }
+	public function getFieldKeyVersion(): int { return count( $this->fieldKeyChanges ); }
 
 	public function getId(): ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId { return $this->id; }
 	public function getIdentity(): ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity { return $this->identity; }
@@ -44,6 +48,12 @@ readonly class Schema {
 
 	public function hasProperty( string|PropertyName $name ): bool {
 		return $this->properties->hasProperty( $name );
+	}
+
+	/** Resolve only within this schema; equal labels or keys elsewhere do not redirect a field. */
+	public function getFieldReference( string|PropertyName $name ): ?SchemaFieldReference {
+		$key = $this->properties->resolveName( $name );
+		return $key === null ? null : new SchemaFieldReference( $this->getReference(), $key );
 	}
 
 	public function getRelationProperties(): PropertyDefinitions {

@@ -7,7 +7,7 @@
 			<component
 				:is="valueEditingComponent( statement )"
 				:ref="( el: any ) => { if ( el ) valueEditors[ index ] = el; }"
-				:label="statement.propertyName.toString()"
+				:label="propertyDisplayName( props.schema.getPropertyDefinition( statement.propertyName ) )"
 				:model-value="statement.value"
 				:property="props.schema.getPropertyDefinition( statement.propertyName )"
 				:server-violations="violationsFor( statement.propertyName.toString() )"
@@ -45,6 +45,7 @@ export interface SubjectEditorExposes {
 </script>
 
 <script setup lang="ts">
+import { propertyDisplayName } from '@/presentation/propertyDisplayName';
 import FieldNoteInput from './FieldNoteInput.vue';
 import { ref, onBeforeUpdate, inject, watch, type Component } from 'vue';
 import { CdxField } from '@wikimedia/codex';
@@ -77,6 +78,7 @@ const emit = defineEmits<{
 	'edit-relation-target': [ SubjectId ];
 }>();
 
+const openedFieldKeyVersion = props.statements.fieldKeyVersion ?? props.schema.getFieldKeyChanges().length;
 const notes = ref<Record<string, string>>( { ...props.statements.fieldNotes } );
 watch( () => props.statements, ( statements ) => { notes.value = { ...statements.fieldNotes }; } );
 
@@ -129,7 +131,7 @@ const getSubjectData = (): StatementList => {
 		)
 	);
 
-	return new StatementList( newStatements, { ...notes.value }, JSON.stringify( notes.value ) !== JSON.stringify( props.statements.fieldNotes ) );
+	return new StatementList( newStatements, { ...notes.value }, JSON.stringify( notes.value ) !== JSON.stringify( props.statements.fieldNotes ), openedFieldKeyVersion );
 };
 
 const getDependentSubjects = (): Subject[] => {

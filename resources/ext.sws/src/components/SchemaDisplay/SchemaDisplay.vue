@@ -18,8 +18,9 @@
 				/>
 			</template>
 
-			<template #item-name="{ item }">
-				{{ item.toString() }}
+			<template #item-name="{ item, row }">
+				{{ propertyDisplayName( row ) }}
+				<small v-if="propertyDisplayName( row ) !== item.toString()" class="ext-sws-field-key"> ({{ item.toString() }})</small>
 			</template>
 
 			<template #item-type="{ item }">
@@ -87,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import { propertyDisplayName } from '@/presentation/propertyDisplayName';
 import { computed, onMounted, shallowRef, watch } from 'vue';
 import { Schema } from '@/domain/Schema.ts';
 import { SWSServices } from '@/SWSServices.ts';

@@ -1,3 +1,4 @@
+import { resolveFieldName } from './fieldNames';
 import type { PropertyDefinition, PropertyName } from '@/domain/PropertyDefinition';
 
 export class PropertyDefinitionList implements Iterable<PropertyDefinition> {
@@ -17,11 +18,16 @@ export class PropertyDefinitionList implements Iterable<PropertyDefinition> {
 	}
 
 	public get( id: PropertyName ): PropertyDefinition {
-		return this.properties.get( id.toString() ) as PropertyDefinition;
+		const key = this.resolveName( id );
+		return ( key === undefined ? undefined : this.properties.get( key ) ) as PropertyDefinition;
 	}
 
 	public has( name: PropertyName ): boolean {
-		return this.properties.has( name.toString() );
+		return this.resolveName( name ) !== undefined;
+	}
+
+	public resolveName( reference: string | PropertyName ): string | undefined {
+		return resolveFieldName( reference, this.properties );
 	}
 
 	public asRecord(): Record<string, PropertyDefinition> {

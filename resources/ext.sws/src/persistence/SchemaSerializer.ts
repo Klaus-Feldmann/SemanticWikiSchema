@@ -13,6 +13,7 @@ export class SchemaSerializer {
 	public schemaToJson( schema: Schema ): Record<string, unknown> {
 		return {
 			description: schema.getDescription(),
+			...( schema.getFieldKeyChanges().length === 0 ? {} : { fieldKeyChanges: schema.getFieldKeyChanges() } ),
 			...( schema.getImportOrigin() === null ? {} : { swsImport: schema.getImportOrigin() } ),
 			... schema.getIdentity(),
 			...( schema.getId() === null ? {} : { formatVersion: 2, id: schema.getId() } ),

@@ -1,18 +1,20 @@
-# Semantic WikiSchema (SWS) 0.4.03
+# Semantic WikiSchema (SWS) 0.5.0
 
 Schema-based metadata and research data for MediaWiki. Define fields once, enter structured values through the **Data** tab, and keep those values outside the article body. SWS is an independent fork of [NeoWiki](https://github.com/ProfessionalWiki/NeoWiki).
 
-**[Install SWS](docs/operations/install/README.md)** · **[Installation auf Deutsch](docs/operations/install/de/README.md)** · **[Downloads](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.4.03)**
+**[Install SWS](docs/operations/install/README.md)** · **[Installation auf Deutsch](docs/operations/install/de/README.md)** · **[Downloads](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.5.0)**
 
 ## What this version provides
 
 - Stable **S-IDs for schemas** and **E-IDs for entities**, with editable multilingual labels and descriptions. Changing a schema label keeps its identity and references intact.
+- Schema-scoped field keys of any valid spelling, multilingual field labels and automatic transfer of stored values, field notes and source snapshots after schema-editor key changes.
+- Positional direct queries such as `{{#sws_value: E3 | F12 }}`, with values usable in caller-written links and template arguments.
 - Schema-driven input forms, field notes, category assignment, and namespace-filtered page suggestions through PrefixSearch.
 - Text, user-entered Wikitext, centrally executed schema templates, historical dates, images, page links, relations and structured URLs.
 - A local entity store for configured Wikidata/Wikibase values. `store` is the default; the previous cached resolution is available as `cache`. Own SWS labels and entered values have precedence over imported labels and values.
 - Optional automatic Semantic MediaWiki annotations and direct SWS queries from Wikitext and Lua.
 - A bundled Graph Explorer with the current schema IDs and labels, linked entity cards, images and source identities. It requires a separately configured SPARQL service.
-- JSON/RDF exports and optional [MCP integration](integrations/mcp/README.md) for external tools.
+- JSON/RDF exports and optional MCP integration for external tools.
 
 A source binding makes data available only when the associated entity, property and usable source response exist. SWS does not infer missing research facts.
 
@@ -22,7 +24,7 @@ This release is for **first installation into an existing MediaWiki**. The helpe
 
 The live-confirmed environment uses **MediaWiki 1.47.0-wmf.24, PHP 8.3.36 and the legacy parser**. MediaWiki 1.47 stable has not been qualified by this release. See [requirements](docs/operations/install/requirements.md) and [verification](publication/VERIFICATION.md).
 
-Already using SWS or NeoWiki? Contact **[Klaus Feldmann / AufEinWort](mailto:info@aufeinwort.info)** before switching. The installer refuses existing SWS/NeoWiki package or directory installations. An automatic NeoWiki import is not included.
+Already using SWS or NeoWiki? Contact **[Klaus Feldmann / AufEinWort](mailto:info@aufeinwort.info)** before switching. The installer refuses existing SWS/NeoWiki package or directory installations. Upgrade and migration procedures are separate from first installation; an automatic NeoWiki import is not included.
 
 ## Installation steps
 
@@ -36,7 +38,7 @@ The installation pages are split by task so they can also be maintained as Media
 
 ## Documentation and support
 
-[Documentation index](docs/README.md) · [Release notes](RELEASE-NOTES.md) · [Source and third-party notices](publication/THIRD-PARTY.md) · [Contact](mailto:info@aufeinwort.info)
+[Documentation index](docs/README.md) · [Release notes](RELEASE-NOTES.md) · [Field keys and multilingual labels (DE)](docs/authoring/field-identifiers.md) · [MCP 0.5.0 patch](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) · [Source and third-party notices](publication/THIRD-PARTY.md) · [Contact](mailto:info@aufeinwort.info)
 
 This fork is maintained by AufEinWort, not by Professional Wiki or the original NeoWiki maintainers. Send SWS-specific reports to the contact above.
 

@@ -26,6 +26,9 @@ abstract class PropertyDefinition {
 		return $this->core->description;
 	}
 
+	/** @return array<string,string> Labels never alter the technical key. */
+	public function getLabels(): array { return $this->core->labels; }
+
 	public function isRequired(): bool {
 		return $this->core->required;
 	}
@@ -70,6 +73,7 @@ abstract class PropertyDefinition {
 		return [
 			...( $this->getFieldNotes() === null ? [] : [ 'fieldNotes' => $this->getFieldNotes() ] ),
 			'type' => $this->getPropertyType(),
+			...( $this->getLabels() === [] ? [] : [ 'labels' => $this->getLabels() ] ),
 			'description' => $this->getDescription(),
 			'required' => $this->isRequired(),
 			'default' => $this->getDefault(),
@@ -172,6 +176,7 @@ abstract class PropertyDefinition {
 			wikiLink: $wikiLink,
 			externalProperty: isset( $values['externalProperty'] ) ? ExternalProperty::fromJson( $values['externalProperty'] ) : null,
             fieldNotes: $notes,
+			labels: self::labelsFromJson( $values['labels'] ?? [] ),
 		);
 
 		// The extension owning the type is disabled or failed to load. Preserve the property
@@ -188,6 +193,16 @@ abstract class PropertyDefinition {
 		} catch ( Throwable $e ) {
 			throw new InvalidArgumentException( 'Invalid property definition: ' . json_encode( $json ), 0, $e );
 		}
+	}
+
+	private static function labelsFromJson( mixed $json ): array {
+		$labels = [];
+		foreach ( is_array( $json ) ? $json : [] as $language => $label ) {
+			if ( is_string( $language ) && \ProfessionalWiki\SWS\Domain\LanguageTag::isValid( $language ) && is_string( $label ) && trim( $label ) !== '' ) {
+				$labels[strtolower( $language )] = trim( $label );
+			}
+		}
+		return $labels;
 	}
 
 }

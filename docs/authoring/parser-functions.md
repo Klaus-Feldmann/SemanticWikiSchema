@@ -103,7 +103,7 @@ Returns the value of a single property from a Subject, formatted as a string.
 ```
 {{#sws_value: <propertyName> }}
 {{#sws_value: <propertyName> | page=<pageName> }}
-{{#sws_value: <propertyName> | subject=<subjectId> }}
+{{#sws_value: <entityId> | <propertyName> }}
 {{#sws_value: <propertyName> | separator=<separator> }}
 ```
 
@@ -112,9 +112,11 @@ Returns the value of a single property from a Subject, formatted as a string.
 | Parameter | Description |
 |-----------|-------------|
 | `propertyName` (positional) | The name of the property to read. Required. |
-| `page` | Read from the Main Subject of the named page. Defaults to the current page. Ignored when `subject` is also passed. |
-| `subject` | Read from the Subject with the given ID, bare or `sourceKey:localId` (see [`{{#view}}`](#view)). Takes precedence over `page`. |
+| `page` | Read from the Main Subject of the named page. Defaults to the current page. Cannot be combined with an explicit entity ID. |
+| `entityId` (first positional argument when followed by a field) | Read the local entity with this E-ID, e.g. `E3`. Cannot be combined with `page`. |
 | `separator` | Separator for multi-valued properties. Defaults to `, `. |
+
+Field names such as `F12` are local to the entity’s schema; ordinary names work as well. `subject=` and `entity=` are not accepted. Unknown, duplicate or conflicting options and extra positional arguments return empty output.
 
 ### Output by property type
 
@@ -130,13 +132,19 @@ Returns the value of a single property from a Subject, formatted as a string.
 Boolean and number values are always rendered, even for `false` and `0` — these are not treated
 as "empty".
 
-### Output is plain text
+### Text, links and template arguments
 
-The output is HTML-escaped and not interpreted as wikitext. Links, templates, and HTML inside
-property values render as literal characters.
+The result is text escaped with MediaWiki's Wikitext encoder. Field content does not execute templates, HTML, categories or formatting. Callers can use the result as a link target, link caption or template argument:
 
-When you pass the result to another parser function as an argument, that function also receives
-HTML-encoded text — a value of `Engineers & Designers` arrives as `Engineers &amp; Designers`.
+```wikitext
+[[{{#sws_value: E3 | F4 }}]]
+[[{{#sws_value: E3 | F4 }}|Geburtsjahr]]
+{{My template | date={{#sws_value: E3 | F4 }} }}
+```
+
+`F4` must exist in the entity's schema; ordinary field names work as well. The caller chooses the link syntax. MediaWiki's normal title rules apply, including its restrictions on characters in titles. Use `[[:…]]` to link to a category or file page instead of categorizing or embedding it. If a value is empty, conditional template logic can suppress the surrounding link or label.
+
+HTML character references may be present when another parser function receives the text. A consumer that requires raw data should use the structured SWS/Lua interfaces instead of decoding and executing returned text.
 
 ### Returns empty when
 
@@ -150,7 +158,7 @@ HTML-encoded text — a value of `Engineers & Designers` arrives as `Engineers &
 ```
 Founded: {{#sws_value: Founded at}}
 Status: {{#sws_value: Status | page=ACME Inc}}
-Process owner: {{#sws_value: Process owner | subject=s1abc5def6ghi78}}
+Process owner: {{#sws_value: E3 | Process owner }}
 Tags: {{#sws_value: Tags | separator=;}}
 ```
 

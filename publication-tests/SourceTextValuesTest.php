@@ -17,22 +17,22 @@ final class SourceTextValuesTest extends TestCase {
         foreach(['Q9049'=>['Avram Noam Chomsky','en'],'Q43746'=>['Giovanni Fidanza','it'],'Q76509'=>['Karl Theodor Jaspers','de']] as $id=>[$text,$language]) {
             $values=TextClaimView::values($claims[$id],'monolingualtext');
             self::assertSame($text,$values[0]['value']);self::assertSame($language,$values[0]['language']);
-            self::assertSame(['Geburtsname='.$text,'Kontrolle=Bleibt'],$this->rows($this->reader($values)));
+            self::assertSame(['Person:Geburtsname='.$text,'Person:Kontrolle=Bleibt'],$this->rows($this->reader($values)));
         }
         self::assertSame([],TextClaimView::values($claims['Q188332'],'monolingualtext'));
     }
     public function testEmptyAndExplicitUnknownValuesNeverBecomeAnnotations(): void {
         foreach([['missing',[]],['resolved',[['kind'=>'somevalue']]],['resolved',[['kind'=>'novalue']]]] as [$status,$values]) {
-            self::assertSame(['Kontrolle=Bleibt'],$this->rows($this->reader($values,$status)));
+            self::assertSame(['Person:Kontrolle=Bleibt'],$this->rows($this->reader($values,$status)));
         }
         $values=TextClaimView::values([['mainsnak'=>['snaktype'=>'somevalue']],['mainsnak'=>['snaktype'=>'novalue']]],'monolingualtext');
         self::assertSame([['kind'=>'somevalue'],['kind'=>'novalue']],$values);
     }
     public function testOwnTextWins(): void {
-        self::assertSame(['Geburtsname=Eigene Angabe','Kontrolle=Bleibt'],$this->rows($this->reader([], 'unavailable',['Eigene Angabe'])));
+        self::assertSame(['Person:Geburtsname=Eigene Angabe','Person:Kontrolle=Bleibt'],$this->rows($this->reader([], 'unavailable',['Eigene Angabe'])));
     }
     public function testUnavailableDoesNotBlockOtherFields(): void {
-        self::assertSame(['Kontrolle=Bleibt'],$this->rows($this->reader([],'unavailable')));
+        self::assertSame(['Person:Kontrolle=Bleibt'],$this->rows($this->reader([],'unavailable')));
     }
     public function testMultipleLanguagesAndRanksStayInReadValues(): void {
         $claims=[];

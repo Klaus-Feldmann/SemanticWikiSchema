@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Install SemanticWikiSchema 0.4.03 into an existing MediaWiki (first installation only)."""
+"""Install SemanticWikiSchema 0.5.0 into an existing MediaWiki (first installation only)."""
 from pathlib import Path
 import argparse, copy, fnmatch, json, os, shutil, subprocess, sys, tempfile
 
-VERSION = '0.4.03'
+VERSION = '0.5.0'
 PACKAGE = 'aufeinwort/semantic-wikischema'
 REPOSITORY = {'type': 'vcs', 'url': 'https://github.com/Klaus-Feldmann/SemanticWikiSchema'}
 PREVIOUS = {PACKAGE, 'aufeinwort/semantic-neowiki', 'neowiki/neowiki'}
@@ -95,7 +95,7 @@ def apply(root, changes, php, composer, backup_root):
     if backup_root == root or root in backup_root.parents:
         raise RuntimeError('Backup directory must be outside the MediaWiki web directory.')
     backup_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    backup = Path(tempfile.mkdtemp(prefix='sws-0.4.03-', dir=backup_root))
+    backup = Path(tempfile.mkdtemp(prefix='sws-0.5.0-', dir=backup_root))
     original = {}
     for name in ['composer.json', 'composer.local.json', 'composer.lock']:
         path = root / name
@@ -116,8 +116,8 @@ def apply(root, changes, php, composer, backup_root):
         raise RuntimeError('Installed extension version/path differs from the requested release. Stop here.')
     print('SWS ' + VERSION + ' files and dependencies installed.', flush=True)
     print('Next: add the LocalSettings load lines, run update and rebuildLocalisationCache, then start/check the job runner.')
-    print('Guide: https://github.com/Klaus-Feldmann/SemanticWikiSchema/blob/v0.4.03/docs/operations/install/README.md')
-    print('Deutsch: https://github.com/Klaus-Feldmann/SemanticWikiSchema/blob/v0.4.03/docs/operations/install/de/README.md')
+    print('Guide: https://github.com/Klaus-Feldmann/SemanticWikiSchema/blob/v0.5.0/docs/operations/install/README.md')
+    print('Deutsch: https://github.com/Klaus-Feldmann/SemanticWikiSchema/blob/v0.5.0/docs/operations/install/de/README.md')
     return backup
 
 

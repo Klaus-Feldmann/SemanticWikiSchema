@@ -163,6 +163,7 @@ final class InternalPageProcessor {
         if ( !$title->exists( IDBAccessObject::READ_LATEST ) ) { return true; }
         ProcessingState::record( $title, 'pending', $title->getLatestRevID() );
         try {
+            ( new InternalFieldKeyWriter() )->apply( $title );
             $current = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
             $result = $this->prepare( $title, \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() && ( $refreshSources || !SourceRefreshReceipt::isCurrent( $title, $current ) ) );
             $result->assertCurrent();

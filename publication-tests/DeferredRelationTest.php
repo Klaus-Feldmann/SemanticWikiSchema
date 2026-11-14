@@ -15,7 +15,7 @@ final class DeferredRelationTest extends TestCase {
     private function rows(array $result): array { return (new AnnotationPlanner(['properties'=>[]]))->build($result)->rows; }
     public function testRelationPreservesIdentityAndDoesNotBlockOtherAnnotations(): void {
         $raw=[['id'=>'rOne','target'=>'sChild']];$result=$this->reader($raw)->collectForAnnotations();
-        self::assertSame(['Name=Archelaos','Zahl=0','Wahr=0'],$this->rows($result));
+        self::assertSame(['Person:Name=Archelaos','Person:Zahl=0','Person:Wahr=0'],$this->rows($result));
         $field=$result['fields'][1];self::assertSame('Forschung',$field['name']);
         self::assertSame(['Forschungsache'],$field['targetSchemas']);
         self::assertSame($raw,$field['rawStatement']['values']);
@@ -24,7 +24,7 @@ final class DeferredRelationTest extends TestCase {
     }
     public function testMultipleAndEmptyRelations(): void {
         foreach([[],[['id'=>'rOne','target'=>'sOne'],['id'=>'rTwo','target'=>'sTwo']]] as $raw) {
-            self::assertSame(['Name=Archelaos','Zahl=0','Wahr=0'],$this->rows($this->reader($raw)->collectForAnnotations()));
+            self::assertSame(['Person:Name=Archelaos','Person:Zahl=0','Person:Wahr=0'],$this->rows($this->reader($raw)->collectForAnnotations()));
         }
     }
     public function testUnsupportedStructureInTextStillFails(): void {

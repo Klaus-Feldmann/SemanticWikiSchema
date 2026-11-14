@@ -1,3 +1,4 @@
+import { resolveFieldName } from './fieldNames';
 import { SubjectId } from '@/domain/SubjectId';
 import { Statement } from '@/domain/Statement';
 import { PropertyName } from '@/domain/PropertyDefinition';
@@ -7,7 +8,7 @@ export class StatementList implements Iterable<Statement> {
 
 	private readonly statements = new Map<string, Statement>();
 
-	public constructor( statements: Statement[], public readonly fieldNotes: Readonly<Record<string, string>> = {}, public readonly notesEdited: boolean = false ) {
+	public constructor( statements: Statement[], public readonly fieldNotes: Readonly<Record<string, string>> = {}, public readonly notesEdited: boolean = false, public readonly fieldKeyVersion?: number ) {
 		for ( const statement of statements ) {
 			const propertyName = statement.propertyName.toString();
 
@@ -20,11 +21,12 @@ export class StatementList implements Iterable<Statement> {
 	}
 
 	public get( name: PropertyName ): Statement {
-		return this.statements.get( name.toString() ) as Statement;
+		const key = resolveFieldName( name, this.statements );
+		return ( key === undefined ? undefined : this.statements.get( key ) ) as Statement;
 	}
 
 	public has( name: PropertyName ): boolean {
-		return this.statements.has( name.toString() );
+		return resolveFieldName( name, this.statements ) !== undefined;
 	}
 
 	public [ Symbol.iterator ](): IterableIterator<Statement> {
@@ -48,18 +50,18 @@ export class StatementList implements Iterable<Statement> {
 	 */
 	public withStatement( statement: Statement ): StatementList {
 		if ( !this.has( statement.propertyName ) ) {
-			return new StatementList( [ ...this, statement ], this.fieldNotes, this.notesEdited );
+			return new StatementList( [ ...this, statement ], this.fieldNotes, this.notesEdited, this.fieldKeyVersion );
 		}
 
 		return new StatementList( [ ...this ].map(
 			( existing ) => existing.propertyName.toString() === statement.propertyName.toString() ? statement : existing,
-		), this.fieldNotes, this.notesEdited );
+		), this.fieldNotes, this.notesEdited, this.fieldKeyVersion );
 	}
 
 	private filter( callback: ( property: Statement ) => boolean ): StatementList {
 		return new StatementList(
 			[ ...this ].filter( callback ),
-            this.fieldNotes, this.notesEdited,
+            this.fieldNotes, this.notesEdited, this.fieldKeyVersion,
 		);
 	}
 

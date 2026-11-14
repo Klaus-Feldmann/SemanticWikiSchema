@@ -1,23 +1,22 @@
-# Verification: SWS 0.4.03
+# Verification: Semantic WikiSchema 0.5.0
 
-## Installed runtime
+Release source: the operator-supplied `SemanticWikiSchema-0.5.00-alpha.8` directory from 2026-11-14. Runtime PHP, TypeScript and bridge sources are unchanged; the release updates version metadata, installer activation, documentation and publication checks. The separately published `mcp-sws-0.5.0` integration is retained byte-for-byte.
 
-On 13 November 2026 the operator supplied the installed SWS 0.4.03 directory and confirmed working Data views, editable schema labels, categories/SMW updates, source-data modes and the Graph Explorer. Runtime PHP, SQL, i18n, bridge, Data UI and active Graph files in this release are byte-identical to that supplied installation. Retired unused Graph bundles and macOS metadata are omitted. Graph build sources were aligned with the installed bundles.
+## Automated checks
 
-This is operator-confirmed operation on the existing AufEinWort wiki, not an independently repeated fresh MediaWiki installation. The tested core is 1.47.0-wmf.24 with PHP 8.3.36 and the legacy parser.
+- 566 PHP domain/projection tests with 979 assertions, plus 84 create/replace action tests with 150 assertions.
+- 66 isolated processing contracts, including actual key-transfer writer/processor tests with controlled MediaWiki host services, source retention, idempotence, collisions and concurrent-edit refusal.
+- 3,852 frontend tests in 248 files, TypeScript and browser build.
+- 78 Graph tests, rebuilt public-bundle comparison and DOM checks.
+- 266 Lua checks: 30 module, 202 schema-field, 24 structured URL and 10 current-reader checks.
+- 13 first-installation helper checks and 2 package/message-registration checks.
+- Actual Composer first installation using the candidate package: 21 resolved packages, correct extension path, S1/E1 autoload, runtime dependencies available, unrelated configuration and existing package versions preserved, LocalSettings.php unchanged. This uses a controlled directory layout, not a running MediaWiki.
+- Release archives are built from committed Git content; source and installer manifests, archive CRC and individual file hashes are checked. The versioned installer pins Composer to 0.5.0.
 
-## Candidate checks
+## Live evidence and limits
 
-- 543 standalone/domain PHP tests, 917 assertions; 57 separate PHP contract scripts.
-- 3,826 Data UI tests in 242 files.
-- 71 Graph tests, rebuilt bundle comparison and node-template / field DOM checks.
-- 12 installer tests covering first-install refusal, preservation of settings, plugin policies, private backups and Composer failure reporting.
-- Actual Composer first installation with the real package files and runtime dependencies into a controlled MediaWiki directory layout. The autoloader resolves S1/E1 domain types and the required libraries; unrelated configuration and existing fixture dependency versions are retained. This is not a running core/database test.
+The operator reports that alpha.8 was installed and `RebuildData` completed all 74 pages. The separate MCP 0.5.0 release records a 22-step live run and a write-protection check against this interface. These are separate from a fresh full MediaWiki installation test.
 
-The release keeps runtime behavior unchanged. Four older test expectations were updated for stable RDF prefixes, separate schema-template/user-Wikitext types, a single authorized source-snapshot read and preservation of raw text whitespace; a raw planner row is not proof SMW stores a blank semantic value.
+The qualified environment is MediaWiki 1.47.0-wmf.24, PHP 8.3, the legacy parser and Vector 2022. MediaWiki 1.47 stable, a fresh core/database installation, every SQL server, Neo4j live Cypher and arbitrary NeoWiki migrations are not qualified by these checks. Built browser assets and the installer do not install MediaWiki or optional services.
 
-## Installation boundary
-
-The helper prepares Composer configuration and installs a pinned package. LocalSettings activation, the database update, job supervision, first schema/entity checks and optional backends are operator steps. No NeoWiki import, automatic upgrade, database conversion or backend installation is claimed.
-
-[Run the candidate checks](../.github/workflows/semantic-checks.yml) · [Installation](../docs/operations/install/README.md)
+Existing SWS/NeoWiki installations are outside the first-installation helper. Contact the maintainer for the appropriate update or migration procedure. The MCP patch is a separate download and does not replace the wiki installer.

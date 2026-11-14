@@ -668,6 +668,7 @@ function onDialogUpdateOpen( value: boolean ): void {
 // nothing unsaved or after a confirmed discard (see useCloseConfirmation), so nothing an
 // earlier session opened or reported carries into the next.
 function startSession(): void {
+	clearTimeout( focusTimer );
 	openEpoch.value += 1;
 	extraPanes.value = [];
 	activePaneId.value = rootPaneId.value;
@@ -703,7 +704,12 @@ async function loadRoot(): Promise<void> {
 		// A task later: Codex focuses the dialog's first focusable element one or two ticks
 		// after it opens, depending on its version, and would otherwise win. Without scrolling:
 		// the form is at its top already, and focusing the pane itself would shift it by its padding.
-		focusTimer = setTimeout( () => focusPane( rootPaneId.value, { preventScroll: true } ) );
+		clearTimeout( focusTimer );
+		focusTimer = setTimeout( () => {
+			if ( props.open && epoch === openEpoch.value ) {
+				focusPane( rootPaneId.value, { preventScroll: true } );
+			}
+		} );
 	} catch ( error ) {
 		if ( epoch !== openEpoch.value ) {
 			return;
@@ -732,6 +738,9 @@ watch( () => props.open, ( isOpen ) => {
 watch( [ () => props.open, () => props.subject ], ( [ isOpen ] ) => {
 	if ( isOpen ) {
 		startSession();
+	} else {
+		clearTimeout( focusTimer );
+		openEpoch.value += 1;
 	}
 }, { immediate: true } );
 

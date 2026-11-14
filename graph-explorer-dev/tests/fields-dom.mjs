@@ -28,10 +28,12 @@ for(const key of ['window','document','navigator','HTMLElement','HTMLImageElemen
 globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window);
 globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);
 const identityFetch=async(url)=>({ok:true,json:async()=>String(url).includes('/sparql?')?{results:{bindings:[{page:{type:'uri',value:'https://aufeinwort.info/page/1152'}}]}}:{swsbaseidentity:{version:2,pageId:1152,scope:'current',mainSubjectId:'sF16iHXBMTQdHDY',identities:{sF16iHXBMTQdHDY:{wikidata:{status:'resolved',id:'Q154751',url:'https://www.wikidata.org/wiki/Q154751'},'wikibase-local':{status:'resolved',id:'Q56',url:'https://aufeinwort.info/wiki/Qwasi:Q56'}}}}}});
+const requestedLanguages=[];
 globalThis.fetch=async(url)=> {
  if(new URL(url).searchParams.get('action')!=='swsbasevalues')return identityFetch(url);
+ const language=new URL(url).searchParams.get('language');requestedLanguages.push(language);
  return {ok:true,json:async()=>({swsbasevalues:{version:1,scope:'current',pageId:1152,mainSubjectId:'sF16iHXBMTQdHDY',presentation:{version:1,ownDescription:'Eigene Forschungsbeschreibung <script>alert(1)</script>',pageUrlTemplate:'https://aufeinwort.info/wiki/SWSGRAPHTITLETOKEN',definitions:[
-  {name:'Klassifizierung',type:'text',predicateLocalName:'Klassifizierung',wikiLink:{labelTarget:'Konzept:Klassifizierung',externalTarget:'local'},externalProperty:{source:'wikidata',id:'P31'}},
+  {name:'Klassifizierung',displayLabel:language==='en'?'Classification':'Klassifizierung',labels:{de:'Klassifizierung',en:'Classification'},type:'text',predicateLocalName:'Klassifizierung',wikiLink:{labelTarget:'Konzept:Klassifizierung',externalTarget:'local'},externalProperty:{source:'wikidata',id:'P31'}},
   {name:'Forschungsnotiz',type:'text',predicateLocalName:'Forschungsnotiz',wikiLink:{label:false,values:false},externalProperty:null}
  ]},fields:[{name:'Klassifizierung',source:'wikidata',propertyId:'P31',status:'resolved',values:[{kind:'entity',id:'Q5',label:'Mensch',url:'https://www.wikidata.org/wiki/Q5'}]}]}})};
 };
@@ -41,7 +43,8 @@ const iri='https://aufeinwort.info/entity/sF16iHXBMTQdHDY';
 const props={color:'#73bd97',types:'Person',isExpanded:true,iri,label:'Nikolaus von Kues',props:{},elementId:'test-person',
  propsAsList:[{id:'https://aufeinwort.info/prop/Forschungsnotiz',name:'Forschungsnotiz',property:{type:'string',values:[{value:'Unverändert',language:'de'}]}}]};
 const template=new module.TestStandardTemplate(props);
-const context={editor:{authoringState:{elements:new Map()},inAuthoringMode:false},view:{model:{getElement:()=>({elementState:undefined,redraw:()=>resized++})}}};
+let graphLanguage='de';
+const context={editor:{authoringState:{elements:new Map()},inAuthoringMode:false},view:{getLanguage:()=>graphLanguage,model:{getElement:()=>({elementState:undefined,redraw:()=>resized++})}}};
 const container=document.getElementById('root');const reactRoot=ReactDOM.createRoot(container);
 let bubbled=0, resized=0;
 reactRoot.render(React.createElement('div',{onClick:()=>bubbled++,onLoad:()=>resized++},template.renderTemplate(context))); 
@@ -71,6 +74,14 @@ assert.equal(bubbled,0,'Field links do not trigger graph selection');
 fs.writeFileSync(path.join(root,'Pruefergebnisse/Felder-Knoten-DOM.html'),container.innerHTML);
 console.log(JSON.stringify({actualServedTemplate:true,fixtureBridgeResult:row.textContent,position:'directly below title',fontSize:row.style.fontSize,
  links:links.map(a=>a.href),nodeClickSuppressed:true,originalPropertyPreserved:true},null,2));
+// Change the actual view language on the same rendered entity.
+graphLanguage='en';
+reactRoot.render(React.createElement('div',null,template.renderTemplate(context)));
+await new Promise(r=>setTimeout(r,80));
+assert.ok(container.querySelector('.graph-explorer-standard-template__properties').textContent.includes('Classification'));
+assert.deepEqual(requestedLanguages,['de','en']);
+assert.ok(container.querySelector('a[href$="Konzept%3AKlassifizierung"]'),'Translated caption retains link destination');
+console.log('D7 served Graph bundle: field labels follow data-language changes, without reusing another language cache entry.');
 // Collapsed nodes retain the same title and identity row.
 template.props={...props,isExpanded:false};
 context.view={model:{getElement:()=>({elementState:undefined})}};

@@ -2,7 +2,7 @@
 
 For the operator installing SWS files and dependencies. Check [requirements](requirements.md) first.
 
-Download **SemanticWikiSchema-0.4.03-installer.zip** from the [release](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.4.03), extract it outside the web directory and open its folder in a terminal.
+Download **SemanticWikiSchema-0.5.0-installer.zip** from the [release](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.5.0), extract it outside the web directory and open its folder in a terminal.
 
 Run a preview, replacing the MediaWiki path:
 

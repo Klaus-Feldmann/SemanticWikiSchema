@@ -17,12 +17,12 @@ This helper is an AufEinWort integration, not a prerequisite for local SWS data 
 
 ## Semantic MediaWiki
 
-Install and configure SMW separately. SWS can generate annotations from configured fields and field notes; the schema field label is the default property name. Existing SMW properties still need compatible datatypes. Enable semantic links for any additional namespaces that should receive annotations. Do not change a working SMW database backend simply to install SWS.
+Install and configure SMW separately. SWS can generate annotations from configured fields and field notes; the default property name is schema-scoped, for example `S1:F12`. An explicit mapping can choose a shared semantic property; changing display labels does not rename the SMW property. Existing SMW properties still need compatible datatypes. Enable semantic links for any additional namespaces that should receive annotations. Do not change a working SMW database backend simply to install SWS.
 
 SMW is optional. Local SWS storage, the Data tab and direct SWS queries do not require it. `integrations/smw/` supplies the optional wiki-side query material.
 
 ## Scribunto and MCP
 
-Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces. The optional MCP adapter in `integrations/mcp/` is a separately versioned integration; follow its own compatibility checks. It is not installed or authenticated by the SWS installer.
+Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces. The optional MCP adapter in `integrations/mcp/` is a separately versioned integration; use the [SWS 0.5.0 patch for MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) and its compatibility checks. It is not installed or authenticated by the SWS installer.
 
 [Graph Explorer setup](graph-explorer.md) · [Installation index](README.md)

@@ -25,15 +25,20 @@ class PropertyDefinitions {
 	 * @throws OutOfBoundsException
 	 */
 	public function getProperty( string|PropertyName $name ): PropertyDefinition {
-		if ( array_key_exists( (string)$name, $this->properties ) ) {
-			return $this->properties[(string)$name];
+		$key = $this->resolveName( $name );
+		if ( $key !== null ) {
+			return $this->properties[$key];
 		}
 
 		throw new OutOfBoundsException( "Property '$name' does not exist" );
 	}
 
 	public function hasProperty( string|PropertyName $name ): bool {
-		return array_key_exists( (string)$name, $this->properties );
+		return $this->resolveName( $name ) !== null;
+	}
+
+	public function resolveName( string|PropertyName $reference ): ?string {
+		return FieldNameResolver::resolve( $reference, $this->properties );
 	}
 
 	/**

@@ -191,6 +191,8 @@ class RdfPageProjector implements PageProjector {
 
         $schema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );
         $schemaId = $schema?->getId() ?? $subject->getSchemaReference()->id;
+        $reference = $schemaId === null ? $subject->getSchemaReference() :
+            \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( $schemaId, $subject->getSchemaReference()->source );
         $class = $schemaId === null
             ? $this->namespaces->schemaClass( $schema?->getName() ?? $subject->getSchemaName(), $subject->getSchemaReference()->source )
             : $this->namespaces->identifiedSchemaClass( $schemaId, $subject->getSchemaReference()->source );
@@ -203,17 +205,22 @@ class RdfPageProjector implements PageProjector {
         }
         if ( $schema?->getIdentity() !== null ) { $quads = array_merge( $quads, IdentityRdfMetadata::quads( $class, $schema->getIdentity(), $graph ) ); }
 
-		$quads = array_merge( $quads, $this->projectStatements( $subject, $subjectIri, $graph, $page->getId() ) );
+		$quads = array_merge( $quads, $this->projectStatements( $subject, $subjectIri, $graph, $page->getId(), $reference, $schema ) );
 
-		return array_merge( $quads, $this->projectRelations( $subject, $subjectIri, $graph ) );
+		foreach ( $subject->getTypedRelations()->relations as $relation ) {
+			$definition = $schema !== null && $schema->hasProperty( $relation->propertyName ) ? $schema->getProperty( $relation->propertyName ) : null;
+			foreach ( $definition?->getLabels() ?? [] as $language => $label ) {
+				$quads[] = new Quad( $this->namespaces->propertyForSchema( $relation->propertyName->text, $reference ), $this->namespaces->rdfsLabel(), RdfLiteralFactory::languageTagged( $label, $language ), $graph );
+			}
+		}
+		return array_merge( $quads, $this->projectRelations( $subject, $subjectIri, $graph, $reference ) );
 	}
 
 	/**
 	 * @return Quad[]
 	 */
-	private function projectStatements( Subject $subject, Iri $subjectIri, Iri $graph, PageId $pageId ): array {
+	private function projectStatements( Subject $subject, Iri $subjectIri, Iri $graph, PageId $pageId, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference, ?\ProfessionalWiki\SWS\Domain\Schema\Schema $schema ): array {
 		$quads = [];
-		$schema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );
 
 		foreach ( $subject->getStatements()->asArray() as $statement ) {
 			$value = $statement->getValue();
@@ -242,7 +249,10 @@ class RdfPageProjector implements PageProjector {
 
 			$this->warnOnDroppedValues( $statement, count( $terms ), $pageId );
 
-			$predicate = $this->namespaces->property( $statement->getPropertyName()->text );
+			$predicate = $this->namespaces->propertyForSchema( $statement->getPropertyName()->text, $reference );
+			foreach ( $definition?->getLabels() ?? [] as $language => $label ) {
+				$quads[] = new Quad( $predicate, $this->namespaces->rdfsLabel(), RdfLiteralFactory::languageTagged( $label, $language ), $graph );
+			}
 			if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ) {
 				foreach ( $value->parts as $index => $entry ) {
 					$node = new Iri( $subjectIri->value . '/url/' . rawurlencode( $name->text ) . '/' . $index );
@@ -266,11 +276,11 @@ class RdfPageProjector implements PageProjector {
 	/**
 	 * @return Quad[]
 	 */
-	private function projectRelations( Subject $subject, Iri $subjectIri, Iri $graph ): array {
+	private function projectRelations( Subject $subject, Iri $subjectIri, Iri $graph, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference ): array {
 		$quads = [];
 
 		foreach ( $subject->getTypedRelations()->relations as $relation ) {
-			$quads = array_merge( $quads, $this->projectRelation( $relation, $subjectIri, $graph, $subject->getIdentity()?->label() ?? $subject->getLabel()?->text ?? $subject->id->text ) );
+			$quads = array_merge( $quads, $this->projectRelation( $relation, $subjectIri, $graph, $subject->getIdentity()?->label() ?? $subject->getLabel()?->text ?? $subject->id->text, $reference ) );
 		}
 
 		return $quads;
@@ -282,14 +292,14 @@ class RdfPageProjector implements PageProjector {
 	 *
 	 * @return Quad[]
 	 */
-	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph, string $sourceLabel ): array {
+	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph, string $sourceLabel, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): array {
 		$targetIri = $this->subjectIris->targetIri( $relation->targetId );
 
 		if ( $targetIri === null ) {
 			return [];
 		}
 
-		$predicate = $this->namespaces->property( $relation->propertyName->text );
+		$predicate = $this->namespaces->propertyForSchema( $relation->propertyName->text, $schema );
 		$relationIri = $this->namespaces->relationNode( $relation->id );
         $targetName = $relation->targetId->isLocal() ? substr( $targetIri->value, strlen( $this->namespaces->subjectIriBase() ) ) : $relation->targetId->text;
 

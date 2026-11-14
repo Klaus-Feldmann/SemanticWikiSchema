@@ -101,6 +101,7 @@ class SubjectContentDataDeserializer {
 		if ( str_starts_with( $id, 'E' ) && !array_key_exists( 'identityLanguage', $jsonArray ) ) { throw new \InvalidArgumentException( 'New entity identity metadata missing' ); }
 		return new Subject(
 			id: new SubjectId( $id ),
+			fieldKeyVersion: \ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::version( $jsonArray['fieldKeyVersion'] ?? 0 ),
 			label: $this->deserializeLabel( $jsonArray['label'] ?? null ),
 			schema: $this->schemaReferenceParser->fromJson( $jsonArray['schema'] ),
 			statements: $this->buildStatementList( $jsonArray ),

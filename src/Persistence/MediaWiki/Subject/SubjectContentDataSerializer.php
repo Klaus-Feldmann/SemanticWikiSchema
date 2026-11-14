@@ -46,6 +46,7 @@ class SubjectContentDataSerializer {
 				$serialized['label'] = $subject->label->text;
 			}
 
+			if ( $subject->getFieldKeyVersion() !== 0 ) { $serialized['fieldKeyVersion'] = $subject->getFieldKeyVersion(); }
 			if ( $subject->getFieldNotes() !== [] ) { $serialized['fieldNotes'] = (object)$subject->getFieldNotes(); }
 			if ( $subject->getSourceSnapshot() !== null ) {
 				$serialized['sourceSnapshot'] = $subject->getSourceSnapshot()->toJson();

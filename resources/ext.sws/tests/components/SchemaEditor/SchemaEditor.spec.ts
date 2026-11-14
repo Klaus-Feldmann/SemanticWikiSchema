@@ -108,13 +108,26 @@ describe( 'SchemaEditor', () => {
 		};
 
 		vi.stubGlobal( 'mw', {
-			config: { get: vi.fn() },
+			config: { get: vi.fn( ( key: string ) => ( { wgContentLanguage: 'en', wgUserLanguage: 'en' } as Record<string, unknown> )[ key ] ) },
+			language: { bcp47: ( code: string ) => code, getFallbackLanguageChain: () => [ 'en' ], getData: () => undefined },
 			notify: vi.fn(),
 			message: vi.fn( ( str ) => ( {
 				text: () => messages[ str ] ?? str,
 				parse: () => messages[ str ] ?? str,
 			} ) ),
 		} );
+	} );
+
+	it( 'D8 records only the original and final key, and preserves history through reordering', async () => {
+		const initial = newSchema( { properties: new PropertyDefinitionList( [ newTextProperty( { name: 'Alt' } ), newTextProperty( { name: 'Andere' } ) ] ) } ).withFieldKeyChanges( [ { 'Früher': 'Alt' } ] );
+		const wrapper = createWrapper( initial );
+		const editor = wrapper.findComponent( { name: 'PropertyDefinitionEditor' } );
+		await editor.vm.$emit( 'update:property-definition', newTextProperty( { name: 'N' } ) );
+		await editor.vm.$emit( 'update:property-definition', newTextProperty( { name: 'N1' } ) );
+		await wrapper.findComponent( { name: 'PropertyList' } ).vm.$emit( 'propertyReordered', [ new PropertyName( 'Andere' ), new PropertyName( 'N1' ) ] );
+		const saved = ( wrapper.vm as unknown as SchemaEditorExposes ).getSchema();
+		expect( saved.getFieldKeyChanges() ).toEqual( [ { 'Früher': 'Alt' }, { Alt: 'N1' } ] );
+		expect( [ ...saved.getPropertyDefinitions() ].map( p => p.name.toString() ) ).toEqual( [ 'Andere', 'N1' ] );
 	} );
 
 	it( 'selects the first property by default when properties exist', () => {

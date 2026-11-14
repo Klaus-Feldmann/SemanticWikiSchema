@@ -45,6 +45,7 @@ export function newNumberProperty( attributes: NumberPropertyAttributes = {} ): 
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Number' ),
 		type: NumberType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 		precision: attributes.precision,

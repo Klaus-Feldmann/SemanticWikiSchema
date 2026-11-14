@@ -79,7 +79,7 @@ $beforeSmw=count(U::$requests);
 (new ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new MediaWiki\Parser\ParserOutput([]),new MediaWiki\Parser\Parser(),SWSExtension::$schema,
  U::$revision->getContent('sws')->getPageSubjects(),$reloaded,new MediaWiki\User\User(),fn()=>SWSExtension::$schema);
 $plan=ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
-upgradeCheck(in_array('Ort=Brünn',$plan->rows,true)&&count(array_filter($plan->rows,fn($row)=>str_starts_with($row,'Ort (AM)=')))===2,'Actual annotation entry uses retained source plus separate author/source notes');
+upgradeCheck(in_array('Person:Ort=Brünn',$plan->rows,true)&&count(array_filter($plan->rows,fn($row)=>str_starts_with($row,'Person:Ort (AM)=')))===2,'Actual annotation entry uses retained source plus separate author/source notes');
 upgradeCheck(count(U::$requests)===$beforeSmw,'Actual SMW planning after outage adds no source requests');
 // Successful empty retrieval preserves old value, recovery updates it.
 U::$failIds=[];unset(U::$entities['wikidata']['Q41390']['claims']['P19']);$missing=ucollect();

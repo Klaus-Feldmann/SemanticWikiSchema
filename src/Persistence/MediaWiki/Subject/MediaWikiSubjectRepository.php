@@ -38,6 +38,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 		private readonly TitleFactory $titleFactory,
 		private readonly IContentHandlerFactory $contentHandlerFactory,
 		private readonly DependentSubjectGuard $dependentSubjectGuard,
+		private readonly ?\ProfessionalWiki\SWS\Application\Source\SchemaResolver $fieldKeySchemas = null,
 	) {
 	}
 
@@ -137,6 +138,13 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 					throw new \RuntimeException( 'Content is not a SubjectContent' );
 				}
 				$previous = $content->getPageSubjects();
+				foreach ( $previous->getAllSubjects()->asArray() as $stored ) {
+					$schema = $this->fieldKeySchemas?->getSchema( $stored->getSchemaReference() );
+					if ( $this->fieldKeySchemas !== null && $schema === null ) { throw new \RuntimeException( 'Cannot verify the field keys of an unavailable schema' ); }
+					if ( $schema !== null && $stored->getFieldKeyVersion() !== $schema->getFieldKeyVersion() ) {
+						throw new \RuntimeException( 'SWS field-key transfer pending; wait for the job runner and reload before editing' );
+					}
+				}
 				// Copy from the CAS parent, not an earlier replica/Subject object: normal edits
 				// cannot erase a source result that finished while the editor was open.
 				foreach ( $pageSubjects->getAllSubjects()->asArray() as $subject ) {

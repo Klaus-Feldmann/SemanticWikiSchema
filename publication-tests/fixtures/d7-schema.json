@@ -1,0 +1,38 @@
+{
+  "formatVersion": 2,
+  "id": "S11",
+  "identityLanguage": "de",
+  "labels": {
+    "de": "Person",
+    "en": "Person"
+  },
+  "descriptions": {
+    "de": "Integrationstest"
+  },
+  "propertyDefinitions": {
+    "F4": {
+      "type": "text",
+      "labels": {
+        "de": "Geburtsdatum",
+        "en": "Date of birth"
+      },
+      "wikiLink": {
+        "labelTarget": "Attribut:Geburtsdatum"
+      },
+      "fieldNotes": {
+        "type": "text",
+        "annotate": true
+      }
+    },
+    "F12": {
+      "type": "text",
+      "labels": {
+        "de": "Anmerkung",
+        "en": "Note"
+      }
+    },
+    "Name": {
+      "type": "text"
+    }
+  }
+}

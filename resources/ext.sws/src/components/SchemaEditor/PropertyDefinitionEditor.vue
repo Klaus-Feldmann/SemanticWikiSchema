@@ -15,6 +15,8 @@
 			/>
 		</CdxField>
 
+		<PropertyLabelsInput ref="labelsInput" :labels="localProperty.labels" @update:labels="updateLabels" />
+
 		<CdxField>
 			<template #label>
 				{{ $i18n( 'sws-property-editor-type' ).text() }}
@@ -102,6 +104,7 @@ import { computed, nextTick, onMounted, ref, shallowRef, watch } from 'vue';
 import { localTargetSchemaNames, type RelationProperty, RelationType, targetsDependentSubjects } from '@/domain/propertyTypes/Relation.ts';
 import { type SchemaSummary, subjectsAreDependentIn } from '@/application/SchemaLookup.ts';
 import { useSchemaStore } from '@/stores/SchemaStore.ts';
+import PropertyLabelsInput from './Property/PropertyLabelsInput.vue';
 import { canonicalPropertyName, propertyNameProblemBeside } from '@/domain/propertyNameRules.ts';
 import { propertyNameProblemMessage } from '@/components/SchemaEditor/propertyNameProblemMessage.ts';
 
@@ -127,6 +130,11 @@ watch(
 	},
 	{ deep: true }
 );
+
+const labelsInput = ref<InstanceType<typeof PropertyLabelsInput> | null>( null );
+function updateLabels( labels: Record<string, string> | undefined ): void {
+	updatePropertyAttributes( { labels } );
+}
 
 const nameInput = ref<InstanceType<typeof CdxTextInput> | null>( null );
 
@@ -156,7 +164,7 @@ const nameError = computed( (): string | null => {
 	}
 
 	if ( props.otherPropertyNames.includes( name ) ) {
-		return mw.message( 'sws-property-editor-name-taken', name ).text();
+		return mw.message( 'sws-field-number-unique' ).text();
 	}
 
 	// What the user types is stored in its canonical form, so only the name the editor opened with can be spelled
@@ -229,6 +237,7 @@ function changePropertyType( type: string ): void {
 			wikiLink: [ 'wikitext', 'wikitextValue' ].includes( type ) ? undefined : localProperty.value.wikiLink,
 			type: type,
 			description: localProperty.value.description,
+			labels: localProperty.value.labels,
             fieldNotes: localProperty.value.fieldNotes,
 			required: localProperty.value.required,
 			default: undefined,
@@ -308,6 +317,7 @@ export interface PropertyDefinitionEditorExposes {
  */
 function unparseableInputMessage(): string | null {
 	return nameError.value ??
+		labelsInput.value?.unparseableInputMessage() ??
 		propertySourceEditor.value?.unparseableInputMessage() ??
 		attributesEditor.value?.unparseableInputMessage?.() ??
 		defaultValueInput.value?.unparseableInputMessage?.() ??

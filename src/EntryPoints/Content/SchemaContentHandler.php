@@ -36,6 +36,11 @@ class SchemaContentHandler extends JsonContentHandler {
 			return $status;
 		}
 
+		if ( \ProfessionalWiki\SWS\Domain\Schema\DuplicateFieldNumbers::find( $content->getText() ) !== [] ) {
+			$status->fatal( 'sws-field-number-unique' );
+			return $status;
+		}
+
 		$title = Title::newFromPageIdentity( $validationParams->getPageIdentity() );
 
 		try {
@@ -59,8 +64,9 @@ class SchemaContentHandler extends JsonContentHandler {
 		if ( $status->isOK() ) {
 			try {
 				$new = json_decode( $content->getText(), true, 512, JSON_THROW_ON_ERROR );
-				$oldRevision = \MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
+				$oldRevision = \MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, \Wikimedia\Rdbms\IDBAccessObject::READ_LATEST );
 				$old = json_decode( $oldRevision?->getContent( 'main' )?->getText() ?? '{}', true );
+				\ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::validateEdit( is_array( $old ) ? $old : [], $new );
 				\ProfessionalWiki\SWS\Application\Identity\SchemaIdentityWritePolicy::validate(
 					$schemaName, $oldRevision === null ? null : ( is_array( $old ) ? $old : [] ), $new,
 					SWSExtension::getInstance()->newIdentityRegistry(), SWSExtension::getInstance()->getIdentityOwner()

@@ -13,9 +13,14 @@ use ProfessionalWiki\SWS\Domain\Value\StringValue;
 final class GraphFieldPresentation {
 	public static function fromSchema( Schema $schema, ?string $pageUrlTemplate, ?Subject $subject = null, string $language = 'de' ): array {
 		$definitions = [];
+		$labelLanguages = \ProfessionalWiki\SWS\Presentation\FieldLabelLanguages::forReader( $language );
+		$reference = $subject?->getSchemaReference() ?? $schema->getReference();
+		if ( $schema->getId() !== null ) { $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( $schema->getId(), $reference->source ); }
 		foreach ( $schema->getAllProperties()->asMap() as $name => $property ) {
 			$definitions[] = [ 'name' => $name, 'type' => $property->getPropertyType(),
 				'predicateLocalName' => RdfNamespaces::localName( $name ),
+				'predicatePath' => RdfNamespaces::fieldPropertyPath( $name, $reference ),
+				...( $property->getLabels() === [] ? [] : [ 'labels' => $property->getLabels(), 'displayLabel' => \ProfessionalWiki\SWS\Domain\Schema\FieldLabels::display( $property->getLabels(), $name, $labelLanguages ) ] ),
 				'wikiLink' => $property->getWikiLink(),
 				...( $property->isSchemaExecution() ? [ 'execute' => true ] : [] ),
 				...( $subject !== null && $property->getPropertyType() === 'page' ? [ 'ownPages' => self::ownImages( $subject, $name ) ] : [] ),

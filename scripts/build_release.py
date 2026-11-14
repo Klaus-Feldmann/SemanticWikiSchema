@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """Build and verify SWS release archives from a committed Git ref, never from untracked local files."""
 from pathlib import Path, PurePosixPath
+from datetime import datetime, timezone
 import argparse, hashlib, io, json, re, stat, subprocess, zipfile
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',required=True,type=Path);parser.add_argument('--ref',default='HEAD');args=parser.parse_args()
-    root=Path(__file__).resolve().parents[1];output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
+    root=Path(__file__).resolve().parents[1]
+    if json.loads((root/'SEMANTICWIKISCHEMA-VERSION.json').read_text()).get('publicationAllowed') is False:
+        raise RuntimeError('Private test candidate: release/installer packaging is disabled; use build_test_package.py.')
+    output=args.output.resolve();output.mkdir(parents=True,exist_ok=True)
     def git(*cmd):return subprocess.check_output(['git',*cmd],cwd=root)
     ref=git('rev-parse','--verify',args.ref+'^{commit}').decode().strip()
     manifest=json.loads(git('show',ref+':extension.json'));version=manifest['version']
+    metadata=json.loads(git('show',ref+':SEMANTICWIKISCHEMA-VERSION.json'))
+    if metadata.get('publicationAllowed') is False:
+        raise RuntimeError('Private test candidate: release/installer packaging is disabled; use build_test_package.py.')
     composer=json.loads(git('show',ref+':composer.json'));assert composer['name']=='aufeinwort/semantic-wikischema'
     installer=git('show',ref+':installer/install.py');assert ('VERSION = '+repr(version)).encode()in installer
     source_name=f'SemanticWikiSchema-{version}-source.zip';installer_name=f'SemanticWikiSchema-{version}-installer.zip'
@@ -51,7 +58,7 @@ def main():
     payload['SHA256SUMS']=(''.join(hashlib.sha256(data).hexdigest()+'  '+name+'\n'for name,data in sorted(payload.items()))).encode()
     with zipfile.ZipFile(output/installer_name,'w',zipfile.ZIP_DEFLATED) as archive:
         for name,data in sorted(payload.items()):
-            info=zipfile.ZipInfo(f'SemanticWikiSchema-{version}-installer/'+name,date_time=(2026,11,13,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;archive.writestr(info,data)
+            info=zipfile.ZipInfo(f'SemanticWikiSchema-{version}-installer/'+name,date_time=datetime.fromtimestamp(int(git('show','-s','--format=%ct',ref)),timezone.utc).timetuple()[:6]);info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;archive.writestr(info,data)
     with zipfile.ZipFile(output/installer_name)as archive:
         assert archive.testzip()is None
         base=f'SemanticWikiSchema-{version}-installer/'

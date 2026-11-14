@@ -26,6 +26,7 @@ export function useEditNotices( resolveRepository: () => EditNoticeRepository ):
 	// Advisory to the last step: an editor must open whether or not its notices could be fetched.
 	async function loadNotices( pageId: number, schemaName?: string ): Promise<void> {
 		const request = ++latestRequest;
+		notices.value = [];
 
 		try {
 			const fetched = await resolveRepository().getNotices( pageId, schemaName );

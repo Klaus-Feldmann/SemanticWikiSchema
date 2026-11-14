@@ -156,6 +156,7 @@ readonly class CreateSubjectAction {
 			label: SubjectLabel::fromText( $request->label ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $request->statements ),
+			fieldKeyVersion: $this->schemaResolver->getSchema( $schemaReference )?->getFieldKeyVersion() ?? 0,
             fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $request->fieldNotes, [], $request->fieldNotes === [] ? null : $this->schemaResolver->getSchema( $schemaReference ) ),
 	), $this->identityLanguage, $request->identity );
 	}

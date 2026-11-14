@@ -101,13 +101,23 @@ readonly class DependentSubjectBuilder {
 			);
 		}
 
-		// Kept, not dropped, so that the rule against labelled Dependent Subjects refuses it.
+		if ( isset( $item['fieldKeyVersion'] ) && $item['fieldKeyVersion'] !== $schema->getFieldKeyVersion() ) {
+            throw new InvalidArgumentException( 'Dependent field keys changed; reload the editor' );
+        }
+        if ( $schema->getFieldKeyVersion() > 0 ) {
+            foreach ( array_keys( $item['statements'] ) as $key ) {
+                if ( !$schema->hasProperty( (string)$key ) ) { throw new InvalidArgumentException( 'Unknown dependent field key: ' . $key ); }
+            }
+        }
+
+        // Kept, not dropped, so that the rule against labelled Dependent Subjects refuses it.
 		$schemaReference = $schema->getReference();
 		return \ProfessionalWiki\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
 			id: $this->newSubjectIdResolver->resolve( $item['id'] ),
 			label: SubjectLabel::fromText( $item['label'] ?? null ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $item['statements'] ),
+			fieldKeyVersion: $schema->getFieldKeyVersion(),
             fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $item['fieldNotes'] ?? [] ),
 		), $this->identityLanguage, \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) );
 	}

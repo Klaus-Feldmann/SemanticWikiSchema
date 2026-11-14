@@ -34,6 +34,7 @@ export function newBooleanProperty( attributes: BooleanPropertyAttributes = {} )
 		name: attributes.name instanceof PropertyName ? attributes.name : new PropertyName( attributes.name || 'Boolean' ),
 		type: BooleanType.typeName,
 		description: attributes.description ?? '',
+		...( attributes.labels === undefined ? {} : { labels: attributes.labels } ),
 		required: attributes.required ?? false,
 		default: attributes.default,
 	};

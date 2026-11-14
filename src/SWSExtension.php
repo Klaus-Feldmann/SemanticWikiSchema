@@ -1865,6 +1865,7 @@ class SWSExtension {
 			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
 			contentHandlerFactory: MediaWikiServices::getInstance()->getContentHandlerFactory(),
 			dependentSubjectGuard: $this->newDependentSubjectGuard( $this->getRequestAuthority() ),
+			fieldKeySchemas: $this->getSchemaResolverFor( $this->getRequestAuthority() ),
 		);
 	}
 

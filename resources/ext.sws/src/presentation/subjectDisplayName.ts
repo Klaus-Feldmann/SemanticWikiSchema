@@ -1,3 +1,4 @@
+import { propertyDisplayName } from '@/presentation/propertyDisplayName';
 import { getActivePinia } from 'pinia';
 import { useSchemaStore } from '@/stores/SchemaStore';
 import type { Subject } from '@/domain/Subject';
@@ -50,7 +51,7 @@ export function identifyingSubjectName( subject: Subject, schema: Schema | undef
 		const text = valueText( propertyDefinition, value );
 
 		if ( text !== null ) {
-			return mw.message( 'sws-dependent-subject-identified-name', name, propertyDefinition.name.toString(), text ).text();
+			return mw.message( 'sws-dependent-subject-identified-name', name, propertyDisplayName( propertyDefinition ), text ).text();
 		}
 	}
 
