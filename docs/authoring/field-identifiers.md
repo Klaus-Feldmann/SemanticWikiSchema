@@ -24,13 +24,9 @@ Die Entität speichert den abgearbeiteten Stand intern als `fieldKeyVersion`. Ne
 
 Alle Felder identifizierter Schemata verwenden Prädikate wie `/schema-id/S1/field/N1`; andere Schemata und Quellen haben eigene Pfade. Jedes Pfadsegment wird einzeln kodiert. Leerzeichen, Unterstriche und Unicode werden nicht zu derselben Kennung zusammengezogen. Graph und vollständige RDF-Ausgabe verwenden dieselbe Regel.
 
-Ohne ausdrückliche Zuordnung heißt das SMW-Attribut beispielsweise `S1:N1`; Prozent- und Gleichheitszeichen im Schlüssel werden eindeutig kodiert, damit sie nicht als SMW-Parametertrenner wirken. Anmerkungen verwenden denselben Namen mit dem konfigurierten Suffix. Eine gemeinsame fachliche Eigenschaft kann ausdrücklich zugeordnet werden:
+SMW-Attribute verwenden die Feldbenennung in der Wiki-Inhaltssprache, danach deren Rückfallsprachen; ohne passende Benennung gilt die technische Feldkennung. Ein Schema-Präfix wird nicht angefügt. Anmerkungen verwenden denselben Namen mit dem konfigurierten Suffix. Eine Änderung der Feldbenennung verändert nach erneuter Verarbeitung auch den SMW-Attributnamen. Die persönliche Anzeigesprache verändert die gespeicherten SMW-Attribute nicht.
 
-```php
-$wgWikiSchemaSmwMapping['properties']['S1']['N1'] = 'Geburtsdatum';
-```
-
-Eine vorhandene ausdrückliche SMW-Zuordnung am bisherigen Schlüssel bleibt bei der Übernahme nutzbar. Eine Zuordnung am aktuellen Schlüssel hat Vorrang. Die Zuordnung gilt auch für Anmerkungen. Neue SMW-Attribute benötigen wie bisher den passenden Datentyp; eine automatische Anlage von Attributseiten wird nicht eingeführt. Nach dem Upgrade betroffene Seiten neu projizieren, damit alte globale Feldprädikate und bisherige Standardattribute ersetzt werden.
+Vorhandene ausdrückliche Zuordnungen in `$wgWikiSchemaSmwMapping` haben weiterhin Vorrang; für normale Felder sind keine solchen Einträge erforderlich. Zuordnungen am bisherigen Schlüssel bleiben bei der Schlüsselübernahme nutzbar, eine Zuordnung am aktuellen Schlüssel hat Vorrang. SMW-Attribute benötigen weiterhin den passenden Datentyp. Nach einer Änderung betroffene Seiten neu verarbeiten.
 
 ## Mehrsprachige Feldbenennungen
 

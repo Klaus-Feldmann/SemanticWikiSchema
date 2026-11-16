@@ -1,6 +1,6 @@
 # SWS Documentation
 
-[Install SWS 0.5.0](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
+[Install SWS 0.5.02](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 
@@ -82,3 +82,7 @@ For the people who operate the server.
 * [Optionales HDTO-Mapping](examples/hdto.md)
 
 * [Schemaeigene Feldkennungen](authoring/field-identifiers.md)
+
+## Complete reference
+
+* [Features and complete configuration](reference/SWS-0.5.02.en.md) · [Deutsch](reference/SWS-0.5.02.de.md)

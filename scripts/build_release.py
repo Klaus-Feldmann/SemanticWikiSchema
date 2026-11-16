@@ -33,10 +33,10 @@ def main():
     assert {line.split('  ',1)[1] for line in lines} == set(entries) - {'publication/DISTRIBUTION-SHA256SUMS'}
     for line in lines:
         digest,name=line.split('  ',1);assert hashlib.sha256(entries[name]).hexdigest()==digest,name
-    payload={'install.py':installer,'README.md':git('show',ref+':installer/README.md'),'COPYING':entries['COPYING'],
+    payload={'install.py':installer,'README.md':git('show',ref+':installer/README.md'),'README.de.md':git('show',ref+':installer/README.de.md'),'COPYING':entries['COPYING'],
              'VERSION.json':(json.dumps({'version':version,'commit':ref,'mode':'first-installation','package':composer['name']},indent=2)+'\n').encode()}
     for name,data in entries.items():
-        if name.startswith('docs/operations/install/')or name in ['publication/apache-sws.example.conf','publication/LocalSettings.SemanticWikiSchema.example.php']:
+        if name.startswith(('docs/operations/install/','docs/reference/'))or name in ['publication/apache-sws.example.conf','publication/LocalSettings.SemanticWikiSchema.example.php']:
             payload[name]=data
     # Links outside this small installer payload point to the corresponding tagged source.
     for name,data in list(payload.items()):

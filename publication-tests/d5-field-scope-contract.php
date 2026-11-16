@@ -33,9 +33,9 @@ fcheck(in_array('https://example.org/schema-id/S11/field/F5',$pred['https://exam
 fcheck(in_array('https://example.org/schema-id/S11/field/Name',$pred['https://example.org/entity/E31']),'Named fields are schema-qualified too');
 $ra=FieldSnapshot::reader($a,$one,fn()=>[])->collectForAnnotations();$rb=FieldSnapshot::reader($b,$two,fn()=>[])->collectForAnnotations();
 $plan=new AnnotationPlanner(['properties'=>[]]);
-fcheck(in_array('S11:F4=Wert A',$plan->build($ra)->rows),'SMW default scopes first schema');
-fcheck(in_array('S12:F4=Wert B',$plan->build($rb)->rows),'SMW default scopes second schema');
-fcheck((new FieldNoteAnnotations())->build($ra,['properties'=>[]])===['S11:F4 (AM)=Notiz A'],'Note uses same scoped SMW name');
+fcheck(in_array('F4=Wert A',$plan->build($ra)->rows),'SMW default uses first field name');
+fcheck(in_array('F4=Wert B',$plan->build($rb)->rows),'SMW default uses second field name');
+fcheck((new FieldNoteAnnotations())->build($ra,['properties'=>[]])===['F4 (AM)=Notiz A'],'Note uses same unprefixed SMW name');
 $mapped=['properties'=>['S11'=>['F4'=>'Geburtsdatum']]];
 fcheck(in_array('Geburtsdatum=Wert A',(new AnnotationPlanner($mapped))->build($ra)->rows),'Explicit semantic mapping remains available');
 fcheck((new FieldNoteAnnotations())->build($ra,$mapped)===['Geburtsdatum (AM)=Notiz A'],'Explicit mapping also controls note name');

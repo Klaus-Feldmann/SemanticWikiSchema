@@ -5,7 +5,7 @@ function search( text, limit, namespace ) {
 	const api = new mw.Api();
 	const metadata = {
 		action: 'query', formatversion: 2,
-		prop: 'info|pageprops|pageimages|description', inprop: 'url', ppprop: 'displaytitle',
+		prop: 'info|pageprops|pageimages|description', inprop: 'url', ppprop: 'displaytitle|sws-description',
 		piprop: 'thumbnail', pithumbsize: 80, redirects: 1
 	};
 	const params = Object.assign( {}, metadata, {
@@ -24,7 +24,7 @@ function search( text, limit, namespace ) {
 					entry.to === page.title && ( entry.index === undefined || entry.index === page.index ) );
 				return { pageId: page.pageid, title: page.title,
 					displayTitle: node.textContent || page.title, url: page.fullurl,
-					description: page.description,
+					description: page.pageprops && page.pageprops[ 'sws-description' ] || page.description,
 					thumbnail: page.thumbnail ? { url: page.thumbnail.source,
 						width: page.thumbnail.width, height: page.thumbnail.height } : undefined,
 					redirectFrom: redirect && redirect.from };

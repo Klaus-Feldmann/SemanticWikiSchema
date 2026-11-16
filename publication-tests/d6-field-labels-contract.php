@@ -12,7 +12,8 @@ fcheck($translated['F4']->getLabels()===$labels,'Labels survive definition readi
 fcheck(FieldLabels::display($labels,'F4',['fr','de'])==='Geburtsdatum','Explicit fallback order');
 fcheck($translatedSchema->getFieldReference('Date of birth')===null,'Display label cannot select a field');
 $record=FieldSnapshot::reader($translatedSchema,$one,fn()=>[])->collectForAnnotations();
-fcheck((new AnnotationPlanner(['properties'=>[]]))->build($record)->rows===$plan->build($ra)->rows,'Translation preserves SMW targets and values');
+fcheck(in_array('Geburtsdatum=Wert A',(new AnnotationPlanner(['properties'=>[]]))->build($record)->rows),'Content-language label names SMW while technical identity stays stable');
+fcheck((new \ProfessionalWiki\SWS\Application\Semantic\FieldNoteAnnotations())->build($record,['properties'=>[]])===['Geburtsdatum (AM)=Notiz A'],'Notes follow the content-language field label');
 $graph=\SWSBaseBridge\GraphFieldPresentation::fromSchema($translatedSchema,'https://example.org/wiki/SWSGRAPHTITLETOKEN',$one,'en');
 fcheck($graph['definitions'][0]['name']==='F4' && $graph['definitions'][0]['displayLabel']==='Date of birth','Graph separates label and technical key');
 fcheck($graph['definitions'][0]['predicatePath']==='/schema-id/S11/field/F4','Graph predicate stays unchanged');

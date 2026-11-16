@@ -1,22 +1,23 @@
-# Verification: Semantic WikiSchema 0.5.0
-
-Release source: the operator-supplied `SemanticWikiSchema-0.5.00-alpha.8` directory from 2026-11-14. Runtime PHP, TypeScript and bridge sources are unchanged; the release updates version metadata, installer activation, documentation and publication checks. The separately published `mcp-sws-0.5.0` integration is retained byte-for-byte.
+# Verification: Semantic WikiSchema 0.5.02
 
 ## Automated checks
 
-- 566 PHP domain/projection tests with 979 assertions, plus 84 create/replace action tests with 150 assertions.
-- 66 isolated processing contracts, including actual key-transfer writer/processor tests with controlled MediaWiki host services, source retention, idempotence, collisions and concurrent-edit refusal.
-- 3,852 frontend tests in 248 files, TypeScript and browser build.
-- 78 Graph tests, rebuilt public-bundle comparison and DOM checks.
+- 578 PHP domain/projection tests with 998 assertions; 84 create/replace action tests with 150 assertions.
+- 68 separate processing contracts, including description ranking, source-mode selection, actual worker output, independent schema annotations and field-label SMW naming. MediaWiki/SMW services at these boundaries are controlled fixtures, not a live database.
+- 3,854 frontend tests in 248 files; TypeScript check and frontend build.
+- 78 Graph tests, bundle comparison and DOM checks.
 - 266 Lua checks: 30 module, 202 schema-field, 24 structured URL and 10 current-reader checks.
-- 13 first-installation helper checks and 2 package/message-registration checks.
-- Actual Composer first installation using the candidate package: 21 resolved packages, correct extension path, S1/E1 autoload, runtime dependencies available, unrelated configuration and existing package versions preserved, LocalSettings.php unchanged. This uses a controlled directory layout, not a running MediaWiki.
-- Release archives are built from committed Git content; source and installer manifests, archive CRC and individual file hashes are checked. The versioned installer pins Composer to 0.5.0.
+- 13 first-installation helper tests and 2 publication/message-registration tests.
+- Actual Composer first installation using the candidate package into a controlled MediaWiki directory layout: 21 packages, S1/E1 autoload and runtime dependencies available, unrelated configuration/package versions preserved, LocalSettings.php unchanged. No running fresh MediaWiki/database test is implied.
 
-## Live evidence and limits
+## Live qualification
 
-The operator reports that alpha.8 was installed and `RebuildData` completed all 74 pages. The separate MCP 0.5.0 release records a 22-step live run and a write-protection check against this interface. These are separate from a fresh full MediaWiki installation test.
+The operator confirmed installation and tested Paulinus Mayr, Johann Wolfgang von Goethe and Nikolaus von Kues. Read-only checks verified unprefixed SMW field/note properties, no values for the tested obsolete schema-prefixed properties, ranked descriptions and corresponding actual PrefixSearch API responses. The active ranks were respectively SHORTDESC, Wikidata and local Wikibase. Multiple SMW description values coexist without changing the selected search subtitle.
 
-The qualified environment is MediaWiki 1.47.0-wmf.24, PHP 8.3, the legacy parser and Vector 2022. MediaWiki 1.47 stable, a fresh core/database installation, every SQL server, Neo4j live Cypher and arbitrary NeoWiki migrations are not qualified by these checks. Built browser assets and the installer do not install MediaWiki or optional services.
+Core: MediaWiki 1.47.0-wmf.24, PHP 8.3.36, legacy parser, Vector 2022. Live source mode: cache. Store behavior is covered by isolated contracts, not a new live mode switch. This is not qualification of MediaWiki 1.47 stable or every database/backend combination.
 
-Existing SWS/NeoWiki installations are outside the first-installation helper. Contact the maintainer for the appropriate update or migration procedure. The MCP patch is a separate download and does not replace the wiki installer.
+## Publication boundary
+
+The published branch retains its existing processing diagnostics. The separately versioned external MCP adapter is unchanged. Only public English/German documentation is included; internal provenance/completeness review material is excluded.
+
+Release archives are generated from committed Git content, with complete file manifests, archive CRC and individual SHA-256 verification. The installer pins Composer to 0.5.02. It prepares Composer files but does not activate extensions, alter LocalSettings.php, update a database or start jobs.

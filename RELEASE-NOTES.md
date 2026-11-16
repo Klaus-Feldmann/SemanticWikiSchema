@@ -1,3 +1,19 @@
+# Semantic WikiSchema 0.5.02
+
+- Default SMW property names use the field label in the wiki content language, falling back to the technical key, without an automatic schema-ID prefix. Notes follow the same naming. Explicit mappings retain priority.
+- Page/schema SHORTDESC takes precedence over local Wikibase, then Wikidata. The first non-empty description supplies the search subtitle and automatic SMW `Kurzbeschreibung` annotation. Explicit schema fields may add independent values.
+- Search reads the persisted description; typing does not fetch external descriptions. Main search and schema page fields share the lookup.
+- English and German feature/configuration references cover all 22 registered settings, array suboptions, requirements and AI-assisted installation/schema design. Main pages remain concise.
+- Existing processing diagnostics and the separately versioned MCP integration are retained.
+
+## Installation
+
+[English](docs/operations/install/README.md) · [Deutsch](docs/operations/install/de/README.md). The helper targets first installation. After replacing an existing extension installation, reprocess affected SWS pages so that SMW names and saved subtitles reflect current schemas. Keep jobs running. No new SQL structure, identity migration or search-index rebuild is required for these output changes.
+
+Qualified core: MediaWiki 1.47.0-wmf.24, PHP 8.3.36, legacy parser, Vector 2022. [Verification](publication/VERIFICATION.md).
+
+---
+
 # Semantic WikiSchema 0.5.0
 
 This release is based on the operator-supplied, installed `0.5.00-alpha.8` source. It adds the field-key and multilingual-label work to the published 0.4.03 line. The separately published MCP integration is retained unchanged.
