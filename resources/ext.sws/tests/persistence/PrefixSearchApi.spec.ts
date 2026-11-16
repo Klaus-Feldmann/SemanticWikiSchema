@@ -65,3 +65,18 @@ describe( 'Supplemental title substring lookup', () => {
 		await api.search( 'abc', 10, 14 ); expect( get ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
+
+describe( 'Ranked SWS description subtitles', () => {
+ it( 'uses the processed active rank instead of the native Wikidata description', async () => {
+  const get = vi.fn().mockResolvedValue( { query: { pages: [ { pageid: 1, ns: 0, title: 'Person', index: 1, description: 'Wikidata', pageprops: { 'sws-description': 'SHORTDESC oder lokale Wikibase' } } ] } } );
+  vi.stubGlobal( 'mw', { Api: class { get = get; } } );
+  const result = await api.search( 'P', 10, 0 );
+  expect( result[ 0 ].description ).toBe( 'SHORTDESC oder lokale Wikibase' );
+  expect( get.mock.calls[ 0 ][ 0 ].ppprop ).toBe( 'displaytitle|sws-description' );
+  expect( get ).toHaveBeenCalledTimes( 1 );
+ } );
+ it( 'keeps the native fallback for pages without a processed SWS description', async () => {
+  vi.stubGlobal( 'mw', { Api: class { get = () => Promise.resolve( { query: { pages: [ { pageid: 1, ns: 14, title: 'Kategorie:Person', description: 'Vorhandener Untertitel' } ] } } ); } } );
+  expect( ( await api.search( 'P', 10, 14 ) )[ 0 ].description ).toBe( 'Vorhandener Untertitel' );
+ } );
+} );

@@ -1,7 +1,7 @@
 {
   "name": "SemanticWikiSchema",
   "bridgeVersion": "0.21.1",
-  "prepared": "2026-11-14",
+  "prepared": "2026-11-16",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
     "commit": "92cf0e347d40899647cdbb1312c4f0dc09768ae3",
@@ -32,39 +32,36 @@
       "Subjekt"
     ]
   },
-  "extensionVersion": "0.5.0",
+  "extensionVersion": "0.5.02",
   "developmentBuild": "0.5.0",
   "developmentStage": "release",
   "baseVersion": "0.5.00-alpha.8",
-  "releaseStatus": "public 0.5.0 release; first-installation package",
+  "releaseStatus": "public 0.5.02 release; first-installation package",
   "publicationAllowed": true,
-  "runtimeLiveInstallVerified": false,
+  "runtimeLiveInstallVerified": true,
   "composerLiveInstallVerified": false,
   "composerLocalInstallVerified": true,
   "existingDataMigrationRequired": false,
   "installationPackage": "complete extension folder",
-  "runtimeVerification": "Operator reports installed alpha.8 and successful rebuild of 74 pages; separate MCP 0.5.0 live checks passed against alpha.8; fresh full MediaWiki runtime not tested",
+  "runtimeVerification": "Operator-confirmed 0.5.02 installation; read-only live SMW and ranked search API checks; no fresh full-core/database installation test",
   "baselineQualification": {
     "version": "0.4.03",
     "operatorConfirmed": true,
     "environment": "MediaWiki 1.47.0-wmf.24, PHP 8.3.36, legacy parser"
   },
   "localVerification": {
-    "phpUnitTests": 566,
-    "phpUnitAssertions": 979,
-    "phpContracts": 66,
-    "uiTests": 3852,
+    "phpUnitTests": 578,
+    "phpUnitAssertions": 998,
+    "actionTests": 84,
+    "actionAssertions": 150,
+    "phpContracts": 68,
+    "uiTests": 3854,
     "uiFiles": 248,
     "graphTests": 78,
-    "typeScript": true,
-    "builds": [
-      "Data UI",
-      "Graph Explorer"
-    ],
-    "fullFreshMediaWikiRuntime": false,
+    "luaChecks": 266,
     "installerTests": 13,
-    "actionTests": 84,
-    "actionAssertions": 150
+    "publicationScriptTests": 2,
+    "composerFirstInstallation": "candidate-path; controlled MediaWiki directory layout, no core/database runtime"
   },
   "fieldIdentity": {
     "scope": "schema + exact field key, for every valid spelling",
@@ -92,5 +89,7 @@
   "operatorReportedRebuiltPages": 74,
   "existingDataReprojectionRequired": true,
   "mcpRelease": "mcp-sws-0.5.0",
-  "composerVerificationScope": "Actual Composer dependency resolution, installer placement, autoload and preservation checks in a controlled MediaWiki directory layout; no fresh core runtime/database test"
+  "composerVerificationScope": "Actual Composer dependency resolution, installer placement, autoload and preservation checks in a controlled MediaWiki directory layout; no fresh core runtime/database test",
+  "version": "0.5.02",
+  "freshRuntimeInstallVerified": false
 }

@@ -23,6 +23,6 @@ SMW is optional. Local SWS storage, the Data tab and direct SWS queries do not r
 
 ## Scribunto and MCP
 
-Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces. The optional MCP adapter in `integrations/mcp/` is a separately versioned integration; use the [SWS 0.5.0 patch for MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) and its compatibility checks. It is not installed or authenticated by the SWS installer.
+Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces. The optional MCP adapter in `integrations/mcp/` is a separately versioned integration; use the [complete integration package for MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) and its compatibility checks. It is not installed or authenticated by the SWS installer.
 
 [Graph Explorer setup](graph-explorer.md) · [Installation index](README.md)

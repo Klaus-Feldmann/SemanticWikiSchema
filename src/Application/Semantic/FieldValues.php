@@ -28,7 +28,9 @@ final class FieldValues {
                 if (($definition['externalProperty'] ?? null) !== null && $definition['type'] !== 'wikitext') { $this->loadExternal(); break; }
             }
         }
-        return $this->collectInternal(null,'all',$language,false,true);
+        return $this->collectInternal(null,'all',$language,false,true) + [
+            'annotationLanguages' => \ProfessionalWiki\SWS\Presentation\FieldLabelLanguages::forReader($language),
+        ];
     }
 
     private function collectInternal(?string $name, string $origin, string $language, bool $includeImages, bool $forAnnotations): array {

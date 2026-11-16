@@ -4,9 +4,10 @@ declare( strict_types = 1 );
 namespace ProfessionalWiki\SWS\Application\Semantic;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\FieldNameResolver;
+use ProfessionalWiki\SWS\Domain\Schema\FieldLabels;
+use ProfessionalWiki\SWS\Presentation\FieldLabelLanguages;
 
-/** Stable SMW names: explicit mappings win; all keys default to schema-qualified names. */
+/** SMW names follow content-language field labels; explicit mappings retain priority. */
 final class FieldAnnotationName {
 	public static function resolve( array $result, string $field, array $config ): string {
 		$schema = $result['schema'];
@@ -27,7 +28,17 @@ final class FieldAnnotationName {
 			if ( !is_string( $names[$candidate] ) ) { throw new InvalidArgumentException( 'Invalid property mapping' ); }
 			return trim( $names[$candidate] );
 		}
-		// #set separates the property and value at '='. Escape it injectively in defaults.
-		return $scope . ':' . strtr( $field, [ '%' => '%25', '=' => '%3D' ] );
+		$definition = [];
+		foreach ( $schema['properties'] ?? [] as $property ) {
+			if ( ( $property['name'] ?? null ) === $field ) { $definition = $property; break; }
+		}
+		$languages = $result['annotationLanguages'] ?? FieldLabelLanguages::forReader(
+			(string)( $GLOBALS['wgLanguageCode'] ?? 'en' )
+		);
+		$name = trim( FieldLabels::display( $definition['labels'] ?? [], $field, $languages ) );
+		// This is an actual SMW property name, not an encoded internal identity.
+		// Reject names that cannot be passed to #set rather than silently changing them.
+		SmwMappingConfig::resolve( [ 'properties' => [ 'field' => [ 'name' => $name ] ] ] );
+		return $name;
 	}
 }

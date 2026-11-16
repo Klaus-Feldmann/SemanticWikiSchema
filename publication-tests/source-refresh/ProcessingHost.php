@@ -15,6 +15,7 @@ namespace D2Harness {
 		public static string $mode = 'store';
 		public static int $liveReads = 0;
 		public static ?string $foreignHtml = null;
+        public static ?string $shortdesc = null;
 		public static ?\Closure $afterCollect = null;
 	}
 }
@@ -85,7 +86,7 @@ namespace MediaWiki\Deferred {
 	}
 }
 namespace MediaWiki\Logger {
-	class LoggerFactory { public static function getInstance( string $name ): mixed { return new class { public function error( mixed ...$args ): void {} }; } }
+	class LoggerFactory { public static function getInstance( string $name ): mixed { return new class { public function error( mixed ...$args ): void {} public function warning( mixed ...$args ): void {} }; } }
 }
 namespace MediaWiki {
 	class MediaWikiServices {
@@ -107,6 +108,7 @@ namespace MediaWiki {
 						$context->observe( $parser );
 						if ( \D2Harness\State::$swsFailure ) { $context->failure = 'SWS schema resolution failed'; }
 						$parser->output->setPageProperty( 'unlinkedwikibase_id', \D2Harness\State::$q );
+                        if ( \D2Harness\State::$shortdesc !== null ) { $parser->output->setPageProperty( 'shortdesc', \D2Harness\State::$shortdesc ); }
 						return $parser->output;
 					}
 				};

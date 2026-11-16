@@ -43,12 +43,12 @@ final class FieldKeyChangesTest extends TestCase {
   FieldKeyChanges::validateEdit(['propertyDefinitions'=>['A'=>['type'=>'text']]],['propertyDefinitions'=>['Z1'=>['type'=>'text']],'fieldKeyChanges'=>[['A'=>'Z1']]]);
   $this->expectException(\InvalidArgumentException::class);FieldKeyChanges::validateEdit(['propertyDefinitions'=>['A'=>['type'=>'text']]],['propertyDefinitions'=>['Z1'=>['type'=>'number']],'fieldKeyChanges'=>[['A'=>'Z1']]]);
  }
- public function testAllSpellingsHaveSchemaScopedRdfAndSmwDefaults():void {
+ public function testRdfStaysSchemaScopedWhileSmwUsesUnprefixedFieldNames():void {
   $one=SchemaReference::identified(new SchemaId('S1'));$two=SchemaReference::identified(new SchemaId('S2'));
   self::assertNotSame(RdfNamespaces::fieldPropertyPath('Has author',$one),RdfNamespaces::fieldPropertyPath('Has_author',$one));
-  self::assertSame('S1:a%3Db',FieldAnnotationName::resolve(['schema'=>['name'=>'S1']],'a=b',['properties'=>[]]));
-  self::assertSame('S1:a%253Db',FieldAnnotationName::resolve(['schema'=>['name'=>'S1']],'a%3Db',['properties'=>[]]));
-  foreach(['F1','N1','Z1','Klassenzuordnung','Ort:Name']as$key){self::assertNotSame(RdfNamespaces::fieldPropertyPath($key,$one),RdfNamespaces::fieldPropertyPath($key,$two));self::assertSame('S1:'.$key,FieldAnnotationName::resolve(['schema'=>['name'=>'S1','id'=>'S1']],$key,['properties'=>[]]));}
+  try { FieldAnnotationName::resolve(['schema'=>['name'=>'S1']],'a=b',['properties'=>[]]); self::fail('Invalid SMW name admitted'); } catch (\InvalidArgumentException) { self::assertTrue(true); }
+  self::assertSame('a%3Db',FieldAnnotationName::resolve(['schema'=>['name'=>'S1']],'a%3Db',['properties'=>[]]));
+  foreach(['F1','N1','Z1','Klassenzuordnung','Ort:Name']as$key){self::assertNotSame(RdfNamespaces::fieldPropertyPath($key,$one),RdfNamespaces::fieldPropertyPath($key,$two));self::assertSame($key,FieldAnnotationName::resolve(['schema'=>['name'=>'S1','id'=>'S1']],$key,['properties'=>[]]));}
  }
  public function testExplicitSmwMappingSurvivesKeyChanges():void {
   $result=['schema'=>['name'=>'S1','fieldKeyChanges'=>[['A'=>'N1'],['N1'=>'Z1']]]];

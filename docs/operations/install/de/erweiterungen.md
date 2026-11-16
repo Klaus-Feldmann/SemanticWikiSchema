@@ -18,6 +18,6 @@ Ein Quellenfeld braucht eine zugeordnete Q-ID und eine passende P-ID. SchemaBase
 
 SMW separat installieren und konfigurieren. Ohne ausdrückliche Zuordnung dient beispielsweise `S1:F12` als schemaeigener Attributname. Mehrsprachige Feldbenennungen ändern diesen Namen nicht. Bestehende Attribute müssen geeignete Datentypen besitzen; zusätzliche Namensräume sind in SMW gesondert freizugeben. SWS kann auch ohne SMW Daten speichern und direkt abfragen.
 
-Scribunto stellt die Lua-Abfragen bereit. Der [MCP-Patch für SWS 0.5.0 und MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) ist ein separates Integrationspaket; der SWS-Installer richtet keine MCP-Anmeldung ein.
+Scribunto stellt die Lua-Abfragen bereit. Der [vollständige Integrationspaket für MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) ist ein separates Integrationspaket; der SWS-Installer richtet keine MCP-Anmeldung ein.
 
 [Englische Detailanleitung](../integrations.md) · [Installationsübersicht](README.md)

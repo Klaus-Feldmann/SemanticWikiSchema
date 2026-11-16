@@ -21,7 +21,7 @@ For production operation, supervise the job runner using the site's service mana
 
 Functional checks:
 
-1. Special:Version lists SemanticWikiSchema 0.5.0 and SchemaBaseBridge 0.21.1.
+1. Special:Version lists SemanticWikiSchema 0.5.02 and SchemaBaseBridge 0.21.1.
 2. Special:Schemas (German: Spezial:Schemata) loads.
 3. Create a schema with a text field. Confirm that its page uses an S-ID and its label can be edited.
 4. On a test article, open Data, create an entity, save a value and reload. The entity has an E-ID and the saved value remains visible.

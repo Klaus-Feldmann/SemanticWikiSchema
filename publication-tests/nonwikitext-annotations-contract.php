@@ -13,7 +13,9 @@ namespace MediaWiki\Title {
 }
 namespace MediaWiki\Parser {
     class ParserOutput {
-        public array $data=[], $dependencies=[];
+        public array $data=[], $dependencies=[], $props=[];
+        public function getPageProperty($key){return $this->props[$key]??null;}
+        public function setPageProperty($key,$value){$this->props[$key]=$value;}
         public function getExtensionData($key){return $this->data[$key]??null;}
         public function setExtensionData($key,$value){$this->data[$key]=$value;}
         public function addTemplate($title,...$args){$this->dependencies[]=$title->name;}
@@ -85,21 +87,27 @@ namespace {
     $schema=new Schema(new SchemaName('Verwaltung'),'',new PropertyDefinitions(['Status'=>new TextProperty(new PropertyCore('',false,null),false,false,null,null)]),false);
     function subject($value){return TestSubject::build(schemaName:new SchemaName('Verwaltung'),statements:new StatementList([new Statement(new PropertyName('Status'),'text',new StringValue($value))]));}
     $user=new \MediaWiki\User\User;
-    function apply($title,$parser,$schema,$subject){global $user;$out=new ParserOutput;(new AutomaticAnnotations)->apply($title,$out,$parser,$schema,new PageSubjects($subject,new SubjectMap),$subject,$user,static fn()=>$schema);return $out;}
+    function apply($title,$parser,$schema,$subject,$description=null){global $user;$out=new ParserOutput;if($description!==null)$out->setPageProperty('sws-description',$description);(new AutomaticAnnotations)->apply($title,$out,$parser,$schema,new PageSubjects($subject,new SubjectMap),$subject,$user,static fn()=>$schema);return $out;}
     foreach(['Scribunto','json','javascript','css']as $model){
         $title=new Title('Metadaten/'.$model,$model);
         $out=apply($title,null,$schema,subject('geprüft'));
-        check($out->getExtensionData('smwdata')->rows===['Verwaltung:Status=geprüft'],'Non-wikitext annotation without main parser: '.$model);
+        check($out->getExtensionData('smwdata')->rows===['Status=geprüft'],'Non-wikitext annotation without main parser: '.$model);
         check(count($out->dependencies)===2,'Schema and property dependencies: '.$model);
         $out=apply($title,null,$schema,subject('geändert'));
-        check($out->getExtensionData('smwdata')->rows===['Verwaltung:Status=geändert'],'Fresh output replaces previous value: '.$model);
+        check($out->getExtensionData('smwdata')->rows===['Status=geändert'],'Fresh output replaces previous value: '.$model);
         $out=apply($title,null,$schema,subject(''));
         check($out->getExtensionData('smwdata')->rows===[],'Fresh empty field removes previous annotation: '.$model);
     }
     $title=new Title('Vorlage:Metadaten','wikitext');
-    check(apply($title,new Parser($title),$schema,subject('Vorlage'))->getExtensionData('smwdata')->rows===['Verwaltung:Status=Vorlage'],'Wikitext path retained');
+    check(apply($title,new Parser($title),$schema,subject('Vorlage'))->getExtensionData('smwdata')->rows===['Status=Vorlage'],'Wikitext path retained');
     foreach([[$title,null],[new Title('Modul:Metadaten','Scribunto'),new Parser(new Title('Andere Seite'))]]as [$title,$parser]){
         try{apply($title,$parser,$schema,subject('abgelehnt'));check(false,'Invalid parser context accepted');}catch(\ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete){check(true,'Incomplete/wrong parser remains refused');}
     }
+    $t=new Title('Vorlage:Beschreibung','json');
+    $described=new Schema(new SchemaName('Verwaltung'),'',new PropertyDefinitions(['Status'=>new TextProperty(new PropertyCore('',false,null,labels:['de'=>'Kurzbeschreibung']),false,false,null,null)]),false);
+    $out=apply($t,null,$described,subject('Zusätzlicher Schemawert'),'Aktiver Rang');
+    check($out->getExtensionData('smwdata')->rows===['Kurzbeschreibung=Aktiver Rang','Kurzbeschreibung=Zusätzlicher Schemawert'],'Automatic description and independent schema value coexist');
+    $out=apply($t,null,$described,subject('Zusätzlicher Schemawert'));
+    check($out->getExtensionData('smwdata')->rows===['Kurzbeschreibung=Zusätzlicher Schemawert'],'Removing automatic description does not remove independent schema value');
     echo "$checks non-wikitext annotation/change/removal/context checks passed (isolated MediaWiki/SMW stand-ins).\n";
 }

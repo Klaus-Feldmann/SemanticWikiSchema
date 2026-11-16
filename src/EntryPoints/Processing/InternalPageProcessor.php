@@ -125,6 +125,9 @@ final class InternalPageProcessor {
             if ( $subject !== null && $schema !== null ) {
                 ( new CategoryAssignments() )->apply( $output, $schema, $subjects, $subject, $resolveSchema );
             }
+            if ( !$sourcePreparation && $subject !== null && $schema !== null ) {
+                ( new EffectivePageDescription() )->apply( $title, $output, $user );
+            }
             if ( !$sourcePreparation && $subject !== null && $schema !== null && $services->hasService( 'SMW.ParserDataFactory' ) ) {
                 ( new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations() )->apply(
                     $title, $output, $context->parser, $schema, $subjects, $subject, $user, $resolveSchema

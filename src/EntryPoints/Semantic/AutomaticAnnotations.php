@@ -35,6 +35,10 @@ final class AutomaticAnnotations {
         $pending = [[$subject, $schema]];
         $visited = [$subject->id->text => true];
         $rows = [];
+        $description = $output->getPageProperty( \ProfessionalWiki\SWS\EntryPoints\Processing\EffectivePageDescription::PROPERTY );
+        if ( is_string( $description ) && trim( $description ) !== '' ) {
+            $rows['Kurzbeschreibung=' . trim( $description )] = true;
+        }
         $objects = [];
         for ($index = 0; $index < count($pending); $index++) {
             [$current, $currentSchema] = $pending[$index];
