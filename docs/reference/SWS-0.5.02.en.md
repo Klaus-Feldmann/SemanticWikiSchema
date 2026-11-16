@@ -247,6 +247,8 @@ External configuration is not part of the 22 SWS/bridge options:
 
 Run MediaWiki's updater during installation and keep jobs running. `SemanticWikiSchema:RebuildData` reprocesses entity pages; `--refresh-sources` additionally requests a refresh of configured sources. Choose the scope of rebuilding for the task at hand.
 
+For optional Q-ID registration, see the [helper setup and require_once example](../operations/install/integrations.md#optional-wikidata-registration-helper) and [helper settings](../../integrations/registration/README.md). The helper requires UnlinkedWikibase and is unnecessary when the association already exists.
+
 ## 4. AI-assisted installation, support and schema design
 
 **We recommend first connecting your existing MediaWiki to an AI through a suitable MediaWiki MCP Server, then using that assistance to install and configure SWS.** General wiki tools can be used before SWS is installed. This is a recommended workflow, not a prerequisite for manual installation.

@@ -247,6 +247,8 @@ Externe Einstellungen sind keine SWS-Optionen:
 
 Nach der Installation das MediaWiki-Updateverfahren ausführen und Jobs dauerhaft betreiben. `SemanticWikiSchema:RebuildData` verarbeitet Entitätsseiten neu; `--refresh-sources` fordert zusätzlich eine Aktualisierung der eingerichteten Quellen an. Den Umfang einer Neuberechnung auf die jeweilige Aufgabe abstimmen.
 
+Für die optionale Q-ID-Registrierung siehe [Einrichtung mit require_once](../operations/install/de/erweiterungen.md#optionale-wikidata-registrierung) und [Helfer-Einstellungen](../../integrations/registration/README.de.md). Der Helfer benötigt UnlinkedWikibase und entfällt bei bereits vorhandener Quellenzuordnung.
+
 ## 4. KI-unterstützte Installation, Support und Schemaerstellung
 
 **Empfehlung: Zunächst das vorhandene MediaWiki über einen passenden MediaWiki-MCP-Server mit einer KI verbinden und anschließend SWS mit deren Unterstützung installieren und einrichten.** Die Anbindung kann bereits vor SWS für allgemeine Wiki-Werkzeuge verwendet werden. Sie ist eine empfohlene Arbeitshilfe, keine Voraussetzung für die manuelle Installation von SWS.
