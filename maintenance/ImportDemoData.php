@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use FileFetcher\SimpleFileFetcher;
 use Maintenance;
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiPageDeleter;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPresenter;
+use AEWI\SWS\Application\Actions\ImportPages\MappingContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\PageContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use AEWI\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
+use AEWI\SWS\Persistence\MediaWiki\MediaWikiPageDeleter;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
 use User;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';

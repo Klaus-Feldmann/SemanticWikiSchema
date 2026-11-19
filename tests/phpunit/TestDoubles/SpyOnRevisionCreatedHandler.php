@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\EntryPoints\OnRevisionCreatedHandler;
 
 class SpyOnRevisionCreatedHandler extends OnRevisionCreatedHandler {
 

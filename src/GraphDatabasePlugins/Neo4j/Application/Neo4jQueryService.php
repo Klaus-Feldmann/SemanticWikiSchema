@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Application;
 
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Exception\Neo4jException;
-use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use AEWI\SWS\Application\RawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryPermissionDeniedException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
 use Throwable;
 
 readonly class Neo4jQueryService {

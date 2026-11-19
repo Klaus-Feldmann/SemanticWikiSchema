@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ProfessionalWiki\SWS\Domain;
+namespace AEWI\SWS\Domain;
 
 /** Bounded historical calendar arithmetic; no Unix timestamp and no year zero. */
 class HistoricalCalendar

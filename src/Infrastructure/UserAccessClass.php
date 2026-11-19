@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Permissions\PermissionManager;
 use MediaWiki\User\UserGroupManager;

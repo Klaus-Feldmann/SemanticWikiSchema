@@ -5,9 +5,9 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 $services->getHookContainer()->register('ParserBeforeInternalParse', static function($parser, &$text, $stripState) {
     // Deterministic stand-in for Q discovery when the schema program enters the full parse.
     if ($parser->getTitle()->getText()==='Relation fixture' && str_contains($text,'identity-fixture')) {

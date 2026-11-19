@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Infrastructure\ProductionIdGenerator;
 
 class TestSubject {
 

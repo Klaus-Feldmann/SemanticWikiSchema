@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Content\WikitextContent;
@@ -12,20 +12,20 @@ use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the pages whose Subjects the view reads and the revisions a diff compares.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserAfterTidy
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onOutputPageParserOutput
- * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
- * @covers \ProfessionalWiki\SWS\SWSExtension::shouldAutoRenderMainSubject
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onParserAfterTidy
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onOutputPageParserOutput
+ * @covers \AEWI\SWS\EntryPoints\MainSubjectParserFunction
+ * @covers \AEWI\SWS\SWSExtension::shouldAutoRenderMainSubject
  * @group Database
  */
 class AutoRenderMainSubjectTest extends SWSIntegrationTestCase {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use Closure;
 use MediaWiki\Cache\LinkBatchFactory;
@@ -12,7 +12,7 @@ use MediaWiki\Linker\LinkTarget;
 use MediaWiki\Parser\Sanitizer;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 use stdClass;
 
 /**

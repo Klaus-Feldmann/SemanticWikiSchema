@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** Private, signed write-ahead report. The original migration journal is never changed. */
 final class MigrationFieldAdditionLog {

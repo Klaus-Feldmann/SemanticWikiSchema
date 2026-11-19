@@ -1,0 +1,21 @@
+{
+	"helpVersion": "0.6.0/patch-5",
+	"mcpBaseVersion": "0.21.0",
+	"swsContractVersions": [
+		"0.6.0",
+		"0.6.0-beta.2",
+		"0.6.0-beta.1",
+		"0.6.0-beta"
+	],
+	"topics": [
+		"overview",
+		"sws",
+		"query",
+		"editing",
+		"authentication",
+		"backends"
+	],
+	"profilePath": "User:<authenticated username>/profil",
+	"profileMaxCharacters": 16000,
+	"searchPolicy": "question-adaptive; optional application/use-case descriptions, no required names"
+}

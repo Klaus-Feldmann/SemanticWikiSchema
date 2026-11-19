@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\JsonContent;
@@ -10,11 +10,11 @@ use MediaWiki\Content\WikitextContent;
 use MediaWiki\Permissions\Authority;
 use MediaWikiIntegrationTestCase;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageContentFetcher;
+use AEWI\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
+use AEWI\SWS\Tests\TestDoubles\StubPageContentFetcher;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
+ * @covers \AEWI\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
  */
 class MediaWikiWikiConfigSourceTest extends MediaWikiIntegrationTestCase {
 

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the page whose Subjects the view reads.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
  * @group Database
  */
 class SubjectIdTitledPageHeadingTest extends SWSIntegrationTestCase {

@@ -1,16 +1,16 @@
 <?php
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyDefinition};
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Rdf\{RdfNamespaces,RdfValueMapperRegistry};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue,RelationValue};
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Application\Rdf\{RdfPageProjector,SubjectIriResolver};
-use ProfessionalWiki\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner,FieldNoteAnnotations};
-use ProfessionalWiki\SWS\Tests\Data\{TestSources,TestProperty,TestPage,TestRelation};
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyDefinition};
+use AEWI\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use AEWI\SWS\Domain\Rdf\{RdfNamespaces,RdfValueMapperRegistry};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\{StringValue,NumberValue,RelationValue};
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Application\Rdf\{RdfPageProjector,SubjectIriResolver};
+use AEWI\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner,FieldNoteAnnotations};
+use AEWI\SWS\Tests\Data\{TestSources,TestProperty,TestPage,TestRelation};
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 use Psr\Log\NullLogger;
 function wfMessage($key,...$args){return new class{function inContentLanguage(){return $this;}function text(){return ' (AM)';}};}
 $checks=0;function fcheck($ok,$why){global $checks;$checks++;if(!$ok)throw new RuntimeException($why);}

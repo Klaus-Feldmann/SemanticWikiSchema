@@ -1,9 +1,9 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 use MediaWiki\Rest\{Response, SimpleHandler};
-use ProfessionalWiki\SWS\Application\Rdf\SchemaRdfProjector;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Rdf\SchemaRdfProjector;
+use AEWI\SWS\SWSExtension;
 class ExportSchemaRdfApi extends SimpleHandler {
  use ReadOnlyEndpoint;
  use SchemaReadEndpoint { getParamSettings as private schemaParamSettings; }

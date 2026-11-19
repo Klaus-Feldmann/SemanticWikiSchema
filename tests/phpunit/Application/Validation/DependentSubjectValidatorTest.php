@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Validation;
+namespace AEWI\SWS\Tests\Application\Validation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Application\Validation\DependentSubjectValidator;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator
+ * @covers \AEWI\SWS\Application\Validation\DependentSubjectValidator
  */
 class DependentSubjectValidatorTest extends TestCase {
 

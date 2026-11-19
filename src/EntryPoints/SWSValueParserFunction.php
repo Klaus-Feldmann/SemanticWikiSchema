@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\SWS\Application\SubjectResolver;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Application\SubjectResolver;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Value\BooleanValue;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 class SWSValueParserFunction {
 
@@ -73,7 +73,7 @@ class SWSValueParserFunction {
 		$options['field'] = $name;
 		try { $result = $this->fields->read( $title, $options ); }
 		catch ( \RuntimeException|\InvalidArgumentException $e ) {
-			if ( $processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
+			if ( $processing = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
 			return '';
 		}
 		$field = $result['fields'][0] ?? null;

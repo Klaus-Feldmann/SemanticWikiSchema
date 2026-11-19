@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
+use AEWI\SWS\EntryPoints\OnRevisionCreatedHandler;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 class PageRebuilder {

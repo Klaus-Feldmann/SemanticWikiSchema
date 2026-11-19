@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 /** Match the client policy: reader language, core fallback chain, wiki content language. */
 final class FieldLabelLanguages {

@@ -6,8 +6,8 @@ namespace SWSBaseBridge;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Source\SourceFieldResult;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Source\SourceFieldResult;
 use Throwable;
 
 /** Explicit write-side collector. Own values never decide which bindings are fetched. */

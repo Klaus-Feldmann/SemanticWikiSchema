@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\SpyPageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\SubjectHostingPageResolver
+ * @covers \AEWI\SWS\Application\SubjectHostingPageResolver
  */
 class SubjectHostingPageResolverTest extends TestCase {
 

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Source;
+namespace AEWI\SWS\Domain\Source;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * Versioned, immutable source data attached to one Subject. Each language has its own processing

@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
 
 /**
  * {{#sparql_raw: <query> }} — outputs the W3C `application/sparql-results+json` document as pretty
  * JSON text, exactly like {{#cypher_raw}} renders its rows. The read-side sibling of
- * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction}.
+ * {@see \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction}.
  */
 class SparqlRawParserFunction {
 

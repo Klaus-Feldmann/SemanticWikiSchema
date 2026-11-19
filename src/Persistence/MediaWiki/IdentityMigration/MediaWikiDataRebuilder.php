@@ -1,16 +1,16 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration;
+namespace AEWI\SWS\Persistence\MediaWiki\IdentityMigration;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\{DatabaseSubjectPageIndex,SubjectSlotPages};
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Processing\InternalPageProcessor;
+use AEWI\SWS\Persistence\MediaWiki\{DatabaseSubjectPageIndex,SubjectSlotPages};
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /** Rebuild current data, not historical revisions. Reuses the normal signed processor and publication policy. */
@@ -34,7 +34,7 @@ final class MediaWikiDataRebuilder {
         if($revision===null) { $extension->withdrawDeletedDataPage($pageId);return; }
         $title=Title::newFromID($pageId);
         if($title===null) { throw new \RuntimeException('Current page title is missing'); }
-        $reader=\ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIdentity::get();
+        $reader=\AEWI\SWS\EntryPoints\Processing\ProcessingIdentity::get();
         if(!$reader->authorizeRead('read',$title)||!$revision->userCan(\MediaWiki\Revision\RevisionRecord::DELETED_TEXT,$reader)||!$extension->getRevisionPolicy()->revisionIsReadableBy($revision,$reader)) {
             throw new \RuntimeException('Current revision is not readable by the data processor');
         }

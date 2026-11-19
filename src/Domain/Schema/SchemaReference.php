@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectId;
 use Stringable;
 
 /**
@@ -27,11 +27,11 @@ readonly class SchemaReference implements Stringable {
 	private function __construct(
 		public ?string $source,
 		public SchemaName $name,
-		public ?\ProfessionalWiki\SWS\Domain\Identity\SchemaId $id = null,
+		public ?\AEWI\SWS\Domain\Identity\SchemaId $id = null,
 	) {
 	}
 
-	public static function identified( \ProfessionalWiki\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): self {
+	public static function identified( \AEWI\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): self {
 		if ( $source !== null && !SubjectId::isValidSourceKey( $source ) ) { throw new InvalidArgumentException( 'Invalid Schema source' ); }
 		return new self( $source, new SchemaName( $id->text ), $id );
 	}
@@ -62,8 +62,8 @@ readonly class SchemaReference implements Stringable {
 	 */
 	public static function fromJson( mixed $json, string $localSourceKey ): self {
 		if ( is_array( $json ) && array_key_exists( 'id', $json ) ) {
-			$ref = \ProfessionalWiki\SWS\Domain\Identity\IdentityReference::fromJson( $json, $localSourceKey );
-			if ( !$ref->id instanceof \ProfessionalWiki\SWS\Domain\Identity\SchemaId ) { throw new InvalidArgumentException( 'Expected a Schema ID' ); }
+			$ref = \AEWI\SWS\Domain\Identity\IdentityReference::fromJson( $json, $localSourceKey );
+			if ( !$ref->id instanceof \AEWI\SWS\Domain\Identity\SchemaId ) { throw new InvalidArgumentException( 'Expected a Schema ID' ); }
 			return self::identified( $ref->id, $ref->source );
 		}
 		if ( is_string( $json ) ) {
@@ -86,7 +86,7 @@ readonly class SchemaReference implements Stringable {
 	 *   stored reference has always used; only a sourced one costs the object form.
 	 */
 	public function toJson(): string|array {
-		if ( $this->id !== null ) { return ( new \ProfessionalWiki\SWS\Domain\Identity\IdentityReference( $this->id, $this->source ) )->toJson(); }
+		if ( $this->id !== null ) { return ( new \AEWI\SWS\Domain\Identity\IdentityReference( $this->id, $this->source ) )->toJson(); }
 		if ( $this->source === null ) {
 			return $this->name->getText();
 		}

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SourceSnapshotStore;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SourceSnapshotStore;
 
 /**
  * A narrowly scoped internal writer, not a general edit permission. It obtains its own read-only
@@ -18,7 +18,7 @@ use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SourceSnapshotStore;
 final class InternalSourceSnapshotWriter {
 
 	public function save( ProcessingResult $preparation ): void {
-		if ( !\ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() || !$preparation->isSourcePreparation || $preparation->sourceSnapshots === [] || ProcessingContext::current() !== null ) {
+		if ( !\AEWI\SWS\Application\Source\SourceDataMode::usesStore() || !$preparation->isSourcePreparation || $preparation->sourceSnapshots === [] || ProcessingContext::current() !== null ) {
 			throw new ProcessingIncomplete( 'Expected a completed, non-recursive source preparation.' );
 		}
 		$preparation->assertCurrent();
@@ -39,7 +39,7 @@ final class InternalSourceSnapshotWriter {
 		if ( $parent === null || $parent->getId() !== $preparation->revision->getId() || $parent->getSha1() !== $preparation->revision->getSha1() ) {
 			throw new ProcessingIncomplete( 'Source write base revision changed.', 'superseded' );
 		}
-		$policy = \ProfessionalWiki\SWS\SWSExtension::getInstance()->getRevisionPolicy();
+		$policy = \AEWI\SWS\SWSExtension::getInstance()->getRevisionPolicy();
 		if ( !$parent->userCan( \MediaWiki\Revision\RevisionRecord::DELETED_TEXT, $user ) ||
 			!$policy->revisionIsReadableBy( $parent, $user ) || $policy->publishedRevision( $parent )?->getId() !== $parent->getId() ) {
 			throw new ProcessingIncomplete( 'Source write revision is not publishable.', 'pending' );
@@ -52,7 +52,7 @@ final class InternalSourceSnapshotWriter {
 			$updater->setContent( 'sws', $content );
 			// Check dependencies after patch construction, immediately before the CAS-protected save.
 			$preparation->assertCurrent();
-			$updater->saveRevision( CommentStoreComment::newUnsavedComment( 'Update SWS source snapshot' ), EDIT_UPDATE | EDIT_INTERNAL );
+			$updater->saveRevision( CommentStoreComment::newUnsavedComment( wfMessage('sws-edit-summary-update-source-snapshot')->inContentLanguage()->text() ), EDIT_UPDATE | EDIT_INTERNAL );
 			if ( !$updater->wasSuccessful() ) {
 				throw new ProcessingIncomplete( 'Source snapshot revision was not saved: ' . ( $updater->getStatus()?->getWikiText() ?? 'unknown error' ), 'superseded' );
 			}

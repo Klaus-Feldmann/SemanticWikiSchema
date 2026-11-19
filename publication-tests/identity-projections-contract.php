@@ -3,25 +3,25 @@ declare( strict_types = 1 );
 require __DIR__ . '/bootstrap.php';
 require __DIR__ . '/fixtures/SqliteIdentityConnection.php';
 use IdentityHarness\SqliteIdentityConnection;
-use ProfessionalWiki\SWS\Application\Identity\IdentityBoundaryResolver;
-use ProfessionalWiki\SWS\Application\Rdf\{RdfPageProjector, SubjectIriResolver, OntologyMappingProjector};
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, SchemaId, LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject, SubjectId, SubjectIdParser, SubjectLabel, StatementList, SubjectMap, SubjectDisplayName};
-use ProfessionalWiki\SWS\Domain\Schema\{Schema, SchemaName, SchemaReference, PropertyDefinitions, PropertyName};
-use ProfessionalWiki\SWS\Domain\Page\{Page, PageId, PageProperties, PageSubjects};
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Rdf\{RdfNamespaces, RdfValueMapperRegistry, Literal, RdfFormat};
-use ProfessionalWiki\SWS\Domain\Relation\{Relation, RelationId};
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\{StringValue, RelationValue};
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\{Neo4jSubjectUpdater, Neo4jPageSubject, Neo4jValueBuilderRegistry};
+use AEWI\SWS\Application\Identity\IdentityBoundaryResolver;
+use AEWI\SWS\Application\Rdf\{RdfPageProjector, SubjectIriResolver, OntologyMappingProjector};
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, SchemaId, LocalizedIdentity};
+use AEWI\SWS\Domain\Subject\{Subject, SubjectId, SubjectIdParser, SubjectLabel, StatementList, SubjectMap, SubjectDisplayName};
+use AEWI\SWS\Domain\Schema\{Schema, SchemaName, SchemaReference, PropertyDefinitions, PropertyName};
+use AEWI\SWS\Domain\Page\{Page, PageId, PageProperties, PageSubjects};
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Rdf\{RdfNamespaces, RdfValueMapperRegistry, Literal, RdfFormat};
+use AEWI\SWS\Domain\Relation\{Relation, RelationId};
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\{StringValue, RelationValue};
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use AEWI\SWS\Presentation\JsonSchemaSerializer;
+use AEWI\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\{Neo4jSubjectUpdater, Neo4jPageSubject, Neo4jValueBuilderRegistry};
 
 $count = 0;
 function d4check( bool $ok, string $why ): void { global $count; if ( !$ok ) { throw new RuntimeException( $why ); } $count++; }
@@ -47,14 +47,14 @@ d4check( $boundary->schema( SchemaReference::local( new SchemaName( 'S1' ) ) )->
 d4check( $boundary->schema( SchemaReference::identified( new SchemaId( 'S1' ) ) )->id?->text === 'S1', 'Explicit S1 never follows legacy name alias' );
 d4check( $canonical->parseOrThrow( 'E1' )->text === 'E1', 'Canonical entity unchanged' );
 d4check( $db->pdo->query( 'SELECT SUM(swsic_value) FROM test_sws_id_counter' )->fetchColumn() === $before, 'Read resolution never allocates or changes counters' );
-$normalizer = new class implements \ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceNormalizer { public function normalize(SchemaReference $reference):SchemaReference{return $reference;} };
-$schemaParser = new \ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser('aewi',$normalizer);
-$types = \ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry::withCoreTypes($schemaParser);
-$generator = new class implements \ProfessionalWiki\SWS\Infrastructure\IdGenerator { public function generate():string{return '11111111111111';} };
+$normalizer = new class implements \AEWI\SWS\Domain\Schema\SchemaReferenceNormalizer { public function normalize(SchemaReference $reference):SchemaReference{return $reference;} };
+$schemaParser = new \AEWI\SWS\Domain\Schema\SchemaReferenceParser('aewi',$normalizer);
+$types = \AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry::withCoreTypes($schemaParser);
+$generator = new class implements \AEWI\SWS\Infrastructure\IdGenerator { public function generate():string{return '11111111111111';} };
 $incomingRelation = ['propertyType'=>'relation','value'=>[['id'=>'r11111111111111','target'=>$oldTarget]]];
-$written = (new \ProfessionalWiki\SWS\Application\StatementListBuilder($types,$generator,$canonical))->build(['Kennt'=>$incomingRelation]);
+$written = (new \AEWI\SWS\Application\StatementListBuilder($types,$generator,$canonical))->build(['Kennt'=>$incomingRelation]);
 d4check($written->getTypedRelations()->relations[0]->targetId->text==='E2','New writes canonicalize incoming legacy relation targets');
-$historical = (new \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer($types,$raw))->deserialize('Kennt',$incomingRelation);
+$historical = (new \AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer($types,$raw))->deserialize('Kennt',$incomingRelation);
 d4check($historical->getValue()->relations[0]->targetId->text===$oldTarget,'Historical relation deserialization retains stored target identity');
 $terms = new LocalizedIdentity( 'de', ['de'=>'Gödel','en'=>'Goedel'], ['de'=>'Mathematiker','en'=>'Mathematician'] );
 $schemaTerms = new LocalizedIdentity( 'de', ['de'=>'Person','en'=>'Human'], ['de'=>'Personendaten'] );
@@ -97,7 +97,7 @@ $foreignTypes = $find( $native->projectPage( $foreignPage ), 'https://wiki.examp
 d4check( $foreignTypes[0]->object->value === 'https://wiki.example/schema-source-id/remote/S1', 'Foreign schema ID retains its source in RDF typing' );
 d4check( $ns->identifiedSchemaClass(new SchemaId('S1'))->value !== $ns->schemaClass(new SchemaName('S1'))->value, 'Old schema named S1 and new ID S1 never share an RDF identity' );
 $legacyNamedS1 = new Schema(new SchemaName('S1'),'',new PropertyDefinitions([]),false);
-d4check( \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSchemaIdentity::label($schema,$schema->getReference()) !== \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSchemaIdentity::label($legacyNamedS1,$legacyNamedS1->getReference()), 'Neo4j typing keeps old names and explicit IDs disjoint' );
+d4check( \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSchemaIdentity::label($schema,$schema->getReference()) !== \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSchemaIdentity::label($legacyNamedS1,$legacyNamedS1->getReference()), 'Neo4j typing keeps old names and explicit IDs disjoint' );
 $unavailable = new Subject(new SubjectId('E3'),null,SchemaReference::identified(new SchemaId('S999')),new StatementList());
 $unavailablePage = new Page(new PageId(14),new PageProperties(['name'=>'Unavailable schema']),new PageSubjects($unavailable,new SubjectMap()));
 d4check($find($native->projectPage($unavailablePage),'https://wiki.example/entity/E3',RdfNamespaces::RDF.'type') === [],'Unavailable schema keeps existing projection exclusion policy');
@@ -106,7 +106,7 @@ $source->addSchema( $renamedSchema );
 $renamedTypes = $find( $native->projectPage( $page ), 'https://wiki.example/entity/E1', RdfNamespaces::RDF . 'type' );
 d4check( $renamedTypes[0]->object->value === 'https://wiki.example/schema-id/S1', 'Schema label edit never changes class identity' );
 $source->addSchema( $schema );
-$mapping = (new MappingPersistenceDeserializer())->deserialize( new \ProfessionalWiki\SWS\Domain\Mapping\MappingName( 'Test' ), json_encode([
+$mapping = (new MappingPersistenceDeserializer())->deserialize( new \AEWI\SWS\Domain\Mapping\MappingName( 'Test' ), json_encode([
  'version'=>1,'prefixes'=>['ex'=>'https://ontology.example/'], 'schemas'=>['S1'=>['subject'=>['class'=>'ex:Legacy']]],
  'schemaIds'=>['S1'=>['subject'=>['class'=>'ex:Human','labelPredicate'=>'ex:name']]],
 ], JSON_THROW_ON_ERROR) );
@@ -139,7 +139,7 @@ d4check( $find( $complete, 'https://wiki.example/entity/E1', RdfNamespaces::RDF.
 $foreignViewSubject = \SWSBaseBridge\DataViewAssembler::subject( $foreign, $schema, ['fields'=>[]], static fn($id)=>['id'=>$id,'status'=>'unavailable'] );
 $foreignComplete = (new \SWSBaseBridge\DataViewRdfProjector($ns))->project(['page'=>['id'=>13,'title'=>'Foreign','url'=>'https://wiki.example/wiki/Foreign'],'subjects'=>[$foreignViewSubject]]);
 d4check( $find( $foreignComplete, 'https://wiki.example/entity/E2', RdfNamespaces::RDF.'type' )[0]->object->value === 'https://wiki.example/schema-source-id/remote/S1', 'Complete export keeps foreign source even with resolved schema identity metadata' );
-$labelResult = \ProfessionalWiki\SWS\Presentation\IdentityLabelResult::serialize(new \ProfessionalWiki\SWS\Application\SubjectLabelLookupResult('E1','Gödel','Article'),$subject,'en');
+$labelResult = \AEWI\SWS\Presentation\IdentityLabelResult::serialize(new \AEWI\SWS\Application\SubjectLabelLookupResult('E1','Gödel','Article'),$subject,'en');
 d4check($labelResult['label']==='Goedel'&&$labelResult['description']==='Mathematician','Label lookup presentation uses requested own language and description');
 d4check((array)$labelResult['labels']===$terms->labels,'Label results retain all own language maps');
 $serializer = new HardfRdfSerializer($ns->prefixMap(),$logger);

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb;
+namespace AEWI\RedHerb;
 
-use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\Domain\Rdf\RdfLiteralFactory;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
 
 class RedHerbHooks {
 

@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Logger\LoggerFactory;
@@ -10,20 +10,20 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\SchemaWikitext;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\Application\SchemaWikitext;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\Infrastructure\ParserPageDependencyRecorder;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 use Throwable;
 
 final class SchemaWikitextHooks {
 	private const MARKER = 'sws-schema-wikitext-visited';
 
 	public static function onParserBeforeInternalParse( Parser $parser, string &$text, $stripState ): void {
-		if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() || \ProfessionalWiki\SWS\EntryPoints\Processing\FieldWikitextContext::isActive()
+		if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() || \AEWI\SWS\EntryPoints\Processing\FieldWikitextContext::isActive()
 			|| $parser->getOutputType() !== Parser::OT_HTML || $parser->getOptions()->isMessage()
 			|| $parser->getOutput()->getExtensionData( self::MARKER ) ) { return; }
 		$parser->getOutput()->setExtensionData( self::MARKER, true );
@@ -51,23 +51,23 @@ final class SchemaWikitextHooks {
 						return $extension->getSchemaResolverFor( $authority )->getSchema( $ref )
 							?? throw new \RuntimeException( 'Category schema unavailable' );
 					};
-					( new \ProfessionalWiki\SWS\EntryPoints\Processing\CategoryAssignments() )->apply(
+					( new \AEWI\SWS\EntryPoints\Processing\CategoryAssignments() )->apply(
 						$parser->getOutput(), $schema, $pageSubjects, $subject, $resolve
 					);
 				}
 			}
 			$text = SchemaWikitext::append( $text, SchemaWikitext::programs( $schema ) );
 		} catch ( Throwable $e ) {
-			if ( $context = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $context->failure = $e->getMessage(); }
+			if ( $context = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $context->failure = $e->getMessage(); }
 			LoggerFactory::getInstance( 'SWS' )->error( 'Schema wikitext preparation failed', [ 'exception' => $e ] );
 			$text .= "\n<strong class=\"error\">" . wfMessage( 'sws-wikitext-error' )->escaped() . '</strong>';
 		}
 	}
 
 	public static function onRevisionFromEditComplete( $wikiPage, RevisionRecord $revision, int|bool $originalRevId, $user, array &$tags ): void {
-        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
+        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
 		try {
-			if ( \ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt::isCurrent( $wikiPage->getTitle(), $revision ) ) { return; }
+			if ( \AEWI\SWS\EntryPoints\Processing\SourceRefreshReceipt::isCurrent( $wikiPage->getTitle(), $revision ) ) { return; }
 			$old = $originalRevId ? MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionById( (int)$originalRevId ) : null;
 			$main = $revision->getContent( SlotRecord::MAIN );
 			$oldMain = $old?->getContent( SlotRecord::MAIN );
@@ -109,8 +109,8 @@ final class SchemaWikitextHooks {
 			if ( SchemaWikitext::programs( $schema ) !== [] ) { return true; }
 			foreach ( $schema->getAllProperties()->asMap() as $property ) {
 				if ( $property->getExternalProperty() !== null
-                    || $property instanceof \ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty && $property->assignsCategories()
-					|| $property instanceof \ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty
+                    || $property instanceof \AEWI\SWS\Domain\Schema\Property\PageProperty && $property->assignsCategories()
+					|| $property instanceof \AEWI\SWS\Domain\Schema\Property\WikitextValueProperty
                     || ( $property->getFieldNotes()['type'] ?? null ) === 'wikitext' ) { return true; }
 			}
 		}
@@ -118,7 +118,7 @@ final class SchemaWikitextHooks {
 	}
 
 	public static function refreshPage( Title $title ): bool {
-        return ( new \ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor() )->refresh( $title );
+        return ( new \AEWI\SWS\EntryPoints\Processing\InternalPageProcessor() )->refresh( $title );
 	}
 
 	public static function refreshJob( Title $title ): object {

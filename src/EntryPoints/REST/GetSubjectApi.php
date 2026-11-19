@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\RestGetSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectQuery;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\RestGetSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetSubjectApi extends SimpleHandler {
@@ -29,7 +29,7 @@ class GetSubjectApi extends SimpleHandler {
 
 		if ( $parsedId === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
-				'message' => 'Invalid Subject ID: ' . $subjectId,
+				'message' => wfMessage('sws-api-invalid-entity-id', $subjectId)->text(),
 			] );
 		}
 
@@ -145,13 +145,13 @@ class GetSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'revisionId' => [
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'integer',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Revision ID to fetch the Subject at. Defaults to the revision the wiki publishes.',
+				self::PARAM_DESCRIPTION => 'Revision ID to fetch the Entity at. Defaults to the revision the wiki publishes.',
 			],
 			'latest' => [
 				self::PARAM_SOURCE => 'query',

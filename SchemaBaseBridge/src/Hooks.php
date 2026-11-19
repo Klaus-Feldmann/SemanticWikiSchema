@@ -3,14 +3,14 @@
 declare( strict_types = 1 );
 namespace SWSBaseBridge;
 
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
 
 final class Hooks {
 	public static function onSWSRegistration( SWSRegistrar $registrar ): void {
 		$registrar->addPagePropertyProvider( new WikidataPagePropertyProvider() );
 	}
 	public static function onScribuntoExternalLibraries( string $engine, array &$libraries ): bool {
-		if ( $engine === 'lua' && \ProfessionalWiki\SWS\SWSExtension::getInstance()->isLuaEnabled() ) {
+		if ( $engine === 'lua' && \AEWI\SWS\SWSExtension::getInstance()->isLuaEnabled() ) {
 			$libraries['mw.swsbase'] = ScribuntoLuaLibrary::class;
 		}
 		return true;

@@ -1,8 +1,8 @@
 {
 	"name": "SemanticWikiSchema",
 	"namemsg": "sws-name",
-	"version": "0.5.02",
-	"author": "Softwaredesign und Weiterentwicklung des Forks: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos. Basiert auf NeoWiki von [https://professional.wiki/ Professional Wiki], [https://www.entropywins.wtf/mediawiki Jeroen De Dauw], Morne Alberts, [https://www.mediawiki.org/wiki/User:Alistair3149 Alistair3149] und [https://github.com/ProfessionalWiki/NeoWiki/graphs/contributors?all=1 weiteren Mitwirkenden].",
+	"version": "0.6.0",
+	"author": "Softwaredesign und Weiterentwicklung des Forks: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos. Basiert auf [https://neowiki.ai NeoWiki] von [https://professional.wiki/ Professional Wiki], [https://www.entropywins.wtf/mediawiki Jeroen De Dauw], Morne Alberts, [https://www.mediawiki.org/wiki/User:Alistair3149 Alistair3149] und [https://github.com/ProfessionalWiki/NeoWiki/graphs/contributors?all=1 weiteren Mitwirkenden].",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"license-name": "GPL-2.0-or-later",
 	"descriptionmsg": "sws-description",
@@ -12,112 +12,112 @@
 			"php": ">= 8.3"
 		}
 	},
-	"callback": "ProfessionalWiki\\SWS\\SWSExtension::onExtensionRegistration",
+	"callback": "AEWI\\SWS\\SWSExtension::onExtensionRegistration",
 	"MessagesDirs": {
 		"SWS": [
 			"i18n"
 		]
 	},
 	"AutoloadNamespaces": {
-		"ProfessionalWiki\\SWS\\": "src/"
+		"AEWI\\SWS\\": "src/"
 	},
 	"AutoloadClasses": {
-		"ProfessionalWiki\\SWS\\Maintenance\\RebuildSubjectPageIndex": "maintenance/RebuildSubjectPageIndex.php",
-		"ProfessionalWiki\\SWS\\Maintenance\\RebuildPublishedSubjectIndex": "maintenance/RebuildPublishedSubjectIndex.php"
+		"AEWI\\SWS\\Maintenance\\RebuildSubjectPageIndex": "maintenance/RebuildSubjectPageIndex.php",
+		"AEWI\\SWS\\Maintenance\\RebuildPublishedSubjectIndex": "maintenance/RebuildPublishedSubjectIndex.php"
 	},
 	"TestAutoloadNamespaces": {
-		"ProfessionalWiki\\SWS\\Tests\\": "tests/phpunit",
-		"ProfessionalWiki\\RedHerb\\": "tests/RedHerb/src"
+		"AEWI\\SWS\\Tests\\": "tests/phpunit",
+		"AEWI\\RedHerb\\": "tests/RedHerb/src"
 	},
 	"Hooks": {
 		"MediaWikiServices": [
-			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onMediaWikiServices",
-			"ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onServices"
+			"AEWI\\SWS\\EntryPoints\\SWSHooks::onMediaWikiServices",
+			"AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onServices"
 		],
-		"LoadExtensionSchemaUpdates": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onLoadExtensionSchemaUpdates",
-		"ParserOptionsRegister": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onParserOptionsRegister",
-		"PageRenderingHash": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onPageRenderingHash",
-		"ParserFirstCallInit": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onParserFirstCallInit",
-		"ParserAfterTidy": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onParserAfterTidy",
-		"OutputPageParserOutput": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onOutputPageParserOutput",
+		"LoadExtensionSchemaUpdates": "AEWI\\SWS\\EntryPoints\\SWSHooks::onLoadExtensionSchemaUpdates",
+		"ParserOptionsRegister": "AEWI\\SWS\\EntryPoints\\SWSHooks::onParserOptionsRegister",
+		"PageRenderingHash": "AEWI\\SWS\\EntryPoints\\SWSHooks::onPageRenderingHash",
+		"ParserFirstCallInit": "AEWI\\SWS\\EntryPoints\\SWSHooks::onParserFirstCallInit",
+		"ParserAfterTidy": "AEWI\\SWS\\EntryPoints\\SWSHooks::onParserAfterTidy",
+		"OutputPageParserOutput": "AEWI\\SWS\\EntryPoints\\SWSHooks::onOutputPageParserOutput",
 		"RevisionFromEditComplete": [
-			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onRevisionFromEditComplete",
-			"ProfessionalWiki\\SWS\\EntryPoints\\SchemaWikitextHooks::onRevisionFromEditComplete"
+			"AEWI\\SWS\\EntryPoints\\SWSHooks::onRevisionFromEditComplete",
+			"AEWI\\SWS\\EntryPoints\\SchemaWikitextHooks::onRevisionFromEditComplete"
 		],
-		"SearchIndexFields": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSearchIndexFields",
-		"SearchDataForIndex2": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSearchDataForIndex2",
-		"ShowSearchHitTitle": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onShowSearchHitTitle",
-		"ShowSearchHit": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onShowSearchHit",
-		"SearchGetNearMatchComplete": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSearchGetNearMatchComplete",
-		"PageDeleteComplete": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onPageDeleteComplete",
-		"PageUndeleteComplete": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onPageUndeleteComplete",
-		"AfterImportPage": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onAfterImportPage",
-		"ArticleRevisionVisibilitySet": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onArticleRevisionVisibilitySet",
-		"LinksUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\LinksRefreshHandler::onLinksUpdateComplete",
-		"BlockIpComplete": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onBlockIpComplete",
-		"UnblockUserComplete": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onUnblockUserComplete",
-		"CodeEditorGetPageLanguage": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onCodeEditorGetPageLanguage",
+		"SearchIndexFields": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSearchIndexFields",
+		"SearchDataForIndex2": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSearchDataForIndex2",
+		"ShowSearchHitTitle": "AEWI\\SWS\\EntryPoints\\SWSHooks::onShowSearchHitTitle",
+		"ShowSearchHit": "AEWI\\SWS\\EntryPoints\\SWSHooks::onShowSearchHit",
+		"SearchGetNearMatchComplete": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSearchGetNearMatchComplete",
+		"PageDeleteComplete": "AEWI\\SWS\\EntryPoints\\SWSHooks::onPageDeleteComplete",
+		"PageUndeleteComplete": "AEWI\\SWS\\EntryPoints\\SWSHooks::onPageUndeleteComplete",
+		"AfterImportPage": "AEWI\\SWS\\EntryPoints\\SWSHooks::onAfterImportPage",
+		"ArticleRevisionVisibilitySet": "AEWI\\SWS\\EntryPoints\\SWSHooks::onArticleRevisionVisibilitySet",
+		"LinksUpdateComplete": "AEWI\\SWS\\EntryPoints\\LinksRefreshHandler::onLinksUpdateComplete",
+		"BlockIpComplete": "AEWI\\SWS\\EntryPoints\\SWSHooks::onBlockIpComplete",
+		"UnblockUserComplete": "AEWI\\SWS\\EntryPoints\\SWSHooks::onUnblockUserComplete",
+		"CodeEditorGetPageLanguage": "AEWI\\SWS\\EntryPoints\\SWSHooks::onCodeEditorGetPageLanguage",
 		"BeforePageDisplay": [
-			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onBeforePageDisplay",
-			"ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onConfigPageBeforePageDisplay",
-			"ProfessionalWiki\\SWS\\EntryPoints\\PrefixSearchHooks::onBeforePageDisplay"
+			"AEWI\\SWS\\EntryPoints\\SWSHooks::onBeforePageDisplay",
+			"AEWI\\SWS\\EntryPoints\\SWSHooks::onConfigPageBeforePageDisplay",
+			"AEWI\\SWS\\EntryPoints\\PrefixSearchHooks::onBeforePageDisplay"
 		],
-		"DifferenceEngineRenderRevisionAddParserOutput": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput",
-		"SpecialPage_initList": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSpecialPageInitList",
-		"ContentModelCanBeUsedOn": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onContentModelCanBeUsedOn",
-		"ContentHandlerDefaultModelFor": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onContentHandlerDefaultModelFor",
-		"JsonValidateSave": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onJsonValidateSave",
-		"AlternateEdit": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onAlternateEdit",
-		"SidebarBeforeOutput": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSidebarBeforeOutput",
-		"SkinTemplateNavigation::Universal": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onSkinTemplateNavigationUniversal",
-		"ScribuntoExternalLibraries": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onScribuntoExternalLibraries",
-		"HtmlPageLinkRendererBegin": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onHtmlPageLinkRendererBegin",
-		"ChangesListInitRows": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onChangesListInitRows",
-		"getUserPermissionsErrors": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onGetUserPermissionsErrors",
-		"ChangesListSpecialPageStructuredFilters": "ProfessionalWiki\\SWS\\EntryPoints\\SWSHooks::onChangesListSpecialPageStructuredFilters",
-		"MakeGlobalVariablesScript": "ProfessionalWiki\\SWS\\EntryPoints\\Hook\\ImageConfigHook::onMakeGlobalVariablesScript",
+		"DifferenceEngineRenderRevisionAddParserOutput": "AEWI\\SWS\\EntryPoints\\SWSHooks::onDifferenceEngineRenderRevisionAddParserOutput",
+		"SpecialPage_initList": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSpecialPageInitList",
+		"ContentModelCanBeUsedOn": "AEWI\\SWS\\EntryPoints\\SWSHooks::onContentModelCanBeUsedOn",
+		"ContentHandlerDefaultModelFor": "AEWI\\SWS\\EntryPoints\\SWSHooks::onContentHandlerDefaultModelFor",
+		"JsonValidateSave": "AEWI\\SWS\\EntryPoints\\SWSHooks::onJsonValidateSave",
+		"AlternateEdit": "AEWI\\SWS\\EntryPoints\\SWSHooks::onAlternateEdit",
+		"SidebarBeforeOutput": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSidebarBeforeOutput",
+		"SkinTemplateNavigation::Universal": "AEWI\\SWS\\EntryPoints\\SWSHooks::onSkinTemplateNavigationUniversal",
+		"ScribuntoExternalLibraries": "AEWI\\SWS\\EntryPoints\\SWSHooks::onScribuntoExternalLibraries",
+		"HtmlPageLinkRendererBegin": "AEWI\\SWS\\EntryPoints\\SWSHooks::onHtmlPageLinkRendererBegin",
+		"ChangesListInitRows": "AEWI\\SWS\\EntryPoints\\SWSHooks::onChangesListInitRows",
+		"getUserPermissionsErrors": "AEWI\\SWS\\EntryPoints\\SWSHooks::onGetUserPermissionsErrors",
+		"ChangesListSpecialPageStructuredFilters": "AEWI\\SWS\\EntryPoints\\SWSHooks::onChangesListSpecialPageStructuredFilters",
+		"MakeGlobalVariablesScript": "AEWI\\SWS\\EntryPoints\\Hook\\ImageConfigHook::onMakeGlobalVariablesScript",
 		"ParserBeforeInternalParse": [
-			"ProfessionalWiki\\SWS\\EntryPoints\\SchemaWikitextHooks::onParserBeforeInternalParse",
-			"ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onParserBeforeInternalParse"
+			"AEWI\\SWS\\EntryPoints\\SchemaWikitextHooks::onParserBeforeInternalParse",
+			"AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onParserBeforeInternalParse"
 		],
-		"UserGetRights": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingIdentity::addRead",
-		"UserGetRightsRemove": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingIdentity::restrictRights",
-		"RevisionDataUpdates": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onRevisionDataUpdates",
-		"SMW::Store::BeforeDataUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onBeforeStore",
-		"PageMoveComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onPageMoveComplete",
-		"LinksUpdate": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onLinksUpdate",
-		"SMW::Store::AfterDataUpdateComplete": "ProfessionalWiki\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onAfterStore",
-		"SkinPageReadyConfig": "ProfessionalWiki\\SWS\\EntryPoints\\PrefixSearchHooks::onSkinPageReadyConfig"
+		"UserGetRights": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingIdentity::addRead",
+		"UserGetRightsRemove": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingIdentity::restrictRights",
+		"RevisionDataUpdates": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onRevisionDataUpdates",
+		"SMW::Store::BeforeDataUpdateComplete": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onBeforeStore",
+		"PageMoveComplete": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onPageMoveComplete",
+		"LinksUpdate": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onLinksUpdate",
+		"SMW::Store::AfterDataUpdateComplete": "AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onAfterStore",
+		"SkinPageReadyConfig": "AEWI\\SWS\\EntryPoints\\PrefixSearchHooks::onSkinPageReadyConfig"
 	},
 	"JobClasses": {
 		"swsGraphRebuild": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Jobs\\GraphRebuildJob",
+			"class": "AEWI\\SWS\\EntryPoints\\Jobs\\GraphRebuildJob",
 			"needsPage": false
 		},
 		"swsRebuildLastEditorPages": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Jobs\\RebuildLastEditorPagesJob",
+			"class": "AEWI\\SWS\\EntryPoints\\Jobs\\RebuildLastEditorPagesJob",
 			"needsPage": false
 		},
-		"swsSchemaWikitextRefresh": "ProfessionalWiki\\SWS\\EntryPoints\\Jobs\\SchemaWikitextRefreshJob"
+		"swsSchemaWikitextRefresh": "AEWI\\SWS\\EntryPoints\\Jobs\\SchemaWikitextRefreshJob"
 	},
 	"ContentHandlers": {
-		"SWSSubject": "ProfessionalWiki\\SWS\\EntryPoints\\Content\\SubjectContentHandler",
-		"SWSSchema": "ProfessionalWiki\\SWS\\EntryPoints\\Content\\SchemaContentHandler",
-		"SWSLayout": "ProfessionalWiki\\SWS\\EntryPoints\\Content\\LayoutContentHandler",
-		"SWSMapping": "ProfessionalWiki\\SWS\\EntryPoints\\Content\\MappingContentHandler"
+		"SWSSubject": "AEWI\\SWS\\EntryPoints\\Content\\SubjectContentHandler",
+		"SWSSchema": "AEWI\\SWS\\EntryPoints\\Content\\SchemaContentHandler",
+		"SWSLayout": "AEWI\\SWS\\EntryPoints\\Content\\LayoutContentHandler",
+		"SWSMapping": "AEWI\\SWS\\EntryPoints\\Content\\MappingContentHandler"
 	},
 	"SearchMappings": {
 		"SearchMySQL": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Search\\SearchMySQLWithSubjects"
+			"class": "AEWI\\SWS\\EntryPoints\\Search\\SearchMySQLWithSubjects"
 		},
 		"SearchSqlite": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Search\\SearchSqliteWithSubjects"
+			"class": "AEWI\\SWS\\EntryPoints\\Search\\SearchSqliteWithSubjects"
 		},
 		"MediaWiki\\Search\\SearchMySQL": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Search\\SearchMySQLWithSubjects"
+			"class": "AEWI\\SWS\\EntryPoints\\Search\\SearchMySQLWithSubjects"
 		},
 		"MediaWiki\\Search\\SearchSqlite": {
-			"class": "ProfessionalWiki\\SWS\\EntryPoints\\Search\\SearchSqliteWithSubjects"
+			"class": "AEWI\\SWS\\EntryPoints\\Search\\SearchSqliteWithSubjects"
 		}
 	},
 	"namespaces": [
@@ -226,18 +226,19 @@
 		}
 	},
 	"SpecialPages": {
-		"NeoJson": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialNeoJson",
-		"Schemas": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialSchemas",
-		"Subjects": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialSubjects",
-		"Layouts": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialLayouts",
-		"Mappings": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialMappings",
-		"GraphStores": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialGraphStores",
-		"CreateSubject": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialCreateSubject",
-		"Subject": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialSubject",
-		"SWS": "ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\SpecialSWS"
+		"NeoJson": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialNeoJson",
+		"Schemas": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialSchemas",
+		"Subjects": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialSubjects",
+		"Layouts": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialLayouts",
+		"Mappings": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialMappings",
+		"GraphStores": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialGraphStores",
+		"CreateSubject": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialCreateSubject",
+		"Subject": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialSubject",
+		"SWS": "AEWI\\SWS\\EntryPoints\\SpecialPages\\SpecialSWS"
 	},
 	"Actions": {
-		"subjects": "ProfessionalWiki\\SWS\\EntryPoints\\Actions\\SubjectsAction"
+		"subjects": "AEWI\\SWS\\EntryPoints\\Actions\\SubjectsAction",
+		"entities": "AEWI\\SWS\\EntryPoints\\Actions\\SubjectsAction"
 	},
 	"config": {
 		"SWSSourceDataMode": {
@@ -245,7 +246,7 @@
 			"description": "Defaults to store: refresh all bindings on processing a save and persist results in each Subject. The optional cache mode keeps the previous source resolution and its cache."
 		},
 		"WikiSchemaSmwMapping": {
-			"description": "Optional SMW property mappings by schema and URL subobject property names. Empty means schema field names and built-in URL defaults. Reprocess affected pages after changing this setting.",
+			"description": "Optional explicit SMW property mappings by schema, URL subobject names and descriptionProperty. Unspecified system names use content-language MediaWiki messages. Reprocess affected pages after changing stored names.",
 			"value": []
 		},
 		"SWSEnableDevelopmentUI": {
@@ -345,315 +346,315 @@
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCreateMainSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newCreateMainSubjectApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/subjects",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCreateOtherSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newCreateOtherSubjectApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/subjects",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetPageSubjectsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetPageSubjectsApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/mainSubject",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetMainSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetMainSubjectApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/editNotices",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSubjectEditNoticesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSubjectEditNoticesApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/rdf",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportPageRdfApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newExportPageRdfApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/mainSubject",
 			"method": [
 				"PUT"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSetMainSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newSetMainSubjectApi"
 		},
 		{
 			"path": "/sws/v0/page/{pageId}/subjectsOrdering",
 			"method": [
 				"PUT"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSetSubjectsOrderingApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newSetSubjectsOrderingApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSubjectApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}",
 			"method": [
 				"PUT"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newReplaceSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newReplaceSubjectApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}",
 			"method": [
 				"DELETE"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newDeleteSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newDeleteSubjectApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/move",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newMoveSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newMoveSubjectApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/statements/{propertyName}",
 			"method": [
 				"PUT"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSetStatementApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newSetStatementApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/statements/{propertyName}",
 			"method": [
 				"DELETE"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newRemoveStatementApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newRemoveStatementApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/rdf",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportSubjectRdfApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newExportSubjectRdfApi"
 		},
 		{
 			"path": "/sws/v0/entity/{subjectId}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveSubjectIriApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newResolveSubjectIriApi"
 		},
 		{
 			"path": "/neowiki/v0/entity/{subjectId}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveSubjectIriApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newResolveSubjectIriApi"
 		},
 		{
 			"path": "/sws/v0/schema/{schemaName}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSchemaApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSchemaApi"
 		},
 		{
 			"path": "/sws/v0/schema/{schemaName}",
 			"method": [
 				"PUT"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSaveSchemaApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newSaveSchemaApi"
 		},
 		{
 			"path": "/sws/v0/schema/{schemaName}",
 			"method": [
 				"DELETE"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newDeleteSchemaApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newDeleteSchemaApi"
 		},
 		{
 			"path": "/sws/v0/schema/{schemaName}/json-schema",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetJsonSchemaApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetJsonSchemaApi"
 		},
 		{
 			"path": "/sws/v0/layout/{layoutName}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetLayoutApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetLayoutApi"
 		},
 		{
 			"path": "/sws/v0/layouts",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetLayoutSummariesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetLayoutSummariesApi"
 		},
 		{
 			"path": "/sws/v0/schema-names/{search}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSchemaNamesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSchemaNamesApi"
 		},
 		{
 			"path": "/sws/v0/recently-edited-subjects",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetRecentlyEditedSubjectsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetRecentlyEditedSubjectsApi"
 		},
 		{
 			"path": "/sws/v0/subject-labels",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSubjectLabelsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSubjectLabelsApi"
 		},
 		{
 			"path": "/sws/v0/schemas",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSchemaSummariesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSchemaSummariesApi"
 		},
 		{
 			"path": "/sws/v0/mappings",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetMappingSummariesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetMappingSummariesApi"
 		},
 		{
 			"path": "/sws/v0/subject-ids",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newMintSubjectIdsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newMintSubjectIdsApi"
 		},
 		{
 			"path": "/sws/v0/subjects",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCreateSubjectPageApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newCreateSubjectPageApi"
 		},
 		{
 			"path": "/sws/v0/subjects",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSubjectSummariesApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSubjectSummariesApi"
 		},
 		{
 			"path": "/sws/v0/subject-counts",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSubjectCountsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSubjectCountsApi"
 		},
 		{
 			"path": "/sws/v0/subject/validate",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newValidateSubjectApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newValidateSubjectApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/validate",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newValidateSubjectUpdateApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newValidateSubjectUpdateApi"
 		},
 		{
 			"path": "/sws/v0/graph-stores",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetGraphStoresApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetGraphStoresApi"
 		},
 		{
 			"path": "/sws/v0/graph-stores/{name}/rebuild",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newStartGraphStoreRebuildApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newStartGraphStoreRebuildApi"
 		},
 		{
 			"path": "/sws/v0/graph-stores/{name}/rebuild",
 			"method": [
 				"DELETE"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCancelGraphStoreRebuildApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newCancelGraphStoreRebuildApi"
 		},
 		{
 			"path": "/sws/v0/subject/{subjectId}/referencingSubjects",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetReferencingSubjectsApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetReferencingSubjectsApi"
 		},
 		{
 			"path": "/sws/v0/schema",
 			"method": [
 				"POST"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCreateSchemaApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newCreateSchemaApi"
 		},
 		{
 			"path": "/sws/v0/schema-id/{schemaName}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetSchemaByIdApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetSchemaByIdApi"
 		},
 		{
 			"path": "/sws/v0/schema-id/{schemaName}/json-schema",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newGetJsonSchemaByIdApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newGetJsonSchemaByIdApi"
 		},
 		{
 			"path": "/sws/v0/schema-id-iri/{schemaName}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveSchemaIdIriApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newResolveSchemaIdIriApi"
 		},
 		{
 			"path": "/sws/v0/schema-iri/{schemaName}",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newResolveLegacySchemaIriApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newResolveLegacySchemaIriApi"
 		},
 		{
 			"path": "/sws/v0/schema-id/{schemaName}/rdf",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportSchemaIdRdfApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newExportSchemaIdRdfApi"
 		},
 		{
 			"path": "/sws/v0/schema/{schemaName}/rdf",
 			"method": [
 				"GET"
 			],
-			"factory": "ProfessionalWiki\\SWS\\SWSExtension::newExportLegacySchemaRdfApi"
+			"factory": "AEWI\\SWS\\SWSExtension::newExportLegacySchemaRdfApi"
 		}
 	],
 	"ResourceFileModulePaths": {
@@ -1421,8 +1422,12 @@
 	},
 	"manifest_version": 2,
 	"APIModules": {
-		"swsimages": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiImages",
-		"swsrenderwikitext": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiRenderWikitext",
-		"swsfields": "ProfessionalWiki\\SWS\\EntryPoints\\Api\\ApiFieldValues"
-	}
+		"swsimages": "AEWI\\SWS\\EntryPoints\\Api\\ApiImages",
+		"swsrenderwikitext": "AEWI\\SWS\\EntryPoints\\Api\\ApiRenderWikitext",
+		"swsfields": "AEWI\\SWS\\EntryPoints\\Api\\ApiFieldValues",
+		"swsprocessingstatus": "AEWI\\SWS\\EntryPoints\\Api\\ApiProcessingStatus"
+	},
+	"TrackingCategories": [
+		"sws-entity-description-missing-category"
+	]
 }

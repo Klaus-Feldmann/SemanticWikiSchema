@@ -1,20 +1,20 @@
 <?php
 require __DIR__.'/d5-query-scope-contract.php';
 use CollectorHarness\State as D7;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
 use MediaWiki\Parser\Parser;
 $wire=json_decode(file_get_contents(__DIR__.'/fixtures/d7-schema.json'),true);
 $wire['propertyDefinitions']['F4']['externalProperty']=['source'=>'wikidata','id'=>'P569'];
 $before=serialize($ea->getStatements());
-$resolver=new class($ea,$eb) extends \ProfessionalWiki\SWS\Application\SubjectResolver {
- public function __construct(private \ProfessionalWiki\SWS\Domain\Subject\Subject $first,private \ProfessionalWiki\SWS\Domain\Subject\Subject $second){}
- public function resolveById(string $id): ?\ProfessionalWiki\SWS\Domain\Subject\Subject{return match($id){'E31'=>$this->first,'E32'=>$this->second,default=>null};}
- public function resolveMainByTitle(\MediaWiki\Title\Title $title): ?\ProfessionalWiki\SWS\Domain\Subject\Subject{return $this->first;}
- public function resolveDisplayValue(\ProfessionalWiki\SWS\Domain\Subject\Subject $subject,\ProfessionalWiki\SWS\Domain\Statement $statement): \ProfessionalWiki\SWS\Domain\Value\NeoValue{return $statement->getValue();}
+$resolver=new class($ea,$eb) extends \AEWI\SWS\Application\SubjectResolver {
+ public function __construct(private \AEWI\SWS\Domain\Subject\Subject $first,private \AEWI\SWS\Domain\Subject\Subject $second){}
+ public function resolveById(string $id): ?\AEWI\SWS\Domain\Subject\Subject{return match($id){'E31'=>$this->first,'E32'=>$this->second,default=>null};}
+ public function resolveMainByTitle(\MediaWiki\Title\Title $title): ?\AEWI\SWS\Domain\Subject\Subject{return $this->first;}
+ public function resolveDisplayValue(\AEWI\SWS\Domain\Subject\Subject $subject,\AEWI\SWS\Domain\Statement $statement): \AEWI\SWS\Domain\Value\NeoValue{return $statement->getValue();}
 };
 foreach(['de','en'] as $language){
  $GLOBALS['wgLanguageCode']=$language;

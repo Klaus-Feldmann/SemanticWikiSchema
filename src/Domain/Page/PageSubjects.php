@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Page;
+namespace AEWI\SWS\Domain\Page;
 
 use Closure;
 use InvalidArgumentException;
 use OutOfBoundsException;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 use RuntimeException;
 
 class PageSubjects {

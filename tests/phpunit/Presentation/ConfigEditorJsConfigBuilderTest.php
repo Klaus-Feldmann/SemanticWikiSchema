@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Config\HashConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
-use ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubWikiConfigSource;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\WikiConfigLookup;
+use AEWI\SWS\Presentation\ConfigEditorJsConfigBuilder;
+use AEWI\SWS\Tests\TestDoubles\StubWikiConfigSource;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder
+ * @covers \AEWI\SWS\Presentation\ConfigEditorJsConfigBuilder
  */
 class ConfigEditorJsConfigBuilderTest extends TestCase {
 

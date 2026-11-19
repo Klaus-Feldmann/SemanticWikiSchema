@@ -17,11 +17,12 @@
 					@input="setTerm( 'labels', language, ( $event.target as HTMLInputElement ).value )">
 			</label>
 			<label>{{ $i18n( 'sws-identity-description' ).text() }}
-				<input
+				<textarea
 					:value="modelValue.descriptions[ language ] ?? ''"
 					:lang="language"
 					maxlength="1024"
-					@input="setTerm( 'descriptions', language, ( $event.target as HTMLInputElement ).value )">
+					rows="3"
+					@input="setTerm( 'descriptions', language, ( $event.target as HTMLTextAreaElement ).value )" />
 			</label>
 		</div>
 		<div class="ext-sws-identity-editor__add">
@@ -93,7 +94,8 @@ function setTerm( kind: 'labels' | 'descriptions', language: string, text: strin
 		font-size: 0.875em;
 	}
 
-	input {
+	input,
+	textarea {
 		box-sizing: border-box;
 		width: 100%;
 		min-width: 0;
@@ -101,6 +103,12 @@ function setTerm( kind: 'labels' | 'descriptions', language: string, text: strin
 		background: var( --background-color-base, transparent );
 		border: 1px solid var( --border-color-base, #72777d );
 		padding: 0.3em;
+	}
+
+	textarea {
+		font: inherit;
+		line-height: 1.4;
+		resize: vertical;
 	}
 
 	&__add {

@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\UpdateStatement;
+namespace AEWI\SWS\Application\Actions\UpdateStatement;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Domain\Validation\ViolationDiff;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\ViolationDiff;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 /**
  * Sets or removes one Statement of a Subject, leaving its other Statements and its label alone.

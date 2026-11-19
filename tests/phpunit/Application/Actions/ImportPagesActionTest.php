@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageData;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\PageDeleter;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPresenter;
+use AEWI\SWS\Application\Actions\ImportPages\MappingContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\PageContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SubjectPageData;
+use AEWI\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use AEWI\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use AEWI\SWS\Persistence\ImportedPageTitlesLookup;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\PageDeleter;
 use MediaWiki\Content\WikitextContent;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction
  * @group Database
  */
 class ImportPagesActionTest extends \MediaWikiIntegrationTestCase {

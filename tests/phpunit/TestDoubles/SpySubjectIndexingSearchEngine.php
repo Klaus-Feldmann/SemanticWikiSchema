@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\EntryPoints\Search\IndexesSubjectText;
+use AEWI\SWS\EntryPoints\Search\IndexesSubjectText;
 
 /**
  * A search engine that adds Subject text the way SWS's database engines do, over a parent that

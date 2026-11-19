@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
+use AEWI\SWS\Domain\Schema\PropertyNameRules;
 
 /** Deterministic reuse of an unambiguous functional majority, otherwise the agreed text placeholder. */
 final class MigrationFieldDefinitionSelector {

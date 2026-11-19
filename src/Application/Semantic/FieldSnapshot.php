@@ -1,10 +1,10 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\Semantic;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
+namespace AEWI\SWS\Application\Semantic;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
 
 /** Converts authorized domain objects. Authorization/dependency recording stays with the caller. */
 final class FieldSnapshot {

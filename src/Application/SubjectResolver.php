@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use Exception;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\PropertyType\Types\SelectType;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Schema\Property\SelectProperty;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 class SubjectResolver {
 

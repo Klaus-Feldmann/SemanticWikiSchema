@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Permissions\Authority;
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigSource;
+use AEWI\SWS\Application\WikiConfig\WikiConfigSource;
 use Throwable;
 
 /**

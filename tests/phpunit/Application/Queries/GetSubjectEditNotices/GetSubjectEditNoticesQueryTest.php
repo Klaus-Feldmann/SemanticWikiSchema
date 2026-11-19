@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSubjectEditNotices;
+namespace AEWI\SWS\Tests\Application\Queries\GetSubjectEditNotices;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Tests\TestDoubles\NullSubjectEditNoticeEnvironment;
-use ProfessionalWiki\SWS\Tests\TestDoubles\RecordingSchemaNoticeProvider;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeContextFactory;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SubjectEditNoticesPresenterSpy;
+use AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNotice;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Tests\TestDoubles\NullSubjectEditNoticeEnvironment;
+use AEWI\SWS\Tests\TestDoubles\RecordingSchemaNoticeProvider;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubSubjectEditNoticeContextFactory;
+use AEWI\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
+use AEWI\SWS\Tests\TestDoubles\SubjectEditNoticesPresenterSpy;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
+ * @covers \AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
  */
 class GetSubjectEditNoticesQueryTest extends TestCase {
 

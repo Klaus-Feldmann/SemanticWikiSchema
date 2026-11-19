@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Databags\TransactionConfiguration;
 use Laudis\Neo4j\Types\CypherList;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine
  */
 class Neo4jClientReadQueryEngineTest extends TestCase {
 

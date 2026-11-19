@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SWSBaseBridge;
 
 /** Decode Wikibase JSON time values with the core's calendar arithmetic. */
-final class HistoricalTime extends \ProfessionalWiki\SWS\Domain\HistoricalCalendar
+final class HistoricalTime extends \AEWI\SWS\Domain\HistoricalCalendar
 {
     public static function read(array $raw): ?array
     {

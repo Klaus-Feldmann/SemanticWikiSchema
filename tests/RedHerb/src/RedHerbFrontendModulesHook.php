@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb;
+namespace AEWI\RedHerb;
 
 use MediaWiki\Output\OutputPage;
-use ProfessionalWiki\SWS\EntryPoints\Hook\SWSGetFrontendModulesHook;
+use AEWI\SWS\EntryPoints\Hook\SWSGetFrontendModulesHook;
 use Skin;
 
 class RedHerbFrontendModulesHook implements SWSGetFrontendModulesHook {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
@@ -12,12 +12,12 @@ use MediaWiki\Permissions\SimpleAuthority;
 use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentityValue;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\SWS\Presentation\FrontendModuleLoader;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\Presentation\FrontendModuleLoader;
 use Skin;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\FrontendModuleLoader
+ * @covers \AEWI\SWS\Presentation\FrontendModuleLoader
  * @group Database
  */
 class FrontendModuleLoaderTest extends MediaWikiIntegrationTestCase {

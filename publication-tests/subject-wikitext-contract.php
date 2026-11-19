@@ -8,7 +8,7 @@ namespace MediaWiki\Title {class Title {public function getText(){return 'Test';
 namespace MediaWiki\User {class User {public function authorizeRead(...$args){return \Harness\State::$read;}}}
 namespace MediaWiki\Revision {class RevisionRecord {
  public const DELETED_TEXT=1;public function userCan(...$args){return !\Harness\State::$suppressed;}public function getId(){return 42;}
- public function getContent($name){return new \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;}
+ public function getContent($name){return new \AEWI\SWS\EntryPoints\Content\SubjectContent;}
 }}
 namespace Wikimedia\Rdbms {interface IDBAccessObject {public const READ_LATEST=1;}}
 namespace MediaWiki\Parser {
@@ -29,15 +29,15 @@ namespace MediaWiki {class MediaWikiServices {
  public function getTitleFactory(){return new class{public function newFromID($id){return $id===123?new \MediaWiki\Title\Title:null;}};}
  public function getRevisionLookup(){return new class{public function getRevisionByTitle(...$args){return \Harness\State::$revision;}};}
  public function getParserFactory(){return new class{public function create(){return new class{public function parse($source,$title,$options,$line,$clear,$rev){
-  if(!\ProfessionalWiki\SWS\EntryPoints\Processing\FieldWikitextContext::isActive())throw new \RuntimeException('Missing recursion guard');
+  if(!\AEWI\SWS\EntryPoints\Processing\FieldWikitextContext::isActive())throw new \RuntimeException('Missing recursion guard');
   \Harness\State::$parses[]=[$source,$title,$rev];if(\Harness\State::$fail)throw new \RuntimeException('Parser failure');
   return clone \Harness\State::$output;
  } };}};}
 }}
-namespace ProfessionalWiki\SWS\EntryPoints\Content {class SubjectContent {public function getPageSubjects(){return \Harness\State::$subjects;}}}
-namespace ProfessionalWiki\SWS {class SWSExtension {
+namespace AEWI\SWS\EntryPoints\Content {class SubjectContent {public function getPageSubjects(){return \Harness\State::$subjects;}}}
+namespace AEWI\SWS {class SWSExtension {
  public static function getInstance(){return new self;}
- public function getSubjectIdParser(){return new class{public function parse($id){return \ProfessionalWiki\SWS\Domain\Subject\SubjectId::isValidLocalId($id)?new \ProfessionalWiki\SWS\Domain\Subject\SubjectId($id):null;}};}
+ public function getSubjectIdParser(){return new class{public function parse($id){return \AEWI\SWS\Domain\Subject\SubjectId::isValidLocalId($id)?new \AEWI\SWS\Domain\Subject\SubjectId($id):null;}};}
  public function getRevisionPolicy(){return new class{public function revisionIsReadableBy(...$args){return \Harness\State::$read;}public function publishedRevision($r){return \Harness\State::$published?$r:null;}};}
  public function getSchemaResolverFor($auth){return new class{public function getSchema($ref){return \Harness\State::$schema;}};}
 }}
@@ -51,14 +51,14 @@ namespace {class ApiBase {
 namespace {
  require dirname(__DIR__).'/tests/standalone/autoload.php';
  use Harness\State as S;
- use ProfessionalWiki\SWS\Domain\Schema\{PropertyCore,PropertyDefinitions,PropertyName,Schema,SchemaName};
- use ProfessionalWiki\SWS\Domain\Schema\Property\{WikitextProperty,WikitextValueProperty,TextProperty};
- use ProfessionalWiki\SWS\Domain\Subject\{StatementList,SubjectMap};
- use ProfessionalWiki\SWS\Domain\Statement;
- use ProfessionalWiki\SWS\Domain\Value\StringValue;
- use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
- use ProfessionalWiki\SWS\Tests\Data\TestSubject;
- use ProfessionalWiki\SWS\EntryPoints\Processing\{UserWikitextRenderer,UserWikitextProcessor,FieldWikitextContext,ProcessingIncomplete};
+ use AEWI\SWS\Domain\Schema\{PropertyCore,PropertyDefinitions,PropertyName,Schema,SchemaName};
+ use AEWI\SWS\Domain\Schema\Property\{WikitextProperty,WikitextValueProperty,TextProperty};
+ use AEWI\SWS\Domain\Subject\{StatementList,SubjectMap};
+ use AEWI\SWS\Domain\Statement;
+ use AEWI\SWS\Domain\Value\StringValue;
+ use AEWI\SWS\Domain\Page\PageSubjects;
+ use AEWI\SWS\Tests\Data\TestSubject;
+ use AEWI\SWS\EntryPoints\Processing\{UserWikitextRenderer,UserWikitextProcessor,FieldWikitextContext,ProcessingIncomplete};
  $n=0;function check($ok,$why){global $n;$n++;if(!$ok)throw new \RuntimeException($why);}
  $core=new PropertyCore('',false,null);
  foreach([[],['execute'=>false],['execute'=>true]]as $old){
@@ -84,8 +84,8 @@ namespace {
  S::$fail=true;try{(new UserWikitextRenderer)->render($title,['x'],$user);check(false,'Parser exception hidden');}catch(\RuntimeException){check(!FieldWikitextContext::isActive(),'Guard restored after exception');}S::$fail=false;
  S::$output=new \MediaWiki\Parser\ParserOutput('<span class="scribunto-error">Error from another module</span>');$processor->apply($title,new \MediaWiki\Parser\ParserOutput,S::$subjects,$user,static fn()=>S::$schema);check(true,'Foreign module message does not block independent SWS metadata');
  S::$output=$rendered;$emptySubjects=new PageSubjects(subject('s11111111111111',[]),new SubjectMap);$fresh=new \MediaWiki\Parser\ParserOutput;$processor->apply($title,$fresh,$emptySubjects,$user,static fn()=>S::$schema);check($fresh->categories===[],'Removed field produces no stale categories');
- $reader=\ProfessionalWiki\SWS\Application\Semantic\FieldSnapshot::reader(S::$schema,$main,static fn()=>[]);check(count($reader->collectForAnnotations()['fields'])===1,'Raw wikitext excluded from automatic SMW scalar projection');check(count($reader->collect()['fields'])===2,'Wikitext available as source for template helpers');
- $api=new \ProfessionalWiki\SWS\EntryPoints\Api\ApiRenderWikitext;$api->params=['pageid'=>123,'subject'=>'s11111111111111','field'=>'Notiz'];$api->execute();
+ $reader=\AEWI\SWS\Application\Semantic\FieldSnapshot::reader(S::$schema,$main,static fn()=>[]);check(count($reader->collectForAnnotations()['fields'])===1,'Raw wikitext excluded from automatic SMW scalar projection');check(count($reader->collect()['fields'])===2,'Wikitext available as source for template helpers');
+ $api=new \AEWI\SWS\EntryPoints\Api\ApiRenderWikitext;$api->params=['pageid'=>123,'subject'=>'s11111111111111','field'=>'Notiz'];$api->execute();
  check($api->cache==='private'&&!$api->isWriteMode(),'Read-only private parser endpoint');check($api->result['swsrenderwikitext']['html']==='<p><a>Brünn</a></p>','Saved field renders');check($api->result['swsrenderwikitext']['source']===implode("\n\n",$main->getStatements()->getStatement(new PropertyName('Notiz'))->getValue()->toScalars()),'Response tied to saved value');
  foreach([['field'=>'Vorlage'],['field'=>'Text'],['field'=>'Missing'],['subject'=>'invalid'],['pageid'=>0]]as $change){$api->params=$change+['pageid'=>123,'subject'=>'s11111111111111','field'=>'Notiz'];try{$api->execute();check(false,'Invalid field rendered');}catch(\RuntimeException $e){check($e->getMessage()==='unavailable','Non-user field rejected');}}
  $api->params=['pageid'=>123,'subject'=>'s22222222222222','field'=>'Notiz'];$api->execute();check($api->result['swsrenderwikitext']['source']==='[[Brno]]','Dependent subject uses own source');

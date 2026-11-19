@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSources;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Tests\Data\TestData;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
  */
 class SubjectContentDataDeserializerTest extends TestCase {
 

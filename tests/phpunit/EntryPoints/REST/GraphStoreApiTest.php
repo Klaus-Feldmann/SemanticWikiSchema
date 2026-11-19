@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Request\FauxRequest;
@@ -11,24 +11,24 @@ use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
+use AEWI\SWS\EntryPoints\REST\GetGraphStoresApi;
+use AEWI\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GraphStoreAdminAccess
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi
- * @covers \ProfessionalWiki\SWS\Presentation\GraphStoreStatusSerializer
+ * @covers \AEWI\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetGraphStoresApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GraphStoreAdminAccess
+ * @covers \AEWI\SWS\EntryPoints\REST\StartGraphStoreRebuildApi
+ * @covers \AEWI\SWS\Presentation\GraphStoreStatusSerializer
  * @group Database
  */
 class GraphStoreApiTest extends SWSIntegrationTestCase {

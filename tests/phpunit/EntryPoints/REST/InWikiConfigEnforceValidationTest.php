@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi
- * @covers \ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup
+ * @covers \AEWI\SWS\EntryPoints\REST\ReplaceSubjectApi
+ * @covers \AEWI\SWS\Application\WikiConfig\WikiConfigLookup
  * @group Database
  */
 class InWikiConfigEnforceValidationTest extends SWSIntegrationTestCase {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use Random\Randomizer;
 use WMDE\Clock\Clock;

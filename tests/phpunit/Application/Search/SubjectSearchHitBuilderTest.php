@@ -2,43 +2,55 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Search;
+namespace AEWI\SWS\Tests\Application\Search;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\MarkedMatchesTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Application\Search\MatchedSearchLine;
+use AEWI\SWS\Application\Search\SubjectSearchHit;
+use AEWI\SWS\Application\Search\SubjectSearchHitBuilder;
+use AEWI\SWS\Application\Search\SubjectSearchLanding;
+use AEWI\SWS\Application\Search\SubjectSearchMatch;
+use AEWI\SWS\Application\Search\SubjectSearchTextBuilder;
+use AEWI\SWS\Application\Search\SearchTermMatcher;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\MarkedMatchesTrait;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder
- * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchHit
- * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding
- * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch
- * @covers \ProfessionalWiki\SWS\Application\Search\MatchedSearchLine
+ * @covers \AEWI\SWS\Application\Search\SubjectSearchHitBuilder
+ * @covers \AEWI\SWS\Application\Search\SubjectSearchHit
+ * @covers \AEWI\SWS\Application\Search\SubjectSearchLanding
+ * @covers \AEWI\SWS\Application\Search\SubjectSearchMatch
+ * @covers \AEWI\SWS\Application\Search\MatchedSearchLine
  */
 class SubjectSearchHitBuilderTest extends TestCase {
 
 	use MarkedMatchesTrait;
+
+	public function testDescriptionOnlyMatchIsNotMistakenForAMatchedLabel(): void {
+		$main = $this->museumIn( 'Amsterdam' );
+		$other = $this->otherSubjectIn( 'Berlin' );
+		$other->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity(
+			'de', [ 'de' => 'Gemaldegalerie' ], [ 'de' => 'Innere Zitate kennzeichnen.' ]
+		) );
+		$hit = $this->hitFor( $this->pageWith( $main, $other ), true, 'zitate' );
+		$match = $this->matchOf( $hit );
+		$this->assertSame( 'Gemaldegalerie', $match->subjectName );
+		$this->assertTrue( $match->lines[0]->isDescription );
+	}
 
 	private const string MAIN_ID = 's11111111111111';
 	private const string OTHER_ID = 's22222222222222';

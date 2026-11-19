@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\Identity;
+namespace AEWI\SWS\Persistence\Identity;
 
 /** Small SQL boundary. All tables and identity algorithms live in SqlIdentityRegistry. */
 interface IdentityConnection {

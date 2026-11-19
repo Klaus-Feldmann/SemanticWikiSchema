@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use PHPUnit\Framework\TestCase;
 

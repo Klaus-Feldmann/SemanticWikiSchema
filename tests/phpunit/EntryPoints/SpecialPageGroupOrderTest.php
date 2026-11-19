@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\SpecialPage\SpecialPageFactory;
 use MediaWiki\Specials\SpecialSpecialPages;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSpecialPageInitList
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onSpecialPageInitList
  * @group Database
  */
 class SpecialPageGroupOrderTest extends SpecialPageTestBase {

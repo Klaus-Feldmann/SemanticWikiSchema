@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Context\RequestContext;
@@ -10,29 +10,29 @@ use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubject;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialSubject;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use SpecialPageExecutor;
 
 /**
  * The page is rendered in qqx, so what is asserted is which message the error box and the title use
  * rather than what those messages happen to say in English.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubject
- * @covers \ProfessionalWiki\SWS\Presentation\SubjectNamePresenter
- * @covers \ProfessionalWiki\SWS\Presentation\SubjectNameMessage
- * @covers \ProfessionalWiki\SWS\SWSExtension::getSubjectUiJsConfigVars
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialSubject
+ * @covers \AEWI\SWS\Presentation\SubjectNamePresenter
+ * @covers \AEWI\SWS\Presentation\SubjectNameMessage
+ * @covers \AEWI\SWS\SWSExtension::getSubjectUiJsConfigVars
  * @group Database
  */
 class SpecialSubjectTest extends SWSIntegrationTestCase {

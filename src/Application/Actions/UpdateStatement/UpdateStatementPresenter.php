@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\UpdateStatement;
+namespace AEWI\SWS\Application\Actions\UpdateStatement;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 interface UpdateStatementPresenter {
 

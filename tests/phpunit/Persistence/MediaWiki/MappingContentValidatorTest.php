@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingContentValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
+use AEWI\SWS\Persistence\MediaWiki\MappingContentValidator;
+use AEWI\SWS\Tests\Data\TestData;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MappingContentValidator
+ * @covers \AEWI\SWS\Persistence\MediaWiki\MappingContentValidator
  */
 class MappingContentValidatorTest extends MediaWikiIntegrationTestCase {
 

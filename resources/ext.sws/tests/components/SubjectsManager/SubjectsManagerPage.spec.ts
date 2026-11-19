@@ -771,7 +771,7 @@ describe( 'SubjectsManagerPage move action', () => {
 		const [ content, options ] = ( mw.notify as ReturnType<typeof vi.fn> ).mock.calls[ 0 ];
 		const link = ( content as HTMLElement ).querySelector( 'a' );
 		expect( ( content as HTMLElement ).textContent ).toContain( 'sws-managesubjects-move-success' );
-		expect( link?.getAttribute( 'href' ) ).toBe( '/wiki/Rembrandt van Rijn?action=subjects' );
+		expect( link?.getAttribute( 'href' ) ).toBe( '/wiki/Rembrandt van Rijn?action=entities' );
 		expect( link?.textContent ).toBe( 'Rembrandt van Rijn' );
 		expect( options ).toEqual( { type: 'success' } );
 

@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\EntryPoints\REST\GetJsonSchemaApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetJsonSchemaApi
  * @group Database
  */
 class GetJsonSchemaApiTest extends SWSIntegrationTestCase {

@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\ImageReference;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\ImageType;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\Property\ImageProperty;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\ImageReference;
+use AEWI\SWS\Domain\PropertyType\Types\ImageType;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\Property\ImageProperty;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Tests\Data\TestSources;
 
 class ImageTypeTest extends TestCase {
 	/** @dataProvider validReferences */
@@ -65,8 +65,8 @@ class ImageTypeTest extends TestCase {
 		$this->assertFalse( $validator->validate( [ 'https://evil/X.jpg' ], $schema )->isValid() );
 		$this->assertFalse( $validator->validate( [ 'local:X.jpg', 'local:X.jpg' ], $schema )->isValid() );
 		$value = new StringValue( 'commons:Example.jpg', 'local:Example.jpg' );
-		$this->assertSame( $value->strings, \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders()->buildNeo4jValue( 'image', $value ) );
-		$this->assertTrue( \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance()->validate( json_encode( [ 'propertyDefinitions' => [ 'Bild' => $p->toJson() ] ] ) ) );
+		$this->assertSame( $value->strings, \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders()->buildNeo4jValue( 'image', $value ) );
+		$this->assertTrue( \AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance()->validate( json_encode( [ 'propertyDefinitions' => [ 'Bild' => $p->toJson() ] ] ) ) );
 	}
 
 }

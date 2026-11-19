@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -10,9 +10,9 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\SWSExtension;
 
 /** Collects all configured bindings, including those overridden by author values. */
 final class SourceSnapshotCapture {

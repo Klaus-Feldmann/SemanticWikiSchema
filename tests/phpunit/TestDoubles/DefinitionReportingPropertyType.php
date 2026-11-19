@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use LogicException;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyType;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\ValueType;
+use AEWI\SWS\Domain\PropertyType\PropertyType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\ValueType;
 
 /**
  * Indexes its values as the Property Definition it was handed, so a test can tell which definition

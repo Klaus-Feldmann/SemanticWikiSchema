@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectRequest;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\RestSetMainSubjectPresenter;
+use AEWI\SWS\Application\Actions\SetMainSubject\SetMainSubjectRequest;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\RestSetMainSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class SetMainSubjectApi extends SimpleHandler {
@@ -87,7 +87,7 @@ class SetMainSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Subject ID (15 characters starting with "s") of a Subject on this page to promote to Main Subject, or null to clear the Main Subject.',
+				self::PARAM_DESCRIPTION => 'Entity ID (E followed by its positive number, or an existing legacy s-ID) of a Entity on this page to promote to Main Entity, or null to clear the Main Entity.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',

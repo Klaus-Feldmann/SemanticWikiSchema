@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS;
+namespace AEWI\SWS;
 
 use Closure;
 use Exception;
@@ -24,241 +24,241 @@ use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentityValue;
 use MessageLocalizer;
 use Opis\JsonSchema\Validator;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPagePresenter;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectPresenter;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\Application\Actions\DeleteSubject\DeleteSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
-use ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Actions\UpdateStatement\UpdateStatementAction;
-use ProfessionalWiki\SWS\Application\Actions\UpdateStatement\UpdateStatementPresenter;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigValidator;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigSource;
-use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
-use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
-use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
-use ProfessionalWiki\SWS\Application\PageSubjectsAtRevisionLookup;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\SWS\Application\SubjectContentRepository;
-use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery;
-use ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
-use ProfessionalWiki\SWS\Application\Queries\ValidateSubjectUpdate\ValidateSubjectUpdateQuery;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
-use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
-use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
-use ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider;
-use ProfessionalWiki\SWS\Application\EditNotice\InterfaceMessageNoticeProvider;
-use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
-use ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
-use ProfessionalWiki\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Application\SubjectCountLookup;
-use ProfessionalWiki\SWS\Application\SubjectLabelLookup;
-use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Application\HostSubjectBuilder;
-use ProfessionalWiki\SWS\Application\LayoutLookup;
-use ProfessionalWiki\SWS\Application\SubjectPermissionHints;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\ReadAuthorizedSubjectLookup;
-use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
-use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
-use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\LastEditorPagesRebuilder;
-use ProfessionalWiki\SWS\Application\PageRebuilder;
-use ProfessionalWiki\SWS\Application\FailureIsolatingRevisionPolicy;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Application\RevisionPolicyRegistry;
-use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
-use ProfessionalWiki\SWS\Application\SubjectIdMinter;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\SubjectResolver;
-use ProfessionalWiki\SWS\Application\MappingLookup;
-use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
-use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageExporter;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
-use ProfessionalWiki\SWS\Application\Rdf\RdfProjectionResolution;
-use ProfessionalWiki\SWS\Application\Rdf\RdfSubjectExporter;
-use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\SWS\EntryPoints\REST\ExportPageRdfApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\Source\LocalSource;
-use ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
-use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
-use ProfessionalWiki\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetGraphStoresApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetMappingSummariesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaNamesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaSummariesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectCountsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
-use ProfessionalWiki\SWS\EntryPoints\REST\MintSubjectIdsApi;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
-use ProfessionalWiki\SWS\EntryPoints\REST\RemoveStatementApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ValidateSubjectUpdateApi;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer;
-use ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder;
-use ProfessionalWiki\SWS\Infrastructure\TitleBasedPageIdentifiersResolver;
-use ProfessionalWiki\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectContentRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PointInTimeSubjectLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSubjectCountLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseMappingNameLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
-use ProfessionalWiki\SWS\Persistence\MappingNameLookup;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin;
-use ProfessionalWiki\SWS\Persistence\DeletedPageIdsLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
-use ProfessionalWiki\SWS\Persistence\NullPublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\NullSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
-use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
-use ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder;
-use ProfessionalWiki\SWS\Infrastructure\MediaWikiRebuildJobQueue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\SWS\Persistence\SchemaNameLookup;
-use ProfessionalWiki\SWS\Persistence\LayoutNameLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLayoutNameLookup;
-use ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder;
-use ProfessionalWiki\SWS\Presentation\ConfigEditorJsConfigBuilder;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\FrontendModuleLoader;
-use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
-use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
-use ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectAction;
+use AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction;
+use AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPagePresenter;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectPresenter;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\Application\Actions\DeleteSubject\DeleteSubjectAction;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
+use AEWI\SWS\Application\Actions\SetMainSubject\SetMainSubjectAction;
+use AEWI\SWS\Application\Actions\SetMainSubject\SetMainSubjectPresenter;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
+use AEWI\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectAction;
+use AEWI\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectPresenter;
+use AEWI\SWS\Application\Actions\UpdateStatement\UpdateStatementAction;
+use AEWI\SWS\Application\Actions\UpdateStatement\UpdateStatementPresenter;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\ConfigValidator;
+use AEWI\SWS\Application\WikiConfig\WikiConfigLookup;
+use AEWI\SWS\Application\WikiConfig\WikiConfigSource;
+use AEWI\SWS\Application\NewSubjectIdResolver;
+use AEWI\SWS\Application\PageIdentifiersLookup;
+use AEWI\SWS\Application\PageIdentifiersResolver;
+use AEWI\SWS\Application\PageSubjectsAtRevisionLookup;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\Search\SubjectSearchHitBuilder;
+use AEWI\SWS\Application\Search\SubjectSearchTextBuilder;
+use AEWI\SWS\Application\SubjectContentRepository;
+use AEWI\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
+use AEWI\SWS\Application\Queries\GetSchema\GetSchemaQuery;
+use AEWI\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
+use AEWI\SWS\Application\Queries\GetLayout\GetLayoutQuery;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
+use AEWI\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsPresenter;
+use AEWI\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectQuery;
+use AEWI\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
+use AEWI\SWS\Application\Queries\ValidateSubjectUpdate\ValidateSubjectUpdateQuery;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use AEWI\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Infrastructure\ProductionIdGenerator;
+use AEWI\SWS\Infrastructure\UserAccessClass;
+use AEWI\SWS\Persistence\CorePagePropertyProvider;
+use AEWI\SWS\Application\EditNotice\InterfaceMessageNoticeProvider;
+use AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
+use AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
+use AEWI\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
+use AEWI\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory;
+use AEWI\SWS\Domain\Page\PagePropertyProviderRegistry;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Application\SubjectCountLookup;
+use AEWI\SWS\Application\SubjectLabelLookup;
+use AEWI\SWS\Application\ReferencingSubjectLookup;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Application\HostSubjectBuilder;
+use AEWI\SWS\Application\LayoutLookup;
+use AEWI\SWS\Application\SubjectPermissionHints;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\ReadAuthorizedSubjectLookup;
+use AEWI\SWS\Application\DependentSubjectBuilder;
+use AEWI\SWS\Application\DependentSubjectGuard;
+use AEWI\SWS\Application\Validation\DependentSubjectValidator;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\LastEditorPagesRebuilder;
+use AEWI\SWS\Application\PageRebuilder;
+use AEWI\SWS\Application\FailureIsolatingRevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicyRegistry;
+use AEWI\SWS\Application\NullRevisionPolicy;
+use AEWI\SWS\Application\SubjectIdMinter;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectLookup;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\SubjectResolver;
+use AEWI\SWS\Application\MappingLookup;
+use AEWI\SWS\Application\Rdf\OntologyMappingProjector;
+use AEWI\SWS\Application\Rdf\SubjectIriResolver;
+use AEWI\SWS\Application\Rdf\RdfPageExporter;
+use AEWI\SWS\Application\Rdf\RdfPageLoader;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Application\Rdf\RdfProjection;
+use AEWI\SWS\Application\Rdf\RdfProjectionResolution;
+use AEWI\SWS\Application\Rdf\RdfSubjectExporter;
+use AEWI\SWS\Domain\Mapping\CurieExpander;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfSerializer;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use AEWI\SWS\EntryPoints\REST\ExportPageRdfApi;
+use AEWI\SWS\EntryPoints\REST\ExportSubjectRdfApi;
+use AEWI\SWS\EntryPoints\REST\ResolveSubjectIriApi;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\Source\LocalSource;
+use AEWI\SWS\Application\Source\SourceRoutingSubjectLookup;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\EntryPoints\OnRevisionCreatedHandler;
+use AEWI\SWS\EntryPoints\REST\CancelGraphStoreRebuildApi;
+use AEWI\SWS\EntryPoints\REST\CreateSubjectApi;
+use AEWI\SWS\EntryPoints\REST\CreateSubjectPageApi;
+use AEWI\SWS\EntryPoints\REST\DeleteSchemaApi;
+use AEWI\SWS\EntryPoints\REST\DeleteSubjectApi;
+use AEWI\SWS\EntryPoints\REST\GetJsonSchemaApi;
+use AEWI\SWS\EntryPoints\REST\GetMainSubjectApi;
+use AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
+use AEWI\SWS\EntryPoints\REST\GetSchemaApi;
+use AEWI\SWS\EntryPoints\REST\GetLayoutApi;
+use AEWI\SWS\EntryPoints\REST\GetGraphStoresApi;
+use AEWI\SWS\EntryPoints\REST\GetLayoutSummariesApi;
+use AEWI\SWS\EntryPoints\REST\GetMappingSummariesApi;
+use AEWI\SWS\EntryPoints\REST\GetSchemaNamesApi;
+use AEWI\SWS\EntryPoints\REST\GetSchemaSummariesApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectApi;
+use AEWI\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectCountsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectSummariesApi;
+use AEWI\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
+use AEWI\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
+use AEWI\SWS\EntryPoints\REST\MintSubjectIdsApi;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
+use AEWI\SWS\EntryPoints\REST\RemoveStatementApi;
+use AEWI\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use AEWI\SWS\EntryPoints\REST\MoveSubjectApi;
+use AEWI\SWS\EntryPoints\REST\SaveSchemaApi;
+use AEWI\SWS\EntryPoints\REST\SetMainSubjectApi;
+use AEWI\SWS\EntryPoints\REST\SetStatementApi;
+use AEWI\SWS\EntryPoints\REST\StartGraphStoreRebuildApi;
+use AEWI\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
+use AEWI\SWS\EntryPoints\REST\ValidateSubjectApi;
+use AEWI\SWS\EntryPoints\REST\ValidateSubjectUpdateApi;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use AEWI\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer;
+use AEWI\SWS\Infrastructure\ParserPageDependencyRecorder;
+use AEWI\SWS\Infrastructure\TitleBasedPageIdentifiersResolver;
+use AEWI\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
+use AEWI\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource;
+use AEWI\SWS\Persistence\MediaWiki\PageContentFetcher;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
+use AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectContentRepository;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Persistence\MediaWiki\Subject\PointInTimeSubjectLookup;
+use AEWI\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup;
+use AEWI\SWS\Persistence\MediaWiki\Subject\DatabaseRecentlyEditedSubjectLookup;
+use AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectInPlaceOfPageTitleLookup;
+use AEWI\SWS\Persistence\MediaWiki\CachingSchemaLookup;
+use AEWI\SWS\Persistence\MediaWiki\CachingSubjectCountLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseMappingNameLookup;
+use AEWI\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
+use AEWI\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
+use AEWI\SWS\Persistence\MappingNameLookup;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlQueryApi;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin;
+use AEWI\SWS\Persistence\DeletedPageIdsLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
+use AEWI\SWS\Persistence\NullPublishedSubjectIndex;
+use AEWI\SWS\Persistence\NullSubjectPageIndex;
+use AEWI\SWS\Persistence\PageIdsLookup;
+use AEWI\SWS\Persistence\PublishedSubjectIndex;
+use AEWI\SWS\Persistence\SubjectPageIndex;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildExecutor;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
+use AEWI\SWS\Application\GraphRebuild\MappingChangeRebuilder;
+use AEWI\SWS\Infrastructure\MediaWikiRebuildJobQueue;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
+use AEWI\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLock;
+use AEWI\SWS\Persistence\SchemaNameLookup;
+use AEWI\SWS\Persistence\LayoutNameLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseLayoutNameLookup;
+use AEWI\SWS\Presentation\ConfigDocumentationBuilder;
+use AEWI\SWS\Presentation\ConfigEditorJsConfigBuilder;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\FrontendModuleLoader;
+use AEWI\SWS\Presentation\ViewHtmlBuilder;
+use AEWI\SWS\Presentation\JsonSchemaSerializer;
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Presentation\LayoutPresentationSerializer;
+use AEWI\SWS\Presentation\SubjectSearchHitHtmlBuilder;
 use RuntimeException;
 use Wikimedia\Rdbms\IDatabase;
 
@@ -533,11 +533,11 @@ class SWSExtension {
 
 	/**
 	 * Parses Subject ids arriving from outside — a REST path, a revision slot, a Lua call — into
-	 * {@see \ProfessionalWiki\SWS\Domain\Subject\SubjectId}s. The local Source key is the
+	 * {@see \AEWI\SWS\Domain\Subject\SubjectId}s. The local Source key is the
 	 * MediaWiki Wiki ID (ADR 22), so an id naming this wiki explicitly canonicalizes to its bare form.
 	 */
-	public function newIdentityBoundaryResolver(): \ProfessionalWiki\SWS\Application\Identity\IdentityBoundaryResolver {
-        return new \ProfessionalWiki\SWS\Application\Identity\IdentityBoundaryResolver( $this->newIdentityRegistry(), $this->config->wikiId );
+	public function newIdentityBoundaryResolver(): \AEWI\SWS\Application\Identity\IdentityBoundaryResolver {
+        return new \AEWI\SWS\Application\Identity\IdentityBoundaryResolver( $this->newIdentityRegistry(), $this->config->wikiId );
     }
 
     public function getSubjectIdParser( bool $resolveAliases = false ): SubjectIdParser {
@@ -676,7 +676,7 @@ class SWSExtension {
 	 */
 	public function getStoreContentUC(): OnRevisionCreatedHandler {
 		return $this->newStoreContentHandler(
-			new \ProfessionalWiki\SWS\Infrastructure\AfterCommitGraphDatabasePlugin(
+			new \AEWI\SWS\Infrastructure\AfterCommitGraphDatabasePlugin(
 				$this->getIsolatingGraphDatabasePlugin(),
 				static function ( \Closure $publish ): void {
 					MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
@@ -722,7 +722,7 @@ class SWSExtension {
 			$this->getRevisionPolicy(),
 			MediaWikiServices::getInstance()->getTitleFormatter(),
 			LoggerFactory::getInstance( 'SWS' ),
-            new \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex(
+            new \AEWI\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex(
                 MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase()
             ),
 		);
@@ -730,8 +730,8 @@ class SWSExtension {
 
     /** Migration writes still commit authoritative entity hosting with the revision, never graph output. */
     public function indexMigrationRevision( \MediaWiki\Revision\RevisionRecord $revision ): void {
-        if ( !\ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { throw new \LogicException('Migration scope required'); }
-        $content = \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader::read($revision);
+        if ( !\AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { throw new \LogicException('Migration scope required'); }
+        $content = \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader::read($revision);
         $this->newSubjectPageIndex()->setSubjectsOfPage(new PageId($revision->getPageId()),$content?->getSubjectIds() ?? []);
     }
 
@@ -940,7 +940,7 @@ class SWSExtension {
 	 * The known projection names the given authority may read, for the REST 400 body. "native" is not a
 	 * page and is always kept; a Mapping name is kept only when its page is readable, so a read-restricted
 	 * Mapping page's title never leaks into the error (#1046, mirroring the Schema
-	 * {@see \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup} read filter). This is
+	 * {@see \AEWI\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup} read filter). This is
 	 * the REST boundary; the system-context {@see self::getRdfProjectionNames()} used by DumpRdf and the
 	 * SPARQL store stays unfiltered.
 	 *
@@ -1837,10 +1837,10 @@ class SWSExtension {
 		return hash( 'sha256', $key );
 	}
 
-	public function newIdentityRegistry(): \ProfessionalWiki\SWS\Application\Identity\IdentityRegistry {
+	public function newIdentityRegistry(): \AEWI\SWS\Application\Identity\IdentityRegistry {
 		$db = MediaWikiServices::getInstance()->getConnectionProvider()->getPrimaryDatabase();
-		return new \ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry(
-			new \ProfessionalWiki\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection( $db )
+		return new \AEWI\SWS\Persistence\Identity\SqlIdentityRegistry(
+			new \AEWI\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection( $db )
 		);
 	}
 
@@ -1990,7 +1990,7 @@ class SWSExtension {
 		return new AuthorityBasedSubjectAuthorizer(
 			authority: $authority,
 			titleFactory: MediaWikiServices::getInstance()->getTitleFactory(),
-			titleIsEligible: \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( ... ),
+			titleIsEligible: \AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( ... ),
 		);
 	}
 
@@ -2412,22 +2412,22 @@ class SWSExtension {
 		return new SetSubjectsOrderingApi( csrfValidator: self::getCsrfValidator() );
 	}
 
-	public static function newResolveSchemaIdIriApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi( true ); }
-    public static function newResolveLegacySchemaIriApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ResolveSchemaIriApi( false ); }
-    public static function newExportSchemaIdRdfApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi( true ); }
-    public static function newExportLegacySchemaRdfApi(): \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \ProfessionalWiki\SWS\EntryPoints\REST\ExportSchemaRdfApi( false ); }
-    public static function newGetSchemaByIdApi(): \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaByIdApi {
-        return new \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaByIdApi();
+	public static function newResolveSchemaIdIriApi(): \AEWI\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \AEWI\SWS\EntryPoints\REST\ResolveSchemaIriApi( true ); }
+    public static function newResolveLegacySchemaIriApi(): \AEWI\SWS\EntryPoints\REST\ResolveSchemaIriApi { return new \AEWI\SWS\EntryPoints\REST\ResolveSchemaIriApi( false ); }
+    public static function newExportSchemaIdRdfApi(): \AEWI\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \AEWI\SWS\EntryPoints\REST\ExportSchemaRdfApi( true ); }
+    public static function newExportLegacySchemaRdfApi(): \AEWI\SWS\EntryPoints\REST\ExportSchemaRdfApi { return new \AEWI\SWS\EntryPoints\REST\ExportSchemaRdfApi( false ); }
+    public static function newGetSchemaByIdApi(): \AEWI\SWS\EntryPoints\REST\GetSchemaByIdApi {
+        return new \AEWI\SWS\EntryPoints\REST\GetSchemaByIdApi();
     }
-    public static function newGetJsonSchemaByIdApi(): \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaByIdApi {
-        return new \ProfessionalWiki\SWS\EntryPoints\REST\GetJsonSchemaByIdApi();
+    public static function newGetJsonSchemaByIdApi(): \AEWI\SWS\EntryPoints\REST\GetJsonSchemaByIdApi {
+        return new \AEWI\SWS\EntryPoints\REST\GetJsonSchemaByIdApi();
     }
     public static function newGetSchemaApi(): GetSchemaApi {
 		return new GetSchemaApi();
 	}
 
-	public static function newCreateSchemaApi(): \ProfessionalWiki\SWS\EntryPoints\REST\CreateSchemaApi {
-		return new \ProfessionalWiki\SWS\EntryPoints\REST\CreateSchemaApi( csrfValidator: self::getCsrfValidator() );
+	public static function newCreateSchemaApi(): \AEWI\SWS\EntryPoints\REST\CreateSchemaApi {
+		return new \AEWI\SWS\EntryPoints\REST\CreateSchemaApi( csrfValidator: self::getCsrfValidator() );
 	}
 
 	public static function newSaveSchemaApi(): SaveSchemaApi {

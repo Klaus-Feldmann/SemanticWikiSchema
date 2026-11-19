@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence;
+namespace AEWI\SWS\Persistence;
 
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
 
 /**
  * The record of every graph rebuild, kept per store.

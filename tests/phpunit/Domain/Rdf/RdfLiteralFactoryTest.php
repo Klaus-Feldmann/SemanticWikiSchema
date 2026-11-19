@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
+namespace AEWI\SWS\Tests\Domain\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\RdfLiteralFactory;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory
+ * @covers \AEWI\SWS\Domain\Rdf\RdfLiteralFactory
  */
 class RdfLiteralFactoryTest extends TestCase {
 

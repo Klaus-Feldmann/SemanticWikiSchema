@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Output\OutputPage;
 use MessageLocalizer;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * A Subject's label with its id beside it, where the label stands in for a title: the heading of a page

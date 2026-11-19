@@ -5,24 +5,24 @@ require __DIR__.'/bootstrap.php';
 require __DIR__.'/fixtures/SqliteIdentityConnection.php';
 
 use IdentityHarness\SqliteIdentityConnection;
-use ProfessionalWiki\SWS\Application\Identity\{SchemaIdentityPreparation, IdentityMetadataWriter};
-use ProfessionalWiki\SWS\Application\{NewSubjectIdResolver, SubjectIdMinter, StatementListBuilder, DependentSubjectBuilder};
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Identity\{LocalizedIdentity, SchemaId, EntityId, IdentityKind};
-use ProfessionalWiki\SWS\Domain\Schema\{Schema, SchemaName, SchemaReference, SchemaReferenceParser, SchemaReferenceNormalizer, PropertyDefinitions};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject, SubjectId, SubjectIdParser, SubjectLabel, SubjectMap, StatementList};
-use ProfessionalWiki\SWS\Domain\Page\{PageSubjects, PageId, PageIdentifiers, DependentSubjectRules};
-use ProfessionalWiki\SWS\Domain\Source\{SourceRegistry, SourceSnapshot};
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\{SchemaPersistenceDeserializer, SchemaContentValidator};
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataSerializer, SubjectContentDataDeserializer, StatementDeserializer};
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\{InMemoryPageIdentifiersLookup, InMemoryPageIdentifiersResolver, InMemorySubjectRepository, InMemorySource, StubPageReadAuthorizer, SpySubjectWriteAuthorizer};
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
-use ProfessionalWiki\SWS\Application\Validation\{SubjectValidator, ProposedSubjectValidator, DependentSubjectValidator};
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\{CreateSubjectAction, CreateSubjectRequest};
-use ProfessionalWiki\SWS\Presentation\RestCreateSubjectPresenter;
+use AEWI\SWS\Application\Identity\{SchemaIdentityPreparation, IdentityMetadataWriter};
+use AEWI\SWS\Application\{NewSubjectIdResolver, SubjectIdMinter, StatementListBuilder, DependentSubjectBuilder};
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Identity\{LocalizedIdentity, SchemaId, EntityId, IdentityKind};
+use AEWI\SWS\Domain\Schema\{Schema, SchemaName, SchemaReference, SchemaReferenceParser, SchemaReferenceNormalizer, PropertyDefinitions};
+use AEWI\SWS\Domain\Subject\{Subject, SubjectId, SubjectIdParser, SubjectLabel, SubjectMap, StatementList};
+use AEWI\SWS\Domain\Page\{PageSubjects, PageId, PageIdentifiers, DependentSubjectRules};
+use AEWI\SWS\Domain\Source\{SourceRegistry, SourceSnapshot};
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Persistence\MediaWiki\{SchemaPersistenceDeserializer, SchemaContentValidator};
+use AEWI\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataSerializer, SubjectContentDataDeserializer, StatementDeserializer};
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Tests\TestDoubles\{InMemoryPageIdentifiersLookup, InMemoryPageIdentifiersResolver, InMemorySubjectRepository, InMemorySource, StubPageReadAuthorizer, SpySubjectWriteAuthorizer};
+use AEWI\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Application\Validation\{SubjectValidator, ProposedSubjectValidator, DependentSubjectValidator};
+use AEWI\SWS\Application\Actions\CreateSubject\{CreateSubjectAction, CreateSubjectRequest};
+use AEWI\SWS\Presentation\RestCreateSubjectPresenter;
 
 $count=0;
 function v2check(bool $ok,string $why):void { global $count;$count++;if(!$ok)throw new RuntimeException($why); }
@@ -125,7 +125,7 @@ try {
  v2check(LocalizedIdentity::fromRequest(['label'=>'Only default label','statements'=>[]])===null,'An old client does not implicitly replace translations');
  v2refused(fn()=>LocalizedIdentity::fromJson(LocalizedIdentity::fromRequest(['labels'=>['de'=>'Partial']])),'Partial metadata cannot silently erase other fields');
  // The ordinary MediaWiki schema content handler uses this same policy.
- $schemaData=json_decode($one['json'],true);$policy=\ProfessionalWiki\SWS\Application\Identity\SchemaIdentityWritePolicy::class;
+ $schemaData=json_decode($one['json'],true);$policy=\AEWI\SWS\Application\Identity\SchemaIdentityWritePolicy::class;
  $policy::validate(new SchemaName('S1'),null,$schemaData,$registry,$owner);
  v2check(true,'A new reserved S schema is admitted');
  v2refused(fn()=>$policy::validate(new SchemaName('S1'),null,$schemaData,$registry,$other),'Another author cannot use the schema reservation');
@@ -152,15 +152,15 @@ try {
  // Actual replace path: clients which send no multilingual block retain translations and snapshots.
  $readAuth->allowed=true;
  $created->setSourceSnapshot(SourceSnapshot::recordAttempt($created->id,943,101,[901=>10],'de','2026-11-12T12:00:00Z',[]));
- $pageLookup=new class($repo) implements \ProfessionalWiki\SWS\Application\PageSubjectsAtRevisionLookup {
+ $pageLookup=new class($repo) implements \AEWI\SWS\Application\PageSubjectsAtRevisionLookup {
   public function __construct(private InMemorySubjectRepository $repo){}
   public function getPageSubjects(PageId $id):PageSubjects{return $this->repo->getSubjectsByPageId($id);}
  };
  $editLookup=new InMemoryPageIdentifiersLookup([[$created->id,new PageIdentifiers(new PageId(943),'Kurt Gödel',0)]]);
- $replacePresenter=new \ProfessionalWiki\SWS\Presentation\RestReplaceSubjectPresenter();
- $replace=new \ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectAction($repo,
-  new \ProfessionalWiki\SWS\Application\SubjectHostingPageResolver($editLookup,$readAuth),$writeAuth,$statementBuilder,$schemaResolver,$proposed,$dependent,new DependentSubjectValidator($proposed),
-  new \ProfessionalWiki\SWS\Application\SubjectResponseItemFactory($pageLookup,new \ProfessionalWiki\SWS\Application\HostSubjectBuilder($rules)),$replacePresenter,true);
+ $replacePresenter=new \AEWI\SWS\Presentation\RestReplaceSubjectPresenter();
+ $replace=new \AEWI\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectAction($repo,
+  new \AEWI\SWS\Application\SubjectHostingPageResolver($editLookup,$readAuth),$writeAuth,$statementBuilder,$schemaResolver,$proposed,$dependent,new DependentSubjectValidator($proposed),
+  new \AEWI\SWS\Application\SubjectResponseItemFactory($pageLookup,new \AEWI\SWS\Application\HostSubjectBuilder($rules)),$replacePresenter,true);
  $replace->replace($created->id,'Gödel',[],null);
  $edited=$repo->getSubject($created->id);
  v2check($replacePresenter->getStatusCode()===200&&$edited->getIdentity()?->labels['de']==='Gödel'&&$edited->getIdentity()?->labels['en']==='Kurt Gödel','Actual replace keeps unedited translations');
@@ -172,21 +172,21 @@ try {
  // Both page-first and subject-first creation pass through the same new allocator.
  if(!defined('NS_MAIN'))define('NS_MAIN',0);
  foreach([false,true]as$subjectFirst){
-  $pagePresenter=new \ProfessionalWiki\SWS\Presentation\RestCreateSubjectPagePresenter();
-  $pageAction=new \ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction($pagePresenter,$repo,$newIds,$writeAuth,$statementBuilder,$schemaResolver,$proposed,new InMemoryPageIdentifiersResolver(),$parser,$dependent,new DependentSubjectValidator($proposed),true,$subjectFirst,0,'de');
-  $pageAction->createSubjectPage(new \ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest('Richard Feynman',null,'S1',[]));
+  $pagePresenter=new \AEWI\SWS\Presentation\RestCreateSubjectPagePresenter();
+  $pageAction=new \AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageAction($pagePresenter,$repo,$newIds,$writeAuth,$statementBuilder,$schemaResolver,$proposed,new InMemoryPageIdentifiersResolver(),$parser,$dependent,new DependentSubjectValidator($proposed),true,$subjectFirst,0,'de');
+  $pageAction->createSubjectPage(new \AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest('Richard Feynman',null,'S1',[]));
   $answer=$pagePresenter->getJsonArray();
   v2check($pagePresenter->getStatusCode()===201&&str_starts_with($answer['subjectId'],'E'),'Actual page creation uses a reserved E ID');
   v2check($answer['pageTitle']===($subjectFirst?$answer['subjectId']:'Richard Feynman'),'Page-first and subject-first naming is retained');
   v2check($answer['subject']['labels']->de==='Richard Feynman','New page entity initializes its own language metadata');
  }
  // Dependent edits preserve metadata, notes and source data when no corresponding replacement is sent.
- $childSchema=new Schema(new SchemaName('S2'),'',new PropertyDefinitions(['Ort'=>\ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty::fromPartialJson(new \ProfessionalWiki\SWS\Domain\Schema\PropertyCore('',false,null,fieldNotes:['type'=>'text']),[])]),true,new SchemaId('S2'),new LocalizedIdentity('de',['de'=>'Notiz']));
+ $childSchema=new Schema(new SchemaName('S2'),'',new PropertyDefinitions(['Ort'=>\AEWI\SWS\Domain\Schema\Property\TextProperty::fromPartialJson(new \AEWI\SWS\Domain\Schema\PropertyCore('',false,null,fieldNotes:['type'=>'text']),[])]),true,new SchemaId('S2'),new LocalizedIdentity('de',['de'=>'Notiz']));
  $schemaSource->addSchema($childSchema);
  $childId=$minter->mint(1,'child')[0];
  $child=new Subject($childId,null,$childSchema->getReference(),new StatementList(),['Ort'=>'Forschungsnotiz'],identity:new LocalizedIdentity('de',[],['en'=>'Research context']));
  $child->setSourceSnapshot(SourceSnapshot::recordAttempt($childId,943,101,[902=>5],'de','2026-11-12T12:00:00Z',[]));
- $host=$created->withStatements(new StatementList([new \ProfessionalWiki\SWS\Domain\Statement(new \ProfessionalWiki\SWS\Domain\Schema\PropertyName('Kind'),'relation',new \ProfessionalWiki\SWS\Domain\Value\RelationValue(new \ProfessionalWiki\SWS\Domain\Relation\Relation(new \ProfessionalWiki\SWS\Domain\Relation\RelationId('r11111111111111'),$childId)))]));
+ $host=$created->withStatements(new StatementList([new \AEWI\SWS\Domain\Statement(new \AEWI\SWS\Domain\Schema\PropertyName('Kind'),'relation',new \AEWI\SWS\Domain\Value\RelationValue(new \AEWI\SWS\Domain\Relation\Relation(new \AEWI\SWS\Domain\Relation\RelationId('r11111111111111'),$childId)))]));
  $beforePage=new PageSubjects($host,new SubjectMap($child));
  $depBuilder=new DependentSubjectBuilder($newIds,$parser,$schemaResolver,$statementBuilder,new DependentSubjectRules($schemaResolver),'de');
  $children=$depBuilder->build([['id'=>$childId->text,'schema'=>['id'=>'S2'],'statements'=>[]]],$host->id,$beforePage);

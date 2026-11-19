@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\Identity;
+namespace AEWI\SWS\Persistence\Identity;
 
 use Closure;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
-use ProfessionalWiki\SWS\Application\Identity\IdentityRegistry;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, PersistentId};
+use AEWI\SWS\Application\Identity\IdentityRegistry;
+use AEWI\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, PersistentId};
 
 /**
  * Serializes each kind through its counter row. Reservations and aliases form one atomic operation. With an ambient

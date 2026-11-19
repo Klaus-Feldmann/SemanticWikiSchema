@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
+use AEWI\SWS\Tests\Data\TestSources;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer
+ * @covers \AEWI\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer
  */
 class LayoutPersistenceDeserializerTest extends TestCase {
 

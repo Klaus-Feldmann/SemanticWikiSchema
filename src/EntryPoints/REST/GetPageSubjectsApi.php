@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\RestGetPageSubjectsPresenter;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\RestGetPageSubjectsPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetPageSubjectsApi extends SimpleHandler {

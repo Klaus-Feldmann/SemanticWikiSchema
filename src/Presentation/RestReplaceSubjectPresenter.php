@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\ReplaceSubject\ReplaceSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 class RestReplaceSubjectPresenter implements ReplaceSubjectPresenter {
 
@@ -62,7 +62,7 @@ class RestReplaceSubjectPresenter implements ReplaceSubjectPresenter {
 	public function presentSaveFailed( ?string $errorMessage ): void {
 		$this->apiResponse = [
 			'status' => 'error',
-			'message' => 'The Subject could not be saved' . ( $errorMessage === null ? '' : ": $errorMessage" ),
+			'message' => wfMessage('sws-api-entity-save-failed')->text() . ( $errorMessage === null ? '' : ": $errorMessage" ),
 		];
 		$this->statusCode = 500;
 	}

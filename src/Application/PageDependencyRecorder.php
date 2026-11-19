@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 
 /**
  * Takes note of the pages a result depends on, so that it can be rebuilt when one of them changes.

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use MediaWiki\Maintenance\LoggedUpdateMaintenance;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 

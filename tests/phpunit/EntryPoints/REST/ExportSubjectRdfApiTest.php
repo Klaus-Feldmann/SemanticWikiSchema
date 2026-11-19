@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\ExportSubjectRdfApi;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Domain\Rdf\ParsedRdf;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ExportSubjectRdfApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\RdfFormatNegotiation
+ * @covers \AEWI\SWS\EntryPoints\REST\ExportSubjectRdfApi
+ * @covers \AEWI\SWS\EntryPoints\REST\RdfFormatNegotiation
  * @group Database
  */
 class ExportSubjectRdfApiTest extends SWSIntegrationTestCase {

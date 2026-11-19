@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\EditNotice;
+namespace AEWI\SWS\Application\EditNotice;
 
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNotice;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
 
 /**
  * Notices wiki admins write as interface messages, following the convention core uses for its own

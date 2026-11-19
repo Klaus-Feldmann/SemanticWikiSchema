@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\EntryPoints\REST\GetSubjectEditNoticesApi;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectEditNoticesApi
- * @covers \ProfessionalWiki\SWS\Presentation\RestGetSubjectEditNoticesPresenter
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
- * @covers \ProfessionalWiki\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectEditNoticesApi
+ * @covers \AEWI\SWS\Presentation\RestGetSubjectEditNoticesPresenter
+ * @covers \AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesQuery
+ * @covers \AEWI\SWS\Infrastructure\TitleBasedSubjectEditNoticeContextFactory
  * @group Database
  */
 class GetSubjectEditNoticesApiTest extends SWSIntegrationTestCase {

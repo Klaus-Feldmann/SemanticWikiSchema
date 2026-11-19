@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
+use AEWI\SWS\Domain\GraphRebuild\RebuildPhase;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLock;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock
  * @group Database
  */
 class DatabaseRebuildStartLockTest extends MediaWikiIntegrationTestCase {

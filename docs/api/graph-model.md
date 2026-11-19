@@ -60,7 +60,7 @@ A Subject whose Schema cannot be loaded, for example because its Schema page was
 
 | Property | Neo4j Type | Description |
 |----------|------------|-------------|
-| `id` | string | ID of a Subject of this wiki, 15 characters starting with `s` (unique) |
+| `id` | string | ID of an Entity of this wiki: an `E` ID or an existing legacy `s` ID (unique) |
 | `name` | string | Subject label, where it has one (see below) |
 | `wiki_id` | string | [MediaWiki Wiki ID](https://www.mediawiki.org/wiki/Manual:Wiki_ID) of the wiki that owns the Subject |
 

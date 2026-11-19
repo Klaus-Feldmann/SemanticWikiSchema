@@ -4,10 +4,10 @@ require __DIR__.'/migration-source-basis-contract.php';
 
 use D2Harness\State as ShapeState;
 use MediaWiki\Revision\{RevisionLookup,RevisionRecord};
-use ProfessionalWiki\SWS\Application\IdentityMigration\{MigrationJsonShapeRepair,MigrationWriteScope,ReferenceRewriter};
-use ProfessionalWiki\SWS\EntryPoints\Content\{SchemaContent,SubjectContent};
-use ProfessionalWiki\SWS\EntryPoints\Processing\{InternalPageProcessor,SourceRefreshReceipt};
-use ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost;
+use AEWI\SWS\Application\IdentityMigration\{MigrationJsonShapeRepair,MigrationWriteScope,ReferenceRewriter};
+use AEWI\SWS\EntryPoints\Content\{SchemaContent,SubjectContent};
+use AEWI\SWS\EntryPoints\Processing\{InternalPageProcessor,SourceRefreshReceipt};
+use AEWI\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost;
 
 $shapeChecks=0;
 function shapeCheck(bool $ok,string $why):void{global $shapeChecks;$shapeChecks++;if(!$ok)throw new RuntimeException($why);}

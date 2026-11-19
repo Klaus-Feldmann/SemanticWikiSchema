@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\MainConfigNames;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use Wikimedia\Rdbms\DatabaseSqlite;
 
 /**

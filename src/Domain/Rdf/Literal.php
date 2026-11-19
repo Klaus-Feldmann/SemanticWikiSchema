@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Rdf;
+namespace AEWI\SWS\Domain\Rdf;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\LanguageTag;
+use AEWI\SWS\Domain\LanguageTag;
 
 /**
  * An RDF literal: a lexical form plus a datatype IRI, and optionally a language tag.

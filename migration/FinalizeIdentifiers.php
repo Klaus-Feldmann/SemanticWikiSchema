@@ -4,7 +4,7 @@ declare(strict_types=1);
 use MediaWiki\Maintenance\Maintenance;
 use MediaWiki\Title\Title;
 use MediaWiki\Registration\ExtensionRegistry;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 
 require_once (getenv('MW_INSTALL_PATH')?:getcwd()).'/maintenance/Maintenance.php';
 

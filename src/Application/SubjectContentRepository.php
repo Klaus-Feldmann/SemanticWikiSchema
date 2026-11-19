@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Page\PageIdentity;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
 
 interface SubjectContentRepository {
 

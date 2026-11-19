@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Title\NamespaceInfo;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\Page\PageId;
 
 readonly class TitleBasedSubjectEditNoticeContextFactory implements SubjectEditNoticeContextFactory {
 

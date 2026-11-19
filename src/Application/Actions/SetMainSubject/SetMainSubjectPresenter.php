@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\SetMainSubject;
+namespace AEWI\SWS\Application\Actions\SetMainSubject;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Violation;
 
 interface SetMainSubjectPresenter {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Search;
+namespace AEWI\SWS\Application\Search;
 
 /**
  * A searchable string of a Subject that the search matched.
@@ -10,7 +10,7 @@ namespace ProfessionalWiki\SWS\Application\Search;
 readonly class MatchedSearchLine {
 
 	/**
-	 * @param ?string $propertyName Null for the label
+	 * @param ?string $propertyName Null for identity text (label or description)
 	 * @param string[] $parts The line split the way {@see SearchTermMatcher::splitOnMatches} splits it
 	 * @param string[] $relationPropertyNames The relation properties leading to the Dependent Subject the line is from,
 	 *   outermost first; empty for a line of the matched Subject itself
@@ -18,7 +18,8 @@ readonly class MatchedSearchLine {
 	public function __construct(
 		public ?string $propertyName,
 		public array $parts,
-		public array $relationPropertyNames
+		public array $relationPropertyNames,
+		public bool $isDescription = false
 	) {
 	}
 

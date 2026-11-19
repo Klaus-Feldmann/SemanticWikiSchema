@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use Closure;
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Application\RevisionPolicyRegistry;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyType;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfTerm;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Domain\Source\Source;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicyRegistry;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderRegistry;
+use AEWI\SWS\Domain\PropertyType\PropertyType;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Domain\Rdf\RdfTerm;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\Source\Source;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
 
 readonly class SWSRegistrar {
 

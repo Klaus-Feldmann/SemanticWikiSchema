@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\WikiConfig;
+namespace AEWI\SWS\Application\WikiConfig;
 
-use ProfessionalWiki\SWS\Domain\LanguageTag;
+use AEWI\SWS\Domain\LanguageTag;
 
 /**
  * The shape of value an exposed setting takes: which values are valid, and how the on-page

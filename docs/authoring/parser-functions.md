@@ -50,7 +50,7 @@ and how.
 
 | Parameter | Description |
 |-----------|-------------|
-| `<subjectId>` (positional) | Subject ID to render: 15 characters starting with `s` for a Subject of this wiki, or `sourceKey:localId` for one from another [Source](../api/subject-format.md#ids). Defaults to the current page's Main Subject. |
+| `<subjectId>` (positional) | Subject ID to render: an `E` ID or an existing legacy `s` ID for an Entity of this wiki, or `sourceKey:localId` for one from another [Source](../api/subject-format.md#ids). Defaults to the current page's Main Subject. |
 | `subject=<subjectId>` | Named alternative to the positional form. Cannot be combined with the positional form. |
 | `layout=<layoutName>` | Layout to apply. Without one, all properties are shown in schema order, except relation properties that point at [Dependent Subjects](../glossary.md#dependent-subject). |
 

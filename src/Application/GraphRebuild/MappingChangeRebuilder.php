@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\GraphRebuild;
+namespace AEWI\SWS\Application\GraphRebuild;
 
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

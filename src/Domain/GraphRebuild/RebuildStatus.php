@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\GraphRebuild;
+namespace AEWI\SWS\Domain\GraphRebuild;
 
 /**
  * Where a {@see RebuildRun} stands. A run is Queued or Running until it reaches one of the terminal

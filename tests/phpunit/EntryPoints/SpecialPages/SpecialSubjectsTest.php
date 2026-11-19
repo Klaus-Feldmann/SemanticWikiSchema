@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubjects;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialSubjects;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSubjects
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialSubjects
  * @group Database
  */
 class SpecialSubjectsTest extends SWSIntegrationTestCase {

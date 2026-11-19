@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence;
 
 use MediaWiki\Http\HttpRequestFactory;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryEndpoint;
 
 /**
  * Runs a SPARQL query over HTTP as a SPARQL 1.1 Protocol *query* operation (§ 2.1.3): the query text is

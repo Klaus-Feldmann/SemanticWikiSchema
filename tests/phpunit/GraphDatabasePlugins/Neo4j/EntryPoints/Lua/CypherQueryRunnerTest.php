@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\Lua;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\Lua;
 
 use Laudis\Neo4j\Databags\SummarizedResult;
 use Laudis\Neo4j\Types\CypherList;
 use Laudis\Neo4j\Types\CypherMap;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use AEWI\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner
  */
 class CypherQueryRunnerTest extends TestCase {
 

@@ -13,12 +13,12 @@ namespace Wikimedia\Message {enum ListType {case SEMICOLON;} class MessageValue 
 namespace MediaWiki\Html { class Html {static function element($tag,$attrs,$text){return '<'.$tag.'>'.htmlspecialchars($text,ENT_QUOTES).'</'.$tag.'>';}} }
 namespace MediaWiki\Parser {class Parser {static function formatPageTitle($ns,$sep,$title){return '<span>'.$ns.$sep.$title.'</span>';}}}
 namespace MediaWiki\Output {class OutputPage {function __construct(public string $heading){}function getPageTitle(){return $this->heading;}function setPageTitle($heading){$this->heading=$heading;}}}
-namespace ProfessionalWiki\SWS {class SWSExtension {static function getInstance(){return new self;} function isConfigPage($title){return $title->text==='MediaWiki:SWS';} function getConfigValidator(){return new \ProfessionalWiki\SWS\Application\WikiConfig\ConfigValidator(new \ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema);}}}
+namespace AEWI\SWS {class SWSExtension {static function getInstance(){return new self;} function isConfigPage($title){return $title->text==='MediaWiki:SWS';} function getConfigValidator(){return new \AEWI\SWS\Application\WikiConfig\ConfigValidator(new \AEWI\SWS\Application\WikiConfig\ConfigSchema);}}}
 namespace {
  class StatusValue {public array $errors=[];function fatal(...$error){$this->errors[]=$error;}}
  require __DIR__.'/bootstrap.php';
- use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
- use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+ use AEWI\SWS\EntryPoints\SWSHooks;
+ use AEWI\SWS\Presentation\SubjectLabelHtml;
  $n=0;function check($pass,$message){global $n;$n++;if(!$pass)throw new \RuntimeException($message);}
  $manifest=json_decode(file_get_contents(__DIR__.'/../extension.json'),true);
  check(isset($manifest['Hooks']['JsonValidateSave'])&&!isset($manifest['Hooks']['EditFilter']),'Correct core hook registered');

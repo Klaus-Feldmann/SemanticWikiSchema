@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\InvalidPageTitleException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\RestCreateSubjectPagePresenter;
+use AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPageRequest;
+use AEWI\SWS\Application\Actions\CreateSubjectPage\InvalidPageTitleException;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\RestCreateSubjectPagePresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -83,11 +83,11 @@ class CreateSubjectPageApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Display label for the Subject, which on a page-first wiki also titles '
+				self::PARAM_DESCRIPTION => 'Display label for the Entity, which on a page-first wiki also titles '
 					. 'the page created for it where no pageTitle is given. Optional: omit it, or pass an empty string, '
-					. 'to create a Subject nobody named, whose page is titled after its Subject ID. A label that is not '
+					. 'to create a Entity nobody named, whose page is titled after its Entity ID. A label that is not '
 					. 'a main-namespace page title titles no page either, and is stored as the label all the same. '
-					. 'A subject-first wiki titles every page it creates after the Subject ID.',
+					. 'A subject-first wiki titles every page it creates after the Entity ID.',
 			],
 			'pageTitle' => [
 				self::PARAM_SOURCE => 'body',
@@ -102,14 +102,14 @@ class CreateSubjectPageApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Name of the Schema this Subject is an instance of.',
+				self::PARAM_DESCRIPTION => 'Name of the Schema this Entity is an instance of.',
 			],
 			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
             'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'List of Statements (property/value pairs) for the Subject. Nested shape matches the subject JSON format documented at ' . DocumentationUrl::SubjectFormat->value . '.',
+				self::PARAM_DESCRIPTION => 'List of Statements (property/value pairs) for the Entity. Nested shape matches the subject JSON format documented at ' . DocumentationUrl::SubjectFormat->value . '.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',
@@ -121,8 +121,8 @@ class CreateSubjectPageApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Optional Subject ID to assign. Must be a well-formed, unused '
-					. 'Subject ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
+				self::PARAM_DESCRIPTION => 'Optional Entity ID to assign. Must be a well-formed, unused '
+					. 'Entity ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
 					. 'mints one. Pre-mint IDs with POST /sws/v0/subject-ids to wire relations across a batch.',
 			],
 		] + $this->dependentSubjectsParamSettings() + $this->identityParamSettings();

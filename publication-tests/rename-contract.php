@@ -22,7 +22,7 @@ foreach (['en', 'de'] as $language) {
  $messages=json_decode(file_get_contents($root.'/SchemaBaseBridge/i18n/'.$language.'.json'),true,512,JSON_THROW_ON_ERROR);
  renameCheck($messages[$bridge['namemsg']]==='SchemaBaseBridge',"$language bridge display label");
 }
-$badge=ProfessionalWiki\SWS\SWSExtension::poweredByBadge('/w/extensions','1.47.0-wmf.24');
+$badge=AEWI\SWS\SWSExtension::poweredByBadge('/w/extensions','1.47.0-wmf.24');
 renameCheck($badge['alt']==='Powered by Semantic WikiSchema','badge display name');
 foreach(array_merge([$badge['src']],array_column($badge['sources']??[],'srcset'))as$url){
  renameCheck(str_starts_with($url,'/w/extensions/SemanticWikiSchema/'),'new badge path');

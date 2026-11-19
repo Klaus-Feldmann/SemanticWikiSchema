@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain;
+namespace AEWI\SWS\Domain;
 
 /** Wikipedia-convention dates in historical era numbering, without a year zero.
  * The lexical precision is significant: 1458 is not shorthand for 1458-01-01.

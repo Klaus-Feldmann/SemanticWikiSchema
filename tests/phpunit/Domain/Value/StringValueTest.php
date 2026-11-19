@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Value;
+namespace AEWI\SWS\Tests\Domain\Value;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Value\StringValue
+ * @covers \AEWI\SWS\Domain\Value\StringValue
  */
 class StringValueTest extends TestCase {
 

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRule;
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
-use ProfessionalWiki\SWS\Domain\Layout\Layout;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Layout\DisplayRule;
+use AEWI\SWS\Domain\Layout\DisplayRules;
+use AEWI\SWS\Domain\Layout\Layout;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
 
 class LayoutPersistenceDeserializer {
 

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Value;
+namespace AEWI\SWS\Tests\Domain\Value;
 
 use PHPUnit\Framework\TestCase;
 use TypeError;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\ValueType;
+use AEWI\SWS\Domain\Value\MonolingualText;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\ValueType;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue
+ * @covers \AEWI\SWS\Domain\Value\MonolingualTextValue
  */
 class MonolingualTextValueTest extends TestCase {
 

@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
  * The data languages the frontend gets wherever it loads, as every page loading it goes through the
  * extension's frontend module loader. Needs the database for the MediaWiki:SWS configuration page.
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension::getDataLanguages
- * @covers \ProfessionalWiki\SWS\Presentation\FrontendModuleLoader
+ * @covers \AEWI\SWS\SWSExtension::getDataLanguages
+ * @covers \AEWI\SWS\Presentation\FrontendModuleLoader
  * @group Database
  */
 class DataLanguagesFrontendConfigTest extends MediaWikiIntegrationTestCase {

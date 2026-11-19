@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\GraphRebuild;
+namespace AEWI\SWS\Application\GraphRebuild;
 
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
 use RuntimeException;
 
 /**

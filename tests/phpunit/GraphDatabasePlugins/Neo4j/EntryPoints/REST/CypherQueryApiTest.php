@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Permissions\Authority;
@@ -11,25 +11,25 @@ use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
 use Throwable;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryResult;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\BackendUnavailableException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\CypherSyntaxException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\EmptyQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\InternalQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\ParameterMissingException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryTimeoutException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryResult;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi
  * @group Database
  */
 class CypherQueryApiTest extends MediaWikiIntegrationTestCase {

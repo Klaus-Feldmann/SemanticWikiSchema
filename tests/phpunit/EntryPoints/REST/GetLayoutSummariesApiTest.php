@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\REST\GetLayoutSummariesApi;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetLayoutSummariesApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetLayoutSummariesApi
  * @group Database
  */
 class GetLayoutSummariesApiTest extends SWSIntegrationTestCase {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 /**
  * Where SWS sends readers in its documentation. Every link from PHP into https://github.com/Klaus-Feldmann/SemanticWikiSchema/blob/master/docs/README.md/ is one of

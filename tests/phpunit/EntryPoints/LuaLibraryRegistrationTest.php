@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Extension\Scribunto\ScribuntoContent;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onScribuntoExternalLibraries
- * @covers \ProfessionalWiki\SWS\SWSExtension::isLuaEnabled
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onScribuntoExternalLibraries
+ * @covers \AEWI\SWS\SWSExtension::isLuaEnabled
  * @group Database
  */
 class LuaLibraryRegistrationTest extends SWSIntegrationTestCase {

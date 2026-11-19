@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\SetMainSubject;
+namespace AEWI\SWS\Application\Actions\SetMainSubject;
 
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 readonly class SetMainSubjectAction {
 

@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Tests\Data\TestSources;
 
 class ExternalValueLinksTest extends TestCase {
 	public function testTargetsSurviveSerializationAndSchemaValidation(): void {

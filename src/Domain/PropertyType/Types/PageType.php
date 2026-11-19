@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\PropertyType\Types;
+namespace AEWI\SWS\Domain\PropertyType\Types;
 
-use ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Schema\Property\PageProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 class PageType extends TextType {
 	public const NAME = 'page';

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
  * @group Database
  */
 class CompositeCypherQueryValidatorIntegrationTest extends SWSIntegrationTestCase {

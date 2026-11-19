@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\RowChanges;
+use AEWI\SWS\Persistence\MediaWiki\RowChanges;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\RowChanges
+ * @covers \AEWI\SWS\Persistence\MediaWiki\RowChanges
  */
 class RowChangesTest extends TestCase {
 

@@ -1,12 +1,12 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Jobs;
+namespace AEWI\SWS\EntryPoints\Jobs;
 
 use Job;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SchemaWikitextHooks;
+use AEWI\SWS\EntryPoints\SchemaWikitextHooks;
 
 /** Indexed, bounded batches; no whole-wiki scan or SQL schema change. */
 class SchemaWikitextRefreshJob extends Job {
@@ -21,7 +21,7 @@ class SchemaWikitextRefreshJob extends Job {
 		if ( ( $this->params['page'] ?? false ) === true ) {
             try {
                 $old = isset( $this->params['movedFrom'] ) ? Title::newFromText( $this->params['movedFrom'] ) : null;
-                return ( new \ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor() )->refresh( $this->title, $old );
+                return ( new \AEWI\SWS\EntryPoints\Processing\InternalPageProcessor() )->refresh( $this->title, $old );
             } catch ( \Throwable $e ) {
                 $this->setLastError( $e->getMessage() );
                 \MediaWiki\Logger\LoggerFactory::getInstance( 'SWS' )->error( 'Internal refresh failed; previous data retained', [ 'exception' => $e ] );

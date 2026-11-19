@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Relation;
+namespace AEWI\SWS\Tests\Domain\Relation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Domain\Relation\TypedRelationList;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Tests\Data\TestRelation;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Relation\TypedRelationList
+ * @covers \AEWI\SWS\Domain\Relation\TypedRelationList
  */
 class TypedRelationListTest extends TestCase {
 

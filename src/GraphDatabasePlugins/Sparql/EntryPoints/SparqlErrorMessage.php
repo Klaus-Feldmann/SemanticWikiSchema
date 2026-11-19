@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
 
 /**
  * Maps a {@see SparqlQueryException} to the localized message that the wikitext-facing surfaces
  * ({{#sparql_raw}} and nw.sparqlQuery()) show to users. Returns the message key and its parameters
  * rather than rendered text, so each surface renders it in its own language context. Mirrors
- * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage}.
+ * {@see \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage}.
  */
 readonly class SparqlErrorMessage {
 

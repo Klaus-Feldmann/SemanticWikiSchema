@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSubject;
+namespace AEWI\SWS\Tests\Application\Queries\GetSubject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem
+ * @covers \AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem
  */
 class GetSubjectResponseItemTest extends TestCase {
 

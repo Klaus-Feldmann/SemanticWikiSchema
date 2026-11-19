@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Application\PageIdentifiersLookup;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup
  * @group Database
  */
 class DatabasePageIdentifiersLookupTest extends MediaWikiIntegrationTestCase {

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Application;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Application;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits
  * @group Database
  */
 class SparqlQueryLimitsTest extends MediaWikiIntegrationTestCase {

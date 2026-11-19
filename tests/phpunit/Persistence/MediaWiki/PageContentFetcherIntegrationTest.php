@@ -2,17 +2,17 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver
+ * @covers \AEWI\SWS\Persistence\MediaWiki\PageContentFetcher
+ * @covers \AEWI\SWS\Persistence\MediaWiki\PageContentSaver
  * @group Database
  */
 class PageContentFetcherIntegrationTest extends SWSIntegrationTestCase {

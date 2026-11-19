@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 class InMemorySchemaLookup implements SchemaLookup {
 

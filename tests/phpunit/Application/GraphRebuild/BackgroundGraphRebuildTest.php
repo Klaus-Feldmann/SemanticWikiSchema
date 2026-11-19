@@ -2,38 +2,38 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
+namespace AEWI\SWS\Tests\Application\GraphRebuild;
 
 use Closure;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToCancelException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\CancellingRebuildBatchObserver;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\Application\GraphRebuild\NothingToCancelException;
+use AEWI\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
+use AEWI\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use AEWI\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\CancellingRebuildBatchObserver;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use TestLogger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator
- * @covers \ProfessionalWiki\SWS\EntryPoints\Jobs\GraphRebuildJob
- * @covers \ProfessionalWiki\SWS\Infrastructure\MediaWikiRebuildJobQueue
+ * @covers \AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator
+ * @covers \AEWI\SWS\EntryPoints\Jobs\GraphRebuildJob
+ * @covers \AEWI\SWS\Infrastructure\MediaWikiRebuildJobQueue
  * @group Database
  */
 class BackgroundGraphRebuildTest extends SWSIntegrationTestCase {

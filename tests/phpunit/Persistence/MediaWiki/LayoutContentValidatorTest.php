@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutContentValidator;
+use AEWI\SWS\Persistence\MediaWiki\LayoutContentValidator;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutContentValidator
+ * @covers \AEWI\SWS\Persistence\MediaWiki\LayoutContentValidator
  */
 class LayoutContentValidatorTest extends TestCase {
 

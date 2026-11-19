@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Search;
+namespace AEWI\SWS\EntryPoints\Search;
 
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Makes one of MediaWiki's own database search engines index a page's Subjects along with its text.

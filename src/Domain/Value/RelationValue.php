@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Value;
+namespace AEWI\SWS\Domain\Value;
 
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Relation\Relation;
 
 readonly class RelationValue implements NeoValue {
 

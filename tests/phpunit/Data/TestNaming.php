@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Application\HostSubjectBuilder;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Application\HostSubjectBuilder;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 class TestNaming {
 

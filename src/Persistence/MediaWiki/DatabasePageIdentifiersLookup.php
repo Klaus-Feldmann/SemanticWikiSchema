@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\TitleFormatter;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Application\PageIdentifiersLookup;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
 use stdClass;
 use Wikimedia\Rdbms\IReadableDatabase;
 

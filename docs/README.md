@@ -1,6 +1,6 @@
 # SWS Documentation
 
-[Install SWS 0.5.02](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
+[Install SWS 0.4.03](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 
@@ -83,6 +83,6 @@ For the people who operate the server.
 
 * [Schemaeigene Feldkennungen](authoring/field-identifiers.md)
 
-## Complete reference
+* [Suchuntertitel](authoring/search-subtitles.md) — Rangfolge und automatische SMW-Kurzbeschreibung.
 
-* [Features and complete configuration](reference/SWS-0.5.02.en.md) · [Deutsch](reference/SWS-0.5.02.de.md)
+- [Configurable outward names](operations/naming.md): set system property names before entering data.

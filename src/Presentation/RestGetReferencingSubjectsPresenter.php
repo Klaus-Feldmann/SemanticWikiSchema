@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\ReferencingSubject;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\ReferencingSubject;
 
 class RestGetReferencingSubjectsPresenter implements GetReferencingSubjectsPresenter {
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialLayouts;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialLayouts;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialLayouts
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialLayouts
  */
 class SpecialLayoutsTest extends SpecialPageTestBase {
 

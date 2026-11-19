@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Content;
@@ -11,7 +11,7 @@ use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Storage\PageUpdater;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageId;
 use WikiPage;
 
 class PageContentSaver {

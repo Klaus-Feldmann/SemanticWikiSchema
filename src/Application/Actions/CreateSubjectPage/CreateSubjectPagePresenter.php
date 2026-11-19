@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage;
+namespace AEWI\SWS\Application\Actions\CreateSubjectPage;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 interface CreateSubjectPagePresenter {
 

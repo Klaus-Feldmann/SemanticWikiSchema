@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 use OutOfBoundsException;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
 
 class PropertyDefinitions {
 

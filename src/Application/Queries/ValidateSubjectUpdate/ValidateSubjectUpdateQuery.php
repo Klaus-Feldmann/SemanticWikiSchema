@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\ValidateSubjectUpdate;
+namespace AEWI\SWS\Application\Queries\ValidateSubjectUpdate;
 
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Validation\Violation;
 
 readonly class ValidateSubjectUpdateQuery {
 

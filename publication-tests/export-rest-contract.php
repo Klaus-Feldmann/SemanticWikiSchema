@@ -1,5 +1,5 @@
 <?php
-namespace { require __DIR__.'/lookup-contract.php'; }
+namespace { require_once __DIR__.'/message-fixture.php'; require __DIR__.'/lookup-contract.php'; }
 namespace MediaWiki\Context {
  class RequestContext {public static function getMain(){return new \Harness\Context();}}
  class DerivativeContext implements IContextSource {
@@ -35,7 +35,7 @@ namespace {
  $context=new \Harness\Context();$page=new \SWSBaseBridge\ExportPageDataViewApi(['format'=>'json','language'=>'de'],$context);
  $r=$page->run(42);check($r->status===200,'JSON page succeeds');$view=json_decode((string)$r->body,true,512,JSON_THROW_ON_ERROR);
  check(count($view['subjects'])===2,'all page subjects');check($view['complete']===true,'complete snapshot');
- check($r->headers['Content-Type']==='application/json; charset=utf-8','JSON mime');check(str_contains($r->headers['Content-Disposition'],'page-42-data-view.json'),'filename');
+ check($r->headers['Content-Type']==='application/json; charset=utf-8','JSON mime');check(str_contains($r->headers['Content-Disposition'],'seite-42-datenansicht.json'),'filename');
  $page->applyCacheControl($r);check($r->headers['Cache-Control']==='private,no-store','private no-store after core cache policy');check($page->needsWriteAccess()===false,'read only');
  foreach(['turtle'=>'text/turtle','trig'=>'application/trig']as$format=>$mime){
   $api=new \SWSBaseBridge\ExportPageDataViewApi(['format'=>$format,'language'=>'de'],$context);$r=$api->run(42);

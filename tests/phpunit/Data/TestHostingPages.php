@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 class TestHostingPages {
 

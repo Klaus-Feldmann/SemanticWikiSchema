@@ -16,7 +16,7 @@ namespace MediaWiki\User {
         public function authorizeRead(string $action,mixed $title): bool { return (new \MediaWiki\Context\TestContext())->getAuthority()->authorizeRead($action,$title); }
     }
 }
-namespace ProfessionalWiki\SWS\EntryPoints\Semantic {
+namespace AEWI\SWS\EntryPoints\Semantic {
     // SMW handler boundary only: AutomaticAnnotations, the shared reader and both planners remain real.
     class SmwAnnotationApplier {
         public static mixed $plan;

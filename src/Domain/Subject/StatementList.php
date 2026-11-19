@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Subject;
+namespace AEWI\SWS\Domain\Subject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelation;
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\Relation\TypedRelation;
+use AEWI\SWS\Domain\Relation\TypedRelationList;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
 
 readonly class StatementList {
 
@@ -94,7 +94,7 @@ readonly class StatementList {
 	}
 
 	public function getStatement( PropertyName $property ): ?Statement {
-		$key = \ProfessionalWiki\SWS\Domain\Schema\FieldNameResolver::resolve( $property, $this->statements );
+		$key = \AEWI\SWS\Domain\Schema\FieldNameResolver::resolve( $property, $this->statements );
 		return $key === null ? null : $this->statements[$key];
 	}
 

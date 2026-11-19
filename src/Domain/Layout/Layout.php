@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Layout;
+namespace AEWI\SWS\Domain\Layout;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 readonly class Layout {
 
@@ -13,7 +13,7 @@ readonly class Layout {
 	 */
 	public function __construct(
 		private LayoutName $name,
-		private SchemaName|\ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema,
+		private SchemaName|\AEWI\SWS\Domain\Schema\SchemaReference $schema,
 		private string $type,
 		private string $description,
 		private DisplayRules $displayRules,
@@ -29,8 +29,8 @@ readonly class Layout {
 		return $this->schema instanceof SchemaName ? $this->schema : $this->schema->name;
 	}
 
-    public function getSchemaReference(): \ProfessionalWiki\SWS\Domain\Schema\SchemaReference {
-        return $this->schema instanceof SchemaName ? \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::local($this->schema) : $this->schema;
+    public function getSchemaReference(): \AEWI\SWS\Domain\Schema\SchemaReference {
+        return $this->schema instanceof SchemaName ? \AEWI\SWS\Domain\Schema\SchemaReference::local($this->schema) : $this->schema;
     }
 
 	public function getType(): string {

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Presentation\JsonSchemaSerializer;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
 use stdClass;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer
+ * @covers \AEWI\SWS\Presentation\JsonSchemaSerializer
  */
 class JsonSchemaSerializerTest extends TestCase {
 

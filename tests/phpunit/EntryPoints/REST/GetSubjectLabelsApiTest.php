@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages the Subjects are saved on and the database the suggestions are
  * read from.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectLabelsApi
  * @group Database
  */
 class GetSubjectLabelsApiTest extends SWSIntegrationTestCase {

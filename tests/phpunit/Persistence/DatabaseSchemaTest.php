@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence;
+namespace AEWI\SWS\Tests\Persistence;
 
 use GenerateSchemaChangeSql;
 use GenerateSchemaSql;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphStoreName;
+use AEWI\SWS\Domain\GraphDatabase\GraphStoreName;
 
 /**
  * The per-DBMS SQL that update.php applies is generated from the abstract schema and committed

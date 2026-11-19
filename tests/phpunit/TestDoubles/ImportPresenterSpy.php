@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPresenter;
 
 class ImportPresenterSpy implements ImportPresenter {
 

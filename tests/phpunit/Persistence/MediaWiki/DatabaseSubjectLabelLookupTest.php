@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectLabelLookupResult;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectLabelLookupResult;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
 class DatabaseSubjectLabelLookupTest extends SWSIntegrationTestCase {

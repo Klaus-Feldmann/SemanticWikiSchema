@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Application\IdentityMigration\{MigrationFieldDefinitionSelector as Selector,MigrationFieldRepairScope as Scope,MigrationFieldAdditionLog as Log,ReferenceRewriter};
+use AEWI\SWS\Application\IdentityMigration\{MigrationFieldDefinitionSelector as Selector,MigrationFieldRepairScope as Scope,MigrationFieldAdditionLog as Log,ReferenceRewriter};
 
 $nAuto=0;function autoCheck(bool $ok,string $why):void{global $nAuto;$nAuto++;if(!$ok)throw new RuntimeException($why);}
 $p31=(object)['type'=>'text','required'=>false,'externalProperty'=>(object)['source'=>'wikidata','id'=>'P31']];

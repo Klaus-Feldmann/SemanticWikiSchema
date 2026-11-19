@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jOrphanCandidates;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Relation\TypedRelationList;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jOrphanCandidates;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Drives the relation reconciliation for a single Subject. The multi-Subject batching it exists for
  * is covered by Neo4jProjectionStoreTest, which saves whole pages.
  *
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jPageRelationUpdater
  * @group Database
  */
 class Neo4jPageRelationUpdaterTest extends SWSIntegrationTestCase {

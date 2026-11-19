@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\TextType
  */
 class TextTypeValidateTest extends TestCase {
 

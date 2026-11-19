@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Source;
+namespace AEWI\SWS\Tests\Application\Source;
 
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Application\Source\SourceRoutingSubjectLookup;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Source\SourceRoutingSubjectLookup
+ * @covers \AEWI\SWS\Application\Source\SourceRoutingSubjectLookup
  */
 class SourceRoutingSubjectLookupTest extends TestCase {
 

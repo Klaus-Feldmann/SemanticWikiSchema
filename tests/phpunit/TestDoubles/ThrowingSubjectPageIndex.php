@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\SubjectPageIndex;
 use RuntimeException;
 
 /**

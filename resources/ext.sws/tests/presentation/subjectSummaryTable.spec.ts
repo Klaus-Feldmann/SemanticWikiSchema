@@ -82,7 +82,7 @@ describe( 'subjectSummaryTable', () => {
 	} );
 
 	it( 'links to the Subject\'s row on its page\'s Data tab on a page-first wiki', () => {
-		expect( summaryUrl( SUMMARY ) ).toBe( '/wiki/Sinclair ZX Spectrum?action=subjects#s1demo1aaaaaaa1' );
+		expect( summaryUrl( SUMMARY ) ).toBe( '/wiki/Sinclair ZX Spectrum?action=entities#s1demo1aaaaaaa1' );
 	} );
 
 	it( 'says how long before now the page was last edited', () => {

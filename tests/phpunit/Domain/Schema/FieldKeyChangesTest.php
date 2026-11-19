@@ -1,12 +1,12 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\{ FieldKeyChanges, SchemaReference, DuplicateFieldNumbers };
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Identity\SchemaId;
-use ProfessionalWiki\SWS\Application\Semantic\FieldAnnotationName;
+use AEWI\SWS\Domain\Schema\{ FieldKeyChanges, SchemaReference, DuplicateFieldNumbers };
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Identity\SchemaId;
+use AEWI\SWS\Application\Semantic\FieldAnnotationName;
 
 final class FieldKeyChangesTest extends TestCase {
  public function testTransfersValuesNotesAndEverySnapshotLanguageWithoutRewritingText(): void {

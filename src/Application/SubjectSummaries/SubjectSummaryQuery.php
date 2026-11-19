@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
+namespace AEWI\SWS\Application\SubjectSummaries;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 readonly class SubjectSummaryQuery {
 

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
-use ProfessionalWiki\SWS\Presentation\SubjectSummarySerializer;
+use AEWI\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
+use AEWI\SWS\Presentation\SubjectSummarySerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -38,7 +38,7 @@ class GetRecentlyEditedSubjectsApi extends SimpleHandler {
 				ParamValidator::PARAM_DEFAULT => 10,
 				IntegerDef::PARAM_MIN => 1,
 				IntegerDef::PARAM_MAX => 50,
-				self::PARAM_DESCRIPTION => 'Maximum number of Subjects to return.',
+				self::PARAM_DESCRIPTION => 'Maximum number of Entities to return.',
 			],
 		];
 	}

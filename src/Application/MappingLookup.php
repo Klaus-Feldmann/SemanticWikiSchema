@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
 
 interface MappingLookup {
 

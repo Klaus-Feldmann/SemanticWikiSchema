@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use RuntimeException;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction
+ * @covers \AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingAction
  */
 class SetSubjectsOrderingActionTest extends TestCase {
 

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfSerializer;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * Exports one Subject's outbound bounded description as a self-contained RDF document, placed in the

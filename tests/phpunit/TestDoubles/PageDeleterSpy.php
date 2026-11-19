@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use MediaWiki\Page\ProperPageIdentity;
-use ProfessionalWiki\SWS\Persistence\PageDeleter;
-use ProfessionalWiki\SWS\Persistence\PageDeletionStatus;
+use AEWI\SWS\Persistence\PageDeleter;
+use AEWI\SWS\Persistence\PageDeletionStatus;
 
 class PageDeleterSpy implements PageDeleter {
 

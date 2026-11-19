@@ -1,14 +1,14 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\Property\WikitextValueProperty;
+use AEWI\SWS\Domain\Schema\PropertyName;
 
 /** All saved field metadata is staged before the existing complete-revision commit gate. */
 final class UserWikitextProcessor {

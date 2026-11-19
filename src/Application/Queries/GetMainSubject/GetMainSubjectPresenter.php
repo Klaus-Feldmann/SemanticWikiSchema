@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetMainSubject;
+namespace AEWI\SWS\Application\Queries\GetMainSubject;
 
 interface GetMainSubjectPresenter {
 

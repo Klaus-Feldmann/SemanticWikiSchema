@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
+namespace AEWI\SWS\Tests\Domain\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Subject\StatementList
+ * @covers \AEWI\SWS\Domain\Subject\StatementList
  */
 class StatementListTest extends TestCase {
 

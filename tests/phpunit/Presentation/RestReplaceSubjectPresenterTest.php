@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Presentation\RestReplaceSubjectPresenter;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Presentation\RestReplaceSubjectPresenter;
+use AEWI\SWS\Tests\Data\TestSchema;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\RestReplaceSubjectPresenter
+ * @covers \AEWI\SWS\Presentation\RestReplaceSubjectPresenter
  */
 class RestReplaceSubjectPresenterTest extends TestCase {
 

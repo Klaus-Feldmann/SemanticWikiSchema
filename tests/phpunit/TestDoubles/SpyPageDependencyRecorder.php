@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 
 class SpyPageDependencyRecorder implements PageDependencyRecorder {
 

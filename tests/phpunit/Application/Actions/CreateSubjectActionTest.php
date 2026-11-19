@@ -2,58 +2,58 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectRequest;
-use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
-use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\UnregisteredTypeProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectAction;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectRequest;
+use AEWI\SWS\Application\DependentSubjectBuilder;
+use AEWI\SWS\Application\NewSubjectIdResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Validation\DependentSubjectValidator;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\Property\SelectOption;
+use AEWI\SWS\Domain\Schema\Property\SelectProperty;
+use AEWI\SWS\Domain\Schema\Property\UnregisteredTypeProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubIdGenerator;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use RuntimeException;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction
+ * @covers \AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectAction
  */
 class CreateSubjectActionTest extends TestCase {
 
@@ -176,9 +176,9 @@ class CreateSubjectActionTest extends TestCase {
 
 	public function testD8NewEntityStartsAtTheCurrentSchemaKeyVersion(): void {
 		$this->subjectRepository->savePageSubjects( PageSubjects::newEmpty(), new PageId( 1 ) );
-		$this->schemaLookup->updateSchema( new \ProfessionalWiki\SWS\Domain\Schema\Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [] ), false, fieldKeyChanges: [ [ 'Alt' => 'N1' ] ] ) );
+		$this->schemaLookup->updateSchema( new \AEWI\SWS\Domain\Schema\Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [] ), false, fieldKeyChanges: [ [ 'Alt' => 'N1' ] ] ) );
 		$this->newCreateSubjectAction()->createSubject( new CreateSubjectRequest( pageId: 1, isMainSubject: true, label: 'Test', schemaName: 'Person', statements: [] ) );
-		$subject = $this->subjectRepository->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $this->presenterSpy->result ) );
+		$subject = $this->subjectRepository->getSubject( new \AEWI\SWS\Domain\Subject\SubjectId( $this->presenterSpy->result ) );
 		$this->assertSame( 1, $subject->getFieldKeyVersion() );
 	}
 

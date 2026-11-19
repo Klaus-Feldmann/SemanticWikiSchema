@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
 
 use Exception;
 use Laudis\Neo4j\Databags\Neo4jError;
@@ -12,19 +12,19 @@ use Laudis\Neo4j\Types\CypherMap;
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Parser;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
+use AEWI\SWS\Application\RawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use AEWI\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction
  */
 class CypherRawParserFunctionTest extends TestCase {
 

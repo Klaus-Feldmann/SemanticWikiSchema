@@ -5,8 +5,8 @@ namespace SWSBaseBridge;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 use RuntimeException;
 use Throwable;
 
@@ -22,7 +22,7 @@ final class DataViewLookup {
 			throw new RuntimeException( 'Data view unavailable' );
 		}
 		$extension = SWSExtension::getInstance();
-		$sourceMode = \ProfessionalWiki\SWS\Application\Source\SourceDataMode::current();
+		$sourceMode = \AEWI\SWS\Application\Source\SourceDataMode::current();
 		$page = $sourceMode === 'store' ? $this->store()->page( $title ) :
 			$extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $title->getArticleID() ) );
 		$subjects = $page->getAllSubjects()->asArray();
@@ -42,7 +42,7 @@ final class DataViewLookup {
 				if ( $host !== null ) {
 					$targetTitle = Title::newFromID( $host->getId()->id );
 					$targetPage = $sourceMode === 'store'
-						? ( $targetTitle !== null ? $this->store()->page( $targetTitle ) : \ProfessionalWiki\SWS\Domain\Page\PageSubjects::newEmpty() )
+						? ( $targetTitle !== null ? $this->store()->page( $targetTitle ) : \AEWI\SWS\Domain\Page\PageSubjects::newEmpty() )
 						: $extension->newPageSubjectsLookup()->getPageSubjects( $host->getId() );
 					$target = $targetPage->getAllSubjects()->getSubject( $subjectId );
 					if ( $target !== null ) {
@@ -109,7 +109,7 @@ final class DataViewLookup {
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $language ) !== 1 ) {
 			throw new RuntimeException( 'Identity descriptions unavailable' );
 		}
-		if ( \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() ) {
+		if ( \AEWI\SWS\Application\Source\SourceDataMode::usesStore() ) {
 			return $this->store()->identities( $title, $language );
 		}
 		$identities = [];

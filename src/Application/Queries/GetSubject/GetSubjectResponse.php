@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetSubject;
+namespace AEWI\SWS\Application\Queries\GetSubject;
 
 readonly class GetSubjectResponse {
 

@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 use MediaWiki\Title\TitleValue;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup
  * @group Database
  */
 class DatabaseSchemaNameLookupTest extends SWSIntegrationTestCase {

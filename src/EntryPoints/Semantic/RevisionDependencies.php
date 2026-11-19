@@ -1,12 +1,12 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\EntryPoints\Semantic;
+namespace AEWI\SWS\EntryPoints\Semantic;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\SWSExtension;
 
 /** Full revision output is a merge of slot outputs, not necessarily Parser::getOutput(). */
 final class RevisionDependencies implements PageDependencyRecorder {

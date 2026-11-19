@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceNormalizer;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceNormalizer;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Derives the name from the Schema page's title, so MediaWiki's own rules apply: the first character

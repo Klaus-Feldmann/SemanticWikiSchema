@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 /** Exact technical-key lookup in one schema/snapshot. Labels are never identifiers. */
 final class FieldNameResolver {

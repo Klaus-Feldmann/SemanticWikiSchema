@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Value;
+namespace AEWI\SWS\Domain\Value;
 
 interface NeoValue {
 

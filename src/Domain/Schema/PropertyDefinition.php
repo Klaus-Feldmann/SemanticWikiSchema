@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Domain\Schema\Property\UnregisteredTypeProperty;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Validation\SeverityNormalizer;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Domain\Schema\Property\UnregisteredTypeProperty;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\SeverityNormalizer;
 use Throwable;
 
 abstract class PropertyDefinition {
@@ -198,7 +198,7 @@ abstract class PropertyDefinition {
 	private static function labelsFromJson( mixed $json ): array {
 		$labels = [];
 		foreach ( is_array( $json ) ? $json : [] as $language => $label ) {
-			if ( is_string( $language ) && \ProfessionalWiki\SWS\Domain\LanguageTag::isValid( $language ) && is_string( $label ) && trim( $label ) !== '' ) {
+			if ( is_string( $language ) && \AEWI\SWS\Domain\LanguageTag::isValid( $language ) && is_string( $label ) && trim( $label ) !== '' ) {
 				$labels[strtolower( $language )] = trim( $label );
 			}
 		}

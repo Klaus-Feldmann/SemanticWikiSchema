@@ -3,8 +3,8 @@
 declare( strict_types = 1 );
 namespace SWSBaseBridge;
 
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
 
 final class WikidataPagePropertyProvider implements PagePropertyProvider {
 	public function getProperties( PagePropertyProviderContext $context ): array {

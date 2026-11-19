@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects;
+namespace AEWI\SWS\Application\Queries\GetReferencingSubjects;
 
 readonly class GetReferencingSubjectsResponse {
 

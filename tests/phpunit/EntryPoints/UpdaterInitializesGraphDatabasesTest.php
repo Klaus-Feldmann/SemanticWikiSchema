@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Installer\DatabaseUpdater;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use TestLogger;
 
 /**
@@ -17,8 +17,8 @@ use TestLogger;
  * is not part of that routine. The Neo4j uniqueness constraints are what the projection's id lookups
  * seek on, so a wiki that never got them pays a scan per lookup.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::initializeGraphDatabases
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::initializeGraphDatabases
  * @group Database
  */
 class UpdaterInitializesGraphDatabasesTest extends SWSIntegrationTestCase {

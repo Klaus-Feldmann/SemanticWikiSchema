@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\TextType
  */
 class TextTypeTest extends TestCase {
 

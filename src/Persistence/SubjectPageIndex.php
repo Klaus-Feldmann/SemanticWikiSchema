@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence;
+namespace AEWI\SWS\Persistence;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageId;
 
 /**
- * The write side of the subject -> page index that {@see \ProfessionalWiki\SWS\Application\PageIdentifiersLookup}
+ * The write side of the subject -> page index that {@see \AEWI\SWS\Application\PageIdentifiersLookup}
  * reads (ADR 32).
  */
 interface SubjectPageIndex {

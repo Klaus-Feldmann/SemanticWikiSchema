@@ -6,13 +6,13 @@ $bridge=json_decode(file_get_contents($root.'/SchemaBaseBridge/extension.json'),
 $composer=json_decode(file_get_contents($root.'/composer.json'),true,512,JSON_THROW_ON_ERROR);
 function swsRenameCheck(bool $pass,string $message):void {if(!$pass)throw new RuntimeException($message);}
 swsRenameCheck($main['name']==='SemanticWikiSchema','Public extension name');
-swsRenameCheck(isset($composer['autoload']['psr-4']['ProfessionalWiki\\SWS\\']),'PHP namespace');
+swsRenameCheck(isset($composer['autoload']['psr-4']['AEWI\\SWS\\']),'PHP namespace');
 foreach($main['ContentHandlers']as$model=>$class){swsRenameCheck(str_starts_with($model,'SWS'),'Content model '.$model);}
-swsRenameCheck(\ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository::SLOT_NAME==='sws','Subject slot');
+swsRenameCheck(\AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository::SLOT_NAME==='sws','Subject slot');
 foreach($main['RestRoutes']as$route){
  $legacyEntity=$route['path']==='/neowiki/v0/entity/{subjectId}';
  swsRenameCheck(str_starts_with($route['path'],'/sws/')||$legacyEntity,'REST route '.$route['path']);
- if($legacyEntity){swsRenameCheck($route['method']===['GET']&&$route['factory']==='ProfessionalWiki\\SWS\\SWSExtension::newResolveSubjectIriApi','Only the intentional old entity-link resolver is retained');}
+ if($legacyEntity){swsRenameCheck($route['method']===['GET']&&$route['factory']==='AEWI\\SWS\\SWSExtension::newResolveSubjectIriApi','Only the intentional old entity-link resolver is retained');}
 }
 foreach($bridge['RestRoutes']as$route){swsRenameCheck(str_starts_with($route['path'],'/swsbase/'),'Bridge route');}
 foreach(['sws_subject','sws_relation','sws_subject_page','sws_rebuild_runs']as$table){

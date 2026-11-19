@@ -3,11 +3,11 @@
 declare( strict_types = 1 );
 namespace SWSBaseBridge;
 
-use ProfessionalWiki\SWS\Domain\HistoricalDate;
-use ProfessionalWiki\SWS\Domain\LanguageTag;
-use ProfessionalWiki\SWS\Domain\Rdf\{Iri, Literal, Quad, QuadList, RdfNamespaces, RdfTerm};
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\HistoricalDate;
+use AEWI\SWS\Domain\LanguageTag;
+use AEWI\SWS\Domain\Rdf\{Iri, Literal, Quad, QuadList, RdfNamespaces, RdfTerm};
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /** Read-time snapshot only. No graph-store projection or writes to research data. */
 final class DataViewRdfProjector {
@@ -47,14 +47,14 @@ final class DataViewRdfProjector {
 			}
             $reference = null;
             try {
-                $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::fromJson( $subject['schema'], 'local' );
-                if ( isset( $subject['schemaIdentity']['id'] ) ) { $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $subject['schemaIdentity']['id'] ), $reference->source ); }
+                $reference = \AEWI\SWS\Domain\Schema\SchemaReference::fromJson( $subject['schema'], 'local' );
+                if ( isset( $subject['schemaIdentity']['id'] ) ) { $reference = \AEWI\SWS\Domain\Schema\SchemaReference::identified( new \AEWI\SWS\Domain\Identity\SchemaId( $subject['schemaIdentity']['id'] ), $reference->source ); }
                 // A foreign schema reference retains its source in a disjoint class-IRI namespace.
                 $this->add( $subjectIri, RdfNamespaces::RDF . 'type', $reference->id === null ? $this->namespaces->schemaClass( $reference->name, $reference->source ) : $this->namespaces->identifiedSchemaClass( $reference->id, $reference->source ), $effectiveGraph );
             } catch ( \InvalidArgumentException ) { /* Incomplete data views retain their status instead of inventing a type. */ }
             if ( isset( $subject['identityLanguage'], $subject['labels'], $subject['descriptions'] ) ) {
-                foreach ( \ProfessionalWiki\SWS\Application\Rdf\IdentityRdfMetadata::quads( $subjectIri,
-                    \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( [ 'identityLanguage'=>$subject['identityLanguage'], 'labels'=>(array)$subject['labels'], 'descriptions'=>(array)$subject['descriptions'] ] ), $effectiveGraph ) as $quad ) { $this->quads[] = $quad; }
+                foreach ( \AEWI\SWS\Application\Rdf\IdentityRdfMetadata::quads( $subjectIri,
+                    \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromJson( [ 'identityLanguage'=>$subject['identityLanguage'], 'labels'=>(array)$subject['labels'], 'descriptions'=>(array)$subject['descriptions'] ] ), $effectiveGraph ) as $quad ) { $this->quads[] = $quad; }
             }
 
 			if ( is_string( $subject['displayName'] ?? null ) ) {

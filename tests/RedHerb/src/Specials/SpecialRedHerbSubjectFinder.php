@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb\Specials;
+namespace AEWI\RedHerb\Specials;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 class SpecialRedHerbSubjectFinder extends SpecialPage {
 

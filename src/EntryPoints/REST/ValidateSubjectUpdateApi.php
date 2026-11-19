@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\ViolationSerializer;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\ViolationSerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class ValidateSubjectUpdateApi extends SimpleHandler {
@@ -47,7 +47,7 @@ class ValidateSubjectUpdateApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 		];
 	}

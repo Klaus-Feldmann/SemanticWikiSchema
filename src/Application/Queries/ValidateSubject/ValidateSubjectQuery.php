@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\ValidateSubject;
+namespace AEWI\SWS\Application\Queries\ValidateSubject;
 
-use ProfessionalWiki\SWS\Application\Schema\Exception\SchemaNotFoundException;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Schema\Exception\SchemaNotFoundException;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\Validation\Violation;
 
 readonly class ValidateSubjectQuery {
 

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\RedHerb\RedHerbGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\RedHerb\RedHerbGraphDatabasePlugin;
 
 /**
  * Proves that the graph-database plugin registry actually dispatches page events to
@@ -23,9 +23,9 @@ use ProfessionalWiki\RedHerb\RedHerbGraphDatabasePlugin;
  * save/delete events that the hook-facing wiring fanned out to it, passing cleanly through
  * the per-plugin failure isolation.
  *
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry
+ * @covers \AEWI\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin
+ * @covers \AEWI\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+ * @covers \AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry
  * @group Database
  */
 class ExtensionGraphDatabasePluginDispatchTest extends SWSIntegrationTestCase {

@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 /** A field parse must not append its host's schema programs recursively. */
 final class FieldWikitextContext {

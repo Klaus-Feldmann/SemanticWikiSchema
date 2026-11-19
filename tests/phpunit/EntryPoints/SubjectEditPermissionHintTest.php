@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
  * @group Database
  */
 class SubjectEditPermissionHintTest extends SWSIntegrationTestCase {

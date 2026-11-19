@@ -1,14 +1,14 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\Value;
+namespace AEWI\SWS\Tests\Domain\Value;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Value\UrlValue;
-use ProfessionalWiki\SWS\Domain\Value\ValueType;
+use AEWI\SWS\Domain\Value\UrlValue;
+use AEWI\SWS\Domain\Value\ValueType;
 use InvalidArgumentException;
 class UrlValueTest extends TestCase {
  public function testNativeLuaConvenienceAndStructuredViewsAgree(): void {
-  $class = new \ReflectionClass(\ProfessionalWiki\SWS\EntryPoints\Scribunto\SubjectDataLookup::class);
+  $class = new \ReflectionClass(\AEWI\SWS\EntryPoints\Scribunto\SubjectDataLookup::class);
   $lookup = $class->newInstanceWithoutConstructor();
   $entry = ['url'=>'https://example.org/?a=1&b=2','label'=>'Title','caption'=>'Source','captionPage'=>'Vermerk:Quelle'];
   $value = new UrlValue([$entry]);
@@ -18,14 +18,14 @@ class UrlValueTest extends TestCase {
  }
  public function testNeo4jProjectionPreservesTheWholeRecord(): void {
   $entry = ['url'=>'https://example.org','label'=>'Title','caption'=>'Source','captionPage'=>'Vermerk:Quelle'];
-  $registry = \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders();
+  $registry = \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry::withCoreBuilders();
   $stored = $registry->buildNeo4jValue('url',new UrlValue([$entry]));
   $this->assertSame([$entry['url']],$stored);
-  $class = new \ReflectionClass(\ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdater::class);
+  $class = new \ReflectionClass(\AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdater::class);
   $updater = $class->newInstanceWithoutConstructor();
   $class->getProperty('valueBuilderRegistry')->setValue($updater,$registry);
-  $statement = new \ProfessionalWiki\SWS\Domain\Statement(new \ProfessionalWiki\SWS\Domain\Schema\PropertyName('Source'),'url',new UrlValue([$entry]));
-  $props = $updater->statementsToNodeProperties(new \ProfessionalWiki\SWS\Domain\Subject\StatementList([$statement]));
+  $statement = new \AEWI\SWS\Domain\Statement(new \AEWI\SWS\Domain\Schema\PropertyName('Source'),'url',new UrlValue([$entry]));
+  $props = $updater->statementsToNodeProperties(new \AEWI\SWS\Domain\Subject\StatementList([$statement]));
   $this->assertSame([$entry['url']],$props['Source']);
   $this->assertSame(['Source'=>[$entry]],json_decode($props['#sws:urlEntries'],true,512,JSON_THROW_ON_ERROR));
  }

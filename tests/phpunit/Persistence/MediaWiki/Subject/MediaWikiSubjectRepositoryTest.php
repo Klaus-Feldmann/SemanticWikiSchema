@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Application\DependentSubjectGuard;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
  * @group Database
  */
 class MediaWikiSubjectRepositoryTest extends SWSIntegrationTestCase {

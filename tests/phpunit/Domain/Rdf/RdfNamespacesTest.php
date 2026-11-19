@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
+namespace AEWI\SWS\Tests\Domain\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces
+ * @covers \AEWI\SWS\Domain\Rdf\RdfNamespaces
  */
 class RdfNamespacesTest extends TestCase {
 

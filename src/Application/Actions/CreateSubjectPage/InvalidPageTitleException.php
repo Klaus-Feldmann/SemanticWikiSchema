@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage;
+namespace AEWI\SWS\Application\Actions\CreateSubjectPage;
 
 use InvalidArgumentException;
 

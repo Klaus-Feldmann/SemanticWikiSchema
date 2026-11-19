@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use MediaWiki\Maintenance\Maintenance;
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 use Throwable;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;

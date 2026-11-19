@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema\Property;
+namespace AEWI\SWS\Domain\Schema\Property;
 
 use DateTimeImmutable;
 use Exception;
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\PropertyType\Types\DateTimeType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
 
 class DateTimeProperty extends PropertyDefinition {
 

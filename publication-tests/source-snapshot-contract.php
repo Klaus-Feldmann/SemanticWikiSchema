@@ -4,27 +4,27 @@ declare( strict_types = 1 );
 
 require __DIR__ . '/bootstrap.php';
 
-use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
-use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
-use ProfessionalWiki\SWS\Application\Source\SourceSnapshotEditGuard;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
-use ProfessionalWiki\SWS\Tests\Data\{ TestNaming, TestRelation, TestSchema, TestSources, TestSubjectIds };
-use ProfessionalWiki\SWS\Tests\TestDoubles\{ InMemoryPageIdentifiersLookup, InMemorySchemaLookup, StubIdGenerator };
+use AEWI\SWS\Application\DependentSubjectBuilder;
+use AEWI\SWS\Application\NewSubjectIdResolver;
+use AEWI\SWS\Application\Source\SourceSnapshotEditGuard;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use AEWI\SWS\Tests\Data\{ TestNaming, TestRelation, TestSchema, TestSources, TestSubjectIds };
+use AEWI\SWS\Tests\TestDoubles\{ InMemoryPageIdentifiersLookup, InMemorySchemaLookup, StubIdGenerator };
 use SWSBaseBridge\TimeClaimView;
 
 $checks = 0;
@@ -147,7 +147,7 @@ $dependentId = new SubjectId( 'sBirth111111111' );
 $dependentSnapshotData = $first->toJson(); $dependentSnapshotData['subjectId'] = $dependentId->text;
 $dependent = new Subject( $dependentId, null, TestSchema::reference( 'Birth' ), new StatementList(), sourceSnapshot: SourceSnapshot::fromJson( $dependentSnapshotData ) );
 $host = new Subject( new SubjectId( 'sPerson11111111' ), null, TestSchema::reference( 'Person' ), new StatementList( [
-	new Statement( new PropertyName( 'Birth' ), 'relation', new \ProfessionalWiki\SWS\Domain\Value\RelationValue( TestRelation::build( targetId: $dependentId->text ) ) ),
+	new Statement( new PropertyName( 'Birth' ), 'relation', new \AEWI\SWS\Domain\Value\RelationValue( TestRelation::build( targetId: $dependentId->text ) ) ),
 ] ) );
 $item = [ 'id' => $dependentId->text, 'schema' => 'Birth', 'statements' => [] ];
 $rebuilt = $builder->build( [ $item ], $host->id, new PageSubjects( $host, new SubjectMap( $dependent ) ) )->getSubject( $dependentId );

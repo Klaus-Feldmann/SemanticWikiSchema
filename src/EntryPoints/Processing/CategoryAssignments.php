@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle;
-use ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\PropertyType\Types\LocalPageTitle;
+use AEWI\SWS\Domain\Schema\Property\PageProperty;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Subject\Subject;
 
 /** Adds selected categories to a fresh full-revision output, never editing source wikitext. */
 final class CategoryAssignments {
@@ -25,7 +25,7 @@ final class CategoryAssignments {
                 if ( !$property instanceof PageProperty || !$property->assignsCategories() ) {
                     continue;
                 }
-                $statement = $subject->getStatements()->getStatement( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( $name ) );
+                $statement = $subject->getStatements()->getStatement( new \AEWI\SWS\Domain\Schema\PropertyName( $name ) );
                 $values = $statement?->getValue()->toScalars() ?? [];
                 $values = array_values( array_filter( $values, static fn ( $value ): bool => !is_string( $value ) || trim( $value ) !== '' ) );
                 // Inherit dynamically; never copy schema defaults into author-owned statements.

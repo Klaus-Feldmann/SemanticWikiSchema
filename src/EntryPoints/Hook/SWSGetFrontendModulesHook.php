@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Hook;
+namespace AEWI\SWS\EntryPoints\Hook;
 
 use MediaWiki\Output\OutputPage;
 use Skin;

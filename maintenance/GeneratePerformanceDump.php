@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use Maintenance;
 use MediaWiki\Content\JsonContent;
@@ -11,10 +11,10 @@ use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Storage\DerivedPageDataUpdater;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 

@@ -6,22 +6,22 @@ require __DIR__.'/source-refresh/StoreReadHost.php';
 require (getenv('SWS_TEST_VENDOR') ?: dirname(__DIR__).'/vendor/autoload.php');
 // Core-only installation: deliberately do not register the optional bridge's namespace.
 spl_autoload_register(static function(string $class): void {
- foreach(['ProfessionalWiki\\SWS\\Tests\\'=>'tests/phpunit/','ProfessionalWiki\\SWS\\'=>'src/'] as $prefix=>$path){
+ foreach(['AEWI\\SWS\\Tests\\'=>'tests/phpunit/','AEWI\\SWS\\'=>'src/'] as $prefix=>$path){
   if(str_starts_with($class,$prefix)){ $file=dirname(__DIR__).'/'.$path.str_replace('\\','/',substr($class,strlen($prefix))).'.php';if(is_file($file))require $file; }
  }
 },true,true);
 use CollectorHarness\State as C;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\{TestSources,TestSubjectIds};
-use ProfessionalWiki\SWS\Domain\Schema\{PropertyDefinition,PropertyDefinitions,Schema,SchemaName,SchemaReference,PropertyName};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\EffectiveFieldLookup;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataDeserializer,StatementDeserializer};
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\{TestSources,TestSubjectIds};
+use AEWI\SWS\Domain\Schema\{PropertyDefinition,PropertyDefinitions,Schema,SchemaName,SchemaReference,PropertyName};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\EffectiveFieldLookup;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataDeserializer,StatementDeserializer};
 $n=0;function coreCheck(bool $ok,string $why):void{global $n;$n++;if(!$ok)throw new RuntimeException($why);}
 function wfMessage(string $key,mixed ...$args):object{return new class($key){public function __construct(private string $key){} public function inContentLanguage():self{return $this;} public function text():string{return $this->key;}};}
 $registry=TestSources::newPropertyTypeRegistry();$props=[];$fields=[];

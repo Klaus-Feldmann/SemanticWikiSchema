@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
 /**
  * Maps one SWS property (referenced by name from the Mapping's Schema) to a target-ontology

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\ConfigSetting;
+use AEWI\SWS\Application\WikiConfig\WikiConfigLookup;
 
 /**
  * What the form on the on-wiki configuration page starts from, by the page key of every exposed setting:

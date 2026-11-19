@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
+namespace AEWI\SWS\Tests\Application\WikiConfig;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema
- * @covers \ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting
+ * @covers \AEWI\SWS\Application\WikiConfig\ConfigSchema
+ * @covers \AEWI\SWS\Application\WikiConfig\ConfigSetting
  */
 class ConfigSchemaTest extends TestCase {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\ImportPages;
+namespace AEWI\SWS\Application\Actions\ImportPages;
 
 class SubjectPageData {
 

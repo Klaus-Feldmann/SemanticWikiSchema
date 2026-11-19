@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Application\IdentityMigration\DurableCheckpoint;
+use AEWI\SWS\Application\IdentityMigration\DurableCheckpoint;
 $trace=[];$commit=function()use(&$trace){$trace[]='committed';return true;};$persist=function($state)use(&$trace){$trace[]='ack:'.$state['operation'];};
 (new DurableCheckpoint($commit,$persist))->save(['operation'=>1]);
 if($trace!==['committed','ack:1'])throw new RuntimeException('Acknowledgement preceded commit');

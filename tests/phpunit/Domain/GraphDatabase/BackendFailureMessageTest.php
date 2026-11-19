@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\GraphDatabase;
+namespace AEWI\SWS\Tests\Domain\GraphDatabase;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage
+ * @covers \AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage
  */
 class BackendFailureMessageTest extends TestCase {
 

@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectSummaries\SortDirection;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaries;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummary;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySort;
 use stdClass;
 use Wikimedia\Rdbms\DBQueryTimeoutError;
 use Wikimedia\Rdbms\IExpression;

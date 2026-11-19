@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Installer\DatabaseUpdater;
@@ -10,21 +10,21 @@ use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
-use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Maintenance\RebuildPublishedSubjectIndex;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Application\NullRevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Maintenance\RebuildPublishedSubjectIndex;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
@@ -33,10 +33,10 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
 /**
  * Needs the database for the tables it rebuilds and the pages it reads.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
- * @covers \ProfessionalWiki\SWS\Maintenance\RebuildPublishedSubjectIndex
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndexRebuilder
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
+ * @covers \AEWI\SWS\Maintenance\RebuildPublishedSubjectIndex
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onLoadExtensionSchemaUpdates
  * @group Database
  */
 class PublishedSubjectIndexRebuildTest extends SWSIntegrationTestCase {

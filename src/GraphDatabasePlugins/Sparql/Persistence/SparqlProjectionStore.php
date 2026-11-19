@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence;
 
-use ProfessionalWiki\SWS\Application\Rdf\PageProjector;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlUpdateEndpoint;
+use AEWI\SWS\Application\Rdf\PageProjector;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfSerializer;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlUpdateEndpoint;
 
 /**
  * Keeps a SPARQL 1.1 graph store in sync with wiki page changes, one instance per configured store

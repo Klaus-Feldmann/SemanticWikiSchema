@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
+namespace AEWI\SWS\Tests\Domain\Schema\Property;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
+use AEWI\SWS\Domain\PropertyType\Types\UrlType;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\JsonSchemaAssertions;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty
+ * @covers \AEWI\SWS\Domain\Schema\Property\UrlProperty
  */
 class UrlPropertyTest extends TestCase {
 

@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql;
 
 use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\SWS\SparqlStoreConfig;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use AEWI\SWS\SparqlStoreConfig;
 use Psr\Log\LoggerInterface;
 
 /**
  * Composition root for one SPARQL graph-database backend — one instance per configured store —
- * mirroring {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin}. Owns both the write
+ * mirroring {@see \AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin}. Owns both the write
  * path (the projection store) and the read path (the query service and its wikitext surfaces). A new
  * backend copies this shape.
  *

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
 use Closure;
 use MediaWiki\Output\OutputPage;
@@ -10,11 +10,11 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionStore;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
 use stdClass;
 use Throwable;
 use Wikimedia\Rdbms\IReadableDatabase;

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
 /**
  * The per-property rules of a {@see Mapping}, keyed by SWS property name.

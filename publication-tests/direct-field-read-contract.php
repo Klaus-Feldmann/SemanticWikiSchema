@@ -1,6 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
+require_once __DIR__.'/message-fixture.php';
 require __DIR__ . '/source-store-read-contract.php';
 require __DIR__ . '/source-refresh/DirectReadHost.php';
 define('SMW_NS_PROPERTY',102);
@@ -9,24 +10,27 @@ use CollectorHarness\State as D;
 use MediaWiki\Context\TestContext;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Semantic\{ FieldSnapshot, AnnotationPlanner, FieldNoteAnnotations };
-use ProfessionalWiki\SWS\Domain\Schema\{ PropertyDefinition, PropertyDefinitions, PropertyName, Schema, SchemaName };
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\{ StringValue, BooleanValue, NumberValue };
-use ProfessionalWiki\SWS\EntryPoints\{ EffectiveFieldLookup, ParserFieldLookup, SWSValueParserFunction };
-use ProfessionalWiki\SWS\EntryPoints\Api\ApiFieldValues;
-use ProfessionalWiki\SWS\EntryPoints\Source\SourceFieldLookup;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Semantic\{ FieldSnapshot, AnnotationPlanner, FieldNoteAnnotations };
+use AEWI\SWS\Domain\Schema\{ PropertyDefinition, PropertyDefinitions, PropertyName, Schema, SchemaName };
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\{ StringValue, BooleanValue, NumberValue };
+use AEWI\SWS\EntryPoints\{ EffectiveFieldLookup, ParserFieldLookup, SWSValueParserFunction };
+use AEWI\SWS\EntryPoints\Api\ApiFieldValues;
+use AEWI\SWS\EntryPoints\Source\SourceFieldLookup;
+use AEWI\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
+use AEWI\SWS\SWSExtension;
 
-function wfMessage( string $key, mixed ...$args ): object {
-    return new class( $key, $args ) {
+require_once __DIR__.'/message-fixture.php';
+function wfMessage(string $key, mixed ...$args): object {
+    if (!str_starts_with($key, 'sws-notes-')) { return swsFixtureMessage($key, ...$args); }
+    return new class($key,$args) {
         public function __construct(private string $key,private array $args) {}
-        public function inContentLanguage(): self { return $this; }
-        public function text(): string { return $this->key === 'sws-notes-property-suffix' ? ' (AM)' : $this->key.':'.implode(' ',$this->args); }
+        public function inContentLanguage():self { return $this; }
+        public function text():string { return $this->key==='sws-notes-property-suffix' ? ' (AM)' : $this->key.':'.implode(' ',$this->args); }
     };
 }
+
 $n=0;
 function dcheck(bool $ok,string $why): void { global $n; $n++; if(!$ok)throw new RuntimeException($why); }
 function drefuse(callable $f,string $why): void { try{$f();}catch(RuntimeException|InvalidArgumentException){dcheck(true,$why);return;}throw new RuntimeException($why); }
@@ -68,11 +72,11 @@ foreach([['language'=>'../../de'],['origin'=>'unsafe'],['unexpected'=>'yes'],['f
 dcheck($lookup->read($title,['subject'=>'external:Q1'])['missing'],'External IDs do not trigger remote requests');
 D::$denied=['Artikel'];dcheck((new EffectiveFieldLookup($context))->read($title)['missing'],'Unreadable page hides fields');D::$denied=[];
 $parser=new Parser();$parserFields=ParserFieldLookup::create($parser);
-$legacy=new class($subject) extends \ProfessionalWiki\SWS\Application\SubjectResolver {
+$legacy=new class($subject) extends \AEWI\SWS\Application\SubjectResolver {
  public function __construct(private mixed $subject) {}
- public function resolveMainByTitle(Title $title): ?\ProfessionalWiki\SWS\Domain\Subject\Subject { return $this->subject; }
- public function resolveById(string $id): ?\ProfessionalWiki\SWS\Domain\Subject\Subject { return $id===$this->subject->id->text?$this->subject:null; }
- public function resolveDisplayValue(\ProfessionalWiki\SWS\Domain\Subject\Subject $subject,\ProfessionalWiki\SWS\Domain\Statement $statement): \ProfessionalWiki\SWS\Domain\Value\NeoValue { return $statement->getValue(); }
+ public function resolveMainByTitle(Title $title): ?\AEWI\SWS\Domain\Subject\Subject { return $this->subject; }
+ public function resolveById(string $id): ?\AEWI\SWS\Domain\Subject\Subject { return $id===$this->subject->id->text?$this->subject:null; }
+ public function resolveDisplayValue(\AEWI\SWS\Domain\Subject\Subject $subject,\AEWI\SWS\Domain\Statement $statement): \AEWI\SWS\Domain\Value\NeoValue { return $statement->getValue(); }
 };
 SWSExtension::$resolver=$legacy;
 $function=new SWSValueParserFunction($legacy,$parserFields);
@@ -98,9 +102,9 @@ $notes=(new FieldNoteAnnotations())->build($smw,['properties'=>[]]);
 dcheck(in_array('Ort (AM)=Forschungsnotiz',$notes,true)&&count(array_filter($notes,fn($v)=>str_contains($v,'unavailable')))===1,'SMW separate notes once');
 
 $user=new \MediaWiki\User\User();
-(new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
- new \ProfessionalWiki\SWS\Domain\Page\PageSubjects($subject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap()),$subject,$user,fn()=>SWSExtension::$schema);
-$automatic=\ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
+(new \AEWI\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
+ new \AEWI\SWS\Domain\Page\PageSubjects($subject,new \AEWI\SWS\Domain\Subject\SubjectMap()),$subject,$user,fn()=>SWSExtension::$schema);
+$automatic=\AEWI\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
 dcheck(in_array('Ort=Gespeicherter Ort',$automatic->rows,true)&&in_array('Ort (AM)=Forschungsnotiz',$automatic->rows,true),'Actual AutomaticAnnotations uses shared local reader and note planner');
 $manual=$subject->withStatements(new StatementList([new Statement(new PropertyName('Ort'),'text',new StringValue('Forschungsstand'))]));setStorePage($manual);
 $m=(new EffectiveFieldLookup($context))->read($title,['field'=>'Ort'])['fields'][0];
@@ -138,9 +142,9 @@ dcheck(!str_contains(json_encode($private['fields']),'Gespeicherter Ort'),'Priva
 SWSExtension::$schema=new Schema(new SchemaName('Person'),' ',new PropertyDefinitions(['Bild'=>$properties['Bild']]),false);
 $badImage=$image;$badImage['status']='unavailable';$badImage['values']=[];
 $imageSubject=readStoreSnapshot(storedAttempt([$badImage],[], $initial,103));
-(new \ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
- new \ProfessionalWiki\SWS\Domain\Page\PageSubjects($imageSubject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap()),$imageSubject,$user,fn()=>SWSExtension::$schema);
-$imagePlan=\ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
+(new \AEWI\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new \MediaWiki\Parser\ParserOutput([]),$parser,SWSExtension::$schema,
+ new \AEWI\SWS\Domain\Page\PageSubjects($imageSubject,new \AEWI\SWS\Domain\Subject\SubjectMap()),$imageSubject,$user,fn()=>SWSExtension::$schema);
+$imagePlan=\AEWI\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
 dcheck(count($imagePlan->rows)===1&&str_starts_with($imagePlan->rows[0],'Bild (AM)=')&&str_contains($imagePlan->rows[0],'unavailable'),'Image-only source warning from local stock without scalar image annotation');
 dcheck(D::$requests===[]&&D::$identityLookups===0,'Zero D4 store source/identity requests');
 
@@ -157,12 +161,12 @@ $backToStore=(new EffectiveFieldLookup($context))->read($title,['field'=>'Ort'])
 dcheck(count(D::$requests)===$beforeRequests&&$backToStore['fields'][0]['values'][0]['value']==='Gespeicherter Ort','Switch back to store reads preserved stock without requests');
 
 // SWS records its own lookup errors explicitly, rather than inspecting foreign HTML.
-$ownContext=new \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext($title);
+$ownContext=new \AEWI\SWS\EntryPoints\Processing\ProcessingContext($title);
 $ownContext->run(function()use($lua,$ownContext){
  try{$lua->collectFields(['field'=>'Nicht vorhandenes SWS-Feld']);throw new LogicException('Lookup should fail');}
  catch(\MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError){dcheck($ownContext->failure!==null,'SWS Lua lookup failure explicitly recorded by SWS');}
 });
-$ownContext=new \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext($title);
+$ownContext=new \AEWI\SWS\EntryPoints\Processing\ProcessingContext($title);
 $ownContext->run(function()use($mf,$mp,$ownContext){
  dcheck($mf->handle($mp,'Nicht vorhandenes SWS-Feld')===''&&$ownContext->failure!==null,'SWS parser function explicitly records own lookup failure');
 });

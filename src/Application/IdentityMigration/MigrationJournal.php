@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** Local locked journal, HMAC-bound to this installation. Contains original current content, not a rollback tool. */
 final class MigrationJournal {

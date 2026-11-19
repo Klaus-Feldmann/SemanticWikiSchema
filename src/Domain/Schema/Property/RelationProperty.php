@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema\Property;
+namespace AEWI\SWS\Domain\Schema\Property;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
 
 class RelationProperty extends PropertyDefinition {
 

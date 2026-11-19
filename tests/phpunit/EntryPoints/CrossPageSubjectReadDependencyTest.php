@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Extension\Scribunto\ScribuntoContent;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
+use AEWI\SWS\Domain\PropertyType\Types\SelectType;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\ParseTimePermissionFixtures;
 
 /**
  * A parse that reads the Subjects of another page depends on that page, the way a page depends on a
@@ -25,10 +25,10 @@ use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
  * Needs the integration base and the database for the real parser, the Lua library, and the pages
  * and subject-to-page index the reads go through.
  *
- * @covers \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder
- * @covers \ProfessionalWiki\SWS\Application\SubjectResolver
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSValueParserFunction
- * @covers \ProfessionalWiki\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary
+ * @covers \AEWI\SWS\Infrastructure\ParserPageDependencyRecorder
+ * @covers \AEWI\SWS\Application\SubjectResolver
+ * @covers \AEWI\SWS\EntryPoints\SWSValueParserFunction
+ * @covers \AEWI\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary
  * @group Database
  */
 class CrossPageSubjectReadDependencyTest extends SWSIntegrationTestCase {

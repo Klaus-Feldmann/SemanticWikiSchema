@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Source;
+namespace AEWI\SWS\Domain\Source;
 
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 
 /**
  * Where a Subject comes from (ADR 23). The local revision slot is one Source; an extension may register

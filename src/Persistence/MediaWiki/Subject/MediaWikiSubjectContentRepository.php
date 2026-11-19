@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Page\PageIdentity;
@@ -11,10 +11,10 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\SubjectContentRepository;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Application\SubjectContentRepository;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
 use RuntimeException;
 use WikiPage;
 use Wikimedia\Rdbms\IDBAccessObject;
@@ -101,8 +101,8 @@ class MediaWikiSubjectContentRepository implements SubjectContentRepository {
 			$revision->getId(),
 			function ( RevisionRecord $parent ) use ( $proposed ): array {
 				$current = $this->getSubjectContentFromRevision( $parent );
-				\ProfessionalWiki\SWS\Application\Source\SourceSnapshotEditGuard::preserve( $proposed,
-					$current?->getPageSubjects() ?? \ProfessionalWiki\SWS\Domain\Page\PageSubjects::newEmpty() );
+				\AEWI\SWS\Application\Source\SourceSnapshotEditGuard::preserve( $proposed,
+					$current?->getPageSubjects() ?? \AEWI\SWS\Domain\Page\PageSubjects::newEmpty() );
 				return [ MediaWikiSubjectRepository::SLOT_NAME => SubjectContent::newFromData( $proposed ) ];
 			},
 			CommentStoreComment::newUnsavedComment( $editSummary )

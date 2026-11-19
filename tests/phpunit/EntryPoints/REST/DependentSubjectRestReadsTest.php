@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
  * Needs the database for the pages the Subjects are on.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectSummariesApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetRecentlyEditedSubjectsApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetReferencingSubjectsApi
  * @group Database
  */
 class DependentSubjectRestReadsTest extends SWSIntegrationTestCase {

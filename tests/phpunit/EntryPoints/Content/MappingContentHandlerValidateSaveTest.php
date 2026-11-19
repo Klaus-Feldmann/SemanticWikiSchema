@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
+namespace AEWI\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\Content\MappingContent;
+use AEWI\SWS\EntryPoints\Content\MappingContentHandler;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler
+ * @covers \AEWI\SWS\EntryPoints\Content\MappingContentHandler
  * @group Database
  */
 class MappingContentHandlerValidateSaveTest extends SWSIntegrationTestCase {

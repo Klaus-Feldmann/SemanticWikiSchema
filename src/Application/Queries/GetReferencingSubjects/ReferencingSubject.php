@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects;
+namespace AEWI\SWS\Application\Queries\GetReferencingSubjects;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 
 readonly class ReferencingSubject {
 

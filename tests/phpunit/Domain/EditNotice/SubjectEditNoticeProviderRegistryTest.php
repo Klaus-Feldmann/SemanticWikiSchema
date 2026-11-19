@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\EditNotice;
+namespace AEWI\SWS\Tests\Domain\EditNotice;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry
+ * @covers \AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry
  */
 class SubjectEditNoticeProviderRegistryTest extends TestCase {
 

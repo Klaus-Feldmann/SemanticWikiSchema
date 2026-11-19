@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Source;
+namespace AEWI\SWS\Application\Source;
 
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\SWS\Application\SubjectLookup;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Application\SubjectLookup;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 
 /**
  * Resolves each Subject through the Source that produced it (ADR 23). Ids are grouped by Source before

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\Neo4jRouteRegistration
  */
 class Neo4jRouteRegistrationTest extends TestCase {
 
@@ -35,7 +35,7 @@ class Neo4jRouteRegistrationTest extends TestCase {
 		$this->assertSame( '/sws/v0/query/cypher', $routes[0]['path'] );
 		$this->assertSame( [ 'POST' ], $routes[0]['method'] );
 		$this->assertSame(
-			'ProfessionalWiki\\SWS\\SWSExtension::newCypherQueryApi',
+			'AEWI\\SWS\\SWSExtension::newCypherQueryApi',
 			$routes[0]['factory']
 		);
 	}

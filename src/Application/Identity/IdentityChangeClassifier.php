@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Identity;
+namespace AEWI\SWS\Application\Identity;
 
 /** Only presentation metadata is ignored. Unknown and future fields remain substantive. */
 final class IdentityChangeClassifier {

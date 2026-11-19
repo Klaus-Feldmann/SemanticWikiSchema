@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\ReadAuthorizedSubjectLookup;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Application\ReadAuthorizedSubjectLookup;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\ReadAuthorizedSubjectLookup
+ * @covers \AEWI\SWS\Application\ReadAuthorizedSubjectLookup
  */
 class ReadAuthorizedSubjectLookupTest extends TestCase {
 

@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSources;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use AEWI\SWS\Tests\Data\TestData;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
  */
 class SubjectContentDataSerializerTest extends TestCase {
 

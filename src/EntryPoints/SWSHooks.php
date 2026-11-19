@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use Exception;
 use HTMLCacheUpdateJob;
@@ -43,29 +43,29 @@ use Wikimedia\Rdbms\IDBAccessObject;
 use Wikimedia\Rdbms\IResultWrapper;
 use MessageLocalizer;
 use NullIndexField;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\SWS\Application\SubjectPermissionHints;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
-use ProfessionalWiki\SWS\Maintenance\RebuildPublishedSubjectIndex;
-use ProfessionalWiki\SWS\Maintenance\RebuildSubjectPageIndex;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\PageToolsBuilder;
-use ProfessionalWiki\SWS\Presentation\SubjectNameMessage;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Application\Search\SubjectSearchHit;
+use AEWI\SWS\Application\SubjectPermissionHints;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\Content\LayoutContent;
+use AEWI\SWS\EntryPoints\Content\MappingContent;
+use AEWI\SWS\EntryPoints\Actions\SubjectsAction;
+use AEWI\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob;
+use AEWI\SWS\EntryPoints\Scribunto\ScribuntoLuaLibrary;
+use AEWI\SWS\Maintenance\RebuildPublishedSubjectIndex;
+use AEWI\SWS\Maintenance\RebuildSubjectPageIndex;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\PageToolsBuilder;
+use AEWI\SWS\Presentation\SubjectNameMessage;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Presentation\ViewHtmlBuilder;
 use MediaWiki\SpecialPage\SpecialPage;
 use SearchEngine;
 use SearchIndexField;
@@ -78,7 +78,7 @@ use WikiPage;
 
 class SWSHooks {
 
-	private const SPECIAL_PAGE_CLASS_PREFIX = 'ProfessionalWiki\\SWS\\EntryPoints\\SpecialPages\\';
+	private const SPECIAL_PAGE_CLASS_PREFIX = 'AEWI\\SWS\\EntryPoints\\SpecialPages\\';
 
 	private const SEARCH_UPDATE_BEFORE_1_44 = 'MediaWiki\\Deferred\\SearchUpdate';
 
@@ -120,7 +120,7 @@ class SWSHooks {
 
 	private static function isContentPage( OutputPage $out ): bool {
 		return $out->isArticle()
-			&& \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $out->getTitle() );
+			&& \AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $out->getTitle() );
 	}
 
 	/** Change display headings only; authorization and technical page identities remain core-owned. */
@@ -132,12 +132,12 @@ class SWSHooks {
 		$id = null;
 		if ( $title->getNamespace() === SWSExtension::NS_SCHEMA && preg_match( '/^S[1-9][0-9]*$/D', $title->getText() ) ) {
 			$schema = $extension->getSchemaLookupFor( $out->getAuthority() )->getSchema(
-				new \ProfessionalWiki\SWS\Domain\Schema\SchemaName( $title->getText() )
+				new \AEWI\SWS\Domain\Schema\SchemaName( $title->getText() )
 			);
 			if ( $schema === null ) { return; }
 			$id = $title->getText();
 			$label = $schema->getIdentity()?->label( $out->getLanguage()->getCode() );
-		} elseif ( \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title ) ) {
+		} elseif ( \AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title ) ) {
 			$subject = $extension->newViewHtmlBuilder()->subjectInPlaceOfPageTitle( $title, null );
 			if ( $subject === null ) { return; }
 			$id = $subject->getId()->text;
@@ -524,7 +524,7 @@ class SWSHooks {
 	public static function initializeIdentityCounters( DatabaseUpdater $updater ): void {
 		// Seed once through update.php. Runtime locks existing rows directly; it does not upgrade
 		// shared duplicate-insert locks to exclusive locks on every MySQL reservation.
-		foreach ( \ProfessionalWiki\SWS\Domain\Identity\IdentityKind::cases() as $kind ) {
+		foreach ( \AEWI\SWS\Domain\Identity\IdentityKind::cases() as $kind ) {
 			$updater->getDB()->insert( 'sws_id_counter', [ 'swsic_kind' => $kind->value, 'swsic_value' => 0 ],
 				__METHOD__, [ 'IGNORE' ] );
 		}
@@ -691,10 +691,10 @@ class SWSHooks {
 		if ( !$originalRevId && $mainContent instanceof SchemaContent ) {
 			$data = json_decode( $mainContent->getText(), true );
 			if ( ( $data['formatVersion'] ?? 1 ) === 2 ) {
-				SWSExtension::getInstance()->newIdentityRegistry()->markUsed( new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $data['id'] ) );
+				SWSExtension::getInstance()->newIdentityRegistry()->markUsed( new \AEWI\SWS\Domain\Identity\SchemaId( $data['id'] ) );
 			}
 		}
-        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
+        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
             SWSExtension::getInstance()->indexMigrationRevision( $revision );
             return;
         }
@@ -1141,7 +1141,7 @@ class SWSHooks {
 		if ( $title->getNamespace() === SWSExtension::NS_SCHEMA ) {
 			$ok = $modelId === SchemaContent::CONTENT_MODEL_ID || (
                 $modelId === CONTENT_MODEL_WIKITEXT &&
-                \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::allowsSchemaRedirect($title->getDBkey())
+                \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::allowsSchemaRedirect($title->getDBkey())
             );
 		}
 
@@ -1235,7 +1235,7 @@ class SWSHooks {
 	 * @return list<array<string, mixed>>
 	 */
 	private static function pageTools( Skin $skin, Title $title ): array {
-		$isContentNamespace = \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
+		$isContentNamespace = \AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
 
 		if ( !$isContentNamespace ) {
 			return [];
@@ -1300,7 +1300,7 @@ class SWSHooks {
 		$action = $sktemplate->getRequest()->getRawVal( 'action' );
 
 		$links['views']['sws-subjects'] = [
-			'class' => $action === SubjectsAction::ACTION_NAME ? 'selected' : false,
+			'class' => SubjectsAction::isActionName( $action ) ? 'selected' : false,
 			'text' => $sktemplate->msg( 'sws-managesubjects-tab' )->text(),
 			'href' => $title->getLocalURL( [ 'action' => SubjectsAction::ACTION_NAME ] ),
 		];

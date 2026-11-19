@@ -1,6 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
+require_once __DIR__ . '/message-fixture.php';
 
 require __DIR__ . '/source-refresh/CollectorHost.php';
 require __DIR__ . '/source-refresh/StoreReadHost.php';
@@ -10,16 +11,16 @@ use CollectorHarness\State as C;
 use MediaWiki\Context\TestContext;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\{ PropertyDefinition, PropertyDefinitions, PropertyName, Schema, SchemaName, SchemaReference };
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\{ StatementList, Subject, SubjectId, SubjectMap };
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{ StatementDeserializer, SubjectContentDataDeserializer };
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\{ TestSources, TestSubjectIds };
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\{ PropertyDefinition, PropertyDefinitions, PropertyName, Schema, SchemaName, SchemaReference };
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\{ StatementList, Subject, SubjectId, SubjectMap };
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\Subject\{ StatementDeserializer, SubjectContentDataDeserializer };
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\{ TestSources, TestSubjectIds };
 use SWSBaseBridge\{ ApiExternalValues, ApiIdentity, DataViewLookup, ExportPageDataViewApi, StoredSourceLookup };
 
 $checks = 0;
@@ -152,6 +153,6 @@ C::$mode = 'store'; $requests = count( C::$requests );
 $storedApi = new ApiExternalValues( $params, $context ); $storedApi->execute();
 scheck( count( C::$requests ) === $requests && $storedApi->output['result']['fields'][0]['values'][0]['value'] === 'Gespeicherter Ort', 'Switching to store reads persisted data without fetching' );
 scheck( C::$revision->getContent( 'sws' )->getText() === $beforeSlot, 'Both read modes leave existing source storage untouched' );
-C::$mode = 'live'; refusesRead( fn () => ProfessionalWiki\SWS\Application\Source\SourceDataMode::current(), 'Renamed mode accepts cache/store and rejects former live name' ); C::$mode = 'store';
+C::$mode = 'live'; refusesRead( fn () => AEWI\SWS\Application\Source\SourceDataMode::current(), 'Renamed mode accepts cache/store and rejects former live name' ); C::$mode = 'store';
 
 echo "$checks D3 store/read/API/identity/description/language/export/permission checks passed (controlled MediaWiki host and unavailable sources).\n";

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
@@ -10,14 +10,14 @@ use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserIdentityValue;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 use Psr\Log\NullLogger;
 use TestLogger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer
+ * @covers \AEWI\SWS\Infrastructure\AuthorityBasedPageReadAuthorizer
  */
 class AuthorityBasedPageReadAuthorizerTest extends MediaWikiIntegrationTestCase {
 

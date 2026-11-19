@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\GraphStoreStatusSerializer;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatus;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\GraphStoreStatusSerializer;
 
 /**
  * Reports every configured graph store: what it holds, how far that is from the wiki, and what

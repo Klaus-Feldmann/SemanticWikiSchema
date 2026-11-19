@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
+namespace AEWI\SWS\Tests\Domain\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectIdList
+ * @covers \AEWI\SWS\Domain\Subject\SubjectIdList
  */
 class SubjectIdListTest extends TestCase {
 

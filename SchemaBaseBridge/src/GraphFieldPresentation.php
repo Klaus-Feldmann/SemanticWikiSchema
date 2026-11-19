@@ -3,24 +3,24 @@
 declare( strict_types = 1 );
 namespace SWSBaseBridge;
 
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Value\StringValue;
 
 /** Read-only display metadata. No SMW dependency and no copy of derived data into storage/RDF. */
 final class GraphFieldPresentation {
 	public static function fromSchema( Schema $schema, ?string $pageUrlTemplate, ?Subject $subject = null, string $language = 'de' ): array {
 		$definitions = [];
-		$labelLanguages = \ProfessionalWiki\SWS\Presentation\FieldLabelLanguages::forReader( $language );
+		$labelLanguages = \AEWI\SWS\Presentation\FieldLabelLanguages::forReader( $language );
 		$reference = $subject?->getSchemaReference() ?? $schema->getReference();
-		if ( $schema->getId() !== null ) { $reference = \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( $schema->getId(), $reference->source ); }
+		if ( $schema->getId() !== null ) { $reference = \AEWI\SWS\Domain\Schema\SchemaReference::identified( $schema->getId(), $reference->source ); }
 		foreach ( $schema->getAllProperties()->asMap() as $name => $property ) {
 			$definitions[] = [ 'name' => $name, 'type' => $property->getPropertyType(),
 				'predicateLocalName' => RdfNamespaces::localName( $name ),
 				'predicatePath' => RdfNamespaces::fieldPropertyPath( $name, $reference ),
-				...( $property->getLabels() === [] ? [] : [ 'labels' => $property->getLabels(), 'displayLabel' => \ProfessionalWiki\SWS\Domain\Schema\FieldLabels::display( $property->getLabels(), $name, $labelLanguages ) ] ),
+				...( $property->getLabels() === [] ? [] : [ 'labels' => $property->getLabels(), 'displayLabel' => \AEWI\SWS\Domain\Schema\FieldLabels::display( $property->getLabels(), $name, $labelLanguages ) ] ),
 				'wikiLink' => $property->getWikiLink(),
 				...( $property->isSchemaExecution() ? [ 'execute' => true ] : [] ),
 				...( $subject !== null && $property->getPropertyType() === 'page' ? [ 'ownPages' => self::ownImages( $subject, $name ) ] : [] ),
@@ -34,12 +34,12 @@ final class GraphFieldPresentation {
 	}
 	private static function ownUrls( Subject $subject, string $name ): array {
 		$value = $subject->getStatements()->getStatement( new PropertyName( $name ) )?->getValue();
-		if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ) { return $value->parts; }
+		if ( $value instanceof \AEWI\SWS\Domain\Value\UrlValue ) { return $value->parts; }
 		return $value instanceof StringValue ? array_map( static fn ( string $url ): array => [ 'url' => $url ], $value->strings ) : [];
 	}
 	private static function ownDateParts( Subject $subject, string $name, string $language, array $options ): array {
 		return array_map( static function ( string $raw ) use ( $language, $options ): array {
-			$date = \ProfessionalWiki\SWS\Domain\HistoricalDate::parse( $raw );
+			$date = \AEWI\SWS\Domain\HistoricalDate::parse( $raw );
 			return $date === null ? [ [ 'text' => $raw ] ] : TimePresentation::parts(
 				[ 'year' => $date->year, ...( $date->month === null ? [] : [ 'month' => $date->month ] ), ...( $date->day === null ? [] : [ 'day' => $date->day ] ) ],
 				$language, (string)( $GLOBALS['wgLanguageCode'] ?? 'de' ), $options );

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use TestLogger;
 
 /**
  * Every configured graph database backend is addressable by name, which is what scopes a rebuild to
  * one store.
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \AEWI\SWS\SWSExtension
  * @group Database
  */
 class NamedGraphDatabasePluginsTest extends SWSIntegrationTestCase {

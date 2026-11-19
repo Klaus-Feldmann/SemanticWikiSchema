@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Actions;
+namespace AEWI\SWS\Tests\EntryPoints\Actions;
 
 use Article;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\EntryPoints\Actions\SubjectsAction;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction
+ * @covers \AEWI\SWS\EntryPoints\Actions\SubjectsAction
  * @group Database
  */
 class SubjectsActionTest extends SWSIntegrationTestCase {

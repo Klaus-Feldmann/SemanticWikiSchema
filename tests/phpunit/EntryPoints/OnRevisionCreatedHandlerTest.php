@@ -2,44 +2,44 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
-use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler;
-use ProfessionalWiki\SWS\FailureIsolatingPagePropertiesSource;
-use ProfessionalWiki\SWS\PagePropertiesBuilder;
-use ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider;
-use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPublishedSubjectIndex;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectPageIndex;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingPublishedSubjectIndex;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingSubjectPageIndex;
+use AEWI\SWS\Application\NullRevisionPolicy;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Domain\Page\PagePropertyProviderRegistry;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\OnRevisionCreatedHandler;
+use AEWI\SWS\FailureIsolatingPagePropertiesSource;
+use AEWI\SWS\PagePropertiesBuilder;
+use AEWI\SWS\Persistence\CorePagePropertyProvider;
+use AEWI\SWS\Persistence\PublishedSubjectIndex;
+use AEWI\SWS\Persistence\SubjectPageIndex;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\SpyPublishedSubjectIndex;
+use AEWI\SWS\Tests\TestDoubles\SpySubjectPageIndex;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\ThrowingPublishedSubjectIndex;
+use AEWI\SWS\Tests\TestDoubles\ThrowingSubjectPageIndex;
 use Psr\Log\NullLogger;
 use Psr\Log\Test\TestLogger;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
+ * @covers \AEWI\SWS\EntryPoints\OnRevisionCreatedHandler
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish
  * @group Database
  */
 class OnRevisionCreatedHandlerTest extends SWSIntegrationTestCase {

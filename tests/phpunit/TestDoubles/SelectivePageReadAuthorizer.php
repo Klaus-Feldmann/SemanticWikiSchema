@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Domain\Page\PageId;
 
 /**
  * Authorizes every page read except for a fixed set of denied page ids. Lets a list-filter test

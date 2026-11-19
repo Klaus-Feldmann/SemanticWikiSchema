@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
+namespace AEWI\SWS\Tests\Application\GraphRebuild;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\Application\GraphRebuild\MappingChangeRebuilder;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\RebuildRunRepository;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
 use Psr\Log\NullLogger;
 use TestLogger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\MappingChangeRebuilder
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks
+ * @covers \AEWI\SWS\Application\GraphRebuild\MappingChangeRebuilder
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks
  * @group Database
  */
 class MappingChangeRebuildTest extends SWSIntegrationTestCase {

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\User\User;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseLastEditorPageIdsLookup
  * @group Database
  */
 class DatabaseLastEditorPageIdsLookupTest extends SWSIntegrationTestCase {

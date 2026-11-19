@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Title\TitleFactory;
 use MessageLocalizer;
-use ProfessionalWiki\SWS\Application\EditNotice\EditNoticeMessageRenderer;
+use AEWI\SWS\Application\EditNotice\EditNoticeMessageRenderer;
 
 readonly class MediaWikiEditNoticeMessageRenderer implements EditNoticeMessageRenderer {
 

@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleParser;
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Errors\ValidationError;
 use Opis\JsonSchema\Validator;
-use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Mapping\CurieExpander;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
 use RuntimeException;
 
 /**

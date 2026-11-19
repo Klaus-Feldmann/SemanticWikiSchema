@@ -341,7 +341,7 @@ describe( 'SubjectRow', () => {
 			const wrapper = mountRowRelatingToTarget( false );
 
 			expect( wrapper.find( RELATION_LINK ).attributes( 'href' ) )
-				.toBe( '/wiki/Anvil (product)?action=subjects#' + TARGET_ID );
+				.toBe( '/wiki/Anvil (product)?action=entities#' + TARGET_ID );
 		} );
 
 		// A View leaves it out unless a Layout names its property.

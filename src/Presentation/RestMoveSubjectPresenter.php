@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
 
 class RestMoveSubjectPresenter implements MoveSubjectPresenter {
 
@@ -31,7 +31,7 @@ class RestMoveSubjectPresenter implements MoveSubjectPresenter {
 	}
 
 	public function presentSubjectNotFound(): void {
-		$this->apiResponse = [ 'status' => 'error', 'message' => 'Subject not found' ];
+		$this->apiResponse = [ 'status' => 'error', 'message' => wfMessage('sws-api-entity-not-found')->text() ];
 		$this->statusCode = 404;
 	}
 
@@ -41,14 +41,14 @@ class RestMoveSubjectPresenter implements MoveSubjectPresenter {
 	}
 
 	public function presentSubjectAlreadyOnTargetPage(): void {
-		$this->apiResponse = [ 'status' => 'error', 'message' => 'Subject is already on the target page' ];
+		$this->apiResponse = [ 'status' => 'error', 'message' => wfMessage('sws-api-entity-already-on-target')->text() ];
 		$this->statusCode = 409;
 	}
 
 	public function presentMoveIncomplete(): void {
 		$this->apiResponse = [
 			'status' => 'error',
-			'message' => 'The subject was removed from its original page but could not be added to the target page, and could not be put back',
+			'message' => wfMessage('sws-api-entity-move-incomplete')->text(),
 		];
 		$this->statusCode = 500;
 	}

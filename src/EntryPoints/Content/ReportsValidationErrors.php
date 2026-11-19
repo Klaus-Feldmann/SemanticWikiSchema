@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use MediaWiki\Message\Message;
 use StatusValue;

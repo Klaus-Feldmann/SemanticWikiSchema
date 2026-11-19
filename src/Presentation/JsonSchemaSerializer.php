@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
 use RuntimeException;
 use stdClass;
 

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -36,7 +36,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 
 		if ( $id === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
-				'message' => 'Invalid Subject ID: ' . $subjectId,
+				'message' => wfMessage('sws-api-invalid-entity-id', $subjectId)->text(),
 			] );
 		}
 		$projectionName = $this->getValidatedParams()['projection'] ?? RdfPageProjector::PROJECTION;
@@ -74,7 +74,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 
 	private function noDataResponse( string $subjectId ): Response {
 		return $this->getResponseFactory()->createHttpError( 404, [
-			'message' => 'No SWS data found for subject: ' . $subjectId,
+			'message' => wfMessage('sws-api-entity-data-missing', $subjectId)->text(),
 		] );
 	}
 
@@ -84,7 +84,7 @@ class ExportSubjectRdfApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'format' => [
 				self::PARAM_SOURCE => 'query',

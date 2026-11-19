@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\LayoutLookup;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Domain\Layout\Layout;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\LayoutLookup;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Domain\Layout\Layout;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\EntryPoints\Content\LayoutContent;
+use AEWI\SWS\SWSExtension;
 
 class WikiPageLayoutLookup implements LayoutLookup {
 

@@ -2,26 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Scribunto;
+namespace AEWI\SWS\EntryPoints\Scribunto;
 
 use Exception;
 use InvalidArgumentException;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LibraryBase;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\Infrastructure\ParserPageDependencyRecorder;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\SparqlErrorMessage;
+use AEWI\SWS\SWSExtension;
 
 class ScribuntoLuaLibrary extends LibraryBase {
 
 	private ?SubjectDataLookup $subjectDataLookup = null;
-	private ?\ProfessionalWiki\SWS\EntryPoints\EffectiveFieldLookup $effectiveFields = null;
+	private ?\AEWI\SWS\EntryPoints\EffectiveFieldLookup $effectiveFields = null;
 	private ?SchemaLuaSerializer $schemaLuaSerializer = null;
 	private ?CypherQueryRunner $cypherQueryRunner = null;
 	private ?SparqlQueryRunner $sparqlQueryRunner = null;
@@ -202,11 +203,17 @@ class ScribuntoLuaLibrary extends LibraryBase {
 
 		$schema = $extension->getSchemaResolverFor( ParserAuthority::of( $this->getParser() ) )->getSchema( $reference );
 
+		// Also track a missing local Schema: creating it must refresh pages that read it.
+		// Successful name/alias reads keep depending on the resolved, stable S-ID page.
+		if ( $reference->isLocal() ) {
+			( new ParserPageDependencyRecorder( $this->getParser() ) )
+				->recordDependencyOnSchema( $schema?->getReference() ?? $reference );
+		}
+
 		if ( $schema === null ) {
 			return [ null ];
 		}
 
-		if ( $reference->isLocal() ) { ( new \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder( $this->getParser() ) )->recordDependencyOnSchema( $schema->getReference() ); }
         return [ $this->getSchemaLuaSerializer()->toLuaTable( $schema ) ];
 	}
 
@@ -217,10 +224,10 @@ class ScribuntoLuaLibrary extends LibraryBase {
 		// The expensive-function limit also bounds reads of other local pages.
 		if ( isset( $options['page'] ) || isset( $options['subject'] ) ) { $this->incrementExpensiveFunctionCount(); }
 		try {
-			$this->effectiveFields ??= \ProfessionalWiki\SWS\EntryPoints\ParserFieldLookup::create( $this->getParser() );
+			$this->effectiveFields ??= \AEWI\SWS\EntryPoints\ParserFieldLookup::create( $this->getParser() );
 			return [ self::fieldsToLua( $this->effectiveFields->read( $this->getTitle(), $options ) ) ];
 		} catch ( \InvalidArgumentException|\RuntimeException $e ) {
-			if ( $processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
+			if ( $processing = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current() ) { $processing->failure ??= $e->getMessage(); }
 			throw new LuaError( 'SWS: ' . $e->getMessage() );
 		}
 	}

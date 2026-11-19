@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -12,13 +12,13 @@ use MediaWiki\Content\ValidationParams;
 use MediaWiki\Message\Message;
 use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\SWS\Domain\Schema\DependentSubjectSchemaRules;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\SWS\Presentation\PropertyNameProblemMessage;
+use AEWI\SWS\Domain\Schema\DependentSubjectSchemaRules;
+use AEWI\SWS\Domain\Schema\PropertyNameRules;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Presentation\PropertyNameProblemMessage;
 use StatusValue;
 
 class SchemaContentHandler extends JsonContentHandler {
@@ -36,7 +36,7 @@ class SchemaContentHandler extends JsonContentHandler {
 			return $status;
 		}
 
-		if ( \ProfessionalWiki\SWS\Domain\Schema\DuplicateFieldNumbers::find( $content->getText() ) !== [] ) {
+		if ( \AEWI\SWS\Domain\Schema\DuplicateFieldNumbers::find( $content->getText() ) !== [] ) {
 			$status->fatal( 'sws-field-number-unique' );
 			return $status;
 		}
@@ -66,8 +66,8 @@ class SchemaContentHandler extends JsonContentHandler {
 				$new = json_decode( $content->getText(), true, 512, JSON_THROW_ON_ERROR );
 				$oldRevision = \MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, \Wikimedia\Rdbms\IDBAccessObject::READ_LATEST );
 				$old = json_decode( $oldRevision?->getContent( 'main' )?->getText() ?? '{}', true );
-				\ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::validateEdit( is_array( $old ) ? $old : [], $new );
-				\ProfessionalWiki\SWS\Application\Identity\SchemaIdentityWritePolicy::validate(
+				\AEWI\SWS\Domain\Schema\FieldKeyChanges::validateEdit( is_array( $old ) ? $old : [], $new );
+				\AEWI\SWS\Application\Identity\SchemaIdentityWritePolicy::validate(
 					$schemaName, $oldRevision === null ? null : ( is_array( $old ) ? $old : [] ), $new,
 					SWSExtension::getInstance()->newIdentityRegistry(), SWSExtension::getInstance()->getIdentityOwner()
 				);
@@ -90,7 +90,7 @@ class SchemaContentHandler extends JsonContentHandler {
                 $old=\MediaWiki\MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle($title);
                 $oldContent=$old?->getContent('main');
                 $previous=$oldContent instanceof SchemaContent ? json_decode($oldContent->getText(),true) : [];
-                $previous=\ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::originalSchema($content->getText()) ?? $previous;
+                $previous=\AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::originalSchema($content->getText()) ?? $previous;
                 \SWSBaseBridge\SchemaPropertyBindings::validate(json_decode($content->getText(),true),$previous ?? [],\MediaWiki\Context\RequestContext::getMain());
             } catch (\Throwable $e) {
                 $status->fatal('sws-property-datatype-invalid',$e->getMessage());

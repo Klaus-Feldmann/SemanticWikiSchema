@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use MediaWiki\Config\HashConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\SWS\SWSConfig;
-use ProfessionalWiki\SWS\SWSConfigFactory;
-use ProfessionalWiki\SWS\SparqlStoreConfig;
+use AEWI\SWS\SWSConfig;
+use AEWI\SWS\SWSConfigFactory;
+use AEWI\SWS\SparqlStoreConfig;
 
 /**
- * @covers \ProfessionalWiki\SWS\SWSConfigFactory
+ * @covers \AEWI\SWS\SWSConfigFactory
  */
 class SWSConfigFactoryTest extends TestCase {
 

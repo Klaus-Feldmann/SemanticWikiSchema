@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
 /**
  * One intermediate node a {@see SchemaMapping} synthesizes: the event-style node that event-centric

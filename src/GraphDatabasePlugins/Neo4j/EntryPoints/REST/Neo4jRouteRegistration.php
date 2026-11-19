@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST;
 
-use ProfessionalWiki\SWS\SWSConfig;
+use AEWI\SWS\SWSConfig;
 
 class Neo4jRouteRegistration {
 

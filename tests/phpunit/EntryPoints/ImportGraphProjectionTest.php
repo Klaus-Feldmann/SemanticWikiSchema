@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Importing a page projects its Subjects into the graph. Imported revisions bypass the edit path, so
  * RevisionFromEditComplete never fires for them. AfterImportPage is fired by WikiImporter itself and so
  * covers every import path, including importDump.php, which no reporter wraps.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAfterImportPage
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onAfterImportPage
  * @group Database
  */
 class ImportGraphProjectionTest extends SWSIntegrationTestCase {

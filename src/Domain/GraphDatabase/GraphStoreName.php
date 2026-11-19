@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\GraphDatabase;
+namespace AEWI\SWS\Domain\GraphDatabase;
 
 /**
  * What a graph store may be called, wherever the name comes from.

@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Scribunto;
+namespace AEWI\SWS\EntryPoints\Scribunto;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\SubjectResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Value\UrlValue;
+use AEWI\SWS\Application\SubjectResolver;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Value\BooleanValue;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Value\UrlValue;
 
 class SubjectDataLookup {
 

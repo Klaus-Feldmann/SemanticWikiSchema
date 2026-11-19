@@ -1,10 +1,10 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 use MediaWiki\Rest\Response;
-use ProfessionalWiki\SWS\Domain\Identity\SchemaId;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Identity\SchemaId;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
 class GetSchemaByIdApi extends GetSchemaApi {
  public function run( string $schemaName ): Response {
   try { $id = new SchemaId( $schemaName ); }

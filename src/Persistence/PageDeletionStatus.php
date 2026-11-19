@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence;
+namespace AEWI\SWS\Persistence;
 
 class PageDeletionStatus {
 

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\SWS\PagePropertiesBuilder;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Domain\Page\PagePropertyProviderRegistry;
+use AEWI\SWS\PagePropertiesBuilder;
+use AEWI\SWS\Tests\TestDoubles\SpyPagePropertyProvider;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
- * @covers \ProfessionalWiki\SWS\PagePropertiesBuilder
+ * @covers \AEWI\SWS\PagePropertiesBuilder
  * @group Database
  */
 class PagePropertiesBuilderTest extends SWSIntegrationTestCase {

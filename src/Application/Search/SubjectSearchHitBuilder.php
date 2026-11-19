@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Search;
+namespace AEWI\SWS\Application\Search;
 
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\RelationValue;
 
 /**
  * What a page's Subjects add to its search result row: the Subject to lead to instead of the page,
@@ -179,7 +179,7 @@ readonly class SubjectSearchHitBuilder {
 			$parts = $matcher->splitOnMatches( $line->text );
 
 			if ( count( $parts ) > 1 ) {
-				$matchedLines[] = new MatchedSearchLine( $line->propertyName, $parts, $relationPropertyNames );
+				$matchedLines[] = new MatchedSearchLine( $line->propertyName, $parts, $relationPropertyNames, $line->isDescription );
 
 				if ( count( $matchedLines ) === self::MAX_LINES ) {
 					break;
@@ -195,7 +195,7 @@ readonly class SubjectSearchHitBuilder {
 	 */
 	private function labelIsAmong( array $lines ): bool {
 		foreach ( $lines as $line ) {
-			if ( $line->propertyName === null ) {
+			if ( $line->propertyName === null && !$line->isDescription ) {
 				return true;
 			}
 		}

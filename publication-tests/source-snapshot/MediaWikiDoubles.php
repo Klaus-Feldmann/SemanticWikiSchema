@@ -142,7 +142,7 @@ namespace MediaWiki\Storage {
 		public function getStatus(): object { return new class { public function getWikiText(): string { return 'edit-conflict'; } }; }
 	}
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
 	// Only the deserializer factory is substituted; SubjectContent, repository and saver are real.
 	class SWSExtension {
 		public const NS_SCHEMA = 7480;
@@ -151,12 +151,12 @@ namespace ProfessionalWiki\SWS {
 		public static ?\Closure $resolver = null;
 		public function getDataLanguages(): array { return []; }
 		public function getRevisionPolicy(): mixed { return self::$policy; }
-		public function getPersistenceSchemaDeserializer(): mixed { return new \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \ProfessionalWiki\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
+		public function getPersistenceSchemaDeserializer(): mixed { return new \AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
 		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schema; } }; }
 		public function newSubjectResolver( mixed $parser ): mixed { return ( self::$resolver )(); }
 		public function newHookPageRebuilder(): mixed { return new class { public function rebuild( mixed $title ): void {} }; }
-		public static \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer $deserializer;
+		public static \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer $deserializer;
 		public static function getInstance(): self { return new self(); }
-		public function newSubjectContentDataDeserializer(): \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer { return self::$deserializer; }
+		public function newSubjectContentDataDeserializer(): \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer { return self::$deserializer; }
 	}
 }

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
+namespace AEWI\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Renderer\ContentParseParams;
@@ -11,14 +11,14 @@ use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Content\MappingContent;
+use AEWI\SWS\EntryPoints\Content\MappingContentHandler;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\MappingContentHandler
- * @covers \ProfessionalWiki\SWS\Presentation\MappingPageHtmlBuilder
+ * @covers \AEWI\SWS\EntryPoints\Content\MappingContentHandler
+ * @covers \AEWI\SWS\Presentation\MappingPageHtmlBuilder
  * @group Database
  */
 class MappingContentHandlerParserOutputTest extends MediaWikiIntegrationTestCase {

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\RedHerb;
+namespace AEWI\SWS\Tests\RedHerb;
 
 use MediaWiki\Output\OutputPage;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\RedHerb\RedHerbFrontendModulesHook;
+use AEWI\RedHerb\RedHerbFrontendModulesHook;
 use Skin;
 
 /**
- * @covers \ProfessionalWiki\RedHerb\RedHerbFrontendModulesHook
+ * @covers \AEWI\RedHerb\RedHerbFrontendModulesHook
  */
 class RedHerbFrontendModulesHookTest extends TestCase {
 

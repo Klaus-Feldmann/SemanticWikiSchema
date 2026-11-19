@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects;
+namespace AEWI\SWS\Application\Queries\GetReferencingSubjects;
 
-use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Application\ReferencingSubjectLookup;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectLookup;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Value\RelationValue;
 
 /**
  * The Subjects whose relations point at a given one.

@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Permissions\PermissionStatus;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the pages whose Subjects decide whether they can be moved.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onGetUserPermissionsErrors
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onGetUserPermissionsErrors
  * @group Database
  */
 class SubjectIdTitledPageMoveTest extends SWSIntegrationTestCase {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Subject\Exception;
+namespace AEWI\SWS\Application\Subject\Exception;
 
 use RuntimeException;
 

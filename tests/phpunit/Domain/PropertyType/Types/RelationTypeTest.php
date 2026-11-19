@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\Schema\Property\RelationProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Tests\Data\TestRelation;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\RelationType
  */
 class RelationTypeTest extends TestCase {
 

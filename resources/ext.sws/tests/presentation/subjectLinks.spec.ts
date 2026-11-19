@@ -41,7 +41,7 @@ describe( 'subjectLinkUrlFromRow', () => {
 	it( 'leads to the Subject\'s own row on its page\'s Data tab on a page-first wiki', () => {
 		onWiki( false );
 
-		expect( subjectLinkUrlFromRow( target() ) ).toBe( '/wiki/Anvil?action=subjects#' + SUBJECT_ID );
+		expect( subjectLinkUrlFromRow( target() ) ).toBe( '/wiki/Anvil?action=entities#' + SUBJECT_ID );
 	} );
 
 } );

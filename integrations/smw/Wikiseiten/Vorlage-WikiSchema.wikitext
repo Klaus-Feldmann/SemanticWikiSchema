@@ -6,7 +6,7 @@ Einzelabfragen erfolgen über [[Modul:WikiSchema]]:
 * <code><nowiki>{{#invoke:WikiSchema|werte|Feldname}}</nowiki></code>
 * <code><nowiki>{{#invoke:WikiSchema|label|Feldname}}</nowiki></code>
 
-Seite, Subjekt, Sprache, Herkunft, Index und Trenner bleiben entsprechend dem Aufruf verwendbar.
+Die Parameter seite, entitaet, sprache, herkunft, index und trenner bleiben entsprechend dem Aufruf verwendbar. subjekt wird weiterhin als Alias für entitaet akzeptiert.
 Quellenzeilen können über [[Vorlage:WikiSchema/URL-Zeile]] ausgegeben werden.
 
 Optionale SMW-Namenszuordnungen stehen in <code>$wgWikiSchemaSmwMapping</code> in LocalSettings.php. Ein API- oder config-Wikimodul wird nicht benötigt. Die SMW-Eigenschaftsseiten bestimmen den gespeicherten Datentyp.

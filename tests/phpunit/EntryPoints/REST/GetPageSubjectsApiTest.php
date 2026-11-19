@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi
- * @covers \ProfessionalWiki\SWS\Presentation\RestGetPageSubjectsPresenter
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery
+ * @covers \AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi
+ * @covers \AEWI\SWS\Presentation\RestGetPageSubjectsPresenter
+ * @covers \AEWI\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery
  * @group Database
  */
 class GetPageSubjectsApiTest extends SWSIntegrationTestCase {

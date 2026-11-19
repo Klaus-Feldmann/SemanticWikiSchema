@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\RestUpdateStatementPresenter;
+use AEWI\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\PropertyNameRules;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\RestUpdateStatementPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class SetStatementApi extends SimpleHandler {
@@ -86,7 +86,7 @@ class SetStatementApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 			'propertyName' => [
 				self::PARAM_SOURCE => 'path',
@@ -103,7 +103,7 @@ class SetStatementApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'The Statement to store, as `{"propertyType": ..., "value": ...}`. `propertyType` defaults to the type the Subject\'s Schema gives the property. A value that is empty for its type removes the Statement. Shape documented at ' . DocumentationUrl::SubjectFormat->value . '.',
+				self::PARAM_DESCRIPTION => 'The Statement to store, as `{"propertyType": ..., "value": ...}`. `propertyType` defaults to the type the Entity\'s Schema gives the property. A value that is empty for its type removes the Statement. Shape documented at ' . DocumentationUrl::SubjectFormat->value . '.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',

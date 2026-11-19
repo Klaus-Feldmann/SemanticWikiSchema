@@ -1,27 +1,27 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Deferred\LinksUpdate\LinksUpdate;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 
 /** Gates ordinary writers instead of relying on the identity of the job-queue runner. */
 final class ProcessingHooks {
     public static ?Title $movedFrom = null;
 
     public static function queue( Title $title, ?Title $old = null ): void {
-        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
+        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
         MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title,
             [ 'page' => true ] + ( $old ? [ 'movedFrom' => $old->getPrefixedText() ] : [] ) ) );
     }
 
     public static function onRevisionDataUpdates( $title, $renderedRevision, array &$updates ): void {
         if ( !InternalPageProcessor::manages( $title, $renderedRevision->getRevision() ) ) { return; }
-        if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
+        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) {
             $updates = array_values( array_filter( $updates, static fn ( $update ) => !$update instanceof LinksUpdate ) );
             return;
         }
@@ -86,7 +86,7 @@ final class ProcessingHooks {
         $title = $data->getSubject()->getTitle();
         $stamp = $data->getExtensionData( ProcessingResult::STAMP );
         if ( $title && ProcessingResult::isCurrent( $title, $stamp ) ) {
-            ProcessingState::record( $title, ProcessingResult::semanticHash( $data ) === ProcessingResult::semanticHash( null ) ? 'complete-empty' : 'complete', $stamp['revision'] );
+            ProcessingState::record( $title, ProcessingResult::semanticHash( $data ) === ProcessingResult::semanticHash( null ) ? 'complete-empty' : 'complete', $stamp['revision'], $stamp, 'smw-store' );
         }
     }
 

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Persistence\PublishedSubjectIndex;
 use stdClass;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Timestamp\ConvertibleTimestamp;

@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
 use stdClass;
 
 /** Rewrites only declared identity/reference positions, never arbitrary research text or source values. */

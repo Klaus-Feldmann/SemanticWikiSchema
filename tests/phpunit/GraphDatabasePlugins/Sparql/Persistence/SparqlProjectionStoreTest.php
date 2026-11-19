@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Persistence;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Persistence;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageProperties;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
-use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
-use ProfessionalWiki\SWS\Tests\TestDoubles\CapturingSparqlUpdateEndpoint;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedPageProjector;
+use AEWI\SWS\Application\Rdf\RdfProjection;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageProperties;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\CallbackProjectionResolver;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\UnknownProjectionException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\ProjectionResolver;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore;
+use AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use AEWI\SWS\Tests\Domain\Rdf\ParsedRdf;
+use AEWI\SWS\Tests\TestDoubles\CapturingSparqlUpdateEndpoint;
+use AEWI\SWS\Tests\TestDoubles\FixedPageProjector;
 use Psr\Log\NullLogger;
 use RuntimeException;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
  */
 class SparqlProjectionStoreTest extends TestCase {
 

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Session\Session;
 use MediaWiki\Session\SessionId;
 use MediaWiki\Session\SessionProviderInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Every registered GET route must behave as a read endpoint. Driven off the route registrations so a
@@ -18,7 +18,7 @@ use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
  * Most tests use a non-persistent session: core overwrites the header for a persistent one, so the
  * cookieless anonymous case is the only one where SWS's own value survives.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReadOnlyEndpoint
+ * @covers \AEWI\SWS\EntryPoints\REST\ReadOnlyEndpoint
  */
 class ReadOnlyEndpointTest extends SWSIntegrationTestCase {
 	use HandlerTestTrait;

@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\FallbackContent;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePageIdentifiersLookup;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use Throwable;
 
 /**
  * The subject -> page index over the page lifecycle: what a wiki operation leaves the index holding,
  * and what a Subject id then resolves to.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder
- * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndexRebuilder
+ * @covers \AEWI\SWS\EntryPoints\OnRevisionCreatedHandler
  * @group Database
  */
 class SubjectPageIndexTest extends SWSIntegrationTestCase {

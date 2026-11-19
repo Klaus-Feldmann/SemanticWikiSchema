@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain;
+namespace AEWI\SWS\Domain;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Value\NeoValue;
 
 readonly class Statement {
 

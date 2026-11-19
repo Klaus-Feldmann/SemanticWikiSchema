@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\SubjectPageIndex;
 use Wikimedia\Rdbms\IDatabase;
 
 /**
@@ -146,7 +146,7 @@ class DatabaseSubjectPageIndex implements SubjectPageIndex {
 			}
 			$this->db->insert( 'sws_identity_host', [ 'swsih_id'=>$id, 'swsih_page'=>$pageId->id ], __METHOD__, [ 'IGNORE' ] );
 			$host = $this->db->selectField( 'sws_identity_host', 'swsih_page', [ 'swsih_id'=>$id ], __METHOD__, [ 'FOR UPDATE' ] );
-			if ( (int)$host !== $pageId->id ) { throw new \ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $id ) ); }
+			if ( (int)$host !== $pageId->id ) { throw new \AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException( new \AEWI\SWS\Domain\Subject\SubjectId( $id ) ); }
 			$this->db->update( 'sws_identity', [ 'swsi_used'=>1 ], [ 'swsi_id'=>$id ], __METHOD__ );
 		}
 	}

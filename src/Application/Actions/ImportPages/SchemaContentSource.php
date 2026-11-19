@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\ImportPages;
+namespace AEWI\SWS\Application\Actions\ImportPages;
 
 use DirectoryIterator;
 use FileFetcher\FileFetcher;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
 
 class SchemaContentSource {
 

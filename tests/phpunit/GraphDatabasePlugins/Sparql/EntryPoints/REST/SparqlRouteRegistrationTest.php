@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\REST;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\REST\SparqlRouteRegistration
  */
 class SparqlRouteRegistrationTest extends TestCase {
 
@@ -35,7 +35,7 @@ class SparqlRouteRegistrationTest extends TestCase {
 		$this->assertSame( '/sws/v0/query/sparql', $routes[0]['path'] );
 		$this->assertSame( [ 'POST' ], $routes[0]['method'] );
 		$this->assertSame(
-			'ProfessionalWiki\\SWS\\SWSExtension::newSparqlQueryApi',
+			'AEWI\\SWS\\SWSExtension::newSparqlQueryApi',
 			$routes[0]['factory']
 		);
 	}

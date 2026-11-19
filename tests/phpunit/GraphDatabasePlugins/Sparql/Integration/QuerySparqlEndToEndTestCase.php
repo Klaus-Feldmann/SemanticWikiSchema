@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 use MediaWiki\Config\ServiceOptions;
 use MediaWiki\Deferred\DeferredUpdates;
@@ -10,15 +10,15 @@ use MediaWiki\Http\HttpRequestFactory;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlUpdateEndpoint;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The headline write+query loop, exercised against a REAL, live SPARQL 1.1 store with REAL HTTP — no

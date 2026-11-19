@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Application\SubjectCountLookup;
+use AEWI\SWS\Application\SubjectCountLookup;
 use stdClass;
 use Wikimedia\Rdbms\IConnectionProvider;
 

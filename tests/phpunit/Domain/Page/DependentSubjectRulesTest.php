@@ -2,39 +2,39 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Page;
+namespace AEWI\SWS\Tests\Domain\Page;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\StatementDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Tests\Data\TestData;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 use Psr\Log\NullLogger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules
+ * @covers \AEWI\SWS\Domain\Page\DependentSubjectRules
  */
 class DependentSubjectRulesTest extends TestCase {
 

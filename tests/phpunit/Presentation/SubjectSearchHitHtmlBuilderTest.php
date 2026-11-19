@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
-use ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Application\Search\MatchedSearchLine;
+use AEWI\SWS\Application\Search\SubjectSearchMatch;
+use AEWI\SWS\Presentation\SubjectSearchHitHtmlBuilder;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * A Subject's labels, values, property names and Schema names are whatever an editor typed, so this
  * covers what becomes of them on the way into a search result row.
  *
- * @covers \ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder
+ * @covers \AEWI\SWS\Presentation\SubjectSearchHitHtmlBuilder
  */
 class SubjectSearchHitHtmlBuilderTest extends SWSIntegrationTestCase {
 

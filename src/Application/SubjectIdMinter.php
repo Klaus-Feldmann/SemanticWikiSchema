@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Infrastructure\IdGenerator;
 
 /**
  * Mints batches of fresh, mutually distinct Subject IDs for client-side wiring of interlinked
@@ -15,7 +15,7 @@ readonly class SubjectIdMinter {
 
 	public function __construct(
 		private IdGenerator $idGenerator,
-		private ?\ProfessionalWiki\SWS\Application\Identity\IdentityRegistry $identities = null,
+		private ?\AEWI\SWS\Application\Identity\IdentityRegistry $identities = null,
 		private string $owner = '',
 	) {
 	}
@@ -30,7 +30,7 @@ readonly class SubjectIdMinter {
 			if ( strlen( $requestKey ) > 120 || $requestKey === '' ) { throw new \InvalidArgumentException( 'Invalid batch request key' ); }
 			$ids = [];
 			for ( $i = 0; $i < $count; $i++ ) {
-				$id = $this->identities->reserveForOwner( \ProfessionalWiki\SWS\Domain\Identity\IdentityKind::Entity, 'batch:' . $requestKey . ':' . $count . ':' . $i, $this->owner );
+				$id = $this->identities->reserveForOwner( \AEWI\SWS\Domain\Identity\IdentityKind::Entity, 'batch:' . $requestKey . ':' . $count . ':' . $i, $this->owner );
 				$ids[] = new SubjectId( $id->text );
 			}
 			return $ids;

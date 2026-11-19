@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure\Rdf;
+namespace AEWI\SWS\Infrastructure\Rdf;
 
 use pietercolpaert\hardf\TriGWriter;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfStreamWriter;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfTerm;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfStreamWriter;
+use AEWI\SWS\Domain\Rdf\RdfTerm;
 use Psr\Log\LoggerInterface;
 
 /**
  * {@see RdfStreamWriter} backed by hardf's TriGWriter. This is the only place that knows hardf's
- * string term representation; the rest of the codebase deals in {@see \ProfessionalWiki\SWS\Domain\Rdf}
+ * string term representation; the rest of the codebase deals in {@see \AEWI\SWS\Domain\Rdf}
  * value objects.
  *
  * A quad is written only when hardf writes each of its IRIs as that IRI: between angle brackets, or as a

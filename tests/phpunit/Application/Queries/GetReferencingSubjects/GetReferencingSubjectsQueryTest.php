@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetReferencingSubjects;
+namespace AEWI\SWS\Tests\Application\Queries\GetReferencingSubjects;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
-use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsPresenter;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery;
+use AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsResponse;
+use AEWI\SWS\Application\ReferencingSubjectLookup;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
+ * @covers \AEWI\SWS\Application\Queries\GetReferencingSubjects\GetReferencingSubjectsQuery
  */
 class GetReferencingSubjectsQueryTest extends TestCase {
 

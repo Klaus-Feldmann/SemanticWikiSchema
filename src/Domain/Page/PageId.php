@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Page;
+namespace AEWI\SWS\Domain\Page;
 
 readonly class PageId {
 

@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageId;
 
 /**
  * The binding authorization for a write to a page's Subjects. Creating, replacing, deleting and

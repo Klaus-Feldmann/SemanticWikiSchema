@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Rdf;
+namespace AEWI\SWS\Domain\Rdf;
 
 /**
  * Incremental RDF writer. {@see write()} returns the serialized text produced for the given quads;

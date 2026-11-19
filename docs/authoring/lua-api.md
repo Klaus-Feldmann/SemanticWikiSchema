@@ -134,7 +134,7 @@ Returns the full data of any Subject by its ID, regardless of which page it live
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `subjectId` | string | Required. A Subject ID: 15 characters starting with `s` for a Subject of this wiki, or `sourceKey:localId` for one from another [Source](../api/subject-format.md#ids). |
+| `subjectId` | string | Required. A Subject ID: an `E` ID or an existing legacy `s` ID for an Entity of this wiki, or `sourceKey:localId` for one from another [Source](../api/subject-format.md#ids). |
 
 #### Returns
 

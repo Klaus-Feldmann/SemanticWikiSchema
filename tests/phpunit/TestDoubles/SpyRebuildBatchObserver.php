@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildBatchObserver;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Application\GraphRebuild\RebuildBatchObserver;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
 
 /**
  * Records the run as it stood after each batch, so a test can see how a rebuild advanced rather than

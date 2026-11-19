@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
+namespace AEWI\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\LayoutContentHandler;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Content\LayoutContent;
+use AEWI\SWS\EntryPoints\Content\LayoutContentHandler;
+use AEWI\SWS\SWSExtension;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\LayoutContentHandler
+ * @covers \AEWI\SWS\EntryPoints\Content\LayoutContentHandler
  * @group Database
  */
 class LayoutContentHandlerValidateSaveTest extends MediaWikiIntegrationTestCase {

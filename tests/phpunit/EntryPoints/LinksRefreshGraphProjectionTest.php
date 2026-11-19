@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\LinksRefreshHandler
+ * @covers \AEWI\SWS\EntryPoints\LinksRefreshHandler
  * @group Database
  */
 class LinksRefreshGraphProjectionTest extends SWSIntegrationTestCase {

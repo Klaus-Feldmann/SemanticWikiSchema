@@ -1,12 +1,12 @@
 <?php
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSchemas;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialSchemas;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSchemas
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialSchemas
  */
 class SpecialSchemasTest extends SpecialPageTestBase {
 

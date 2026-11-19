@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Contracts\TransactionInterface;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Page\PageId;
 use Psr\Log\LoggerInterface;
 
 class Neo4jSubjectUpdaterFactory {

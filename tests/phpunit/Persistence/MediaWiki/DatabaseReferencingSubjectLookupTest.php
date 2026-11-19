@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseReferencingSubjectLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
 class DatabaseReferencingSubjectLookupTest extends SWSIntegrationTestCase {

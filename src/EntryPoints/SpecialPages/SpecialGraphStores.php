@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
+namespace AEWI\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Message\Message;
 use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToCancelException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\StoreSyncState;
-use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatus;
+use AEWI\SWS\Application\GraphRebuild\NothingToCancelException;
+use AEWI\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use AEWI\SWS\Application\GraphRebuild\StoreSyncState;
+use AEWI\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
 use Throwable;
 
 /**

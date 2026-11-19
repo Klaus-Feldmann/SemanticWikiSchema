@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Infrastructure\IdGenerator;
 
 /**
  * The id a Subject about to be created gets: the one the caller minted for it, or a fresh one where
@@ -21,7 +21,7 @@ readonly class NewSubjectIdResolver {
 		private SubjectIdParser $subjectIdParser,
 		private IdGenerator $idGenerator,
 		private PageIdentifiersLookup $pageIdentifiersLookup,
-		private ?\ProfessionalWiki\SWS\Application\Identity\IdentityRegistry $identities = null,
+		private ?\AEWI\SWS\Application\Identity\IdentityRegistry $identities = null,
 		private string $owner = '',
 	) {
 	}
@@ -34,7 +34,7 @@ readonly class NewSubjectIdResolver {
 	public function resolve( ?string $suppliedId ): SubjectId {
 		if ( $suppliedId === null ) {
 			if ( $this->identities !== null ) {
-				$id = $this->identities->reserveForOwner( \ProfessionalWiki\SWS\Domain\Identity\IdentityKind::Entity, bin2hex( random_bytes( 16 ) ), $this->owner );
+				$id = $this->identities->reserveForOwner( \AEWI\SWS\Domain\Identity\IdentityKind::Entity, bin2hex( random_bytes( 16 ) ), $this->owner );
 				return new SubjectId( $id->text );
 			}
 			return SubjectId::createNew( $this->idGenerator );
@@ -47,7 +47,7 @@ readonly class NewSubjectIdResolver {
 		}
 
 		if ( $this->identities !== null && !$this->isInUse( $subjectId ) ) {
-			if ( !$subjectId->isSequential() || !$this->identities->canCreate( new \ProfessionalWiki\SWS\Domain\Identity\EntityId( $subjectId->text ), $this->owner ) ) {
+			if ( !$subjectId->isSequential() || !$this->identities->canCreate( new \AEWI\SWS\Domain\Identity\EntityId( $subjectId->text ), $this->owner ) ) {
 				throw new InvalidArgumentException( 'New entity IDs must be reserved by the current author' );
 			}
 		}

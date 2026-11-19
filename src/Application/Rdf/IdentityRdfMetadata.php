@@ -1,8 +1,8 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Rdf;
-use ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity;
-use ProfessionalWiki\SWS\Domain\Rdf\{Iri, Quad, RdfNamespaces, RdfLiteralFactory};
+namespace AEWI\SWS\Application\Rdf;
+use AEWI\SWS\Domain\Identity\LocalizedIdentity;
+use AEWI\SWS\Domain\Rdf\{Iri, Quad, RdfNamespaces, RdfLiteralFactory};
 final class IdentityRdfMetadata {
  public static function quads( Iri $resource, LocalizedIdentity $identity, Iri $graph ): array {
   $quads = [];

@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
+namespace AEWI\SWS\Tests\Domain\Subject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectLabel
+ * @covers \AEWI\SWS\Domain\Subject\SubjectLabel
  */
 class SubjectLabelTest extends TestCase {
 

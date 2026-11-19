@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
 use Exception;
 use MediaWiki\Revision\RevisionLookup;
@@ -12,15 +12,15 @@ use MediaWiki\Storage\NameTableStore;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFormatter;
 use MediaWiki\Utils\MWTimestamp;
-use ProfessionalWiki\SWS\Application\HostSubjectBuilder;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Application\HostSubjectBuilder;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Application\SubjectSummaries\RecentlyEditedSubjectLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummary;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
 use stdClass;
 use TypeError;
 use Wikimedia\Rdbms\IConnectionProvider;

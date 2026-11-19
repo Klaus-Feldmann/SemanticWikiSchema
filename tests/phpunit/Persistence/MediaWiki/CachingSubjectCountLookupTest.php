@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\SubjectCountLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSubjectCountLookup;
+use AEWI\SWS\Application\SubjectCountLookup;
+use AEWI\SWS\Persistence\MediaWiki\CachingSubjectCountLookup;
 use Wikimedia\ObjectCache\HashBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSubjectCountLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\CachingSubjectCountLookup
  */
 class CachingSubjectCountLookupTest extends TestCase {
 

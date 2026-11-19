@@ -4,13 +4,13 @@ require __DIR__.'/direct-field-read-contract.php';
 use CollectorHarness\State as Q;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
-use ProfessionalWiki\SWS\Domain\Schema\{PropertyName,PropertyDefinition,PropertyDefinitions,Schema,SchemaName};
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
+use AEWI\SWS\Domain\Schema\{PropertyName,PropertyDefinition,PropertyDefinitions,Schema,SchemaName};
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
+use AEWI\SWS\SWSExtension;
 $checks=0;
 function qcheck($ok,$why){global $checks;$checks++;if(!$ok)throw new RuntimeException($why);}
 Q::$mode='store';Q::$denied=[];Q::$requests=[];Q::$cache=[];
@@ -23,14 +23,14 @@ $source=SourceSnapshot::recordAttempt($eid,943,201,[901=>100],'de','2026-11-13T1
 $entity=new Subject($eid,null,$subject->getSchemaReference(),new StatementList([
  new Statement(new PropertyName('F12'),'text',new StringValue('Eins','Zwei')),
  new Statement(new PropertyName('Name'),'text',new StringValue('<b>Entität</b>'))
-]),['Ort'=>'Notiz E3'],$source,new \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity('de'));
+]),['Ort'=>'Notiz E3'],$source,new \AEWI\SWS\Domain\Identity\LocalizedIdentity('de'));
 setStorePage($entity,202);
-$ownResolver=new class($entity) extends \ProfessionalWiki\SWS\Application\SubjectResolver {
+$ownResolver=new class($entity) extends \AEWI\SWS\Application\SubjectResolver {
  public int $idReads=0,$mainReads=0;
  public function __construct(private Subject $entity){}
  public function resolveById(string $id): ?Subject{$this->idReads++;return $id==='E3'?$this->entity:null;}
  public function resolveMainByTitle(Title $title): ?Subject{$this->mainReads++;return $this->entity;}
- public function resolveDisplayValue(Subject $s,Statement $v): \ProfessionalWiki\SWS\Domain\Value\NeoValue{return $v->getValue();}
+ public function resolveDisplayValue(Subject $s,Statement $v): \AEWI\SWS\Domain\Value\NeoValue{return $v->getValue();}
 };
 $p=new Parser();$fn=new SWSValueParserFunction($ownResolver,ParserFieldLookup::create($p));
 qcheck($fn->handle($p,'E3','F12')[0]==='Eins, Zwei','Explicit E-ID and schema-local field');

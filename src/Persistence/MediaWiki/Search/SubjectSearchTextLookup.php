@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Search;
+namespace AEWI\SWS\Persistence\MediaWiki\Search;
 
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\Application\Search\SubjectSearchTextBuilder;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**

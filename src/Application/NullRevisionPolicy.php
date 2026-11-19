@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;

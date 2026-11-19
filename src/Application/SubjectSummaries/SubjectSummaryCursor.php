@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
+namespace AEWI\SWS\Application\SubjectSummaries;
 
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectId;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
 /**

@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Validation;
+namespace AEWI\SWS\Tests\Application\Validation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Domain\Schema\Property\NumberProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSchema;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator
+ * @covers \AEWI\SWS\Application\Validation\ProposedSubjectValidator
  */
 class ProposedSubjectValidatorTest extends TestCase {
 

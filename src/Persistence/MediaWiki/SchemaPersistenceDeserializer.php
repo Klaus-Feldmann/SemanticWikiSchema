@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
 
 /**
  * MediaWiki revision SPECIFIC deserializer. Not for general use such as in the presentation layer.
@@ -38,12 +38,12 @@ class SchemaPersistenceDeserializer {
 		if ( !in_array( $version, [1, 2], true ) ) { throw new InvalidArgumentException( 'Unsupported schema content version' ); }
 		return new Schema(
 			name: $schemaName,
-			id: $version === 2 ? new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( $json['id'] ?? '' ) : null,
-			identity: $version === 2 ? \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $json ) : null,
+			id: $version === 2 ? new \AEWI\SWS\Domain\Identity\SchemaId( $json['id'] ?? '' ) : null,
+			identity: $version === 2 ? \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromJson( $json ) : null,
 			description: $json['description'] ?? '',
 			properties: $this->propertiesFromJson( $json ),
 			subjectsAreDependent: ( $json['subjectsAreDependent'] ?? false ) === true,
-			fieldKeyChanges: \ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::validateHistory( $json['fieldKeyChanges'] ?? [] ),
+			fieldKeyChanges: \AEWI\SWS\Domain\Schema\FieldKeyChanges::validateHistory( $json['fieldKeyChanges'] ?? [] ),
 		);
 	}
 

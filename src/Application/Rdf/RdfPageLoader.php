@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\PagePropertiesBuilder;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\PagePropertiesBuilder;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 
 /**
  * Loads a {@see Page} domain object from the revision the registered revision policy publishes, so it

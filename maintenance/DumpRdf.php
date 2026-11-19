@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use Exception;
 use Maintenance;
-use ProfessionalWiki\SWS\Application\Rdf\PageProjector;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfStreamWriter;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Rdf\PageProjector;
+use AEWI\SWS\Application\Rdf\RdfPageLoader;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfStreamWriter;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;
 

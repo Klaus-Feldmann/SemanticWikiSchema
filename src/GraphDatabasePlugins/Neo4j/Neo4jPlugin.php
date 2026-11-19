@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j;
 
 use Laudis\Neo4j\Contracts\ClientInterface;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdaterFactory;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\ExplainCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\KeywordCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jReadQueryEngine;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction\CypherRawParserFunction;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jClientReadQueryEngine;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jConstraintUpdater;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jResultNormalizer;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jSubjectUpdaterFactory;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jWriteQueryEngine;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
 use Psr\Log\LoggerInterface;
 
 /**

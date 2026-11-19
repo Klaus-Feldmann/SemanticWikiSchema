@@ -1,17 +1,17 @@
 <?php
 // Real read-model and persistence paths; source snapshots and localized messages are controlled inputs.
 require dirname(__DIR__).'/tests/standalone/autoload.php';
-use ProfessionalWiki\SWS\Application\Semantic\{FieldValues,AnnotationPlanner,FieldNoteAnnotations,FieldSnapshot};
-use ProfessionalWiki\SWS\Domain\FieldNotes;
-use ProfessionalWiki\SWS\Domain\Schema\{PropertyCore,PropertyDefinitions,Schema,SchemaName,PropertyDefinition};
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Subject\{SubjectId,SubjectIdParser,StatementList,Subject};
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataSerializer,SubjectContentDataDeserializer};
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Application\Semantic\{FieldValues,AnnotationPlanner,FieldNoteAnnotations,FieldSnapshot};
+use AEWI\SWS\Domain\FieldNotes;
+use AEWI\SWS\Domain\Schema\{PropertyCore,PropertyDefinitions,Schema,SchemaName,PropertyDefinition};
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Subject\{SubjectId,SubjectIdParser,StatementList,Subject};
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Persistence\MediaWiki\Subject\{SubjectContentDataSerializer,SubjectContentDataDeserializer};
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 function wfMessage($key,...$args){return new class($key,$args){public function __construct(private $key,private $args){}public function inContentLanguage(){return $this;}public function text(){return match($this->key){'sws-notes-property-suffix'=>' (AM)','sws-notes-source-unavailable'=>implode(' ',$this->args).' derzeit nicht abrufbar.',default=>$this->key.':'.implode(' ',$this->args)};}};}
 $n=0;function check($ok,$why){global $n;$n++;if(!$ok)throw new RuntimeException($why);}
 $binding=['source'=>'wikidata','id'=>'P19'];
@@ -56,7 +56,7 @@ check(FieldNotes::forSchema(['Leer'=>'Neu'],[], $plainSchema)===['Leer'=>'Neu'],
 check(FieldNotes::forSchema(['Alt'=>'Bestehend'],['Alt'=>'Bestehend'],null)===['Alt'=>'Bestehend'],'Unknown/disabled existing notes are retained');
 check(FieldNotes::forSchema([],['Alt'=>'Bestehend'],null)===[],'Explicit removal remains possible after schema changes');
 try{FieldNotes::forSchema(['Neu'=>'Forged'],[],null);check(false,'Unconfigured note accepted');}catch(InvalidArgumentException){check(true,'Write path requires schema permission for new notes');}
-$normalizer=new class implements \ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceNormalizer { public function normalize(\ProfessionalWiki\SWS\Domain\Schema\SchemaReference $ref): \ProfessionalWiki\SWS\Domain\Schema\SchemaReference{return $ref;} };
+$normalizer=new class implements \AEWI\SWS\Domain\Schema\SchemaReferenceNormalizer { public function normalize(\AEWI\SWS\Domain\Schema\SchemaReference $ref): \AEWI\SWS\Domain\Schema\SchemaReference{return $ref;} };
 $parser=new SchemaReferenceParser('aewi',$normalizer);$registry=PropertyTypeRegistry::withCoreTypes($parser);
 $definition=PropertyDefinition::fromJson(['type'=>'text','fieldNotes'=>['type'=>'wikitext','annotate'=>true]],$registry);
 check($definition->toJson()['fieldNotes']===['type'=>'wikitext','annotate'=>true],'Schema note configuration roundtrip');

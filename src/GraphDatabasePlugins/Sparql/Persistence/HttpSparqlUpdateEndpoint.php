@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence;
 
 use MediaWiki\Http\HttpRequestFactory;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlUpdateFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlUpdateEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlUpdateFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlUpdateEndpoint;
 
 /**
  * Posts SPARQL 1.1 Update requests over HTTP: the update text is the request body with a

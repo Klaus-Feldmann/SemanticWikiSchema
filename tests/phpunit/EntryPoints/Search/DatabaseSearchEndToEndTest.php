@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use ISearchResultSet;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
 
 /**
  * What a reader of Special:Search finds, against a real full-text index. Needs a database that has one,
@@ -17,8 +17,8 @@ use ProfessionalWiki\SWS\Tests\Data\TestSubject;
  * covers what is handed to the engine on any database.
  *
  * @group Database
- * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchMySQLWithSubjects
- * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchSqliteWithSubjects
+ * @covers \AEWI\SWS\EntryPoints\Search\SearchMySQLWithSubjects
+ * @covers \AEWI\SWS\EntryPoints\Search\SearchSqliteWithSubjects
  */
 class DatabaseSearchEndToEndTest extends FullTextSearchTestCase {
 

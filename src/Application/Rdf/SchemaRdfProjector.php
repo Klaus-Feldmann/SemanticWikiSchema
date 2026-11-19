@@ -1,8 +1,8 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Rdf;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Rdf\{Iri, Quad, QuadList, RdfNamespaces, RdfLiteralFactory};
+namespace AEWI\SWS\Application\Rdf;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Rdf\{Iri, Quad, QuadList, RdfNamespaces, RdfLiteralFactory};
 final readonly class SchemaRdfProjector {
  public function __construct( private RdfNamespaces $namespaces ) {}
  public function project( Schema $schema ): QuadList {

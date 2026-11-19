@@ -137,7 +137,7 @@ namespace Wikibase\Repo {
 		}; }
 	}
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
 	class SWSExtension {
 		public const NS_SCHEMA = 7480;
 		public static mixed $resolver;
@@ -145,7 +145,7 @@ namespace ProfessionalWiki\SWS {
         public static array $schemaById = [];
 		public static mixed $deserializer;
 		public static function getInstance(): self { return new self(); }
-		public function getPersistenceSchemaDeserializer(): mixed { return new \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \ProfessionalWiki\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
+		public function getPersistenceSchemaDeserializer(): mixed { return new \AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
 		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schemaById[$ref->id?->text ?? ''] ?? SWSExtension::$schema; } }; }
 		public function newSubjectResolver(mixed $parser): mixed { return self::$resolver; }
         public function newIdentityBoundaryResolver(): mixed { return new class { public function entity($id) { return $id; } }; }
@@ -154,7 +154,7 @@ namespace ProfessionalWiki\SWS {
             public function resolveReadableHostingPage($id): mixed {
                 $title=new \MediaWiki\Title\Title();
                 if (!$this->authority->authorizeRead('read',$title) || !\CollectorHarness\State::$revision->getContent('sws')->getPageSubjects()->getAllSubjects()->getSubject($id)) { return null; }
-                return new class { public function getId(): mixed { return new \ProfessionalWiki\SWS\Domain\Page\PageId(943); } public function getTitle(): string { return 'Artikel'; } };
+                return new class { public function getId(): mixed { return new \AEWI\SWS\Domain\Page\PageId(943); } public function getTitle(): string { return 'Artikel'; } };
             }
         }; }
         public function getDataLanguages(): array { return []; }
@@ -168,7 +168,7 @@ namespace ProfessionalWiki\SWS {
 		public function newSubjectContentRepository( mixed $authority ): mixed { return new class {
 			public function getSubjectContentByRevisionId( int $id ): mixed { return \CollectorHarness\State::$revisions[$id]?->getContent( 'sws' ); }
 		}; }
-		public function getRdfNamespaces(): mixed { return new \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces( 'https://local.example' ); }
-		public function getRdfSerializer(): mixed { return new \ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer( $this->getRdfNamespaces()->prefixMap(), new \Psr\Log\NullLogger() ); }
+		public function getRdfNamespaces(): mixed { return new \AEWI\SWS\Domain\Rdf\RdfNamespaces( 'https://local.example' ); }
+		public function getRdfSerializer(): mixed { return new \AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer( $this->getRdfNamespaces()->prefixMap(), new \Psr\Log\NullLogger() ); }
 	}
 }

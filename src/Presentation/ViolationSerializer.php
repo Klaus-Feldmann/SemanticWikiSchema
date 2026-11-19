@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Violation;
 
 final class ViolationSerializer {
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 /**
  * The subjects a write transaction may have orphaned, collected as it goes.

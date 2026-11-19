@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseDeletedPageIdsLookup
  * @group Database
  */
 class DatabaseDeletedPageIdsLookupTest extends SWSIntegrationTestCase {

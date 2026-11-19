@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Search;
+namespace AEWI\SWS\Application\Search;
 
 /**
  * Which Subject a search hit matched, and through which lines.

@@ -2,35 +2,35 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
 use LogicException;
-use ProfessionalWiki\SWS\Domain\LanguageTag;
-use ProfessionalWiki\SWS\Domain\Mapping\CurieExpander;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMappings;
-use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfTerm;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\LanguageTag;
+use AEWI\SWS\Domain\Mapping\CurieExpander;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\NodeMapping;
+use AEWI\SWS\Domain\Mapping\NodeScope;
+use AEWI\SWS\Domain\Mapping\PropertyMapping;
+use AEWI\SWS\Domain\Mapping\PropertyMappings;
+use AEWI\SWS\Domain\Mapping\SchemaMapping;
+use AEWI\SWS\Domain\Mapping\SubjectMapping;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfLiteralFactory;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfTerm;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Value\RelationValue;
 use Psr\Log\LoggerInterface;
 
 /**

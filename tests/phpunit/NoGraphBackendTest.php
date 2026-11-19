@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
@@ -16,29 +16,29 @@ use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectLabelsApi;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\SubjectDataLookup;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Domain\GraphDatabase\GraphBackendNotConfiguredException;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\EntryPoints\REST\GetReferencingSubjectsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectLabelsApi;
+use AEWI\SWS\EntryPoints\Scribunto\SubjectDataLookup;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
 use TestLogger;
 
 /**
  * A wiki with no graph backend configured is a supported mode: Subjects are stored, found, read and
  * rendered without one, and only the query surfaces a backend brings are unavailable (#1040).
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \AEWI\SWS\SWSExtension
  * @group Database
  */
 class NoGraphBackendTest extends SWSIntegrationTestCase {

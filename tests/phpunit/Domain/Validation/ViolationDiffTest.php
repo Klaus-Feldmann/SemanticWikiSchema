@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Validation;
+namespace AEWI\SWS\Tests\Domain\Validation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Domain\Validation\ViolationDiff;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\ViolationDiff;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Validation\ViolationDiff
+ * @covers \AEWI\SWS\Domain\Validation\ViolationDiff
  */
 class ViolationDiffTest extends TestCase {
 

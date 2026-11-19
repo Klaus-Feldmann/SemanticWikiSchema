@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Domain\Page\PageDateTime;
-use ProfessionalWiki\SWS\Domain\Page\PageProperties;
+use AEWI\SWS\Domain\Page\PageDateTime;
+use AEWI\SWS\Domain\Page\PageProperties;
 
 class TestPageProperties {
 

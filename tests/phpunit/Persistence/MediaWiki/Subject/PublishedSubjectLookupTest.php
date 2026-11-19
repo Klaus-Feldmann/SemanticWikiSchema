@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Application\NullRevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\PublishedSubjectLookup
  * @group Database
  */
 class PublishedSubjectLookupTest extends SWSIntegrationTestCase {

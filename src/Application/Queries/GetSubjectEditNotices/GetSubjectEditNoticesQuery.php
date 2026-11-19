@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices;
+namespace AEWI\SWS\Application\Queries\GetSubjectEditNotices;
 
-use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
-use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeEnvironment;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
+use AEWI\SWS\Application\EditNotice\SubjectEditNoticeEnvironment;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNotice;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Domain\Page\PageId;
 
 readonly class GetSubjectEditNoticesQuery {
 

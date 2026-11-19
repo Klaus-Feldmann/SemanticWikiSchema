@@ -1,17 +1,17 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Api;
+namespace AEWI\SWS\EntryPoints\Api;
 
 use ApiBase;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\Property\WikitextValueProperty;
 use Wikimedia\Rdbms\IDBAccessObject;
-use ProfessionalWiki\SWS\EntryPoints\Processing\UserWikitextRenderer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\EntryPoints\Processing\UserWikitextRenderer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 
 /** A page batch shares one authorized revision. Neither submitted source nor store writes. */
 final class ApiRenderWikitext extends ApiBase {

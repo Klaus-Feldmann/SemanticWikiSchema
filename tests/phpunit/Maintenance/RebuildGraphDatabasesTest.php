@@ -2,28 +2,28 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Maintenance;
+namespace AEWI\SWS\Tests\Maintenance;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
-use ProfessionalWiki\SWS\Maintenance\RebuildGraphDatabases;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use AEWI\SWS\Maintenance\RebuildGraphDatabases;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
 // Its RUN_MAINTENANCE_IF_MAIN guard is a no-op under PHPUnit, so this does not execute the script.
 require_once __DIR__ . '/../../../maintenance/RebuildGraphDatabases.php';
 
 /**
- * @covers \ProfessionalWiki\SWS\Maintenance\RebuildGraphDatabases
+ * @covers \AEWI\SWS\Maintenance\RebuildGraphDatabases
  * @group Database
  */
 class RebuildGraphDatabasesTest extends SWSIntegrationTestCase {
@@ -79,7 +79,7 @@ class RebuildGraphDatabasesTest extends SWSIntegrationTestCase {
 	}
 
 	/**
-	 * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore::initialize
+	 * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jProjectionStore::initialize
 	 */
 	public function testRebuildCreatesGraphUniquenessConstraints(): void {
 		// setUpNeo4j() dropped any pre-existing constraints, so the graph starts without them. A subject
@@ -119,7 +119,7 @@ class RebuildGraphDatabasesTest extends SWSIntegrationTestCase {
 	 * The rebuild runs on wikis with no graph backend configured (e.g. a SPARQL-only install with no
 	 * store), so its initialization step must be a no-op there rather than throwing.
 	 *
-	 * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin::initialize
+	 * @covers \AEWI\SWS\Domain\GraphDatabase\CompositeGraphDatabasePlugin::initialize
 	 */
 	public function testInitializingGraphDatabasesDoesNotThrowWithoutABackend(): void {
 		$this->runWithoutGraphBackend( function (): void {

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Application;
 
 /**
  * The store's response to a query: the W3C `application/sparql-results+json` document, decoded and

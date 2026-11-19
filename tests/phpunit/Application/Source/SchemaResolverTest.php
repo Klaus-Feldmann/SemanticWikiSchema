@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Source;
+namespace AEWI\SWS\Tests\Application\Source;
 
 use Psr\Log\LogLevel;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Source\SchemaResolver
+ * @covers \AEWI\SWS\Application\Source\SchemaResolver
  */
 class SchemaResolverTest extends TestCase {
 
@@ -70,8 +70,8 @@ class SchemaResolverTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $localSchemas
-	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $otherSchemas
+	 * @param \AEWI\SWS\Domain\Schema\Schema[] $localSchemas
+	 * @param \AEWI\SWS\Domain\Schema\Schema[] $otherSchemas
 	 */
 	private function newResolver(
 		array $localSchemas = [],
@@ -86,7 +86,7 @@ class SchemaResolverTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\SWS\Domain\Schema\Schema[] $schemas
+	 * @param \AEWI\SWS\Domain\Schema\Schema[] $schemas
 	 */
 	private function newSource( array $schemas ): InMemorySource {
 		$source = new InMemorySource();

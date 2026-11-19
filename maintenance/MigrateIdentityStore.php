@@ -1,13 +1,13 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use MediaWiki\Maintenance\Maintenance;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\IdentityMigration\{InventoryPlanner,MigrationCoordinator,MigrationJournal,DurableCheckpoint,MigrationFieldAdditionLog,ReferenceRewriter};
-use ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\IdentityMigration\{InventoryPlanner,MigrationCoordinator,MigrationJournal,DurableCheckpoint,MigrationFieldAdditionLog,ReferenceRewriter};
+use AEWI\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost;
+use AEWI\SWS\SWSExtension;
 
 $basePath=getenv('MW_INSTALL_PATH')!==false?getenv('MW_INSTALL_PATH'):__DIR__.'/../../..';
 require_once $basePath.'/maintenance/Maintenance.php';

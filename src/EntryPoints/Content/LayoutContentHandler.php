@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -11,9 +11,9 @@ use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutContentValidator;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\LayoutContentValidator;
 use StatusValue;
 
 class LayoutContentHandler extends JsonContentHandler {

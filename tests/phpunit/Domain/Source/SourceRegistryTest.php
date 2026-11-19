@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Source;
+namespace AEWI\SWS\Tests\Domain\Source;
 
 use Closure;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Source\Source;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Domain\Source\Source;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Source\SourceRegistry
+ * @covers \AEWI\SWS\Domain\Source\SourceRegistry
  */
 class SourceRegistryTest extends TestCase {
 

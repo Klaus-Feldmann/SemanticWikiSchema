@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\Severity;
 
 readonly class PropertyCore {
 

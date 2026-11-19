@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Api\IApiMessage;
 use MediaWiki\MediaWikiServices;
@@ -11,8 +11,8 @@ use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseException;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**

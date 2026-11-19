@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -10,18 +10,18 @@ use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the database for the page linked to, whose label is read from its Subject slot.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onHtmlPageLinkRendererBegin
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onChangesListInitRows
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onChangesListSpecialPageStructuredFilters
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onHtmlPageLinkRendererBegin
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onChangesListInitRows
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onChangesListSpecialPageStructuredFilters
  * @group Database
  */
 class SubjectIdTitledPageLinkTest extends SWSIntegrationTestCase {

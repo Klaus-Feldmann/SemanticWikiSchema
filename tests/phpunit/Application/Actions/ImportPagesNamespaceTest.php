@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\SWS\Persistence\PageDeleter;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ImportPresenterSpy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\PageContentSaverStub;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use AEWI\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\MappingContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\PageContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use AEWI\SWS\Persistence\ImportedPageTitlesLookup;
+use AEWI\SWS\Persistence\PageDeleter;
+use AEWI\SWS\Tests\TestDoubles\ImportPresenterSpy;
+use AEWI\SWS\Tests\TestDoubles\PageContentSaverStub;
 
 /**
  * Covers the title and content model each demo data source directory imports into. The saver is a
  * stub, so what the action derives from the file names can be checked without touching the database.
  *
- * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction
  */
 class ImportPagesNamespaceTest extends MediaWikiIntegrationTestCase {
 

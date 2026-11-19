@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\SWSConfig;
-use ProfessionalWiki\SWS\SparqlStoreConfig;
+use AEWI\SWS\SWSConfig;
+use AEWI\SWS\SparqlStoreConfig;
 
 /**
- * @covers \ProfessionalWiki\SWS\SWSConfig
+ * @covers \AEWI\SWS\SWSConfig
  */
 class SWSConfigTest extends TestCase {
 

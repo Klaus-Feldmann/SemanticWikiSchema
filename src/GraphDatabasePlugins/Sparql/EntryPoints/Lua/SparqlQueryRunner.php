@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryPermissionDeniedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryRequest;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
 
 /**
  * Runs a SPARQL query for nw.sparqlQuery() and returns the W3C results document as a Lua table,
  * preserving the standard `head` / `results.bindings` structure. The read-side sibling of
- * {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner}.
+ * {@see \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\Lua\CypherQueryRunner}.
  */
 class SparqlQueryRunner {
 

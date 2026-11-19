@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration;
+namespace AEWI\SWS\Persistence\MediaWiki\IdentityMigration;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
@@ -9,13 +9,13 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\IdentityMigration\{MigrationHost,MigrationWriteScope,ReferenceRewriter,MigrationJsonShapeRepair,MigrationFieldRepairScope,MigrationFieldDefinitionSelector,MigrationFieldAdditionLog};
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\{SchemaContent,SubjectContent,MappingContent,LayoutContent};
-use ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\{PageContentSaver,PageContentSavingStatus,SubjectSlotPages};
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\IdentityMigration\{MigrationHost,MigrationWriteScope,ReferenceRewriter,MigrationJsonShapeRepair,MigrationFieldRepairScope,MigrationFieldDefinitionSelector,MigrationFieldAdditionLog};
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\{SchemaContent,SubjectContent,MappingContent,LayoutContent};
+use AEWI\SWS\EntryPoints\Processing\SourceRefreshReceipt;
+use AEWI\SWS\Persistence\MediaWiki\{PageContentSaver,PageContentSavingStatus,SubjectSlotPages};
+use AEWI\SWS\SWSExtension;
 use Wikimedia\Rdbms\{IDatabase,IDBAccessObject};
 
 /** Ordinary MediaWiki revisions and CAS writes; no direct revision/slot SQL manipulation. */
@@ -108,7 +108,7 @@ final class MediaWikiMigrationHost implements MigrationHost {
         }
         foreach($plan['operations']as$op) {
             if($op['action']==='create-schema') {
-                $validator=\ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance();
+                $validator=\AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance();
                 if(!$validator->validate($op['json'])) { throw new \RuntimeException('Planned schema is invalid: '.json_encode($validator->getErrors())); }
             }
         }
@@ -270,7 +270,7 @@ final class MediaWikiMigrationHost implements MigrationHost {
         $placeholder=wfMessage('sws-migration-field-added-placeholder')->inLanguage($language)->text();
         $selection=MigrationFieldDefinitionSelector::select($request['field'],$schemas,$placeholder);
         $next=ReferenceRewriter::object($beforeJson);$next->propertyDefinitions->{$request['field']}=$selection['definition'];$afterJson=ReferenceRewriter::encode($next);
-        $validator=\ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance();
+        $validator=\AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator::newInstance();
         if(!$validator->validate($afterJson)){throw new \RuntimeException('Automatically completed schema is invalid: '.$request['schemaId']);}
         $entry=['schemaId'=>$request['schemaId'],'schemaLabel'=>$data->labels->{$data->identityLanguage??$language}??$request['schemaId'],
             'field'=>$request['field'],'page'=>$request['page'],'caller'=>$request['caller'],'language'=>$language,

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\PageSubjectsLookup
+ * @covers \AEWI\SWS\Application\PageSubjectsLookup
  */
 class PageSubjectsLookupTest extends TestCase {
 

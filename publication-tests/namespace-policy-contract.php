@@ -24,7 +24,7 @@ namespace MediaWiki {
         public function getMainConfig() { return new class { public function get($key) { if($key!=='SWSAdditionalSubjectNamespaces')throw new \RuntimeException($key);return MediaWikiServices::$additional; } }; }
     }
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
     class SWSExtension {
         public const NS_SCHEMA=7474,NS_LAYOUT=7476,NS_MAPPING=7478;
         public static function getInstance() { return new self; }
@@ -33,8 +33,8 @@ namespace ProfessionalWiki\SWS {
 }
 namespace {
     require dirname(__DIR__).'/tests/standalone/autoload.php';
-    use ProfessionalWiki\SWS\Infrastructure\{SubjectNamespacePolicy,AuthorityBasedSubjectAuthorizer};
-    use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
+    use AEWI\SWS\Infrastructure\{SubjectNamespacePolicy,AuthorityBasedSubjectAuthorizer};
+    use AEWI\SWS\EntryPoints\Actions\SubjectsAction;
     use MediaWiki\Title\{Title,TitleFactory};
     use MediaWiki\MediaWikiServices as Services;
     $checks=0;function check($yes,$why){global $checks;$checks++;if(!$yes)throw new \RuntimeException($why);}
@@ -56,7 +56,7 @@ namespace {
         public function definitelyCan($right,$title){return $this->allowed;}
         public function authorizeWrite($right,$title){$this->writes++;return $this->allowed;}
     };
-    $title=new Title(828);$factory=new TitleFactory($title);$id=new \ProfessionalWiki\SWS\Domain\Page\PageId(1);
+    $title=new Title(828);$factory=new TitleFactory($title);$id=new \AEWI\SWS\Domain\Page\PageId(1);
     $authorizer=new AuthorityBasedSubjectAuthorizer($authority,$factory,SubjectNamespacePolicy::allowsTitle(...));
     check($authorizer->canEditSubject($id),'Permission hints allow eligible readable edit');
     check($authorizer->authorize($id) && $authority->writes===1,'Write still invokes real authorization boundary');

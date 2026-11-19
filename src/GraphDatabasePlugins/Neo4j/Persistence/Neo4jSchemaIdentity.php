@@ -1,7 +1,7 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema, SchemaReference};
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence;
+use AEWI\SWS\Domain\Schema\{Schema, SchemaReference};
 final class Neo4jSchemaIdentity {
  public static function label( ?Schema $schema, SchemaReference $reference ): string {
   $name = ( $schema?->getName() ?? $reference->name )->getText();

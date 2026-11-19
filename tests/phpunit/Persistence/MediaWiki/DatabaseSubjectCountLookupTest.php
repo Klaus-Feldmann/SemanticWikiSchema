@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages whose saves fill the table the lookup reads.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectCountLookup
  * @group Database
  */
 class DatabaseSubjectCountLookupTest extends SWSIntegrationTestCase {

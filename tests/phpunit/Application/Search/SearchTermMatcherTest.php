@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Search;
+namespace AEWI\SWS\Tests\Application\Search;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\SWS\Tests\MarkedMatchesTrait;
+use AEWI\SWS\Application\Search\SearchTermMatcher;
+use AEWI\SWS\Tests\MarkedMatchesTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Search\SearchTermMatcher
+ * @covers \AEWI\SWS\Application\Search\SearchTermMatcher
  */
 class SearchTermMatcherTest extends TestCase {
 

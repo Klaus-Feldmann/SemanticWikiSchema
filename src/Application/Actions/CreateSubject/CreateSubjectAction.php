@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\CreateSubject;
+namespace AEWI\SWS\Application\Actions\CreateSubject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
-use ProfessionalWiki\SWS\Application\NewSubjectIdResolver;
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\DependentSubjectBuilder;
+use AEWI\SWS\Application\NewSubjectIdResolver;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\Application\Validation\DependentSubjectValidator;
+use AEWI\SWS\Application\PageIdentifiersResolver;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 use RuntimeException;
 
 readonly class CreateSubjectAction {
@@ -151,13 +151,13 @@ readonly class CreateSubjectAction {
 
 	private function buildSubject( CreateSubjectRequest $request, SchemaReference $schemaReference ): Subject {
 		$schemaReference = $this->schemaResolver->getSchema( $schemaReference )?->getReference() ?? $schemaReference;
-		return \ProfessionalWiki\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
+		return \AEWI\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
 			id: $this->newSubjectIdResolver->resolve( $request->id ),
 			label: SubjectLabel::fromText( $request->label ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $request->statements ),
 			fieldKeyVersion: $this->schemaResolver->getSchema( $schemaReference )?->getFieldKeyVersion() ?? 0,
-            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $request->fieldNotes, [], $request->fieldNotes === [] ? null : $this->schemaResolver->getSchema( $schemaReference ) ),
+            fieldNotes: \AEWI\SWS\Domain\FieldNotes::forSchema( $request->fieldNotes, [], $request->fieldNotes === [] ? null : $this->schemaResolver->getSchema( $schemaReference ) ),
 	), $this->identityLanguage, $request->identity );
 	}
 

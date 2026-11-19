@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfSerializer;
 
 /**
  * Exports a single page as a self-contained RDF document. Returns null when there is no page to export,

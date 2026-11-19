@@ -5,9 +5,9 @@ namespace SWSBaseBridge;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 use RuntimeException;
 use Throwable;
 
@@ -15,21 +15,21 @@ use Throwable;
 final class ExternalValuesLookup {
 	public function __construct( private readonly IContextSource $context ) {}
 
-	public function read( Title $title, array $p, ?PageDependencyRecorder $dependencies = null, ?\ProfessionalWiki\SWS\Domain\Subject\Subject $selectedSubject = null ): array {
+	public function read( Title $title, array $p, ?PageDependencyRecorder $dependencies = null, ?\AEWI\SWS\Domain\Subject\Subject $selectedSubject = null ): array {
 		if ( !$this->context->getAuthority()->authorizeRead( 'read', $title ) ||
 			preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $p['language'] ) !== 1 ) {
 			throw new RuntimeException( 'SWSBaseBridge: page or language unavailable' );
 		}
-		if ( \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() ) {
+		if ( \AEWI\SWS\Application\Source\SourceDataMode::usesStore() ) {
 			return ( new StoredSourceLookup( $this->context ) )->fields( $title, $p, $dependencies, $selectedSubject );
 		}
 		$dependencies?->recordDependencyOn( $title );
 		$extension = SWSExtension::getInstance();
-		$processing = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current();
+		$processing = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current();
 		$local = $processing !== null && $processing->useStoredSources && $processing->title->isSamePageAs( $title ) ? $processing->subjects : null;
-		$local ??= \ProfessionalWiki\SWS\EntryPoints\Processing\SourceWriteScope::subjectsFor( $title );
+		$local ??= \AEWI\SWS\EntryPoints\Processing\SourceWriteScope::subjectsFor( $title );
 		$subject = $selectedSubject ?? ( $local !== null
-			? ( isset( $p['subject'] ) ? $local->getAllSubjects()->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $p['subject'] ) ) : $local->getMainSubject() )
+			? ( isset( $p['subject'] ) ? $local->getAllSubjects()->getSubject( new \AEWI\SWS\Domain\Subject\SubjectId( $p['subject'] ) ) : $local->getMainSubject() )
 			: $extension->newPageSubjectsLookup()->getPageSubjects( new PageId( $p['pageid'] ) )->getMainSubject() );
 		if ( $local !== null && $subject !== null ) {
 			$subject = $local->getAllSubjects()->getSubject( $subject->id );
@@ -40,7 +40,7 @@ final class ExternalValuesLookup {
 			$schema = $extension->getSchemaResolverFor( $this->context->getAuthority() )->getSchema( $subject->getSchemaReference() );
 			$dependencies?->recordDependencyOnSchema( $subject->getSchemaReference() );
 			if ( $local !== null && $schema !== null ) {
-				return \ProfessionalWiki\SWS\Application\Source\StoredSourceValues::read( $subject, $schema, $p['language'], $p['pageid'] );
+				return \AEWI\SWS\Application\Source\StoredSourceValues::read( $subject, $schema, $p['language'], $p['pageid'] );
 			}
 			$groups = [];
 			$fieldTypes = [];
@@ -92,7 +92,7 @@ final class ExternalValuesLookup {
 						if ( $status === 'resolved' && !$isTime && $values === [] ) { $status = 'unavailable'; }
 						$timeResult = null;
 						if ( $isTime && $supported && isset( $entities[$entityId] ) ) {
-							$options = $schema->getProperty( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( $name ) )->getWikiLink() ?? [];
+							$options = $schema->getProperty( new \AEWI\SWS\Domain\Schema\PropertyName( $name ) )->getWikiLink() ?? [];
 							$timeResult = TimeClaimView::result( $claims, $source, $p['language'], (string)( $GLOBALS['wgLanguageCode'] ?? 'de' ), $options );
 							$status = $timeResult['status'];
 							$values = $timeResult['values'];

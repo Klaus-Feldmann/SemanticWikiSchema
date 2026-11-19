@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
+namespace AEWI\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
@@ -10,13 +10,13 @@ use MediaWiki\Message\Message;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
-use ProfessionalWiki\SWS\Presentation\SubjectNameMessage;
-use ProfessionalWiki\SWS\Presentation\SubjectNamePresenter;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Presentation\SubjectNameMessage;
+use AEWI\SWS\Presentation\SubjectNamePresenter;
 
 class SpecialSubject extends SpecialPage {
 
@@ -84,7 +84,7 @@ class SpecialSubject extends SpecialPage {
 
 		if ( $title === null
 			|| $title->isRedirect()
-			|| !\ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title )
+			|| !\AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title )
 			|| !$this->isMainSubjectOfPublishedLatestRevision( $extension, $title, $subjectId )
 		) {
 			return null;

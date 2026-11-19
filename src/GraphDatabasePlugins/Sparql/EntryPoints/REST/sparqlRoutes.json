@@ -4,6 +4,6 @@
 		"method": [
 			"POST"
 		],
-		"factory": "ProfessionalWiki\\SWS\\SWSExtension::newSparqlQueryApi"
+		"factory": "AEWI\\SWS\\SWSExtension::newSparqlQueryApi"
 	}
 ]

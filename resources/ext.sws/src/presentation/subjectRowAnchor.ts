@@ -1,6 +1,6 @@
 import { SubjectId } from '@/domain/SubjectId';
 
-// The DOM id of a Subject's row, on the Data tab (?action=subjects) and on Special:Subject alike.
+// The DOM id of a Subject's row, on the Data tab (?action=entities) and on Special:Subject alike.
 // Internal rendering detail — HTML hygiene and in-page scroll targeting — not a public contract. A row's
 // public deep-link anchor is the bare Subject id in the URL fragment (see subjectIdFromHash), which the
 // mount handler resolves to a row itself, so the fragment and this DOM id are decoupled.

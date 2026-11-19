@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\ParserOptions;
@@ -32,7 +32,7 @@ final class ProcessingResult {
     public static function isCurrent( Title $title, mixed $stamp, bool $allowSourcePreparation = false ): bool {
         if ( !is_array( $stamp ) || !isset( $stamp['signature'], $stamp['revision'], $stamp['dependencies'] ) ) { return false; }
         if ( ( $stamp['stage'] ?? 'complete' ) !== 'complete' && !$allowSourcePreparation ) { return false; }
-        if ( isset( $stamp['sourceDataMode'] ) && $stamp['sourceDataMode'] !== \ProfessionalWiki\SWS\Application\Source\SourceDataMode::current() ) { return false; }
+        if ( isset( $stamp['sourceDataMode'] ) && $stamp['sourceDataMode'] !== \AEWI\SWS\Application\Source\SourceDataMode::current() ) { return false; }
         $signature = $stamp['signature'];
         unset( $stamp['signature'] );
         if ( !hash_equals( self::seal( $stamp )['signature'], $signature ) || $stamp['page'] !== $title->getArticleID() ) { return false; }

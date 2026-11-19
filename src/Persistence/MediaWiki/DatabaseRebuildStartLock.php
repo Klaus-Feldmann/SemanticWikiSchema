@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use Closure;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLock;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\IDatabase;
 

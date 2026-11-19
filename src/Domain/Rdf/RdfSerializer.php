@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Rdf;
+namespace AEWI\SWS\Domain\Rdf;
 
 /**
  * Serializes {@see Quad}s into an RDF document. This is SWS's own port; concrete implementations

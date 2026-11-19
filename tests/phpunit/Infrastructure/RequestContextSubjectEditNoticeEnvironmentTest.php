@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment
+ * @covers \AEWI\SWS\Infrastructure\RequestContextSubjectEditNoticeEnvironment
  * @group Database
  */
 class RequestContextSubjectEditNoticeEnvironmentTest extends SWSIntegrationTestCase {

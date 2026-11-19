@@ -4,11 +4,11 @@ declare(strict_types=1);
 require __DIR__.'/source-refresh-processing-contract.php';
 use D2Harness\State as S;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\Identity\IdentityChangeClassifier as C;
-use ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\EntryPoints\Content\{SubjectContent,SchemaContent};
-use ProfessionalWiki\SWS\EntryPoints\Processing\{SourceRefreshReceipt,InternalPageProcessor,ProcessingResult};
+use AEWI\SWS\Application\Identity\IdentityChangeClassifier as C;
+use AEWI\SWS\Domain\Identity\LocalizedIdentity;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\EntryPoints\Content\{SubjectContent,SchemaContent};
+use AEWI\SWS\EntryPoints\Processing\{SourceRefreshReceipt,InternalPageProcessor,ProcessingResult};
 $countD5=0;
 function d5check(bool $ok,string $why):void{global$countD5;$countD5++;if(!$ok)throw new RuntimeException($why);}
 $a=['formatVersion'=>2,'id'=>'S1','identityLanguage'=>'de','labels'=>['de'=>'Person'],'descriptions'=>['de'=>'Beschreibung'],'propertyDefinitions'=>['Ort'=>['type'=>'text','externalProperty'=>['source'=>'wikidata','id'=>'P19']]]];
@@ -33,7 +33,7 @@ S::$page->revision=$revision;S::$history[$revision->getId()]=$revision;
 d5check(SourceRefreshReceipt::isCurrent($title,$revision),'Carried receipt verifies against exact new content and parent');
 $updates=[new \MediaWiki\Deferred\LinksUpdate\LinksUpdate()];
 $rendered=new class($revision){public function __construct(private $revision){}public function getRevision(){return $this->revision;}public function getRevisionParserOutput(){return new \MediaWiki\Parser\ParserOutput();}};
-\ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingHooks::onRevisionDataUpdates($title,$rendered,$updates);
+\AEWI\SWS\EntryPoints\Processing\ProcessingHooks::onRevisionDataUpdates($title,$rendered,$updates);
 d5check($updates===[]&&count(S::$queued)>0,'Metadata source receipt cannot bypass the fresh complete-processing job');
 S::$queued=[];
 
@@ -73,14 +73,14 @@ $initial->getMainSubject()->setIdentity(new LocalizedIdentity('de',['de'=>'Vorhe
 S::$page->revision=new RevisionRecord(101,943,['main'=>$base->getContent('main'),'sws'=>SubjectContent::newFromData($initial)]);S::$history[101]=S::$page->revision;
 $processor->refresh($title);$subjects=S::$page->revision->getContent('sws')->getPageSubjects();$subjects->getMainSubject()->setLabel(new SubjectLabel('Repository-Name'));
 $actor=new class implements \MediaWiki\Permissions\Authority {public function authorizeRead(string $action,mixed $title):bool{return true;}public function authorizeWrite(string $action,mixed $title):bool{return true;}};
-$repository=new \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository(
- new \ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup(),new \MediaWiki\Revision\RevisionLookup(S::$page),
- new \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver(new \MediaWiki\Page\WikiPageFactory(S::$page),$actor),
+$repository=new \AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository(
+ new \AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup(),new \MediaWiki\Revision\RevisionLookup(S::$page),
+ new \AEWI\SWS\Persistence\MediaWiki\PageContentSaver(new \MediaWiki\Page\WikiPageFactory(S::$page),$actor),
  new \MediaWiki\Title\TitleFactory(),new class implements \MediaWiki\Content\IContentHandlerFactory {},
- new \ProfessionalWiki\SWS\Application\DependentSubjectGuard(\ProfessionalWiki\SWS\Tests\Data\TestNaming::newDependentSubjectRules(),static fn()=>new \ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup())
+ new \AEWI\SWS\Application\DependentSubjectGuard(\AEWI\SWS\Tests\Data\TestNaming::newDependentSubjectRules(),static fn()=>new \AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup())
 );
-$status=$repository->savePageSubjects($subjects,new \ProfessionalWiki\SWS\Domain\Page\PageId(943));
-d5check($status->status===\ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus::REVISION_CREATED&&SourceRefreshReceipt::isCurrent($title,S::$page->revision),'Actual CAS repository save carries the verified source basis');
+$status=$repository->savePageSubjects($subjects,new \AEWI\SWS\Domain\Page\PageId(943));
+d5check($status->status===\AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus::REVISION_CREATED&&SourceRefreshReceipt::isCurrent($title,S::$page->revision),'Actual CAS repository save carries the verified source basis');
 $fetches=count(S::$collected);$processor->refresh($title);
 d5check(count(S::$collected)===$fetches,'Actual repository label edit reaches full processing without fresh source collection');
 echo "$countD5 D5 metadata/source-reuse/signature/cache-boundary checks passed (actual processor with controlled MW host).\n";

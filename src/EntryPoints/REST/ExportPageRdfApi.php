@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use Exception;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\BackendFailureMessage;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Domain\GraphDatabase\BackendFailureMessage;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\Rdbms\DBError;
 use Wikimedia\RequestTimeout\TimeoutException;

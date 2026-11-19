@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\SWS\SWSExtension::onExtensionRegistration
- * @covers \ProfessionalWiki\SWS\SWSExtension::poweredByBadge
- * @covers \ProfessionalWiki\SWS\SWSExtension::requireComposerLibraries
+ * @covers \AEWI\SWS\SWSExtension::onExtensionRegistration
+ * @covers \AEWI\SWS\SWSExtension::poweredByBadge
+ * @covers \AEWI\SWS\SWSExtension::requireComposerLibraries
  */
 class OnExtensionRegistrationTest extends TestCase {
 
@@ -197,7 +197,7 @@ class OnExtensionRegistrationTest extends TestCase {
 		$this->expectException( Exception::class );
 		$this->expectExceptionMessage( 'composer update' );
 
-		SWSExtension::requireComposerLibraries( 'ProfessionalWiki\SWS\Tests\NoSuchLibraryClass' );
+		SWSExtension::requireComposerLibraries( 'AEWI\SWS\Tests\NoSuchLibraryClass' );
 	}
 
 	public function testWeightsTheSubjectFieldIntoCirrusSearchQueries(): void {

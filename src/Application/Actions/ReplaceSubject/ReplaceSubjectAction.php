@@ -2,30 +2,30 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\ReplaceSubject;
+namespace AEWI\SWS\Application\Actions\ReplaceSubject;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Application\DependentSubjectBuilder;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\SWS\Application\Validation\DependentSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Validation\ViolationDiff;
+use AEWI\SWS\Application\DependentSubjectBuilder;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\Application\Validation\DependentSubjectValidator;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Validation\ViolationDiff;
 
 readonly class ReplaceSubjectAction {
 
@@ -101,11 +101,11 @@ readonly class ReplaceSubjectAction {
 		$priorViolations = $this->proposedSubjectValidator->validate( $subject );
 
 		if ( $identity !== null ) {
-			$terms = \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $identity );
+			$terms = \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromJson( $identity );
 		}
 		$subject->setLabel( SubjectLabel::fromText( $label ) );
 		if ( $identity !== null ) { $subject->setIdentity( $terms ); }
-        if ( $fieldNotes !== null ) { $subject->setFieldNotes( \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $fieldNotes, $subject->getFieldNotes(), $fieldNotes === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) ); }
+        if ( $fieldNotes !== null ) { $subject->setFieldNotes( \AEWI\SWS\Domain\FieldNotes::forSchema( $fieldNotes, $subject->getFieldNotes(), $fieldNotes === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) ); }
 		$subject->setStatements( $this->statementListBuilder->build( $statements ) );
 
 		$proposedViolations = $this->proposedSubjectValidator->validate( $subject, $newDependentSubjects );

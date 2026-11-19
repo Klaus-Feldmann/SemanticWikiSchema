@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Search;
+namespace AEWI\SWS\EntryPoints\Search;
 
 use SearchSqlite;
 

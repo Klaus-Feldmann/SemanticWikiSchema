@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb;
+namespace AEWI\RedHerb;
 
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
 
 /**
  * Example of an extension-contributed graph-database backend. A real plugin would project the

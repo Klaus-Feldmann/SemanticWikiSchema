@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\EditPage\EditPage;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAlternateEdit
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onAlternateEdit
  * @group Database
  */
 class MappingPageEditDocsPointerTest extends MediaWikiIntegrationTestCase {

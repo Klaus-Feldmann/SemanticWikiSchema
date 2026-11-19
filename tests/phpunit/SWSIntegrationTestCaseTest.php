@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPagePropertyProvider;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\StubPagePropertyProvider;
 
 /**
  * Guards the registration helpers themselves. Both go through the same hook, and getting that wrong
  * loses one of them silently: the test stays green because whatever was dropped simply never sees a
  * projection, so nothing it would have asserted on ever runs.
  *
- * @covers \ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase
+ * @covers \AEWI\SWS\Tests\SWSIntegrationTestCase
  * @group Database
  */
 class SWSIntegrationTestCaseTest extends SWSIntegrationTestCase {

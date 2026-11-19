@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql;
 
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The REST route's presence is covered by SparqlRouteRegistrationTest and OnExtensionRegistrationTest.
  *
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
- * @covers \ProfessionalWiki\SWS\SWSExtension::getFirstSparqlPlugin
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \AEWI\SWS\SWSExtension::getFirstSparqlPlugin
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
  * @group Database
  */
 class SparqlSurfaceRegistrationTest extends SWSIntegrationTestCase {

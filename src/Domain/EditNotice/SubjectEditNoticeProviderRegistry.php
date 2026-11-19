@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\EditNotice;
+namespace AEWI\SWS\Domain\EditNotice;
 
 class SubjectEditNoticeProviderRegistry {
 

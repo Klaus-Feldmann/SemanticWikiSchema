@@ -2,35 +2,35 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
-use ProfessionalWiki\SWS\Application\Validation\ProposedSubjectValidator;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Tests\Data\TestPage;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\Validation\ProposedSubjectValidator;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\Persistence\MediaWiki\CachingSchemaLookup;
+use AEWI\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Tests\Data\TestPage;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyPageContentFetcher;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\ObjectCache\EmptyBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSources;
 
 /**
  * The Schema of a Subject is needed by both the validation and the graph projection of every
  * Subject on a saved page. These pin that a page's Schemas are resolved once per Schema, not
  * once per Subject per path.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup
- * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \AEWI\SWS\Persistence\MediaWiki\CachingSchemaLookup
+ * @covers \AEWI\SWS\SWSExtension
  * @group Database
  */
 class SchemaLookupSharingTest extends SWSIntegrationTestCase {

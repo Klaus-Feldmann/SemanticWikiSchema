@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
+namespace AEWI\SWS\Tests\Domain\Rdf;
 
 use pietercolpaert\hardf\TriGParser;
 

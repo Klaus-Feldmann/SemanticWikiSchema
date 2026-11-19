@@ -2,32 +2,32 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetSubjectApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi
- * @covers \ProfessionalWiki\SWS\Presentation\RestGetSubjectPresenter
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectApi
+ * @covers \AEWI\SWS\Presentation\RestGetSubjectPresenter
+ * @covers \AEWI\SWS\Application\Queries\GetSubject\GetSubjectQuery
  * @group Database
  */
 class GetSubjectApiTest extends SWSIntegrationTestCase {

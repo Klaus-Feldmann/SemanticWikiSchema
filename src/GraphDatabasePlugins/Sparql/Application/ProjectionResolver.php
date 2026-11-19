@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Application;
 
-use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
+use AEWI\SWS\Application\Rdf\RdfProjection;
 
 /**
- * The narrow seam through which {@see \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore}
+ * The narrow seam through which {@see \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore}
  * resolves its configured projection, lazily on each save, without depending on the whole extension.
  *
  * Two operations, matching what core already exposes: obtain the projection for a name (null when the

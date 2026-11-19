@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use MediaWiki\Content\Content;
 use MediaWiki\Content\JsonContentHandler;
@@ -27,7 +27,8 @@ class SubjectContentHandler extends JsonContentHandler {
 	): void {
 		$parserOutput->setContentHolderText( '' );
 		if ( $content instanceof SubjectContent ) {
-			\ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories( $content, $cpoParams, $parserOutput );
+			MainDescriptionCategory::apply( $content->getPageSubjects(), $parserOutput );
+			\AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories( $content, $cpoParams, $parserOutput );
 		}
 	}
 

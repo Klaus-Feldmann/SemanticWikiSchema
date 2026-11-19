@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use Closure;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\{Page, PageId, PageSubjects};
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\{Page, PageId, PageSubjects};
+use AEWI\SWS\Domain\Subject\SubjectMap;
 
 /** External stores must never observe IDs from a transaction which can still be aborted. */
 final readonly class AfterCommitGraphDatabasePlugin implements GraphDatabasePlugin {

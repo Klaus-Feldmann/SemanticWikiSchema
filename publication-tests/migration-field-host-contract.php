@@ -3,9 +3,9 @@ declare(strict_types=1);
 require __DIR__.'/fixtures/MigrationFieldHost.php';require __DIR__.'/bootstrap.php';
 use MediaWiki\MediaWikiServices as S;
 use MediaWiki\Revision\RevisionRecord as R;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent as C;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost as Host;
-use ProfessionalWiki\SWS\Application\IdentityMigration\{MigrationFieldAdditionLog as Log,ReferenceRewriter as J};
+use AEWI\SWS\EntryPoints\Content\SchemaContent as C;
+use AEWI\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiMigrationHost as Host;
+use AEWI\SWS\Application\IdentityMigration\{MigrationFieldAdditionLog as Log,ReferenceRewriter as J};
 $n=0;function fh(bool $ok,string $why):void{global$n;$n++;if(!$ok)throw new RuntimeException($why);}function refusesField(callable $f,string $why):void{try{$f();}catch(RuntimeException){fh(true,$why);return;}throw new RuntimeException('Accepted: '.$why);}
 $source=(object)['formatVersion'=>2,'id'=>'S1','identityLanguage'=>'de','labels'=>(object)['de'=>'Person'],'descriptions'=>new stdClass(),'propertyDefinitions'=>(object)['Klassenzuordnung'=>(object)['type'=>'text','required'=>false,'externalProperty'=>(object)['source'=>'wikidata','id'=>'P31']]]];
 $target=(object)['formatVersion'=>2,'id'=>'S2','identityLanguage'=>'de','labels'=>(object)['de'=>'Werk'],'descriptions'=>new stdClass(),'propertyDefinitions'=>new stdClass(),'opaque'=>(object)['keep'=>'unchanged']];
@@ -17,7 +17,7 @@ $host->enableFieldRepair($log,function()use(&$commits,&$fail):bool{$commits++;re
 $rc=new ReflectionClass($host);$add=$rc->getMethod('addMissingField');$recover=$rc->getMethod('recoverFieldAdditions');
 $request=static fn($name)=>['schemaId'=>'S2','field'=>$name,'page'=>'Werk:Beispiel','caller'=>'Werk:Beispiel'];
 $add->invoke($host,$request('Klassenzuordnung'));$data=json_decode(S::$revisions[102]->content->getText());
-fh($data->propertyDefinitions->Klassenzuordnung->externalProperty->id==='P31','Actual host copies P31 definition');fh($data->opaque->keep==='unchanged'&&$data->descriptions instanceof stdClass,'Other schema data and object shapes preserved');fh($commits===1&&array_values($log->entries())[0]['status']==='completed','Report acknowledges only committed edit');fh(ProfessionalWiki\SWS\SWSExtension::$resets===1,'Schema lookup caches reset');
+fh($data->propertyDefinitions->Klassenzuordnung->externalProperty->id==='P31','Actual host copies P31 definition');fh($data->opaque->keep==='unchanged'&&$data->descriptions instanceof stdClass,'Other schema data and object shapes preserved');fh($commits===1&&array_values($log->entries())[0]['status']==='completed','Report acknowledges only committed edit');fh(AEWI\SWS\SWSExtension::$resets===1,'Schema lookup caches reset');
 $add->invoke($host,$request('Unbekannt'));$data=json_decode(S::$revisions[102]->content->getText());fh($data->propertyDefinitions->Unbekannt->default===['SWS Migration Feld ergänzt'],'German fallback stored in schema only');fh(array_values($log->entries())[1]['needsReview'],'Fallback marked for review');
 $add->invoke($host,array_replace($request('Unbekannt'),['schemaId'=>'S3']));$englishData=json_decode(S::$revisions[103]->content->getText());fh($englishData->propertyDefinitions->Unbekannt->default===['SWS migration field added'],'Copied placeholder is recreated in next schema language');$all=array_values($log->entries());fh($all[2]['needsReview']&&$all[2]['sourceSchema']===null,'Inherited placeholder still requires review');
 refusesField(fn()=>$add->invoke($host,$request('Klassenzuordnung')),'Existing field protected');refusesField(fn()=>$add->invoke($host,array_replace($request('X'),['schemaId'=>'S99'])),'Outside-plan schema protected');

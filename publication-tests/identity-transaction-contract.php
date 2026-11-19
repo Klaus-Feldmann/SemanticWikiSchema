@@ -3,14 +3,14 @@
 declare( strict_types = 1 );
 require __DIR__ . '/identity-mediawiki-boundary-contract.php';
 
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LocalizedIdentity};
-use ProfessionalWiki\SWS\Infrastructure\AfterCommitGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\{Page, PageId, PageProperties, PageSubjects};
-use ProfessionalWiki\SWS\Domain\Schema\{SchemaName, SchemaReference};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject, SubjectId, SubjectLabel, SubjectMap, StatementList};
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
+use AEWI\SWS\Domain\Identity\{IdentityKind, LocalizedIdentity};
+use AEWI\SWS\Infrastructure\AfterCommitGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\{Page, PageId, PageProperties, PageSubjects};
+use AEWI\SWS\Domain\Schema\{SchemaName, SchemaReference};
+use AEWI\SWS\Domain\Subject\{Subject, SubjectId, SubjectLabel, SubjectMap, StatementList};
 
 class TransactionHost extends IdentityMwHarness\Database {
  public array $callbacks = [];

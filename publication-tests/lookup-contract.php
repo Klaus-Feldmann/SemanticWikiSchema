@@ -24,20 +24,20 @@ namespace MediaWiki\Title {
   public static function newFromText($text){return new self(42,$text);}
  }
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
  class SWSExtension {
   public static $instance;
   public static function getInstance(){return self::$instance;}
-  public function getRdfNamespaces(){return new \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces('https://example.org');}
-  public function getRdfSerializer(){return new \ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer($this->getRdfNamespaces()->prefixMap(),new \Psr\Log\NullLogger());}
+  public function getRdfNamespaces(){return new \AEWI\SWS\Domain\Rdf\RdfNamespaces('https://example.org');}
+  public function getRdfSerializer(){return new \AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer($this->getRdfNamespaces()->prefixMap(),new \Psr\Log\NullLogger());}
   public function newPageSubjectsLookup(){return $this;}
   public function getPageSubjects($id){return \Harness\State::$page;}
   public function getSchemaResolverFor($auth){return $this;}
   public function getSchema($ref){if(\Harness\State::$schemaError)throw new \RuntimeException('schema');return \Harness\State::$schema;}
-  public function getSubjectIdParser(){return new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser('local');}
+  public function getSubjectIdParser(){return new \AEWI\SWS\Domain\Subject\SubjectIdParser('local');}
   public function newIdentityBoundaryResolver(){return new class {public function entity($id){return $id;}};}
   public function newSubjectHostingPageResolver($auth){return $this;}
-  public function resolveReadableHostingPage($id){return \Harness\State::$targetAllowed ? new class { public function getId(){return new \ProfessionalWiki\SWS\Domain\Page\PageId(42);} public function getTitle(){return 'Zielseite';} } : null;}
+  public function resolveReadableHostingPage($id){return \Harness\State::$targetAllowed ? new class { public function getId(){return new \AEWI\SWS\Domain\Page\PageId(42);} public function getTitle(){return 'Zielseite';} } : null;}
  }
 }
 namespace SWSBaseBridge {
@@ -65,10 +65,10 @@ namespace Harness {
 }
 namespace {
  require __DIR__.'/bootstrap.php';
- use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
- use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
- use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
- use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+ use AEWI\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions,PropertyCore,PropertyName};
+ use AEWI\SWS\Domain\Schema\Property\TextProperty;
+ use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+ use AEWI\SWS\Domain\Page\PageSubjects;
  $checks=0;
  function check($condition,$why){global $checks;if(!$condition)throw new RuntimeException($why);$checks++;}
  $core=new PropertyCore('',false,null);
@@ -76,7 +76,7 @@ namespace {
  $main=new Subject(new SubjectId('sF1FCQPNcwQdw4B'),null,SchemaReference::local(new SchemaName('Person')),new StatementList([]));
  $other=new Subject(new SubjectId('sF16iHXBMTQdHDY'),null,SchemaReference::local(new SchemaName('Person')),new StatementList([]));
  \Harness\State::$page=new PageSubjects($main,new SubjectMap($other));
- \ProfessionalWiki\SWS\SWSExtension::$instance=new \ProfessionalWiki\SWS\SWSExtension();
+ \AEWI\SWS\SWSExtension::$instance=new \AEWI\SWS\SWSExtension();
  $context=new \Harness\Context();$lookup=new \SWSBaseBridge\DataViewLookup($context);$title=new \MediaWiki\Title\Title();
  $v=$lookup->read($title,'de');
  check(count($v['subjects'])===2,'all page subjects');check($v['subjects'][0]['isMainSubject']===true,'main');check($v['subjects'][1]['isMainSubject']===false,'other');
@@ -89,8 +89,8 @@ namespace {
  \Harness\State::$sourceError=true;$v=$lookup->read($title,'de');check($v['identities']['wikidata']['id']==='Q619','identity retained on source failure');check($v['complete']===false,'description failure explicit');\Harness\State::$sourceError=false;
  \Harness\State::$schemaError=true;$v=$lookup->read($title,'de');check($v['subjects'][0]['schemaStatus']==='unavailable' && !$v['complete'],'missing schema');
  \Harness\State::$schemaError=false;
- $r=new \ProfessionalWiki\SWS\Domain\Relation\Relation(new \ProfessionalWiki\SWS\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),$other->id);
- $main->setStatements(new StatementList([new \ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Bezug'),'relation',new \ProfessionalWiki\SWS\Domain\Value\RelationValue($r)),new \ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Studium'),'page',new \ProfessionalWiki\SWS\Domain\Value\StringValue('Universität Wien'))]));
+ $r=new \AEWI\SWS\Domain\Relation\Relation(new \AEWI\SWS\Domain\Relation\RelationId('rF1FCQPNcwQdw4B'),$other->id);
+ $main->setStatements(new StatementList([new \AEWI\SWS\Domain\Statement(new PropertyName('Bezug'),'relation',new \AEWI\SWS\Domain\Value\RelationValue($r)),new \AEWI\SWS\Domain\Statement(new PropertyName('Studium'),'page',new \AEWI\SWS\Domain\Value\StringValue('Universität Wien'))]));
  $v=$lookup->read($title,'de');
  check($v['subjects'][0]['fields'][1]['ownValues'][0]['target']===['id'=>$other->id->text,'status'=>'unavailable'],'unreadable target metadata withheld');
  check(str_contains($v['subjects'][0]['fields'][2]['ownValues'][0]['url'],'Universit'),'local page URL');

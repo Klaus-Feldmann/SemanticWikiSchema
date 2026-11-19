@@ -30,7 +30,7 @@ namespace {
     }
     require dirname(__DIR__).'/tests/standalone/autoload.php';
     use MediaWiki\Content\Content;
-    use ProfessionalWiki\SWS\Persistence\MediaWiki\{PageContentSaver,PageContentSavingStatus};
+    use AEWI\SWS\Persistence\MediaWiki\{PageContentSaver,PageContentSavingStatus};
     $checks=0;function check($yes,$why){global $checks;$checks++;if(!$yes)throw new \RuntimeException($why);}
     foreach([
         'wikitext'=>"Vorlagentext <noinclude>Dokumentation</noinclude>",
@@ -45,7 +45,7 @@ namespace {
         $comment=\MediaWiki\CommentStore\CommentStoreComment::newUnsavedComment('isolated');
         foreach(['erste Werte','geänderte Werte','']as $value){
             $subject=new Content('SWSSubject',$value);
-            $status=$saver->saveContent(new \ProfessionalWiki\SWS\Domain\Page\PageId(42),['sws'=>$subject],$comment);
+            $status=$saver->saveContent(new \AEWI\SWS\Domain\Page\PageId(42),['sws'=>$subject],$comment);
             check($status->status===PageContentSavingStatus::REVISION_CREATED,'Successful slot save: '.$model);
             check($page->slots['main']===$main && $page->slots['main']->text===$text && $page->slots['main']->model===$model,'Main content/model unchanged: '.$model);
             check($page->slots['other']===$other && $page->slots['sws']===$subject,'Only requested subject slot replaced: '.$model);

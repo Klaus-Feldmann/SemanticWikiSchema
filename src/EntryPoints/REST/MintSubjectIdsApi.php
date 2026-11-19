@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\SubjectIdMinter;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\SubjectIdMinter;
+use AEWI\SWS\Domain\Subject\SubjectId;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -22,7 +22,7 @@ class MintSubjectIdsApi extends SimpleHandler {
 
 	public function __construct(
 		private readonly SubjectIdMinter $subjectIdMinter,
-		private readonly ?\ProfessionalWiki\SWS\Presentation\CsrfValidator $csrfValidator = null,
+		private readonly ?\AEWI\SWS\Presentation\CsrfValidator $csrfValidator = null,
 	) {
 	}
 
@@ -54,7 +54,7 @@ class MintSubjectIdsApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'integer',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Number of Subject IDs to mint, between '
+				self::PARAM_DESCRIPTION => 'Number of Entity IDs to mint, between '
 					. self::MIN_COUNT . ' and ' . self::MAX_COUNT . ' inclusive.',
 			],
 		];

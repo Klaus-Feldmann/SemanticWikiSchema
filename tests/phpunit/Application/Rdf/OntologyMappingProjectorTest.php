@@ -2,54 +2,54 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
+namespace AEWI\SWS\Tests\Application\Rdf;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
-use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMappings;
-use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Infrastructure\Rdf\HardfRdfSerializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\SWS\Tests\Data\TestPage;
-use ProfessionalWiki\SWS\Tests\Data\TestPageProperties;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\Domain\Rdf\ParsedRdf;
+use AEWI\SWS\Application\Rdf\OntologyMappingProjector;
+use AEWI\SWS\Application\Rdf\SubjectIriResolver;
+use AEWI\SWS\Domain\Mapping\LinkDirection;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Mapping\NodeMapping;
+use AEWI\SWS\Domain\Mapping\NodeScope;
+use AEWI\SWS\Domain\Mapping\PropertyMapping;
+use AEWI\SWS\Domain\Mapping\PropertyMappings;
+use AEWI\SWS\Domain\Mapping\SchemaMapping;
+use AEWI\SWS\Domain\Mapping\SubjectMapping;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfLiteralFactory;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\MonolingualText;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Infrastructure\Rdf\HardfRdfSerializer;
+use AEWI\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use AEWI\SWS\Tests\Data\TestPage;
+use AEWI\SWS\Tests\Data\TestPageProperties;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\Domain\Rdf\ParsedRdf;
 use Psr\Log\NullLogger;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \AEWI\SWS\Application\Rdf\OntologyMappingProjector
  */
 class OntologyMappingProjectorTest extends TestCase {
 

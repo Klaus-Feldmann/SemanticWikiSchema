@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Moving a page keeps its graph node in sync with its new title. This needs no dedicated move hook:
@@ -18,7 +18,7 @@ use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * is created. The write-count tests pin that, so a move cannot start projecting a page twice or
  * deleting nodes.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
  * @group Database
  */
 class PageMoveGraphProjectionTest extends SWSIntegrationTestCase {

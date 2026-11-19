@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 /**
  * Saves, clears, and restores the NEO4J_URL_OVERRIDE / NEO4J_URL_READ_OVERRIDE environment variables.

@@ -2,44 +2,44 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSubject;
+namespace AEWI\SWS\Tests\Application\Queries\GetSubject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponse;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Application\SubjectLookup;
-use ProfessionalWiki\SWS\Application\SubjectResponseItemFactory;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectQuery;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponse;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Application\SubjectLookup;
+use AEWI\SWS\Application\SubjectResponseItemFactory;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectQuery
+ * @covers \AEWI\SWS\Application\Queries\GetSubject\GetSubjectQuery
  */
 class GetSubjectQueryTest extends TestCase {
 

@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** Recognizes only the old receipt writer's conversion of empty objects to empty arrays. */
 final class MigrationJsonShapeRepair {

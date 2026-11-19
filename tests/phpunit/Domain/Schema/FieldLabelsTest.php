@@ -1,9 +1,9 @@
 <?php
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\{PropertyDefinition,FieldLabels};
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Domain\Schema\{PropertyDefinition,FieldLabels};
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
 final class FieldLabelsTest extends TestCase {
  private function definition(array $labels,string $type='text'){return PropertyDefinition::fromJson(['type'=>$type,'labels'=>$labels],TestSources::newPropertyTypeRegistry());}
  public function testKnownTypePreservesLabels():void{$p=$this->definition(['de'=>' Geburtsdatum ','en'=>'Date of birth']);$this->assertSame(['de'=>'Geburtsdatum','en'=>'Date of birth'],$p->getLabels());$this->assertSame($p->getLabels(),$p->toJson()['labels']);}

@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery;
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,SubjectLabel,SubjectMap,StatementList};
-use ProfessionalWiki\SWS\Domain\Page\{PageId,PageSubjects};
-use ProfessionalWiki\SWS\Tests\TestDoubles\{InMemorySubjectRepository,InMemorySchemaLookup,InMemorySubjectLookup,InMemoryPageIdentifiersLookup,StubPageReadAuthorizer};
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Presentation\{RestGetPageSubjectsPresenter,SchemaPresentationSerializer};
+use AEWI\SWS\Application\Queries\GetPageSubjects\GetPageSubjectsQuery;
+use AEWI\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,SchemaReference,PropertyDefinitions};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,SubjectLabel,SubjectMap,StatementList};
+use AEWI\SWS\Domain\Page\{PageId,PageSubjects};
+use AEWI\SWS\Tests\TestDoubles\{InMemorySubjectRepository,InMemorySchemaLookup,InMemorySubjectLookup,InMemoryPageIdentifiersLookup,StubPageReadAuthorizer};
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Presentation\{RestGetPageSubjectsPresenter,SchemaPresentationSerializer};
 $checks=0;
 function pageCheck(bool $ok,string $why):void{global $checks;if(!$ok)throw new RuntimeException($why);$checks++;}
 $lookup=new InMemorySchemaLookup(

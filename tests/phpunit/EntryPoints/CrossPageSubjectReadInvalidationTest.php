@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\TextContent;
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Page\PageRecord;
 use MediaWiki\Parser\ParserOptions;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
@@ -22,8 +22,8 @@ use Wikimedia\Rdbms\IDBAccessObject;
  * Needs the integration base and the database for what ties the two pages together: the real parser
  * and parser cache, the links a save records, and the jobs a change queues.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
- * @covers \ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
+ * @covers \AEWI\SWS\Infrastructure\ParserPageDependencyRecorder
  * @group Database
  */
 class CrossPageSubjectReadInvalidationTest extends SWSIntegrationTestCase {

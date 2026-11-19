@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
+use AEWI\SWS\Persistence\PageIdsLookup;
 
 /**
  * The pages a rebuild walks, without a wiki behind them, for the cases the real lookup cannot produce

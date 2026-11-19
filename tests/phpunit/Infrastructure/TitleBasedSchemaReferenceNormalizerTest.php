@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer
+ * @covers \AEWI\SWS\Infrastructure\TitleBasedSchemaReferenceNormalizer
  */
 class TitleBasedSchemaReferenceNormalizerTest extends MediaWikiIntegrationTestCase {
 

@@ -1,14 +1,14 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Context\{DerivativeContext,RequestContext};
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\Application\Source\SourceDataMode;
+use AEWI\SWS\Application\Source\SourceDataMode;
 
 /** Publishes one ranked description from the completed parse. Search only reads this projection. */
 final class EffectivePageDescription {

@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 /** @deprecated Legacy helper; no longer used to decide whether SWS may publish data.
  * Confirmed core sort-key warnings and Cite reference messages are not failed data computations.

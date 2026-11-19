@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class DeleteSubjectApi extends SimpleHandler {
@@ -37,7 +37,7 @@ class DeleteSubjectApi extends SimpleHandler {
 		if ( $id === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
 				'status' => 'error',
-				'message' => "Subject ID has the wrong format: '$subjectId'",
+				'message' => wfMessage('sws-api-invalid-entity-id', $subjectId)->text(),
 			] );
 		}
 
@@ -72,7 +72,7 @@ class DeleteSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 		];
 	}

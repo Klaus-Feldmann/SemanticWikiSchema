@@ -1,5 +1,5 @@
 # Installation
 
-[First installation](install/README.md) · [Deutsch](install/de/README.md)
+[First installation of SWS 0.4.03](install/README.md) · [Deutsch](install/de/README.md)
 
-[Features and all settings for SWS 0.5.02](../reference/SWS-0.5.02.en.md).
+This release installs into an existing MediaWiki; no Docker demo is supplied.

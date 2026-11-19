@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 /** Check raw schema JSON before decoding can silently discard a repeated object key. */
 final class DuplicateFieldNumbers {

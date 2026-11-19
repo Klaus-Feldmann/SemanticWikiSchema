@@ -10,18 +10,18 @@ use D2Harness\State as S;
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Revision\{ RevisionLookup, RevisionRecord };
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\{ ExternalProperty, PropertyCore, PropertyDefinitions, PropertyName, Schema, SchemaName, SchemaReference };
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\{ StatementList, Subject, SubjectId, SubjectMap };
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\Content\{ SchemaContent, SubjectContent };
-use ProfessionalWiki\SWS\EntryPoints\Processing\{ InternalPageProcessor, InternalSourceSnapshotWriter, ProcessingContext, ProcessingHooks, ProcessingIdentity, ProcessingIncomplete, ProcessingResult, SourceRefreshReceipt, SourceWriteScope };
-use ProfessionalWiki\SWS\EntryPoints\SchemaWikitextHooks;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{ StatementDeserializer, SubjectContentDataDeserializer };
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\{ TestSources, TestSubjectIds };
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\{ ExternalProperty, PropertyCore, PropertyDefinitions, PropertyName, Schema, SchemaName, SchemaReference };
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\{ StatementList, Subject, SubjectId, SubjectMap };
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\Content\{ SchemaContent, SubjectContent };
+use AEWI\SWS\EntryPoints\Processing\{ InternalPageProcessor, InternalSourceSnapshotWriter, ProcessingContext, ProcessingHooks, ProcessingIdentity, ProcessingIncomplete, ProcessingResult, SourceRefreshReceipt, SourceWriteScope };
+use AEWI\SWS\EntryPoints\SchemaWikitextHooks;
+use AEWI\SWS\Persistence\MediaWiki\Subject\{ StatementDeserializer, SubjectContentDataDeserializer };
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\{ TestSources, TestSubjectIds };
 
 $checks = 0;
 function d2check( bool $condition, string $message ): void {
@@ -202,8 +202,8 @@ resetD2(); $a = $processor->prepare( $title, true ); $b = $processor->prepare( $
 ( new InternalSourceSnapshotWriter() )->save( $a );
 d2refuses( fn () => ( new InternalSourceSnapshotWriter() )->save( $b ), 'Second concurrent collection cannot overwrite first completed write' );
 d2check( S::$page->saveCalls === 1, 'Concurrent results produce only one source revision' );
-$generic = new \ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver( new \MediaWiki\Page\WikiPageFactory( S::$page ), ProcessingIdentity::get() );
-$denied = $generic->updateContentAtRevision( new \ProfessionalWiki\SWS\Domain\Page\PageId( 943 ), 102,
+$generic = new \AEWI\SWS\Persistence\MediaWiki\PageContentSaver( new \MediaWiki\Page\WikiPageFactory( S::$page ), ProcessingIdentity::get() );
+$denied = $generic->updateContentAtRevision( new \AEWI\SWS\Domain\Page\PageId( 943 ), 102,
 	static fn () => [ 'main' => new JsonContent( 'Must not change' ) ], \MediaWiki\CommentStore\CommentStoreComment::newUnsavedComment( 'test' ) );
 d2check( $denied->status === 'error' && S::$page->revision->getContent( 'main' )->getText() === 'Artikel', 'Generic write permission remains denied for internal processor' );
 

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
 /**
  * One Schema's entry within a page-level {@see Mapping}. The Schema it applies to is its key in

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\SWSExtension;
 
 class GetMappingSummariesApi extends SimpleHandler {
 

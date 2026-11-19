@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetMainSubjectApi;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
  * Runs the handler against pages saved through MediaWiki, which is where the page's title and the
  * viewer's page-level read permission come from.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetMainSubjectApi
- * @covers \ProfessionalWiki\SWS\Presentation\RestGetMainSubjectPresenter
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
+ * @covers \AEWI\SWS\EntryPoints\REST\GetMainSubjectApi
+ * @covers \AEWI\SWS\Presentation\RestGetMainSubjectPresenter
+ * @covers \AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
  * @group Database
  */
 class GetMainSubjectApiTest extends SWSIntegrationTestCase {

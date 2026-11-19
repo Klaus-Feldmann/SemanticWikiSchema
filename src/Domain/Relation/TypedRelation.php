@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Relation;
+namespace AEWI\SWS\Domain\Relation;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 readonly class TypedRelation {
 

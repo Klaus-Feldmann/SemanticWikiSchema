@@ -2,44 +2,44 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
+namespace AEWI\SWS\Tests\Application\GraphRebuild;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use InvalidArgumentException;
 use LogicException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor;
-use ProfessionalWiki\SWS\Application\GraphRebuild\NothingToResumeException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildBatchObserver;
-use ProfessionalWiki\SWS\Application\GraphRebuild\UnknownGraphStoreException;
-use ProfessionalWiki\SWS\Application\PageRebuilder;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
-use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\CancellingRebuildRunRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryDeletedPageIdsLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\RefusingRebuildStartLock;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdsLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildBatchObserver;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildExecutor;
+use AEWI\SWS\Application\GraphRebuild\NothingToResumeException;
+use AEWI\SWS\Application\GraphRebuild\NullRebuildBatchObserver;
+use AEWI\SWS\Application\GraphRebuild\RebuildAlreadyRunningException;
+use AEWI\SWS\Application\GraphRebuild\RebuildBatchObserver;
+use AEWI\SWS\Application\GraphRebuild\UnknownGraphStoreException;
+use AEWI\SWS\Application\PageRebuilder;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphRebuild\RebuildPhase;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildStartLock;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLock;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use AEWI\SWS\Persistence\PageIdsLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\CancellingRebuildRunRepository;
+use AEWI\SWS\Tests\TestDoubles\InMemoryDeletedPageIdsLookup;
+use AEWI\SWS\Tests\TestDoubles\RefusingRebuildStartLock;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdsLookup;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\SpyRebuildBatchObserver;
+use AEWI\SWS\Tests\TestDoubles\SpyRebuildJobQueue;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
@@ -48,9 +48,9 @@ use Wikimedia\Rdbms\DBUnexpectedError;
 use Wikimedia\RequestTimeout\TimeoutException;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildExecutor
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\RebuildProgress
+ * @covers \AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator
+ * @covers \AEWI\SWS\Application\GraphRebuild\GraphRebuildExecutor
+ * @covers \AEWI\SWS\Application\GraphRebuild\RebuildProgress
  * @group Database
  */
 class GraphRebuildTest extends SWSIntegrationTestCase {

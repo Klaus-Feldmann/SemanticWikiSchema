@@ -25,7 +25,7 @@ Subjects have
   chose it. A page titled with the id of a Subject stored on it names nothing, so its Main Subject is shown the same
   way ([ADR 31](adr/031-optional-subject-labels.md))
 - `statements`: a list of Statements
-- An `id`: persistent identifier. Subject IDs start with `s` and are always 15 characters long ([ADR 14](adr/014-improved-id-format.md))
+- An `id`: persistent identifier. New Entity IDs use `E` followed by a positive number; existing 15-character `s` IDs remain readable ([ADR 14](adr/014-improved-id-format.md))
 
 *Avoid using these terms as synonyms: "object", "entity", "item"*
 

@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectSummaries\SortDirection;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaries;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummary;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySort;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\Rdbms\DBQueryTimeoutError;
 use Wikimedia\Rdbms\IConnectionProvider;
 use Wikimedia\Rdbms\IDatabase;
@@ -30,8 +30,8 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
 /**
  * Needs the integration base class for the pages whose saves fill the tables the lookup reads.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\LowestPageRows
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectSummaryLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\LowestPageRows
  * @group Database
  */
 class DatabaseSubjectSummaryLookupTest extends SWSIntegrationTestCase {

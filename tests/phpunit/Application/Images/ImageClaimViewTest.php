@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Application\Images;
+namespace AEWI\SWS\Tests\Application\Images;
 use PHPUnit\Framework\TestCase;
 use SWSBaseBridge\ImageClaimView;
 require_once __DIR__ . '/../../../../SchemaBaseBridge/src/ImageClaimView.php';
