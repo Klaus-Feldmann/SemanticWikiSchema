@@ -2,41 +2,41 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectAction;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectPresenter;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 use RuntimeException;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\TestDoubles\SelectivePageReadAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\SpySubjectWriteAuthorizer;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectAction
+ * @covers \AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectAction
  */
 class MoveSubjectActionTest extends TestCase {
 

@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\SubjectSummaries;
+namespace AEWI\SWS\Tests\Application\SubjectSummaries;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummary;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummary;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects
+ * @covers \AEWI\SWS\Application\SubjectSummaries\SubjectSummaryHostSubjects
  */
 class SubjectSummaryHostSubjectsTest extends TestCase {
 

@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Subject\Exception;
+namespace AEWI\SWS\Application\Subject\Exception;
 
 use Exception;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Violation;
 
 /**
  * Thrown whatever the validation enforcement setting. The refused write has changed nothing.

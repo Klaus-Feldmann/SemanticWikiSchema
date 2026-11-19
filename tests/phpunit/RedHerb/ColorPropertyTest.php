@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\RedHerb;
+namespace AEWI\SWS\Tests\RedHerb;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Tests\JsonSchemaAssertions;
-use ProfessionalWiki\RedHerb\ColorProperty;
-use ProfessionalWiki\RedHerb\ColorType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Tests\JsonSchemaAssertions;
+use AEWI\RedHerb\ColorProperty;
+use AEWI\RedHerb\ColorType;
 
 /**
- * @covers \ProfessionalWiki\RedHerb\ColorProperty
- * @covers \ProfessionalWiki\RedHerb\ColorType
+ * @covers \AEWI\RedHerb\ColorProperty
+ * @covers \AEWI\RedHerb\ColorType
  */
 class ColorPropertyTest extends TestCase {
 

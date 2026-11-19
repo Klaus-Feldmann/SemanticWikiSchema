@@ -1,12 +1,12 @@
 <?php
 require __DIR__.'/source-refresh-processing-contract.php';
 use D2Harness\State as K;
-use ProfessionalWiki\SWS\EntryPoints\Processing\InternalFieldKeyWriter;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions};
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Processing\InternalFieldKeyWriter;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions};
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\SWSExtension;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
 
 resetD2();
 // Populate a real snapshot first; then rename both an own and a derived field.
@@ -20,14 +20,14 @@ K::$schemaRevision=new RevisionRecord(200,901,['main'=>new SchemaContent($wire)]
 $saveCalls=K::$page->saveCalls;
 (new InternalFieldKeyWriter())->apply($title);
 $after=K::$page->revision->getContent('sws')->getPageSubjects()->getMainSubject();
-d2check($after->getStatements()->getStatement(new \ProfessionalWiki\SWS\Domain\Schema\PropertyName('N1'))->getValue()->toScalars()===['Eigene Angabe'],'Own value moved to arbitrary key');
+d2check($after->getStatements()->getStatement(new \AEWI\SWS\Domain\Schema\PropertyName('N1'))->getValue()->toScalars()===['Eigene Angabe'],'Own value moved to arbitrary key');
 d2check($after->getFieldNotes()===['Z1'=>'Forschungsnotiz'],'Field note moved with source field');
 d2check($after->getFieldKeyVersion()===1,'Applied version persisted');
 $stock=$after->getSourceSnapshot()->toJson();
 d2check($stock['languages']['de']['fields']['Z1']['lastSuccess']['result']['values']===$source['languages']['de']['fields']['Quelle']['lastSuccess']['result']['values'],'Last source success retained');
 d2check($stock['languages']['de']['fields']['Z1']['lastAttempt']['name']==='Z1','Source metadata uses new key');
 d2check($stock['languages']['de']['identities']===$source['languages']['de']['identities'],'Source identities unchanged');
-d2check(K::$page->lastWrittenSlots['sws'] instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent && count(K::$page->lastWrittenSlots)===1,'Only subject slot written');
+d2check(K::$page->lastWrittenSlots['sws'] instanceof \AEWI\SWS\EntryPoints\Content\SubjectContent && count(K::$page->lastWrittenSlots)===1,'Only subject slot written');
 d2check(K::$page->revision->getContent('main')->getText()==='Artikel','Article body untouched');
 (new InternalFieldKeyWriter())->apply($title);
 d2check(K::$page->saveCalls===$saveCalls+1,'Retry is a no-op, not a second migration');
@@ -38,7 +38,7 @@ d2check(K::$page->revision->getContent('sws')->getPageSubjects()->getMainSubject
 resetD2();
 $raw=json_decode(K::$page->revision->getContent('sws')->getText(),true);
 $raw['subjects']['s11111111111111']['statements']['N1']=['propertyType'=>'text','value'=>['Existing orphan']];
-K::$page->revision=new RevisionRecord(101,943,['main'=>new \MediaWiki\Content\JsonContent('Artikel'),'sws'=>new \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent(json_encode($raw))]);K::$history[101]=K::$page->revision;
+K::$page->revision=new RevisionRecord(101,943,['main'=>new \MediaWiki\Content\JsonContent('Artikel'),'sws'=>new \AEWI\SWS\EntryPoints\Content\SubjectContent(json_encode($raw))]);K::$history[101]=K::$page->revision;
 K::$schemaRevision=new RevisionRecord(200,901,['main'=>new SchemaContent($wire)]);K::$history[200]=K::$schemaRevision;
 $beforeText=K::$page->revision->getContent('sws')->getText();
 d2refuses(fn()=>(new InternalFieldKeyWriter())->apply($title),'Collision is refused before writing');

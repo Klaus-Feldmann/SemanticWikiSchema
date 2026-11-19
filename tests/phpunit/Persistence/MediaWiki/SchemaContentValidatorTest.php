@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Tests\Data\TestData;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator
+ * @covers \AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator
  */
 class SchemaContentValidatorTest extends TestCase {
 

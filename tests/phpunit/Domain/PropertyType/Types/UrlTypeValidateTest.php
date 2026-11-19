@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\PropertyType\Types\UrlType;
+use AEWI\SWS\Domain\Schema\Property\UrlProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\StringValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\UrlType
  */
 class UrlTypeValidateTest extends TestCase {
 

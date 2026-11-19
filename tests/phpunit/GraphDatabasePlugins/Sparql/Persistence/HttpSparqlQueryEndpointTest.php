@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Persistence;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Persistence;
 
 use MediaWiki\Http\HttpRequestFactory;
 use MWHttpRequest;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
  */
 class HttpSparqlQueryEndpointTest extends TestCase {
 

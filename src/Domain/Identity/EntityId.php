@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Identity;
+namespace AEWI\SWS\Domain\Identity;
 
 final readonly class EntityId extends PersistentId {
 	protected const string PREFIX = 'E';

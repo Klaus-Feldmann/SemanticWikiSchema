@@ -1,11 +1,11 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\Semantic;
+namespace AEWI\SWS\Application\Semantic;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\HistoricalDate;
-use ProfessionalWiki\SWS\Domain\HistoricalCalendar;
+use AEWI\SWS\Domain\HistoricalDate;
+use AEWI\SWS\Domain\HistoricalCalendar;
 
 /** Pure, schema-driven read model. Caller supplies an authorized snapshot and lazy source reader.
  * No global cache, no network, no store writes. One instance belongs to one snapshot.
@@ -29,7 +29,7 @@ final class FieldValues {
             }
         }
         return $this->collectInternal(null,'all',$language,false,true) + [
-            'annotationLanguages' => \ProfessionalWiki\SWS\Presentation\FieldLabelLanguages::forReader($language),
+            'annotationLanguages' => \AEWI\SWS\Presentation\FieldLabelLanguages::forReader($language),
         ];
     }
 
@@ -38,7 +38,7 @@ final class FieldValues {
         $fields = []; $found = false;
         $definitions = $this->schema['properties'];
         if ($name !== null) {
-            $key = \ProfessionalWiki\SWS\Domain\Schema\FieldNameResolver::resolve($name, $this->definitionsByName);
+            $key = \AEWI\SWS\Domain\Schema\FieldNameResolver::resolve($name, $this->definitionsByName);
             if ($key === null) { throw new InvalidArgumentException('Field not found: '.$name); }
             $definitions = [$this->definitionsByName[$key]];
         }

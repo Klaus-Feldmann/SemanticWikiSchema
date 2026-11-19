@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Subject\StatementList;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Value\UnregisteredTypeValue;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Value\UnregisteredTypeValue;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\TestDoubles\StubIdGenerator;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\StatementListBuilder
+ * @covers \AEWI\SWS\Application\StatementListBuilder
  */
 class StatementListBuilderTest extends TestCase {
 
@@ -31,7 +31,7 @@ class StatementListBuilderTest extends TestCase {
 	public function testBuildsStructuredUrlEntriesWithoutFlattening(): void {
 		$entry = [ 'url' => 'https://example.org/?a=1&b=2', 'label' => 'Title', 'caption' => 'Source', 'captionPage' => 'Vermerk:Quelle' ];
 		$list = $this->newBuilder()->build( [ 'Source' => [ 'propertyType' => 'url', 'value' => [ $entry ] ] ] );
-		$this->assertSame( [ $entry ], $list->getStatement( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( 'Source' ) )->getValue()->toScalars() );
+		$this->assertSame( [ $entry ], $list->getStatement( new \AEWI\SWS\Domain\Schema\PropertyName( 'Source' ) )->getValue()->toScalars() );
 	}
 
 	public function testRejectsBareUrlObjectInsteadOfAList(): void {

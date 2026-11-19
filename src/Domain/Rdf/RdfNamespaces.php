@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Rdf;
+namespace AEWI\SWS\Domain\Rdf;
 
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * The IRI and prefix scheme for the native RDF projection (NativeRdfProjection.md § Namespaces).
@@ -60,7 +60,7 @@ readonly class RdfNamespaces {
 	}
 
 	/** Relative predicate path shared by native export and Graph presentation. */
-	public static function fieldPropertyPath( string $name, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): string {
+	public static function fieldPropertyPath( string $name, \AEWI\SWS\Domain\Schema\SchemaReference $schema ): string {
 		$path = $schema->id !== null ? '/schema-id/' : '/schema/';
 		if ( $schema->source !== null ) {
 			$path = $schema->id !== null ? '/schema-source-id/' : '/schema-source/';
@@ -69,7 +69,7 @@ readonly class RdfNamespaces {
 		return $path . rawurlencode( $schema->id?->text ?? $schema->name->getText() ) . '/field/' . rawurlencode( $name );
 	}
 
-	public function propertyForSchema( string $name, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): Iri {
+	public function propertyForSchema( string $name, \AEWI\SWS\Domain\Schema\SchemaReference $schema ): Iri {
 		return new Iri( $this->baseUri . self::fieldPropertyPath( $name, $schema ) );
 	}
 
@@ -78,7 +78,7 @@ readonly class RdfNamespaces {
         return new Iri( $this->baseUri . $prefix . self::localName( $schemaName->getText() ) );
 	}
 
-	public function identifiedSchemaClass( \ProfessionalWiki\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): Iri {
+	public function identifiedSchemaClass( \AEWI\SWS\Domain\Identity\SchemaId $id, ?string $source = null ): Iri {
         $prefix = $source === null ? '/schema-id/' : '/schema-source-id/' . self::localName( $source ) . '/';
         return new Iri( $this->baseUri . $prefix . $id->text );
     }

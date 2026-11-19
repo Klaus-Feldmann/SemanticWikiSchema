@@ -1,9 +1,9 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Identity;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, SchemaId};
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+namespace AEWI\SWS\Application\Identity;
+use AEWI\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, SchemaId};
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 /** Read-only compatibility resolution. Persistence and historical readers retain the original IDs. */
 final readonly class IdentityBoundaryResolver {
  public function __construct( private IdentityRegistry $registry, private string $origin ) {}

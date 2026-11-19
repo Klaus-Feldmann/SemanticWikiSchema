@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Identity;
+namespace AEWI\SWS\Application\Identity;
 
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, PersistentId};
+use AEWI\SWS\Domain\Identity\{IdentityKind, LegacyIdentity, PersistentId};
 
 interface IdentityRegistry {
 	/** Caller supplies a stable, actor/operation-scoped request key, reused only for retries. */

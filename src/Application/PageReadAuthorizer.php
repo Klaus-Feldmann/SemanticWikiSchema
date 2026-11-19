@@ -2,10 +2,10 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageId;
 
 /**
  * The binding per-page authorization for reading page-backed content: Subjects, Schemas, Layouts

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\Utils\MWTimestamp;
-use ProfessionalWiki\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\Rdbms\IConnectionProvider;
 
 /**

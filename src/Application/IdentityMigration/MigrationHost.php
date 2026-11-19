@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 interface MigrationHost {
     /** Read-only, revision-bound records: schemas, subjects, mappings, layouts, occupied schema titles, counters. */

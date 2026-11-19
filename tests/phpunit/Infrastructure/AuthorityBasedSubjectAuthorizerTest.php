@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer
+ * @covers \AEWI\SWS\Infrastructure\AuthorityBasedSubjectAuthorizer
  */
 class AuthorityBasedSubjectAuthorizerTest extends MediaWikiIntegrationTestCase {
 

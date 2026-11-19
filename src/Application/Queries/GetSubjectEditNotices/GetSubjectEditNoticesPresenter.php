@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices;
+namespace AEWI\SWS\Application\Queries\GetSubjectEditNotices;
 
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNotice;
 
 interface GetSubjectEditNoticesPresenter {
 

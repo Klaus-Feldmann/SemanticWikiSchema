@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use Closure;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLock;
-use ProfessionalWiki\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLock;
+use AEWI\SWS\Application\GraphRebuild\RebuildStartLockUnavailableException;
 
 /**
  * Stands in for a start lock another process is holding on to, which one test cannot produce for itself.

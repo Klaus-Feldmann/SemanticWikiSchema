@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use Exception;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Needs the integration base class to set the wiki's Neo4j URLs, and the test Neo4j, which requires a login,
  * to show that the credentials still reach it.
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension::getNeo4jClient
- * @covers \ProfessionalWiki\SWS\SWSExtension::getReadOnlyNeo4jClient
+ * @covers \AEWI\SWS\SWSExtension::getNeo4jClient
+ * @covers \AEWI\SWS\SWSExtension::getReadOnlyNeo4jClient
  */
 class Neo4jPasswordStaysOutOfErrorsTest extends SWSIntegrationTestCase {
 

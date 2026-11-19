@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction;
 
 use MediaWiki\Message\Message;
 use MediaWiki\Parser\Parser;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
+use AEWI\SWS\Application\RawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction;
+use AEWI\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
+use AEWI\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\ParserFunction\SparqlRawParserFunction
  */
 class SparqlRawParserFunctionTest extends TestCase {
 

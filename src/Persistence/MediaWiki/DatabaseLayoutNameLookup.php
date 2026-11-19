@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\LayoutNameLookup;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\LayoutNameLookup;
 use Wikimedia\Rdbms\IDatabase;
 
 class DatabaseLayoutNameLookup implements LayoutNameLookup {

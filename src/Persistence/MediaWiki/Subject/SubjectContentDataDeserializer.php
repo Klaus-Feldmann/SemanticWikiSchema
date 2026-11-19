@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
 
 class SubjectContentDataDeserializer {
 
@@ -101,12 +101,12 @@ class SubjectContentDataDeserializer {
 		if ( str_starts_with( $id, 'E' ) && !array_key_exists( 'identityLanguage', $jsonArray ) ) { throw new \InvalidArgumentException( 'New entity identity metadata missing' ); }
 		return new Subject(
 			id: new SubjectId( $id ),
-			fieldKeyVersion: \ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges::version( $jsonArray['fieldKeyVersion'] ?? 0 ),
+			fieldKeyVersion: \AEWI\SWS\Domain\Schema\FieldKeyChanges::version( $jsonArray['fieldKeyVersion'] ?? 0 ),
 			label: $this->deserializeLabel( $jsonArray['label'] ?? null ),
 			schema: $this->schemaReferenceParser->fromJson( $jsonArray['schema'] ),
 			statements: $this->buildStatementList( $jsonArray ),
-			identity: array_intersect( array_keys( $jsonArray ), [ 'identityLanguage', 'labels', 'descriptions' ] ) !== [] ? \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromJson( $jsonArray ) : null,
-            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $jsonArray['fieldNotes'] ?? [] ),
+			identity: array_intersect( array_keys( $jsonArray ), [ 'identityLanguage', 'labels', 'descriptions' ] ) !== [] ? \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromJson( $jsonArray ) : null,
+            fieldNotes: \AEWI\SWS\Domain\FieldNotes::validate( $jsonArray['fieldNotes'] ?? [] ),
 			sourceSnapshot: array_key_exists( 'sourceSnapshot', $jsonArray )
 				? SourceSnapshot::fromJson( $jsonArray['sourceSnapshot'] ) : null,
 		);

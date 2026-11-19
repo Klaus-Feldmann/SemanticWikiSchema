@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
 use RuntimeException;
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Page\PageSubjects;
 
 /** Request-local and strictly scoped; never changes RequestContext or public API authority. */
 final class ProcessingContext {

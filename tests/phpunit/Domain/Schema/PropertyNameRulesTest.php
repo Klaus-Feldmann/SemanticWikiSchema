@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameProblem;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRule;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules;
-use ProfessionalWiki\SWS\Tests\Data\PropertyNameVectors;
+use AEWI\SWS\Domain\Schema\PropertyNameProblem;
+use AEWI\SWS\Domain\Schema\PropertyNameRule;
+use AEWI\SWS\Domain\Schema\PropertyNameRules;
+use AEWI\SWS\Tests\Data\PropertyNameVectors;
 
 /**
  * The shared vectors in tests/vectors/property-names.json, which the TypeScript suite runs against its own rules, so
  * the Schema editor refuses what the wiki refuses.
  *
- * @covers \ProfessionalWiki\SWS\Domain\Schema\PropertyNameRules
- * @covers \ProfessionalWiki\SWS\Domain\Schema\PropertyNameProblem
+ * @covers \AEWI\SWS\Domain\Schema\PropertyNameRules
+ * @covers \AEWI\SWS\Domain\Schema\PropertyNameProblem
  */
 class PropertyNameRulesTest extends TestCase {
 

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Rdf;
+namespace AEWI\SWS\Domain\Rdf;
 
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\SWS\Domain\HistoricalDate;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\MonolingualTextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\PropertyType\Types\BooleanType;
+use AEWI\SWS\Domain\PropertyType\Types\DateTimeType;
+use AEWI\SWS\Domain\HistoricalDate;
+use AEWI\SWS\Domain\PropertyType\Types\DateType;
+use AEWI\SWS\Domain\PropertyType\Types\MonolingualTextType;
+use AEWI\SWS\Domain\PropertyType\Types\NumberType;
+use AEWI\SWS\Domain\PropertyType\Types\SelectType;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\PropertyType\Types\UrlType;
+use AEWI\SWS\Domain\Schema\Property\DateProperty;
+use AEWI\SWS\Domain\Schema\Property\DateTimeProperty;
+use AEWI\SWS\Domain\Value\MonolingualText;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NeoValue;
 
 /**
  * Maps a Statement's {@see NeoValue} to the RDF {@see RdfTerm}s that represent it — {@see Literal}s, or
@@ -67,7 +67,7 @@ class RdfValueMapperRegistry {
 		$registry->registerMapper( 'page', static function ( NeoValue $value ): array {
 			$result = [];
 			foreach ( (array)$value->toScalars() as $text ) {
-				$normal = is_string( $text ) ? \ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $text ) : null;
+				$normal = is_string( $text ) ? \AEWI\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $text ) : null;
 				if ( $normal !== null ) {
 					$result[] = new Iri( \MediaWiki\Title\Title::newFromText( $normal )->getFullURL() );
 				}
@@ -120,7 +120,7 @@ class RdfValueMapperRegistry {
 	 * @return RdfTerm[]
 	 */
 	private static function urlMapper( NeoValue $value ): array {
-		$scalars = $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ? $value->urls() : $value->toScalars();
+		$scalars = $value instanceof \AEWI\SWS\Domain\Value\UrlValue ? $value->urls() : $value->toScalars();
 
 		if ( !is_array( $scalars ) ) {
 			return [];

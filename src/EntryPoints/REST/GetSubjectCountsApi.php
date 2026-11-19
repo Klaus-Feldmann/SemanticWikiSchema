@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\SubjectCountLookup;
-use ProfessionalWiki\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
+use AEWI\SWS\Application\SubjectCountLookup;
+use AEWI\SWS\Infrastructure\AuthorityBasedRawQueryAuthorizer;
 
 class GetSubjectCountsApi extends SimpleHandler {
 

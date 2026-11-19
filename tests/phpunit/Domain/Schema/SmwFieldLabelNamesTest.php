@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Semantic\{FieldAnnotationName,AnnotationPlanner,FieldNoteAnnotations};
+use AEWI\SWS\Application\Semantic\{FieldAnnotationName,AnnotationPlanner,FieldNoteAnnotations};
 final class SmwFieldLabelNamesTest extends TestCase {
  private function result(string $id='S1',array $labels=['de'=>'Geburtsort','en'=>'Place of birth']):array {
   $field=['name'=>'F12','labels'=>$labels,'type'=>'text','values'=>[['value'=>'Sterzing','origin'=>'own','metadata'=>[]]],'hasStoredValues'=>true,'fieldNotes'=>['type'=>'text','annotate'=>true]];

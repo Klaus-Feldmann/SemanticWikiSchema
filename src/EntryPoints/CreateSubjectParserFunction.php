@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use Closure;
 use InvalidArgumentException;
@@ -10,12 +10,12 @@ use MediaWiki\Html\Html;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutputFlags;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\SchemaLookup;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\SchemaLookup;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\Actions\SubjectsAction;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Only the parsed page's own Subjects are resolved at parse time: they live in its revision, so it

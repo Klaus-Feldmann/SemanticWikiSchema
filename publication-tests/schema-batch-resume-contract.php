@@ -36,7 +36,7 @@ namespace {
   public function __construct(public string $type,public mixed $title,public array $params){}
  }
  require __DIR__.'/bootstrap.php';
- use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+ use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
  use D5Batch\State as S;
  $n=0;function batchCheck(bool $ok,string $why):void{global $n;$n++;if(!$ok)throw new RuntimeException($why);}
  $schema=new MediaWiki\Title\Title('Person');$first=new SchemaWikitextRefreshJob($schema,['after'=>0]);

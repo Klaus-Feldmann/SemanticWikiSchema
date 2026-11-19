@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
+namespace AEWI\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\User\User;

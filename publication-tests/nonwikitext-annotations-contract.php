@@ -69,18 +69,19 @@ namespace MediaWiki {
         }
     }
 }
-namespace ProfessionalWiki\SWS { class SWSExtension {public const NS_SCHEMA=7474;} }
+namespace AEWI\SWS { class SWSExtension {public const NS_SCHEMA=7474;} }
 namespace {
+    require_once __DIR__.'/message-fixture.php';
     define('SMW_NS_PROPERTY',102);
     require dirname(__DIR__).'/tests/standalone/autoload.php';
-    use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyCore,PropertyDefinitions,PropertyName};
-    use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-    use ProfessionalWiki\SWS\Domain\Subject\{StatementList,SubjectMap};
-    use ProfessionalWiki\SWS\Domain\{Statement};
-    use ProfessionalWiki\SWS\Domain\Value\StringValue;
-    use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-    use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-    use ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations;
+    use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyCore,PropertyDefinitions,PropertyName};
+    use AEWI\SWS\Domain\Schema\Property\TextProperty;
+    use AEWI\SWS\Domain\Subject\{StatementList,SubjectMap};
+    use AEWI\SWS\Domain\{Statement};
+    use AEWI\SWS\Domain\Value\StringValue;
+    use AEWI\SWS\Domain\Page\PageSubjects;
+    use AEWI\SWS\Tests\Data\TestSubject;
+    use AEWI\SWS\EntryPoints\Semantic\AutomaticAnnotations;
     use MediaWiki\Parser\{Parser,ParserOutput};
     use MediaWiki\Title\Title;
     $checks=0;function check($yes,$why){global $checks;$checks++;if(!$yes)throw new \RuntimeException($why);}
@@ -101,7 +102,7 @@ namespace {
     $title=new Title('Vorlage:Metadaten','wikitext');
     check(apply($title,new Parser($title),$schema,subject('Vorlage'))->getExtensionData('smwdata')->rows===['Status=Vorlage'],'Wikitext path retained');
     foreach([[$title,null],[new Title('Modul:Metadaten','Scribunto'),new Parser(new Title('Andere Seite'))]]as [$title,$parser]){
-        try{apply($title,$parser,$schema,subject('abgelehnt'));check(false,'Invalid parser context accepted');}catch(\ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete){check(true,'Incomplete/wrong parser remains refused');}
+        try{apply($title,$parser,$schema,subject('abgelehnt'));check(false,'Invalid parser context accepted');}catch(\AEWI\SWS\EntryPoints\Processing\ProcessingIncomplete){check(true,'Incomplete/wrong parser remains refused');}
     }
     $t=new Title('Vorlage:Beschreibung','json');
     $described=new Schema(new SchemaName('Verwaltung'),'',new PropertyDefinitions(['Status'=>new TextProperty(new PropertyCore('',false,null,labels:['de'=>'Kurzbeschreibung']),false,false,null,null)]),false);

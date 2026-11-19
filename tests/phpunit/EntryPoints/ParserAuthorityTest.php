@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Extension\Scribunto\ScribuntoContent;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\ParseTimePermissionFixtures;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\ParseTimePermissionFixtures;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\ParserAuthority
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserOptionsRegister
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
+ * @covers \AEWI\SWS\EntryPoints\ParserAuthority
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onParserOptionsRegister
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
  * @group Database
  */
 class ParserAuthorityTest extends SWSIntegrationTestCase {

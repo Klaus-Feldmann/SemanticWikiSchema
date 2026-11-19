@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Infrastructure\GuidGenerator;
+use AEWI\SWS\Infrastructure\GuidGenerator;
 
 class StubGuidGenerator implements GuidGenerator {
 

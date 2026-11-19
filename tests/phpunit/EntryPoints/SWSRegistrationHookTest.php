@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Registration\ExtensionRegistry;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\RedHerb\RedHerbGraphDatabasePlugin;
+use AEWI\SWS\SWSExtension;
+use AEWI\RedHerb\RedHerbGraphDatabasePlugin;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSRegistrar
- * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \AEWI\SWS\EntryPoints\SWSRegistrar
+ * @covers \AEWI\SWS\SWSExtension
  * @group Database
  */
 class SWSRegistrationHookTest extends MediaWikiIntegrationTestCase {

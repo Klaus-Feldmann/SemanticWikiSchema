@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Relation;
+namespace AEWI\SWS\Tests\Domain\Relation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Relation\RelationId;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Relation\RelationId
+ * @covers \AEWI\SWS\Domain\Relation\RelationId
  */
 class RelationIdTest extends TestCase {
 

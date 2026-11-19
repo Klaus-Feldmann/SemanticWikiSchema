@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
+namespace AEWI\SWS\Tests\Application\Rdf;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\RevisionSlots;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\NullRevisionPolicy;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Application\NullRevisionPolicy;
+use AEWI\SWS\Application\Rdf\RdfPageLoader;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Rdf\RdfPageLoader
+ * @covers \AEWI\SWS\Application\Rdf\RdfPageLoader
  * @group Database
  */
 class RdfPageLoaderTest extends SWSIntegrationTestCase {

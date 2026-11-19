@@ -2,7 +2,7 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetSchema;
+namespace AEWI\SWS\Application\Queries\GetSchema;
 
 interface GetSchemaPresenter {
 

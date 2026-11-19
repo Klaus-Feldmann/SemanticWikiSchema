@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Persistence;
 
 use InvalidArgumentException;
 use Laudis\Neo4j\Authentication\Authenticate;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jUrl
  */
 class Neo4jUrlTest extends TestCase {
 

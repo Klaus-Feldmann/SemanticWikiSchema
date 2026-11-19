@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 /**
  * The Host Subject a Dependent Subject is named after, as in "Birth of Pablo Picasso". Sent as parts rather than as a
  * name, so that the reader's language composes it. Fields mean what they mean on
- * {@see \ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem}.
+ * {@see \AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem}.
  */
 readonly class HostSubject {
 

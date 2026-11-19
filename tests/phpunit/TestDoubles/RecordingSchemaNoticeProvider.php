@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProvider;
 
 /**
  * Records the context it was handed, so tests can assert what reached the extension point.

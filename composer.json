@@ -63,12 +63,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"ProfessionalWiki\\SWS\\": "src/"
+			"AEWI\\SWS\\": "src/"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"ProfessionalWiki\\SWS\\Tests\\": "tests/phpunit/"
+			"AEWI\\SWS\\Tests\\": "tests/phpunit/"
 		}
 	},
 	"scripts": {

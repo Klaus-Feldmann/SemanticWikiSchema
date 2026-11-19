@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 
 /** A signed storage receipt, not an authorization to publish parser or SMW output. */
 final class SourceRefreshReceipt {
@@ -28,12 +28,12 @@ final class SourceRefreshReceipt {
 
     /** Only the maintenance writer may attest an already-proved reference-only migration. */
     public static function attachMigrated(Title $title,RevisionRecord $parent,SubjectContent $next,array $dependencies):SubjectContent {
-        if (!\ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() || !self::isCurrent($title,$parent) || !ProcessingResult::dependenciesCurrent($dependencies)) {
+        if (!\AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() || !self::isCurrent($title,$parent) || !ProcessingResult::dependenciesCurrent($dependencies)) {
             throw new ProcessingIncomplete('Unverified migration source basis');
         }
         // Preserve object/list distinctions from the signed migration plan. The receipt hash
         // keeps its existing associative-array contract so earlier valid receipts remain readable.
-        $raw=\ProfessionalWiki\SWS\Application\IdentityMigration\ReferenceRewriter::object($next->getText());unset($raw->{self::KEY});
+        $raw=\AEWI\SWS\Application\IdentityMigration\ReferenceRewriter::object($next->getText());unset($raw->{self::KEY});
         $hashData=json_decode($next->getText(),true,512,JSON_THROW_ON_ERROR);unset($hashData[self::KEY]);
         $receipt=['version'=>1,'kind'=>'sws-source-refresh','page'=>$title->getArticleID(),'parent'=>$parent->getId(),'parentSha1'=>$parent->getSha1(),
             'dependencies'=>$dependencies,'languages'=>SourceSnapshotCapture::languages(),'contentHash'=>hash('sha256',json_encode($hashData,JSON_THROW_ON_ERROR))];
@@ -43,9 +43,9 @@ final class SourceRefreshReceipt {
 
     /** Carries a verified source basis through a metadata-only CAS edit. No new source result is invented. */
     public static function carryMetadata( \MediaWiki\Title\Title $title, RevisionRecord $parent, SubjectContent $next ): SubjectContent {
-        if ( !\ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore() || !self::isCurrent( $title, $parent ) ) { return $next; }
+        if ( !\AEWI\SWS\Application\Source\SourceDataMode::usesStore() || !self::isCurrent( $title, $parent ) ) { return $next; }
         $previous = SubjectSlotReader::read( $parent );
-        if ( $previous === null || \ProfessionalWiki\SWS\Application\Identity\IdentityChangeClassifier::subjects( $previous->getText(), $next->getText() ) !== 'metadata' ) { return $next; }
+        if ( $previous === null || \AEWI\SWS\Application\Identity\IdentityChangeClassifier::subjects( $previous->getText(), $next->getText() ) !== 'metadata' ) { return $next; }
         $old = json_decode( $previous->getText(), true, 512, JSON_THROW_ON_ERROR );
         $raw = json_decode( $next->getText(), true, 512, JSON_THROW_ON_ERROR );
         unset( $raw[self::KEY] );
@@ -68,16 +68,16 @@ final class SourceRefreshReceipt {
             if ( ( $current?->getId() ?? 0 ) === $dependency['revision'] ) { continue; }
             $old = $lookup->getRevisionById( $dependency['revision'] );
             if ( $current === null || $old === null || $old->getPageId() !== $current->getPageId() ||
-                $title->getNamespace() !== \ProfessionalWiki\SWS\SWSExtension::NS_SCHEMA ) { return false; }
+                $title->getNamespace() !== \AEWI\SWS\SWSExtension::NS_SCHEMA ) { return false; }
             $user = ProcessingIdentity::get();
-            $policy = \ProfessionalWiki\SWS\SWSExtension::getInstance()->getRevisionPolicy();
+            $policy = \AEWI\SWS\SWSExtension::getInstance()->getRevisionPolicy();
             if ( !$user->authorizeRead( 'read', $title ) || !$old->userCan( RevisionRecord::DELETED_TEXT, $user ) ||
                 !$current->userCan( RevisionRecord::DELETED_TEXT, $user ) || !$policy->revisionIsReadableBy( $old, $user ) ||
                 !$policy->revisionIsReadableBy( $current, $user ) || $policy->publishedRevision( $current )?->getId() !== $current->getId() ) { return false; }
             $a = $old->getContent( 'main', RevisionRecord::FOR_THIS_USER, $user );
             $b = $current->getContent( 'main', RevisionRecord::FOR_THIS_USER, $user );
-            if ( !$a instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent || !$b instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent ||
-                !in_array( \ProfessionalWiki\SWS\Application\Identity\IdentityChangeClassifier::schema( $a->getText(), $b->getText() ), ['metadata','unchanged'], true ) ) { return false; }
+            if ( !$a instanceof \AEWI\SWS\EntryPoints\Content\SchemaContent || !$b instanceof \AEWI\SWS\EntryPoints\Content\SchemaContent ||
+                !in_array( \AEWI\SWS\Application\Identity\IdentityChangeClassifier::schema( $a->getText(), $b->getText() ), ['metadata','unchanged'], true ) ) { return false; }
             // Other slots (for example associated executable code) are never presentation metadata.
             $roles = $old->getSlotRoles(); $newRoles = $current->getSlotRoles(); sort($roles); sort($newRoles);
             if ( $roles !== $newRoles ) { return false; }

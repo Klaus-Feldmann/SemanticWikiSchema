@@ -4,7 +4,7 @@ declare(strict_types=1);
 require __DIR__.'/source-refresh-processing-contract.php';
 
 use D2Harness\State as ForeignState;
-use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
+use AEWI\SWS\EntryPoints\Processing\ProcessingIncomplete;
 $n=0;function foreignCheck(bool $ok,string $why):void{global $n;$n++;if(!$ok)throw new RuntimeException($why);}
 $messages=[file_get_contents(__DIR__.'/fixtures/foreign-literature-message.html'),
  '<span class="error">Unknown message from another extension</span>',

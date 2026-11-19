@@ -6,7 +6,7 @@ namespace IdentityHarness;
 
 use LogicException;
 use PDO;
-use ProfessionalWiki\SWS\Persistence\Identity\IdentityConnection;
+use AEWI\SWS\Persistence\Identity\IdentityConnection;
 
 /** Real SQLite transport for the same production registry SQL; not a simulated database. */
 final class SqliteIdentityConnection implements IdentityConnection {

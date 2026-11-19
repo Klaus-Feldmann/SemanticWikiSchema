@@ -1,16 +1,16 @@
 <?php
 require __DIR__.'/d2-query-syntax-contract.php';
 use CollectorHarness\State as H;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinition,PropertyDefinitions};
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\{StringValue,NumberValue};
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinition,PropertyDefinitions};
+use AEWI\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\{StringValue,NumberValue};
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\{SWSValueParserFunction,ParserFieldLookup};
+use AEWI\SWS\SWSExtension;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Revision\RevisionRecord;
 $count=0;function xcheck($ok,$why){global $count;$count++;if(!$ok)throw new RuntimeException($why);}

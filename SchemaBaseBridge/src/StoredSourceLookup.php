@@ -7,31 +7,31 @@ namespace SWSBaseBridge;
 use MediaWiki\Context\IContextSource;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Application\Source\StoredSourceValues;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Application\Source\StoredSourceValues;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\SWSExtension;
 use RuntimeException;
 use Throwable;
 
 /** Authorized reads of persisted source data. Never calls wbgetentities, parses or writes. */
 final class StoredSourceLookup {
 
-	private ?\ProfessionalWiki\SWS\EntryPoints\Source\PublishedSubjectsLookup $published = null;
+	private ?\AEWI\SWS\EntryPoints\Source\PublishedSubjectsLookup $published = null;
 	private array $access = [];
 	private EntityGateway $links;
 
-	public function __construct( private readonly IContextSource $context, ?\ProfessionalWiki\SWS\EntryPoints\Source\PublishedSubjectsLookup $published = null ) {
+	public function __construct( private readonly IContextSource $context, ?\AEWI\SWS\EntryPoints\Source\PublishedSubjectsLookup $published = null ) {
 		$this->published = $published;
 		// Only url() is used: local title/permission lookup, not source-value retrieval.
 		$this->links = new EntityGateway( $context );
 	}
 
 	public function page( Title $title ): PageSubjects {
-		return ( $this->published ??= new \ProfessionalWiki\SWS\EntryPoints\Source\PublishedSubjectsLookup( $this->context ) )->page( $title );
+		return ( $this->published ??= new \AEWI\SWS\EntryPoints\Source\PublishedSubjectsLookup( $this->context ) )->page( $title );
 	}
 
 	public function fields( Title $title, array $params, ?PageDependencyRecorder $dependencies = null, ?Subject $selected = null, ?Schema $selectedSchema = null ): array {

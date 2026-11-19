@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
-use ProfessionalWiki\SWS\Domain\Relation\Relation;
-use ProfessionalWiki\SWS\Domain\Relation\RelationId;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\Domain\Value\RelationValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Value\UrlValue;
-use ProfessionalWiki\SWS\Domain\Value\UnregisteredTypeValue;
-use ProfessionalWiki\SWS\Domain\Value\ValueType;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Domain\Relation\Relation;
+use AEWI\SWS\Domain\Relation\RelationId;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Value\BooleanValue;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\Value\RelationValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Value\UrlValue;
+use AEWI\SWS\Domain\Value\UnregisteredTypeValue;
+use AEWI\SWS\Domain\Value\ValueType;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
 
 /**
  * Deserializes statements from persistence-type JSON.

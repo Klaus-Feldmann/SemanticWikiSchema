@@ -7,11 +7,11 @@ use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\{SchemaContent,SubjectContent};
-use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\SWS\EntryPoints\Actions\SubjectsAction;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\{SchemaContent,SubjectContent};
+use AEWI\SWS\EntryPoints\Processing\InternalPageProcessor;
+use AEWI\SWS\EntryPoints\Actions\SubjectsAction;
 
 $services=MediaWikiServices::getInstance();
 if($services->getMainConfig()->get('DBname')!=='semantic_test' || $services->getMainConfig()->get('Server')!=='http://127.0.0.1:18747'){

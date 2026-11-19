@@ -2,31 +2,31 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Rdf;
+namespace AEWI\SWS\Tests\Application\Rdf;
 
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSources;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Application\Rdf\SubjectIriResolver;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Tests\Data\TestPage;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Application\Rdf\OntologyMappingProjector;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Application\Rdf\SubjectIriResolver;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Mapping\SchemaMapping;
+use AEWI\SWS\Domain\Mapping\SubjectMapping;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Tests\Data\TestPage;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
 
 /**
@@ -35,9 +35,9 @@ use WMDE\PsrLogTestDoubles\LegacyLoggerSpy;
  * projections can share one triple store without the per-page replace sync of one wiping the other's
  * triples. The page RESOURCE IRI that appears inside the triples is unaffected — only the graph moves.
  *
- * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector
- * @covers \ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces
+ * @covers \AEWI\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \AEWI\SWS\Application\Rdf\RdfPageProjector
+ * @covers \AEWI\SWS\Domain\Rdf\RdfNamespaces
  */
 class ProjectionNamedGraphTest extends TestCase {
 

@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Subject;
+namespace AEWI\SWS\Tests\Domain\Subject;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
-use ProfessionalWiki\SWS\Tests\Data\SubjectIdVectors;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Tests\Data\SubjectIdVectors;
 
 /**
  * The shared vectors in tests/vectors/subject-ids.json, which the TypeScript suite runs against its
  * own SubjectId, so both implementations answer the same for every case. Canonicalization is this
  * parser's alone: it needs the local Source key, which the frontend does not hold.
  *
- * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser
- * @covers \ProfessionalWiki\SWS\Domain\Subject\SubjectId
+ * @covers \AEWI\SWS\Domain\Subject\SubjectIdParser
+ * @covers \AEWI\SWS\Domain\Subject\SubjectId
  */
 class SubjectIdParserTest extends TestCase {
 

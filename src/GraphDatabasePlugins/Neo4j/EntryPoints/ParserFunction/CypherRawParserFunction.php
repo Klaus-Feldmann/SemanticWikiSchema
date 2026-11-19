@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\ParserFunction;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\CypherErrorMessage;
 
 class CypherRawParserFunction {
 

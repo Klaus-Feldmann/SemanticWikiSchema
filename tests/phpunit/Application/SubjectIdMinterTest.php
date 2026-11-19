@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\SubjectIdMinter;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
-use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
-use ProfessionalWiki\SWS\Tests\TestDoubles\IncrementalIdGenerator;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SequenceIdGenerator;
+use AEWI\SWS\Application\SubjectIdMinter;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Infrastructure\ProductionIdGenerator;
+use AEWI\SWS\Tests\TestDoubles\IncrementalIdGenerator;
+use AEWI\SWS\Tests\TestDoubles\SequenceIdGenerator;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\SubjectIdMinter
+ * @covers \AEWI\SWS\Application\SubjectIdMinter
  */
 class SubjectIdMinterTest extends TestCase {
 

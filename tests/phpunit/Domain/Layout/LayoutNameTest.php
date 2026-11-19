@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Layout;
+namespace AEWI\SWS\Tests\Domain\Layout;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Domain\Layout\LayoutName;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Layout\LayoutName
+ * @covers \AEWI\SWS\Domain\Layout\LayoutName
  */
 class LayoutNameTest extends TestCase {
 

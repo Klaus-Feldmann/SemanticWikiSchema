@@ -1,9 +1,9 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
-use ProfessionalWiki\SWS\Domain\Identity\SchemaId;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema, SchemaReference};
-use ProfessionalWiki\SWS\SWSExtension;
+namespace AEWI\SWS\EntryPoints\REST;
+use AEWI\SWS\Domain\Identity\SchemaId;
+use AEWI\SWS\Domain\Schema\{Schema, SchemaReference};
+use AEWI\SWS\SWSExtension;
 trait SchemaReadEndpoint {
  protected function readSchemaReference( string $name, bool $identified ): ?Schema {
   $extension = SWSExtension::getInstance();

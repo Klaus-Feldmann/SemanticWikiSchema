@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\RestGetSubjectEditNoticesPresenter;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\RestGetSubjectEditNoticesPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetSubjectEditNoticesApi extends SimpleHandler {

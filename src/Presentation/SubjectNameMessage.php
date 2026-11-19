@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use MediaWiki\Language\RawMessage;
 use MediaWiki\Message\Message;
 use MessageLocalizer;
-use ProfessionalWiki\SWS\Application\HostSubject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\HostSubject;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * A Subject's name as a message: verbatim when someone chose it, and otherwise the Subject's id,
  * marked as the stand-in it is. The chosen name comes from
- * {@see \ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName}.
+ * {@see \AEWI\SWS\Domain\Subject\SubjectDisplayName}.
  */
 class SubjectNameMessage {
 

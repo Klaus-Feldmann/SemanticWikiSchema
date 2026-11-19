@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Persistence\DeletedPageIdsLookup;
+use AEWI\SWS\Persistence\DeletedPageIdsLookup;
 
 class InMemoryDeletedPageIdsLookup implements DeletedPageIdsLookup {
 

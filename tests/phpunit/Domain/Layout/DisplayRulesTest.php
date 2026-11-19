@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Layout;
+namespace AEWI\SWS\Tests\Domain\Layout;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRule;
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Layout\DisplayRule;
+use AEWI\SWS\Domain\Layout\DisplayRules;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Layout\DisplayRules
+ * @covers \AEWI\SWS\Domain\Layout\DisplayRules
  */
 class DisplayRulesTest extends TestCase {
 

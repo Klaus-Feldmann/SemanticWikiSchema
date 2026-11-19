@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Mapping\LinkDirection;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\NodeScope;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\PropertyMappings;
-use ProfessionalWiki\SWS\Domain\Mapping\SchemaMapping;
-use ProfessionalWiki\SWS\Domain\Mapping\SubjectMapping;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Mapping\LinkDirection;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Mapping\NodeMapping;
+use AEWI\SWS\Domain\Mapping\NodeScope;
+use AEWI\SWS\Domain\Mapping\PropertyMapping;
+use AEWI\SWS\Domain\Mapping\PropertyMappings;
+use AEWI\SWS\Domain\Mapping\SchemaMapping;
+use AEWI\SWS\Domain\Mapping\SubjectMapping;
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 class MappingPersistenceDeserializer {
 
@@ -55,7 +55,7 @@ class MappingPersistenceDeserializer {
 	 */
 	private function schemaIdsFromJson( mixed $entries ): array {
         if ( !is_array( $entries ) ) { throw new InvalidArgumentException( 'Invalid schema ID mappings' ); }
-        foreach ( array_keys( $entries ) as $id ) { new \ProfessionalWiki\SWS\Domain\Identity\SchemaId( (string)$id ); }
+        foreach ( array_keys( $entries ) as $id ) { new \AEWI\SWS\Domain\Identity\SchemaId( (string)$id ); }
         return $this->schemasFromJson( $entries );
     }
 

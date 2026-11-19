@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSWS;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialSWS;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialSWS
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialSWS
  * @group Database
  */
 class SpecialSWSTest extends SpecialPageTestBase {

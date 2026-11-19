@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Source;
+namespace AEWI\SWS\Tests\Application\Source;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Source\LocalSource;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Application\Source\LocalSource;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Source\LocalSource
+ * @covers \AEWI\SWS\Application\Source\LocalSource
  */
 class LocalSourceTest extends TestCase {
 
@@ -63,7 +63,7 @@ class LocalSourceTest extends TestCase {
 	}
 
 	/**
-	 * @param \ProfessionalWiki\SWS\Domain\Subject\Subject[] $subjects
+	 * @param \AEWI\SWS\Domain\Subject\Subject[] $subjects
 	 * @param Schema[] $schemas
 	 */
 	private function newSource( array $subjects = [], array $schemas = [] ): LocalSource {

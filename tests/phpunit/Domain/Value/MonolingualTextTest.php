@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Value;
+namespace AEWI\SWS\Tests\Domain\Value;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
+use AEWI\SWS\Domain\Value\MonolingualText;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Value\MonolingualText
+ * @covers \AEWI\SWS\Domain\Value\MonolingualText
  */
 class MonolingualTextTest extends TestCase {
 

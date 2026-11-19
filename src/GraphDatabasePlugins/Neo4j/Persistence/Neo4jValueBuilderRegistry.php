@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use DateTimeImmutable;
 use Laudis\Neo4j\Types\Date;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualText;
-use ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+use AEWI\SWS\Domain\Schema\Property\DateProperty;
+use AEWI\SWS\Domain\Schema\Property\DateTimeProperty;
+use AEWI\SWS\Domain\Value\MonolingualText;
+use AEWI\SWS\Domain\Value\MonolingualTextValue;
+use AEWI\SWS\Domain\Value\NeoValue;
 
 class Neo4jValueBuilderRegistry {
 
@@ -47,7 +47,7 @@ class Neo4jValueBuilderRegistry {
 		$registry->registerBuilder( 'wikitext', $toScalars );
 		$registry->registerBuilder( 'wikitextValue', $toScalars );
 		$registry->registerBuilder( 'page', $toScalars );
-		$registry->registerBuilder( 'url', static fn ( NeoValue $value ): array => $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ? $value->urls() : (array)$value->toScalars() );
+		$registry->registerBuilder( 'url', static fn ( NeoValue $value ): array => $value instanceof \AEWI\SWS\Domain\Value\UrlValue ? $value->urls() : (array)$value->toScalars() );
 		$registry->registerBuilder( 'image', $toScalars );
 		$registry->registerBuilder( 'number', $toScalars );
 		$registry->registerBuilder( 'select', $toScalars );

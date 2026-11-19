@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS;
+namespace AEWI\SWS;
 
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphStoreName;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Domain\GraphDatabase\GraphStoreName;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin;
 
 readonly class SWSConfig {
 

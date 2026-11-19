@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\REST\GetSchemaApi;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSchemaApi
  * @group Database
  */
 class GetSchemaApiTest extends SWSIntegrationTestCase {

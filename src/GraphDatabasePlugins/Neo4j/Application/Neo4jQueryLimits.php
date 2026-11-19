@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Application;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\User\User;

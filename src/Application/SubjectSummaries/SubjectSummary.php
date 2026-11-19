@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
+namespace AEWI\SWS\Application\SubjectSummaries;
 
-use ProfessionalWiki\SWS\Application\HostSubject;
+use AEWI\SWS\Application\HostSubject;
 
 /**
  * One row of a Subject listing. $displayName, $displayNameIsGenerated and $hostSubject mean what they mean in

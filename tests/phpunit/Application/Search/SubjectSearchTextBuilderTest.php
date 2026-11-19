@@ -2,38 +2,61 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Search;
+namespace AEWI\SWS\Tests\Application\Search;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchLine;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\DefinitionReportingPropertyType;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Application\Search\SubjectSearchLine;
+use AEWI\SWS\Application\Search\SubjectSearchTextBuilder;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\BooleanValue;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\DefinitionReportingPropertyType;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder
+ * @covers \AEWI\SWS\Application\Search\SubjectSearchTextBuilder
  */
 class SubjectSearchTextBuilderTest extends TestCase {
+
+	public function testDescriptionsInAllLanguagesAreIndexedWithoutAStatement(): void {
+		$subject = TestSubject::build( label: null );
+		$subject->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity(
+			'de', [], [ 'de' => 'Innere Zitate kennzeichnen.', 'en' => 'Nested quotations.', 'fr' => '  ' ]
+		) );
+		$this->assertSame( "Innere Zitate kennzeichnen.\nNested quotations.", $this->textForSubjects( $subject ) );
+		$this->assertTrue( $this->linesFor( $subject )[0]->isDescription );
+		$this->assertNull( $this->linesFor( $subject )[0]->propertyName );
+	}
+
+	public function testDescriptionTextAfterTheShortIdentityTermIndexLimitIsPreserved(): void {
+		$subject = TestSubject::build( label: null );
+		$text = str_repeat( 'Ein langer Anwendungstext. ', 20 ) . 'SeltenesSchlusswort';
+		$subject->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity( 'de', [], [ 'de' => $text ] ) );
+		$this->assertSame( $text, $this->textForSubjects( $subject ) );
+	}
+
+	public function testDuplicateLocalizedDescriptionsContributeOnce(): void {
+		$subject = TestSubject::build( label: null );
+		$subject->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity( 'de', [], [ 'de' => 'Zitat', 'en' => 'Zitat' ] ) );
+		$this->assertSame( 'Zitat', $this->textForSubjects( $subject ) );
+	}
 
 	private const SCHEMA_NAME = 'Museum';
 

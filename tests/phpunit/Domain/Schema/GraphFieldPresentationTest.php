@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 
 use SWSBaseBridge\GraphFieldPresentation;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Tests\Data\TestSources;
 
 require_once __DIR__ . '/../../../../SchemaBaseBridge/src/GraphFieldPresentation.php';
 require_once __DIR__ . '/../../../../SchemaBaseBridge/src/TimePresentation.php';
@@ -19,10 +19,10 @@ class GraphFieldPresentationTest extends TestCase {
 		$schema = new Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [
 			'Bezug' => PropertyDefinition::fromJson( [ 'type' => 'page' ], TestSources::newPropertyTypeRegistry() ),
 		] ), false );
-		$subject = \ProfessionalWiki\SWS\Tests\Data\TestSubject::build( statements:
-			new \ProfessionalWiki\SWS\Domain\Subject\StatementList( [
-				\ProfessionalWiki\SWS\Tests\Data\TestStatement::build( 'Bezug',
-					new \ProfessionalWiki\SWS\Domain\Value\StringValue( 'Werk:Abhandlung', 'Athen' ), 'page' ),
+		$subject = \AEWI\SWS\Tests\Data\TestSubject::build( statements:
+			new \AEWI\SWS\Domain\Subject\StatementList( [
+				\AEWI\SWS\Tests\Data\TestStatement::build( 'Bezug',
+					new \AEWI\SWS\Domain\Value\StringValue( 'Werk:Abhandlung', 'Athen' ), 'page' ),
 			] ) );
 		$view = GraphFieldPresentation::fromSchema( $schema, 'https://wiki.example/wiki/SWSGRAPHTITLETOKEN', $subject );
 		$this->assertSame( [ 'Werk:Abhandlung', 'Athen' ], $view['definitions'][0]['ownPages'] );
@@ -32,7 +32,7 @@ class GraphFieldPresentationTest extends TestCase {
 	public function testOwnStructuredUrlEntriesArePreservedForTheGraph(): void {
 		$entry = [ 'url' => 'https://example.org', 'label' => 'Article', 'caption' => 'Source', 'captionPage' => 'Vermerk:Quelle' ];
 		$schema = new Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [ 'Quelle' => PropertyDefinition::fromJson( [ 'type' => 'url' ], TestSources::newPropertyTypeRegistry() ) ] ), false );
-		$subject = \ProfessionalWiki\SWS\Tests\Data\TestSubject::build( statements: new \ProfessionalWiki\SWS\Domain\Subject\StatementList( [ \ProfessionalWiki\SWS\Tests\Data\TestStatement::build( 'Quelle', new \ProfessionalWiki\SWS\Domain\Value\UrlValue( [ $entry ] ), 'url' ) ] ) );
+		$subject = \AEWI\SWS\Tests\Data\TestSubject::build( statements: new \AEWI\SWS\Domain\Subject\StatementList( [ \AEWI\SWS\Tests\Data\TestStatement::build( 'Quelle', new \AEWI\SWS\Domain\Value\UrlValue( [ $entry ] ), 'url' ) ] ) );
 		$view = GraphFieldPresentation::fromSchema( $schema, 'https://wiki.example/wiki/SWSGRAPHTITLETOKEN', $subject );
 		$this->assertSame( [ $entry ], $view['definitions'][0]['ownUrls'] );
 	}
@@ -63,33 +63,33 @@ class GraphFieldPresentationTest extends TestCase {
 	public function testCurrentOwnImageSnapshotIsExplicitEvenWhenEmpty(): void {
 		$property = PropertyDefinition::fromJson( [ 'type' => 'image' ], TestSources::newPropertyTypeRegistry() );
 		$schema = new Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [ 'Bild' => $property ] ), false );
-		$subject = new \ProfessionalWiki\SWS\Domain\Subject\Subject(
-			new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( 's1aaaaaaaaaaaa1' ), null,
-			\ProfessionalWiki\SWS\Domain\Schema\SchemaReference::local( new SchemaName( 'Person' ) ),
-			new \ProfessionalWiki\SWS\Domain\Subject\StatementList( [ new \ProfessionalWiki\SWS\Domain\Statement(
-				new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( 'Bild' ), 'image',
-				new \ProfessionalWiki\SWS\Domain\Value\StringValue( 'local:Own.jpg' ) ) ] ) );
+		$subject = new \AEWI\SWS\Domain\Subject\Subject(
+			new \AEWI\SWS\Domain\Subject\SubjectId( 's1aaaaaaaaaaaa1' ), null,
+			\AEWI\SWS\Domain\Schema\SchemaReference::local( new SchemaName( 'Person' ) ),
+			new \AEWI\SWS\Domain\Subject\StatementList( [ new \AEWI\SWS\Domain\Statement(
+				new \AEWI\SWS\Domain\Schema\PropertyName( 'Bild' ), 'image',
+				new \AEWI\SWS\Domain\Value\StringValue( 'local:Own.jpg' ) ) ] ) );
 		$before = $subject->getStatements();
 		$view = GraphFieldPresentation::fromSchema( $schema, null, $subject );
 		$this->assertSame( [ 'local:Own.jpg' ], $view['definitions'][0]['ownImages'] );
 		$this->assertSame( $before, $subject->getStatements() );
-		$subject->setStatements( new \ProfessionalWiki\SWS\Domain\Subject\StatementList() );
+		$subject->setStatements( new \AEWI\SWS\Domain\Subject\StatementList() );
 		$this->assertSame( [], GraphFieldPresentation::fromSchema( $schema, null, $subject )['definitions'][0]['ownImages'] );
 	}
 
 	public function testOwnDatePresentationIsCurrentAndUsesIndependentYearTargets(): void {
 		$property = PropertyDefinition::fromJson( [ 'type' => 'historicalDate', 'wikiLink' => [ 'dateBceEn' => 'BCE' ] ], TestSources::newPropertyTypeRegistry() );
 		$schema = new Schema( new SchemaName( 'Person' ), '', new PropertyDefinitions( [ 'Datum' => $property ] ), false );
-		$subject = new \ProfessionalWiki\SWS\Domain\Subject\Subject(
-			new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( 's1aaaaaaaaaaaa1' ), null,
-			\ProfessionalWiki\SWS\Domain\Schema\SchemaReference::local( new SchemaName( 'Person' ) ),
-			new \ProfessionalWiki\SWS\Domain\Subject\StatementList( [ new \ProfessionalWiki\SWS\Domain\Statement(
-				new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( 'Datum' ), 'historicalDate',
-				new \ProfessionalWiki\SWS\Domain\Value\StringValue( '-0347' ) ) ] ) );
+		$subject = new \AEWI\SWS\Domain\Subject\Subject(
+			new \AEWI\SWS\Domain\Subject\SubjectId( 's1aaaaaaaaaaaa1' ), null,
+			\AEWI\SWS\Domain\Schema\SchemaReference::local( new SchemaName( 'Person' ) ),
+			new \AEWI\SWS\Domain\Subject\StatementList( [ new \AEWI\SWS\Domain\Statement(
+				new \AEWI\SWS\Domain\Schema\PropertyName( 'Datum' ), 'historicalDate',
+				new \AEWI\SWS\Domain\Value\StringValue( '-0347' ) ) ] ) );
 		$view = GraphFieldPresentation::fromSchema( $schema, null, $subject, 'en' );
 		$this->assertSame( [ '-0347' ], $view['definitions'][0]['ownDates'] );
 		$this->assertSame( [ [ [ 'text' => '347 BCE', 'yearTitle' => '347 v. Chr.' ] ] ], $view['definitions'][0]['ownDateParts'] );
-		$subject->setStatements( new \ProfessionalWiki\SWS\Domain\Subject\StatementList() );
+		$subject->setStatements( new \AEWI\SWS\Domain\Subject\StatementList() );
 		$this->assertSame( [], GraphFieldPresentation::fromSchema( $schema, null, $subject )['definitions'][0]['ownDateParts'] );
 	}
 

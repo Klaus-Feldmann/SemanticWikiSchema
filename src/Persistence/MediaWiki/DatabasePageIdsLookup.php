@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Persistence\PageIdsLookup;
+use AEWI\SWS\Persistence\PageIdsLookup;
 use Wikimedia\Rdbms\IReadableDatabase;
 
 class DatabasePageIdsLookup implements PageIdsLookup {

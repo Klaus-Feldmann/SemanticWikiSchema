@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Message\Message;
@@ -13,7 +13,7 @@ use StatusValue;
 /**
  * Saves pages through MediaWiki, which needs the database.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onJsonValidateSave
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onJsonValidateSave
  * @group Database
  */
 class InWikiConfigSaveValidationTest extends MediaWikiIntegrationTestCase {

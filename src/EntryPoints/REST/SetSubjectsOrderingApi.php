@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\RestSetSubjectsOrderingPresenter;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingRequest;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\RestSetSubjectsOrderingPresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -100,13 +100,13 @@ class SetSubjectsOrderingApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Subject ID (15 characters starting with "s") of a Subject on this page to be the Main Subject, or null to clear it.',
+				self::PARAM_DESCRIPTION => 'Entity ID (E followed by its positive number, or an existing legacy s-ID) of a Entity on this page to be the Main Entity, or null to clear it.',
 			],
 			'otherSubjectIds' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Ordered list of the IDs of the page\'s other Subjects. Together with mainSubjectId (if non-null) this must exactly equal the current set of Subject IDs on the page.',
+				self::PARAM_DESCRIPTION => 'Ordered list of the IDs of the page\'s other Entities. Together with mainSubjectId (if non-null) this must exactly equal the current set of Entity IDs on the page.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',

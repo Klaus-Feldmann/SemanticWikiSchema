@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\SubjectSummaries;
+namespace AEWI\SWS\Application\SubjectSummaries;
 
 /**
  * Lists this wiki's Subjects a page at a time, without totals (ADR 27, #1062).

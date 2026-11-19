@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\EditNotice\SubjectEditNoticeContextFactory;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\Page\PageId;
 
 class StubSubjectEditNoticeContextFactory implements SubjectEditNoticeContextFactory {
 

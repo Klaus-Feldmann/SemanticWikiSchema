@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Application\IdentityMigration\{MigrationWriteScope,ReferenceRewriter};
+use AEWI\SWS\Application\IdentityMigration\{MigrationWriteScope,ReferenceRewriter};
 use SWSBaseBridge\SchemaPropertyBindings;
 $old=['propertyDefinitions'=>['Ort'=>['type'=>'text','externalProperty'=>['source'=>'wikidata','id'=>'P19']]]];
 $new=$old+['formatVersion'=>2,'id'=>'S2','identityLanguage'=>'de','labels'=>(object)['de'=>'Person'],'descriptions'=>(object)[]];

@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onParserFirstCallInit
  * @group Database
  */
 class ParserFunctionRegistrationTest extends SWSIntegrationTestCase {

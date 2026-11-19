@@ -1,7 +1,7 @@
 {
   "name": "SemanticWikiSchema",
   "bridgeVersion": "0.21.1",
-  "prepared": "2026-11-16",
+  "prepared": "2026-11-19",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
     "commit": "92cf0e347d40899647cdbb1312c4f0dc09768ae3",
@@ -32,43 +32,21 @@
       "Subjekt"
     ]
   },
-  "extensionVersion": "0.5.02",
-  "developmentBuild": "0.5.0",
+  "extensionVersion": "0.6.0",
+  "developmentBuild": "0.6.0",
   "developmentStage": "release",
-  "baseVersion": "0.5.00-alpha.8",
-  "releaseStatus": "public 0.5.02 release; first-installation package",
+  "baseVersion": "0.5.02",
+  "releaseStatus": "release; qualified on MediaWiki development build",
   "publicationAllowed": true,
   "runtimeLiveInstallVerified": true,
-  "composerLiveInstallVerified": false,
-  "composerLocalInstallVerified": true,
   "existingDataMigrationRequired": false,
-  "installationPackage": "complete extension folder",
-  "runtimeVerification": "Operator-confirmed 0.5.02 installation; read-only live SMW and ranked search API checks; no fresh full-core/database installation test",
-  "baselineQualification": {
-    "version": "0.4.03",
-    "operatorConfirmed": true,
-    "environment": "MediaWiki 1.47.0-wmf.24, PHP 8.3.36, legacy parser"
-  },
-  "localVerification": {
-    "phpUnitTests": 578,
-    "phpUnitAssertions": 998,
-    "actionTests": 84,
-    "actionAssertions": 150,
-    "phpContracts": 68,
-    "uiTests": 3854,
-    "uiFiles": 248,
-    "graphTests": 78,
-    "luaChecks": 266,
-    "installerTests": 13,
-    "publicationScriptTests": 2,
-    "composerFirstInstallation": "candidate-path; controlled MediaWiki directory layout, no core/database runtime"
-  },
+  "runtimeVerification": "Operator-confirmed installed 0.6 candidate; final version metadata only",
   "fieldIdentity": {
     "scope": "schema + exact field key, for every valid spelling",
     "automaticNumbering": false,
     "globalRegistry": false,
     "rdfPredicate": "/schema-id/S-ID/field/percent-encoded-key",
-    "smwDefault": "S-ID:field-key",
+    "smwDefault": "content-language field label; explicit mappings retain priority",
     "explicitMappingsPreserved": true,
     "automaticKeyTransfer": true,
     "schemaTransferHistory": "fieldKeyChanges",
@@ -85,11 +63,10 @@
     ],
     "automaticFieldNumbering": false
   },
-  "operatorReportedInstalled": true,
-  "operatorReportedRebuiltPages": 74,
-  "existingDataReprojectionRequired": true,
-  "mcpRelease": "mcp-sws-0.5.0",
-  "composerVerificationScope": "Actual Composer dependency resolution, installer placement, autoload and preservation checks in a controlled MediaWiki directory layout; no fresh core runtime/database test",
-  "version": "0.5.02",
-  "freshRuntimeInstallVerified": false
+  "version": "0.6.0",
+  "derivedDataRebuildRequired": false,
+  "phpNamespace": "AEWI\\SWS",
+  "namespaceRenameRequiresDataMigration": false,
+  "priorAlphaLiveAcceptanceReported": true,
+  "searchIndexRefreshForExistingDescriptions": "Targeted reindex needed for pages whose existing descriptions have not reached the search index; no automatic global rebuild is scheduled."
 }

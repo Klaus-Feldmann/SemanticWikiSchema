@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\GraphRebuild;
+namespace AEWI\SWS\Application\GraphRebuild;
 
 use RuntimeException;
 

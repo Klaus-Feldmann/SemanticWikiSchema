@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 /**
  * An ontology mapping: the correspondence between the native SWS Schemas and one target ontology
@@ -41,8 +41,8 @@ readonly class Mapping {
 	) {
 	}
 
-	public function forSchema( SchemaName|\ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): ?SchemaMapping {
-        if ( $schema instanceof \ProfessionalWiki\SWS\Domain\Schema\SchemaReference ) {
+	public function forSchema( SchemaName|\AEWI\SWS\Domain\Schema\SchemaReference $schema ): ?SchemaMapping {
+        if ( $schema instanceof \AEWI\SWS\Domain\Schema\SchemaReference ) {
             if ( !$schema->isLocal() ) { return null; }
             if ( $schema->id !== null ) { return $this->schemaIds[$schema->id->text] ?? null; }
             $schema = $schema->name;

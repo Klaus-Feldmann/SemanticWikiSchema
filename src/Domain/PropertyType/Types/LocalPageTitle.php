@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\PropertyType\Types;
+namespace AEWI\SWS\Domain\PropertyType\Types;
 
 use MediaWiki\Title\Title;
 

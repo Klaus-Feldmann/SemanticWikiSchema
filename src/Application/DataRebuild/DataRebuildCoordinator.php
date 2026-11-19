@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\DataRebuild;
+namespace AEWI\SWS\Application\DataRebuild;
 
 /** Bounded current-data walk. A failed item is never acknowledged as completed. */
 final readonly class DataRebuildCoordinator {

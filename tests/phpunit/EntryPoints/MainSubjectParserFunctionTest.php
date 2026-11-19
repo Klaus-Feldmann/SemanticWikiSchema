@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use InvalidArgumentException;
 use MediaWiki\Language\RawMessage;
@@ -10,19 +10,19 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\MainSubjectParserFunction;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
 use Throwable;
 use TypeError;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
+ * @covers \AEWI\SWS\EntryPoints\MainSubjectParserFunction
  */
 class MainSubjectParserFunctionTest extends TestCase {
 

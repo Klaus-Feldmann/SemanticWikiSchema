@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\SWS\Application\SubjectLabelLookupResult;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\SubjectLabelLookupResult;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -32,10 +32,10 @@ class GetSubjectLabelsApi extends SimpleHandler {
             }
         }
         $results = $extension->getSubjectLabelLookup()->getSubjectLabelsMatching( $params['search'], $params['limit'], $filters );
-        $ids = new \ProfessionalWiki\SWS\Domain\Subject\SubjectIdList( array_map( static fn ( $result ) => new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $result->id ), $results ) );
+        $ids = new \AEWI\SWS\Domain\Subject\SubjectIdList( array_map( static fn ( $result ) => new \AEWI\SWS\Domain\Subject\SubjectId( $result->id ), $results ) );
         $published = $extension->newIdentityPresentationLookup( $this->getAuthority() )->getSubjects( $ids );
-        $subjects = array_map( static fn ( $result ) => \ProfessionalWiki\SWS\Presentation\IdentityLabelResult::serialize(
-            $result, $published->getSubject( new \ProfessionalWiki\SWS\Domain\Subject\SubjectId( $result->id ) ), $params['language'] ?? null ), $results );
+        $subjects = array_map( static fn ( $result ) => \AEWI\SWS\Presentation\IdentityLabelResult::serialize(
+            $result, $published->getSubject( new \AEWI\SWS\Domain\Subject\SubjectId( $result->id ) ), $params['language'] ?? null ), $results );
 
 		$response = $this->getResponseFactory()->create();
 		$response->setBody( new StringStream( json_encode( $subjects ) ) );
@@ -60,7 +60,7 @@ class GetSubjectLabelsApi extends SimpleHandler {
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_ISMULTI => true,
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Names of the Schemas to filter results by, separated by "|" (e.g. "Person|Group"). Case-sensitive. Only Subjects of these Schemas are returned. Omit it to search Subjects of every Schema.',
+				self::PARAM_DESCRIPTION => 'Names of the Schemas to filter results by, separated by "|" (e.g. "Person|Group"). Case-sensitive. Only Entities of these Schemas are returned. Omit it to search Entities of every Schema.',
 			],
 			'limit' => [
 				self::PARAM_SOURCE => 'query',

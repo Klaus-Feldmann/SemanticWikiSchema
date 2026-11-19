@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePublishedSubjectIndex;
 use Wikimedia\Rdbms\IResultWrapper;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 

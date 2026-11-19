@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\SetSubjectsOrdering\SetSubjectsOrderingPresenter;
 
 class RestSetSubjectsOrderingPresenter implements SetSubjectsOrderingPresenter {
 

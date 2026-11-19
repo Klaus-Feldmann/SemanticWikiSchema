@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS;
+namespace AEWI\SWS;
 
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Domain\Page\PageProperties;
+use AEWI\SWS\Domain\Page\PageProperties;
 
 /**
  * The Page Properties to project for a revision.

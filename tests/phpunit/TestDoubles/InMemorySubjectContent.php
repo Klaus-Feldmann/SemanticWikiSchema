@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
 
 class InMemorySubjectContent extends SubjectContent {
 

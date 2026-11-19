@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\GraphRebuild;
+namespace AEWI\SWS\Domain\GraphRebuild;
 
 /**
  * One rebuild of one graph store: its progress while it runs, and its record afterwards.

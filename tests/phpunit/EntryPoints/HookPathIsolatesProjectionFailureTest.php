@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use StatusValue;
 
 /**
@@ -27,8 +27,8 @@ use StatusValue;
  * without these nothing would catch SWSExtension being rewired to the propagating composite,
  * which would silently restore the outage-hard-fails-the-edit behavior that #1028 removed.
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
+ * @covers \AEWI\SWS\SWSExtension
+ * @covers \AEWI\SWS\Domain\GraphDatabase\FailureIsolatingGraphDatabasePlugin
  * @group Database
  */
 class HookPathIsolatesProjectionFailureTest extends SWSIntegrationTestCase {

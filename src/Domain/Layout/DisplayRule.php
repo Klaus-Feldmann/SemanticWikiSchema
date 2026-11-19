@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Layout;
+namespace AEWI\SWS\Domain\Layout;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Schema\PropertyName;
 
 readonly class DisplayRule {
 

@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Search;
+namespace AEWI\SWS\Application\Search;
 
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\Subject;
 
 /**
  * What a page's Subjects add to the wiki's search index, one searchable string per line: each Subject's
- * label, plus what each Statement's Property Type says its value contributes. Property and Schema names
+ * label and own localized descriptions, plus what each Statement's Property Type says its value contributes. Property and Schema names
  * stay out: they match every page using them rather than the one being looked for.
  */
 readonly class SubjectSearchTextBuilder {
@@ -46,6 +46,15 @@ readonly class SubjectSearchTextBuilder {
 
 		if ( $label !== null ) {
 			$lines[] = new SubjectSearchLine( null, $label->text );
+		}
+
+		$descriptions = [];
+		foreach ( $subject->getIdentity()?->descriptions ?? [] as $description ) {
+			$text = trim( $description );
+			if ( $text !== '' && !in_array( $text, $descriptions, true ) ) {
+				$descriptions[] = $text;
+				$lines[] = new SubjectSearchLine( null, $text, isDescription: true );
+			}
 		}
 
 		$schema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );

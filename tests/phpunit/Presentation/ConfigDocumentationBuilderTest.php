@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MainConfigNames;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Presentation\ConfigDocumentationBuilder;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\ConfigDocumentationBuilder
+ * @covers \AEWI\SWS\Presentation\ConfigDocumentationBuilder
  * @group Database
  */
 class ConfigDocumentationBuilderTest extends MediaWikiIntegrationTestCase {

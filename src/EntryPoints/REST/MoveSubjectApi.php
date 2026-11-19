@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\RestMoveSubjectPresenter;
+use AEWI\SWS\Application\Actions\MoveSubject\MoveSubjectRequest;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\RestMoveSubjectPresenter;
 use RuntimeException;
 use Wikimedia\ParamValidator\ParamValidator;
 
@@ -62,7 +62,7 @@ class MoveSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Subject ID (15 characters, starting with "s").',
+				self::PARAM_DESCRIPTION => 'Entity ID: E followed by its positive number, or an existing legacy s-ID.',
 			],
 		];
 	}
@@ -73,13 +73,13 @@ class MoveSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'integer',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'MediaWiki page ID of the page to move the Subject to.',
+				self::PARAM_DESCRIPTION => 'MediaWiki page ID of the page to move the Entity to.',
 			],
 			'makeMainSubject' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'boolean',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Make the moved Subject the target page\'s Main Subject, demoting the page\'s current Main Subject to one of its other Subjects.',
+				self::PARAM_DESCRIPTION => 'Make the moved Entity the target page\'s Main Entity, demoting the page\'s current Main Entity to one of its other Entities.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',

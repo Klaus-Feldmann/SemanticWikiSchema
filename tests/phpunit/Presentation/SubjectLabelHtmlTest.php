@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MockMessageLocalizer;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Presentation\SubjectLabelHtml;
+use AEWI\SWS\Presentation\SubjectLabelHtml;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\SubjectLabelHtml
+ * @covers \AEWI\SWS\Presentation\SubjectLabelHtml
  */
 class SubjectLabelHtmlTest extends TestCase {
 

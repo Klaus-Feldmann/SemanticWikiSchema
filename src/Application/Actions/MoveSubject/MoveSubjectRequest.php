@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\MoveSubject;
+namespace AEWI\SWS\Application\Actions\MoveSubject;
 
 readonly class MoveSubjectRequest {
 

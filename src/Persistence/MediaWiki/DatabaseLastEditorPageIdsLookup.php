@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use MediaWiki\User\ActorNormalization;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\SWS\Persistence\LastEditorPageIdsLookup;
+use AEWI\SWS\Persistence\LastEditorPageIdsLookup;
 use Wikimedia\Rdbms\IReadableDatabase;
 
 /**

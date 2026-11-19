@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 /**
  * {@see QuerySparqlEndToEndTestCase} against Apache Jena Fuseki — a conformance target, not an engine
@@ -25,11 +25,11 @@ namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
  *
  *     FUSEKI_TEST_BASE_URL=http://test_fuseki:3030/ds make phpunit filter=QueryFusekiEndToEndTest
  *
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
- * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \AEWI\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
 class QueryFusekiEndToEndTest extends QuerySparqlEndToEndTestCase {

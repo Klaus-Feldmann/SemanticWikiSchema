@@ -9,7 +9,7 @@ namespace MediaWiki\Permissions {interface Authority {}}
 namespace MediaWiki\Title {class Title {}}
 namespace MediaWiki\Revision {class RevisionRecord {public function getId():int{return 123;}}class SlotRecord {public const MAIN='main';}}
 namespace Wikimedia\ObjectCache {class WANObjectCache {public const TTL_DAY=86400;public function makeKey(...$args):string{return implode(':',$args);}public function getWithSetCallback($key,$ttl,$callback):mixed{return $callback();}}}
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki {
+namespace AEWI\SWS\Persistence\MediaWiki {
  require __DIR__.'/bootstrap.php';
  class RedirectFixtureFetcher extends PageContentFetcher {
   public int $reads=0;
@@ -19,8 +19,8 @@ namespace ProfessionalWiki\SWS\Persistence\MediaWiki {
  }
 }
 namespace {
- $fetcher=new \ProfessionalWiki\SWS\Persistence\MediaWiki\RedirectFixtureFetcher(new \MediaWiki\Content\WikitextContent(true));
- $lookup=new \ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup($fetcher,new class implements \MediaWiki\Permissions\Authority {},new \Wikimedia\ObjectCache\WANObjectCache());
+ $fetcher=new \AEWI\SWS\Persistence\MediaWiki\RedirectFixtureFetcher(new \MediaWiki\Content\WikitextContent(true));
+ $lookup=new \AEWI\SWS\Persistence\MediaWiki\PublishedPageJsonLookup($fetcher,new class implements \MediaWiki\Permissions\Authority {},new \Wikimedia\ObjectCache\WANObjectCache());
  $page=new \MediaWiki\Title\Title();$checks=0;
  function redirectCheck(bool $ok,string $why):void{global $checks;if(!$ok)throw new \RuntimeException($why);$checks++;}
  redirectCheck($lookup->getJson($page)===null,'Retired schema redirect is not a schema definition');

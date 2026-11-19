@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\EditNotice\EditNoticeMessageRenderer;
+use AEWI\SWS\Application\EditNotice\EditNoticeMessageRenderer;
 
 class StubEditNoticeMessageRenderer implements EditNoticeMessageRenderer {
 

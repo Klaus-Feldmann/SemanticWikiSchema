@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Schema\SchemaReference
+ * @covers \AEWI\SWS\Domain\Schema\SchemaReference
  */
 class SchemaReferenceTest extends TestCase {
 

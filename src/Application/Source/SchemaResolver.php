@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Source;
+namespace AEWI\SWS\Application\Source;
 
 use Psr\Log\LoggerInterface;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceResolver;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\SchemaReferenceResolver;
+use AEWI\SWS\Domain\Source\SourceRegistry;
 
 /**
  * Resolves a Schema through the Source it is referenced from (ADR 23), which need not be the Source of

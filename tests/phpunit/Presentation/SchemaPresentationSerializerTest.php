@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\Tests\Data\TestData;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\PropertyType\Types\NumberType;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Tests\Data\TestData;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer
+ * @covers \AEWI\SWS\Presentation\SchemaPresentationSerializer
  */
 class SchemaPresentationSerializerTest extends TestCase {
 

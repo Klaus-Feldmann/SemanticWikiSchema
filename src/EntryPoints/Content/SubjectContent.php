@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use MediaWiki\Json\FormatJson;
 use MediaWiki\Content\JsonContent;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 
 class SubjectContent extends JsonContent {
 

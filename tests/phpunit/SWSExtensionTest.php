@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests;
+namespace AEWI\SWS\Tests;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\SWS\SWSExtension
+ * @covers \AEWI\SWS\SWSExtension
  */
 class SWSExtensionTest extends TestCase {
 

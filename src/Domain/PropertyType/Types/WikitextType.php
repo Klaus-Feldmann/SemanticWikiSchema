@@ -1,11 +1,11 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\PropertyType\Types;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Value\NeoValue;
+namespace AEWI\SWS\Domain\PropertyType\Types;
+use AEWI\SWS\Domain\Schema\Property\WikitextProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Value\NeoValue;
 
 class WikitextType extends TextType {
 	public const NAME = 'wikitext';

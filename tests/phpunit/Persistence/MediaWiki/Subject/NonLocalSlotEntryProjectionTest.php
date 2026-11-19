@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\TextContent;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * A local slot holds local Subjects only (ADR 23). Imported or hand-edited content can still carry an
@@ -20,7 +20,7 @@ use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
  * the subject-to-page index reads those keys as bare local ids (ADR 32) and drops such an entry, so
  * the projectors must drop it too rather than write a node nothing can find a page for.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer
  * @group Database
  */
 class NonLocalSlotEntryProjectionTest extends SWSIntegrationTestCase {

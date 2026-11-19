@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Context\RequestContext;
@@ -12,15 +12,15 @@ use MediaWiki\Session\CsrfTokenSet;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\User\User;
 use PermissionsError;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialGraphStores;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Tests\HandlesNeo4jEnvOverrides;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\EntryPoints\Content\MappingContent;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialGraphStores;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Tests\HandlesNeo4jEnvOverrides;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 use SpecialPageTestBase;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
 
@@ -28,8 +28,8 @@ use Wikimedia\Timestamp\ConvertibleTimestamp;
  * The page is rendered in qqx, so what is asserted is which message each cell and box uses rather than
  * what that message happens to say in English.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialGraphStores
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\EnforcesRestriction
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialGraphStores
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\EnforcesRestriction
  * @group Database
  */
 class SpecialGraphStoresTest extends SpecialPageTestBase {

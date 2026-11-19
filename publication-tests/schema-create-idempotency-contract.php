@@ -29,12 +29,12 @@ namespace MediaWiki\Title {
  class Title {public function __construct(private string $name){}public static function makeTitleSafe($ns,$name):self{return new self($name);}public function exists():bool{return isset(\D6Api\State::$pages[$this->name]);}public function getText():string{return $this->name;}public function getPrefixedDBkey():string{return 'Schema:'.$this->name;}}
 }
 namespace MediaWiki {
- class MediaWikiServices {public static function getInstance():self{return new self();}public function getContentLanguage():object{return new class{public function getCode():string{return 'de';}};}public function getRevisionLookup():object{return new class{public function getRevisionByTitle($title):object{return new class($title){public function __construct(private $title){}public function userCan(...$args):bool{return \D6Api\State::$revisionRead;}public function getContent($slot,...$args):object{return new \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent(\D6Api\State::$pages[$this->title->getText()]);}};}};}}
+ class MediaWikiServices {public static function getInstance():self{return new self();}public function getContentLanguage():object{return new class{public function getCode():string{return 'de';}};}public function getRevisionLookup():object{return new class{public function getRevisionByTitle($title):object{return new class($title){public function __construct(private $title){}public function userCan(...$args):bool{return \D6Api\State::$revisionRead;}public function getContent($slot,...$args):object{return new \AEWI\SWS\EntryPoints\Content\SchemaContent(\D6Api\State::$pages[$this->title->getText()]);}};}};}}
 }
-namespace ProfessionalWiki\SWS\Presentation {
+namespace AEWI\SWS\Presentation {
  class CsrfValidator {public function verifyCsrfToken():bool{\D6Api\State::$csrf++;if(!\D6Api\State::$token)throw new \MediaWiki\Rest\HttpException('CSRF',403);return true;}}
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
  class SWSExtension {
   public const NS_SCHEMA=7474;
   public static function getInstance():self{return new self();}
@@ -42,16 +42,16 @@ namespace ProfessionalWiki\SWS {
   public function getRevisionPolicy():object{return new class{public function revisionIsReadableBy($revision,$authority):bool{return \D6Api\State::$policyRead;}};}
   public function getIdentityOwner($authority):string{return hash('sha256','actor');}
   public function newPageReadAuthorizer($authority):object{return new class{public function authorizeReadByPageTitle($title):bool{return \D6Api\State::$read;}};}
-  public function getPersistenceSchemaDeserializer():mixed{return new \ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer(\ProfessionalWiki\SWS\Tests\Data\TestSources::newPropertyTypeRegistry());}
-  public function getSchemaPresentationSerializer():mixed{return new \ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer();}
+  public function getPersistenceSchemaDeserializer():mixed{return new \AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer(\AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry());}
+  public function getSchemaPresentationSerializer():mixed{return new \AEWI\SWS\Presentation\SchemaPresentationSerializer();}
  }
 }
 namespace {
 require __DIR__.'/identity-projections-contract.php';
 $nCreate=0;function createCheck(bool $ok,string $why):void{global$nCreate;$nCreate++;if(!$ok)throw new RuntimeException($why);}
 use D6Api\State as A;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSchemaApi;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\EntryPoints\REST\CreateSchemaApi;
+use AEWI\SWS\Presentation\CsrfValidator;
 A::$body=['requestKey'=>'stable-import','schema'=>(object)['label'=>'Import','propertyDefinitions'=>(object)[]]];
 $reply=(new CreateSchemaApi(new CsrfValidator()))->execute();$id=$reply->data['schema']['id'];
 createCheck(A::$writes===1&&$id==='S3','Actual create handler writes a fresh owned ID schema');
@@ -65,7 +65,7 @@ A::$read=false;try{(new CreateSchemaApi(new CsrfValidator()))->execute();throw n
 foreach(['revisionRead','policyRead']as$restriction){A::${$restriction}=false;try{(new CreateSchemaApi(new CsrfValidator()))->execute();throw new LogicException('Hidden revision returned');}catch(\MediaWiki\Rest\HttpException $e){createCheck($e->getCode()===404&&A::$writes===1,'Retry respects revision visibility and registered policy');}A::${$restriction}=true;}
 A::$pages['S4']='{"propertyDefinitions":{}}';A::$body['requestKey']='legacy-collision';
 try{(new CreateSchemaApi(new CsrfValidator()))->execute();throw new LogicException('Collision ignored');}catch(\MediaWiki\Rest\HttpException $e){createCheck($e->getCode()===409&&A::$writes===1&&A::$pages['S4']==='{"propertyDefinitions":{}}','Legacy page cannot be replaced by a reserved ID');}
-class SaveParamsProbe extends \ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi {public function params():array{return $this->getActionParameters();}}
+class SaveParamsProbe extends \AEWI\SWS\EntryPoints\REST\SaveSchemaApi {public function params():array{return $this->getActionParameters();}}
 A::$body['baseRevisionId']=77;$params=(new SaveParamsProbe(new CsrfValidator()))->params();
 createCheck($params['baserevid']==='77','Schema completion forwards exact base revision to MediaWiki edit CAS');
 echo "$nCreate D6 actual schema create/retry/CAS/permission/CSRF/collision checks passed (real registry; controlled MediaWiki action adapter).\n";

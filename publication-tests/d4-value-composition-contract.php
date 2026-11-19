@@ -2,14 +2,14 @@
 require __DIR__.'/d2-query-syntax-contract.php';
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,StatementList};
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\{NeoValue,StringValue};
-use ProfessionalWiki\SWS\EntryPoints\{ParserFieldLookup,SWSValueParserFunction};
-\ProfessionalWiki\SWS\SWSExtension::$schema = new \ProfessionalWiki\SWS\Domain\Schema\Schema(
- new \ProfessionalWiki\SWS\Domain\Schema\SchemaName('Person'), '',
- new \ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions(['F4'=>$props['F12']]), false );
+use AEWI\SWS\Domain\Subject\{Subject,StatementList};
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\{NeoValue,StringValue};
+use AEWI\SWS\EntryPoints\{ParserFieldLookup,SWSValueParserFunction};
+\AEWI\SWS\SWSExtension::$schema = new \AEWI\SWS\Domain\Schema\Schema(
+ new \AEWI\SWS\Domain\Schema\SchemaName('Person'), '',
+ new \AEWI\SWS\Domain\Schema\PropertyDefinitions(['F4'=>$props['F12']]), false );
 $compositionChecks=0;
 function vcheck($ok,$why){global $compositionChecks;$compositionChecks++;if(!$ok)throw new RuntimeException($why);}
 $values=['427 v. Chr.','Müller (Person)','A & B','A|B','<script>alert(1)</script>',
@@ -18,7 +18,7 @@ $values=['427 v. Chr.','Müller (Person)','A & B','A|B','<script>alert(1)</scrip
  '&#91;&#91;Kategorie:Doppelt&#93;&#93;','https://example.org/?a=1&b=2','0',''];
 foreach($values as $i=>$raw){
  $target=$entity->withStatements(new StatementList([new Statement(new PropertyName('F4'),'text',new StringValue($raw))]));setStorePage($target,300+$i);
- $resolver=new class($target) extends \ProfessionalWiki\SWS\Application\SubjectResolver {
+ $resolver=new class($target) extends \AEWI\SWS\Application\SubjectResolver {
   public function __construct(private Subject $target){}
   public function resolveById(string $id): ?Subject{return $id==='E3'?$this->target:null;}
   public function resolveMainByTitle(Title $title): ?Subject{return $this->target;}

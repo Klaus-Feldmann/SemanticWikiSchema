@@ -2,28 +2,28 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderRegistry;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Application\RevisionPolicyRegistry;
-use ProfessionalWiki\SWS\Domain\Source\SourceRegistry;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPagePropertyProvider;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeProviderRegistry;
+use AEWI\SWS\Domain\Page\PagePropertyProviderRegistry;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Application\RevisionPolicyRegistry;
+use AEWI\SWS\Domain\Source\SourceRegistry;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence\Neo4jValueBuilderRegistry;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\StubSubjectEditNoticeProvider;
+use AEWI\SWS\Tests\TestDoubles\StubPagePropertyProvider;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSRegistrar
+ * @covers \AEWI\SWS\EntryPoints\SWSRegistrar
  */
 class SWSRegistrarTest extends TestCase {
 

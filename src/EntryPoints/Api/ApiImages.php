@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Api;
+namespace AEWI\SWS\EntryPoints\Api;
 
 use ApiBase;
 use MediaWiki\Api\ApiMain;
@@ -9,7 +9,7 @@ use MediaWiki\Context\DerivativeContext;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Request\DerivativeRequest;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Images\ImageResults;
+use AEWI\SWS\Application\Images\ImageResults;
 use Throwable;
 
 /** Read-only file selection/preview; never accepts an arbitrary remote API URL. */

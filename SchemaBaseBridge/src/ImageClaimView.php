@@ -3,7 +3,7 @@
 declare( strict_types = 1 );
 namespace SWSBaseBridge;
 
-use ProfessionalWiki\SWS\Domain\ImageReference;
+use AEWI\SWS\Domain\ImageReference;
 
 /** commonsMedia denotes Commons files in standard Wikidata AND Wikibase. The claim source is retained by the field. */
 final class ImageClaimView {

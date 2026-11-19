@@ -1,30 +1,43 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\Semantic;
+namespace AEWI\SWS\Application\Semantic;
 
 use InvalidArgumentException;
 
 /** Editable server mappings; schema field names remain the default property names. */
 final class SmwMappingConfig {
-    public static function resolve(mixed $overrides): array {
+    public static function resolve(mixed $overrides, ?array $messageDefaults = null): array {
         $defaults = [
             'properties' => [],
+            'descriptionProperty' => 'Kurzbeschreibung',
             'urlEntries' => [
                 'url' => 'Quellen-URL', 'label' => 'Quellentitel',
                 'caption' => 'Quellenbezeichnung', 'captionPage' => 'Quellenbezeichnungsseite',
-                'field' => 'WikiSchema-Feld', 'subject' => 'WikiSchema-Subjekt',
+                'field' => 'WikiSchema-Feld', 'subject' => 'WikiSchema-Entität',
             ],
         ];
+        if ($messageDefaults !== null) {
+            foreach ($defaults['urlEntries'] as $key => $_) {
+                self::validateName($messageDefaults['urlEntries'][$key] ?? null);
+                $defaults['urlEntries'][$key] = $messageDefaults['urlEntries'][$key];
+            }
+            self::validateName($messageDefaults['descriptionProperty'] ?? null);
+            $defaults['descriptionProperty'] = $messageDefaults['descriptionProperty'];
+        }
         if (!is_array($overrides) || array_diff(array_keys($overrides), array_keys($defaults))) {
-            throw new InvalidArgumentException('WikiSchemaSmwMapping: expected properties and/or urlEntries arrays.');
+            throw new InvalidArgumentException('WikiSchemaSmwMapping: expected properties/urlEntries arrays and optional descriptionProperty.');
         }
         foreach ($overrides as $key => $value) {
-            if (!is_array($value)) {
+            if ($key !== 'descriptionProperty' && !is_array($value)) {
                 throw new InvalidArgumentException('WikiSchemaSmwMapping: '.$key.' must be an array.');
             }
         }
         $config = $defaults;
+        if (array_key_exists('descriptionProperty', $overrides)) {
+            self::validateName($overrides['descriptionProperty']);
+            $config['descriptionProperty'] = trim($overrides['descriptionProperty']);
+        }
         $config['properties'] = $overrides['properties'] ?? [];
         foreach ($config['properties'] as $schema => $fields) {
             if (!is_string($schema) || trim($schema) === '' || !is_array($fields)) {

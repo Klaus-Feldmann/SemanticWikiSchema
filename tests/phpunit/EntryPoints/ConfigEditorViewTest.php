@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Content\JsonContent;
 use MediaWiki\Context\RequestContext;
@@ -11,16 +11,16 @@ use MediaWiki\Permissions\PermissionStatus;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
  * Viewing MediaWiki:SWS, which shows the form the frontend builds from the configuration it is
  * handed, or leaves the page to core. Needs the database for the configuration page and its revisions.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onConfigPageBeforePageDisplay
- * @covers \ProfessionalWiki\SWS\SWSExtension::newConfigEditorJsConfigBuilder
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onConfigPageBeforePageDisplay
+ * @covers \AEWI\SWS\SWSExtension::newConfigEditorJsConfigBuilder
  * @group Database
  */
 class ConfigEditorViewTest extends SWSIntegrationTestCase {

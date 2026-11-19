@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\MainConfigNames;
-use ProfessionalWiki\SWS\EntryPoints\Search\SearchMySQLWithSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Search\SearchSqliteWithSubjects;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\Search\SearchMySQLWithSubjects;
+use AEWI\SWS\EntryPoints\Search\SearchSqliteWithSubjects;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use SearchEngine;
 use SearchEngineDummy;
 
@@ -19,8 +19,8 @@ use SearchEngineDummy;
  * The test framework configures SearchEngineDummy, so every case states the configuration it is about.
  *
  * @group Database
- * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchMySQLWithSubjects
- * @covers \ProfessionalWiki\SWS\EntryPoints\Search\SearchSqliteWithSubjects
+ * @covers \AEWI\SWS\EntryPoints\Search\SearchMySQLWithSubjects
+ * @covers \AEWI\SWS\EntryPoints\Search\SearchSqliteWithSubjects
  */
 class SearchEngineMappingTest extends SWSIntegrationTestCase {
 

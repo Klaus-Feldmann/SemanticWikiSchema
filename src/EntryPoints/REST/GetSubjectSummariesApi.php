@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\ResponseException;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SortDirection;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySort;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\SubjectSummarySerializer;
+use AEWI\SWS\Application\SubjectSummaries\InvalidSubjectSummaryCursorException;
+use AEWI\SWS\Application\SubjectSummaries\SortDirection;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaries;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryCursor;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySort;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\SubjectSummarySerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 
@@ -57,7 +57,7 @@ class GetSubjectSummariesApi extends SimpleHandler {
 		} catch ( SubjectSummarySearchTimeoutException ) {
 			return $this->getResponseFactory()->createHttpError( 503, [
 				'errorType' => 'searchTimeout',
-				'message' => 'The search took too long. Search within one Schema to search fewer Subjects.',
+				'message' => wfMessage('sws-api-entity-search-timeout')->text(),
 			] );
 		}
 	}
@@ -94,14 +94,14 @@ class GetSubjectSummariesApi extends SimpleHandler {
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
 				ParamValidator::PARAM_DEFAULT => null,
-				self::PARAM_DESCRIPTION => 'Only Subjects of this Schema (case-sensitive). Omit it for every Schema.',
+				self::PARAM_DESCRIPTION => 'Only Entities of this Schema (case-sensitive). Omit it for every Schema.',
 			],
 			'search' => [
 				self::PARAM_SOURCE => 'query',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
 				ParamValidator::PARAM_DEFAULT => '',
-				self::PARAM_DESCRIPTION => 'Keeps Subjects whose name or page title contains it, in any case, or whose ID starts with it.',
+				self::PARAM_DESCRIPTION => 'Keeps Entities whose name or page title contains it, in any case, or whose ID starts with it.',
 			],
 			'sort' => [
 				self::PARAM_SOURCE => 'query',
@@ -131,7 +131,7 @@ class GetSubjectSummariesApi extends SimpleHandler {
 				ParamValidator::PARAM_DEFAULT => 10,
 				IntegerDef::PARAM_MIN => 1,
 				IntegerDef::PARAM_MAX => 50,
-				self::PARAM_DESCRIPTION => 'Maximum number of Subjects to return.',
+				self::PARAM_DESCRIPTION => 'Maximum number of Entities to return.',
 			],
 		];
 	}

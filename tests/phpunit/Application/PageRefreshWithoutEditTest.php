@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\MutablePagePropertyProvider;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\MutablePagePropertyProvider;
 
 /**
  * The refresh a Page Property Provider triggers when the state it contributes changes outside an edit
  * (#889): an approval extension marking a revision approved, say. A page holding no Subjects is the
  * case this has to cover, since approval is tracked for ordinary content pages.
  *
- * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
- * @covers \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler
+ * @covers \AEWI\SWS\Application\PageRebuilder
+ * @covers \AEWI\SWS\EntryPoints\OnRevisionCreatedHandler
  * @group Database
  */
 class PageRefreshWithoutEditTest extends SWSIntegrationTestCase {

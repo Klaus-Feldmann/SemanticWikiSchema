@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Source;
+namespace AEWI\SWS\Application\Source;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Page\PageSubjects;
 
 /** Raw JSON edits may show server data, but may neither forge nor clear it. */
 final class SourceSnapshotEditGuard {

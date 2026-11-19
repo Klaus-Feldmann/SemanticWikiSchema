@@ -1,6 +1,6 @@
 <?php
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\MainConfigNames;
@@ -9,13 +9,13 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Request\FauxRequest;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use PermissionsError;
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialNeoJson;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialNeoJson;
+use AEWI\SWS\SWSExtension;
 use SpecialPageTestBase;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialNeoJson
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialNeoJson
  * @group Database
  */
 class SpecialNeoJsonTest extends SpecialPageTestBase {

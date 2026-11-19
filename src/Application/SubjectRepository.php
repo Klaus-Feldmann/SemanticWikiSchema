@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 /**
  * Every write but {@see self::restorePageSubjects()} refuses to break a rule for Dependent Subjects, and removes the

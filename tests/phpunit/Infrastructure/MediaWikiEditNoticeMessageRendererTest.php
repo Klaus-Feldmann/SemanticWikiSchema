@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\Context\RequestContext;
-use ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer
+ * @covers \AEWI\SWS\Infrastructure\MediaWikiEditNoticeMessageRenderer
  * @group Database
  */
 class MediaWikiEditNoticeMessageRendererTest extends SWSIntegrationTestCase {

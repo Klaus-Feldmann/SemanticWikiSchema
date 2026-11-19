@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Source;
+namespace AEWI\SWS\Application\Source;
 
 use MediaWiki\MediaWikiServices;
 
@@ -10,7 +10,7 @@ use MediaWiki\MediaWikiServices;
 final class SourceDataMode {
 
 	public static function current(): string {
-		if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return 'store'; }
+		if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return 'store'; }
 		$mode = MediaWikiServices::getInstance()->getMainConfig()->get( 'SWSSourceDataMode' );
 		if ( !in_array( $mode, [ 'cache', 'store' ], true ) ) {
 			throw new \UnexpectedValueException( 'SWSSourceDataMode must be cache or store.' );

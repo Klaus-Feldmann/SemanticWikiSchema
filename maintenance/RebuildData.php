@@ -1,11 +1,11 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Maintenance;
+namespace AEWI\SWS\Maintenance;
 
 use MediaWiki\Maintenance\Maintenance;
-use ProfessionalWiki\SWS\Application\DataRebuild\DataRebuildCoordinator;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiDataRebuilder;
+use AEWI\SWS\Application\DataRebuild\DataRebuildCoordinator;
+use AEWI\SWS\Persistence\MediaWiki\IdentityMigration\MediaWikiDataRebuilder;
 
 $basePath=getenv('MW_INSTALL_PATH')!==false?getenv('MW_INSTALL_PATH'):__DIR__.'/../../..';
 require_once $basePath.'/maintenance/Maintenance.php';

@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\WikiConfig;
+namespace AEWI\SWS\Application\WikiConfig;
 
 use InvalidArgumentException;
 use MediaWiki\Config\Config;

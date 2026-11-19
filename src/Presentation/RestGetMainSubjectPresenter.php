@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
 
 class RestGetMainSubjectPresenter implements GetMainSubjectPresenter {
 

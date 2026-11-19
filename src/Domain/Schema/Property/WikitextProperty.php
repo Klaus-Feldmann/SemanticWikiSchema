@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema\Property;
+namespace AEWI\SWS\Domain\Schema\Property;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyCore;
 
 /** The schema program is separate from all subject values, including dormant old values. */
 class WikitextProperty extends TextProperty {

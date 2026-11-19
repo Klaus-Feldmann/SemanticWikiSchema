@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
 use InvalidArgumentException;
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 use RuntimeException;
 
 /**
@@ -43,7 +43,7 @@ final readonly class SourceSnapshotStore {
 			$expectedRevisionId,
 			fn ( RevisionRecord $revision ): array => [ MediaWikiSubjectRepository::SLOT_NAME =>
 				$this->contentForRevision( $revision, $page, $expectedRevisionId, $snapshots ) ],
-			CommentStoreComment::newUnsavedComment( 'Update SWS source snapshot' )
+			CommentStoreComment::newUnsavedComment( wfMessage('sws-edit-summary-update-source-snapshot')->inContentLanguage()->text() )
 		);
 	}
 

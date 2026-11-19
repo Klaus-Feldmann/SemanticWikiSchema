@@ -4,8 +4,8 @@ namespace UtfNormal { class Validator { public static function cleanUp(string $t
 namespace Wikimedia\Rdbms {interface IDatabase { public const ATOMIC_CANCELABLE="cancelable"; } }
 namespace {
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex as Index;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex as Index;
+use AEWI\SWS\Domain\Page\PageId;
 final class TermSqliteDatabase implements \Wikimedia\Rdbms\IDatabase {
  public PDO $pdo;public int $writes=0;public bool $failInsert=false;
  public function __construct(){ $this->pdo=new PDO('sqlite::memory:',null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]); }

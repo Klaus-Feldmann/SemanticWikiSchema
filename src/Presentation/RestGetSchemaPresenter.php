@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
+use AEWI\SWS\Application\Queries\GetSchema\GetSchemaPresenter;
 
 class RestGetSchemaPresenter implements GetSchemaPresenter {
 

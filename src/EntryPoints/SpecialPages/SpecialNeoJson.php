@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
+namespace AEWI\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\HTMLForm\HTMLForm;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Title\Title;
 use PermissionsError;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
 
 class SpecialNeoJson extends SpecialPage {
 
@@ -106,7 +106,7 @@ class SpecialNeoJson extends SpecialPage {
 		SWSExtension::getInstance()->newSubjectContentRepository( $this->getAuthority() )->editSubjectContent(
 			$content,
 			new PageId( $title->getId() ),
-			'Update Subject'
+			wfMessage('sws-edit-summary-update-entity')->inContentLanguage()->text()
 		);
 
 		return true;

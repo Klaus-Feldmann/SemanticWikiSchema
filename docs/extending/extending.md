@@ -55,7 +55,7 @@ Register backend extension points through the `SWSRegistration` hook:
 
 ```json
 "Hooks": {
-	"SWSRegistration": "ProfessionalWiki\\MyExt\\MyExtHooks::onSWSRegistration"
+	"SWSRegistration": "AEWI\\MyExt\\MyExtHooks::onSWSRegistration"
 }
 ```
 

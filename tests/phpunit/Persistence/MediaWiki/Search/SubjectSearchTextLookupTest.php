@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Search;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Search;
 
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * @group Database
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchTextLookup
  */
 class SubjectSearchTextLookupTest extends SWSIntegrationTestCase {
 

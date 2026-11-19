@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\GraphRebuild;
+namespace AEWI\SWS\Tests\Domain\GraphRebuild;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus
+ * @covers \AEWI\SWS\Domain\GraphRebuild\RebuildStatus
  */
 class RebuildStatusTest extends TestCase {
 

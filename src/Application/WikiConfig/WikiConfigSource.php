@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\WikiConfig;
+namespace AEWI\SWS\Application\WikiConfig;
 
 /**
  * A source of the raw (undecoded-into-values, unvalidated) configuration from the on-wiki configuration

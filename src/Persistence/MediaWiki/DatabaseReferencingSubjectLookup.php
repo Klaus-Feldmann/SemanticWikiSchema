@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Application\ReferencingSubjectLookup;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\ReferencingSubjectLookup;
+use AEWI\SWS\Domain\Subject\SubjectId;
 use stdClass;
 use Wikimedia\Rdbms\IConnectionProvider;
 

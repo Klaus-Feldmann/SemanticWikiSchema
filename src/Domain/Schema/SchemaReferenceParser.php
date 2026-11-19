@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 use InvalidArgumentException;
 
@@ -15,7 +15,7 @@ use InvalidArgumentException;
  *
  * Every reference crossing a boundary — a revision slot, Schema JSON, a REST body, a Lua call — is
  * parsed here rather than constructed directly, as
- * {@see \ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser} is for Subject ids.
+ * {@see \AEWI\SWS\Domain\Subject\SubjectIdParser} is for Subject ids.
  */
 readonly class SchemaReferenceParser {
 

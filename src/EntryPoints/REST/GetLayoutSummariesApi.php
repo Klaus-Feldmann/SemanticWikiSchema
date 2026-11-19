@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\SWS\Domain\Layout\Layout;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Layout\Layout;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\SWSExtension;
 
 class GetLayoutSummariesApi extends SimpleHandler {
 

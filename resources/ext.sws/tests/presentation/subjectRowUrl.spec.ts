@@ -11,11 +11,11 @@ describe( 'subjectRowUrl', () => {
 	// The Data tab of the page storing it, with the bare Subject id as the fragment: the deep-link
 	// anchor that tab resolves to a row.
 	it( 'points at the Subject\'s row on the Data tab of the page storing it', () => {
-		expect( subjectRowUrl( 'Berlin', 's12345abcdefghj' ) ).toBe( '/wiki/Berlin?action=subjects#s12345abcdefghj' );
+		expect( subjectRowUrl( 'Berlin', 's12345abcdefghj' ) ).toBe( '/wiki/Berlin?action=entities#s12345abcdefghj' );
 	} );
 
 	it( 'builds on the Data tab of that page', () => {
-		expect( dataTabUrl( 'Berlin' ) ).toBe( '/wiki/Berlin?action=subjects' );
+		expect( dataTabUrl( 'Berlin' ) ).toBe( '/wiki/Berlin?action=entities' );
 	} );
 
 } );

@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\TitleFormatter;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\PagePropertiesSource;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
-use ProfessionalWiki\SWS\Persistence\PublishedSubjectIndex;
-use ProfessionalWiki\SWS\Persistence\SubjectPageIndex;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\PagePropertiesSource;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
+use AEWI\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
+use AEWI\SWS\Persistence\PublishedSubjectIndex;
+use AEWI\SWS\Persistence\SubjectPageIndex;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 
@@ -32,7 +32,7 @@ class OnRevisionCreatedHandler {
 		private readonly RevisionPolicy $revisionPolicy,
 		private readonly TitleFormatter $titleFormatter,
 		private readonly LoggerInterface $logger,
-        private readonly ?\ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex $termIndex = null,
+        private readonly ?\AEWI\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex $termIndex = null,
 	) {
 	}
 
@@ -101,7 +101,7 @@ class OnRevisionCreatedHandler {
             $pageName = $this->titleFormatter->getPrefixedText( $revisionRecord->getPage() );
             $this->termIndex->setSubjects( $pageId, $pageName, $subjects );
             $main = $published->getContent('main');
-            $schema = $main instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent
+            $schema = $main instanceof \AEWI\SWS\EntryPoints\Content\SchemaContent
                 ? json_decode($main->getText(),true,512,JSON_THROW_ON_ERROR) : null;
             $this->termIndex->setSchema($pageId, is_array($schema)?$schema:null, str_replace('_', ' ', $revisionRecord->getPage()->getDBkey()));
         }

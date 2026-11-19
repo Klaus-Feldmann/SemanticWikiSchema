@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Parser\Parser;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Records a page a parse read as a template of the parsed page, as `{{REVISIONID:…}}` does, so that the

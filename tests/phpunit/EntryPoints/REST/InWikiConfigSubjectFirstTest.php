@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\JsonContent;
@@ -12,12 +12,12 @@ use MediaWiki\Rest\Response;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\EntryPoints\REST\ResolveSubjectIriApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\EntryPoints\REST\ResolveSubjectIriApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use TestLogger;
 
 /**
@@ -25,9 +25,9 @@ use TestLogger;
  * dereference reads its target through the combining lookup, so a valid page value wins over the PHP
  * config, an invalid one falls back with a warning, and the kill switch stops the page from applying.
  *
- * @covers \ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup
- * @covers \ProfessionalWiki\SWS\SWSExtension::isSubjectFirst
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
+ * @covers \AEWI\SWS\Application\WikiConfig\WikiConfigLookup
+ * @covers \AEWI\SWS\SWSExtension::isSubjectFirst
+ * @covers \AEWI\SWS\Persistence\MediaWiki\MediaWikiWikiConfigSource
  * @group Database
  */
 class InWikiConfigSubjectFirstTest extends SWSIntegrationTestCase {

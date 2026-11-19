@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 
 /**
@@ -42,7 +42,7 @@ class ResolveSubjectIriApi extends SimpleHandler {
 
 		if ( $id === null ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
-				'message' => 'Invalid Subject ID: ' . $subjectId,
+				'message' => wfMessage('sws-api-invalid-entity-id', $subjectId)->text(),
 			] );
 		}
 
@@ -131,7 +131,7 @@ class ResolveSubjectIriApi extends SimpleHandler {
 
 	private function noDataResponse( string $subjectId ): Response {
 		return $this->getResponseFactory()->createHttpError( 404, [
-			'message' => 'No SWS data found for subject: ' . $subjectId,
+			'message' => wfMessage('sws-api-entity-data-missing', $subjectId)->text(),
 		] );
 	}
 
@@ -141,7 +141,7 @@ class ResolveSubjectIriApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'path',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Persistent identifier of the Subject whose concept URI to dereference: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
+				self::PARAM_DESCRIPTION => 'Persistent identifier of the Entity whose concept URI to dereference: E followed by its positive number, an existing legacy s-ID, or sourceKey:localId for another Source.',
 			],
 		];
 	}

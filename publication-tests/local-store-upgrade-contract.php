@@ -4,16 +4,16 @@ declare(strict_types=1);
 require __DIR__.'/direct-field-read-contract.php';
 
 use CollectorHarness\State as U;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition,PropertyName,SchemaReference};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\EffectiveFieldLookup;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition,PropertyName,SchemaReference};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList,SubjectMap};
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\EntryPoints\Processing\ProcessingContext;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\EffectiveFieldLookup;
 use SWSBaseBridge\{SourceSnapshotCollector,DataViewLookup,ExportPageDataViewApi};
 
 $u=0;function upgradeCheck(bool $ok,string $why):void{global $u;$u++;if(!$ok)throw new RuntimeException($why);}
@@ -76,9 +76,9 @@ $f=array_column((new EffectiveFieldLookup($context))->read($title)['fields'],nul
 upgradeCheck($f['Ort']['values'][0]['value']==='Brünn'&&$f['Ort']['sourceStatus']==='unavailable'&&$f['Ort']['external']['retained'],'Actual failed update retains last good field');
 upgradeCheck($f['Name']['values'][0]['value']==='Eigene Angabe'&&$f['Lokal']['values'][0]['value']==='Lokaler Wert','Outage neither overwrites manual data nor blocks other source');
 $beforeSmw=count(U::$requests);
-(new ProfessionalWiki\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new MediaWiki\Parser\ParserOutput([]),new MediaWiki\Parser\Parser(),SWSExtension::$schema,
+(new AEWI\SWS\EntryPoints\Semantic\AutomaticAnnotations())->apply($title,new MediaWiki\Parser\ParserOutput([]),new MediaWiki\Parser\Parser(),SWSExtension::$schema,
  U::$revision->getContent('sws')->getPageSubjects(),$reloaded,new MediaWiki\User\User(),fn()=>SWSExtension::$schema);
-$plan=ProfessionalWiki\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
+$plan=AEWI\SWS\EntryPoints\Semantic\SmwAnnotationApplier::$plan;
 upgradeCheck(in_array('Ort=Brünn',$plan->rows,true)&&count(array_filter($plan->rows,fn($row)=>str_starts_with($row,'Ort (AM)=')))===2,'Actual annotation entry uses retained source plus separate author/source notes');
 upgradeCheck(count(U::$requests)===$beforeSmw,'Actual SMW planning after outage adds no source requests');
 // Successful empty retrieval preserves old value, recovery updates it.

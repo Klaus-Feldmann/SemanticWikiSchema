@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Search;
+namespace AEWI\SWS\Persistence\MediaWiki\Search;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Search\SearchTermMatcher;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHit;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchLanding;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\Application\Search\SearchTermMatcher;
+use AEWI\SWS\Application\Search\SubjectSearchHit;
+use AEWI\SWS\Application\Search\SubjectSearchHitBuilder;
+use AEWI\SWS\Application\Search\SubjectSearchLanding;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use Psr\Log\LoggerInterface;
 use Throwable;
 

@@ -1,16 +1,16 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
+namespace AEWI\SWS\Tests\Domain\Schema\Property;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextValueType;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextType;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Domain\Schema\Property\WikitextProperty;
+use AEWI\SWS\Domain\Schema\Property\WikitextValueProperty;
+use AEWI\SWS\Domain\PropertyType\Types\WikitextValueType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\PropertyType\Types\WikitextType;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
 
 class WikitextPropertyTest extends TestCase {
 	public function testSchemaProgramIsSeparateFromSubjectValueAndSurvivesSerialization(): void {

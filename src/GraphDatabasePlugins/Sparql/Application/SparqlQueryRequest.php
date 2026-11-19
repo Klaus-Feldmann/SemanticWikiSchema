@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Application;
 
 readonly class SparqlQueryRequest {
 

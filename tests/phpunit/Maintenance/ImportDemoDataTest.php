@@ -2,19 +2,19 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Maintenance;
+namespace AEWI\SWS\Tests\Maintenance;
 
 use MediaWiki\Status\Status;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
-use ProfessionalWiki\SWS\Maintenance\ImportDemoData;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Maintenance\ImportDemoData;
+use AEWI\SWS\SWSExtension;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
 // Its RUN_MAINTENANCE_IF_MAIN guard is a no-op under PHPUnit, so this does not execute the script.
 require_once __DIR__ . '/../../../maintenance/ImportDemoData.php';
 
 /**
- * @covers \ProfessionalWiki\SWS\Maintenance\ImportDemoData
+ * @covers \AEWI\SWS\Maintenance\ImportDemoData
  * @group Database
  */
 class ImportDemoDataTest extends MaintenanceBaseTestCase {

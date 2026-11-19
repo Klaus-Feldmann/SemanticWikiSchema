@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Hiding a user hides their name on every revision they made, by a write straight to the revision
@@ -18,10 +18,10 @@ use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * (#1246). The RevisionDelete route to the same disclosure is covered by
  * RevisionVisibilityGraphProjectionTest.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBlockIpComplete
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onUnblockUserComplete
- * @covers \ProfessionalWiki\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob
- * @covers \ProfessionalWiki\SWS\Application\LastEditorPagesRebuilder
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onBlockIpComplete
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onUnblockUserComplete
+ * @covers \AEWI\SWS\EntryPoints\Jobs\RebuildLastEditorPagesJob
+ * @covers \AEWI\SWS\Application\LastEditorPagesRebuilder
  * @group Database
  */
 class HiddenUserGraphProjectionTest extends SWSIntegrationTestCase {

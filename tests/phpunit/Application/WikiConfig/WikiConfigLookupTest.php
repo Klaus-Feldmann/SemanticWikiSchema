@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\WikiConfig;
+namespace AEWI\SWS\Tests\Application\WikiConfig;
 
 use MediaWiki\Config\HashConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubWikiConfigSource;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\WikiConfigLookup;
+use AEWI\SWS\Tests\TestDoubles\StubWikiConfigSource;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\WikiConfig\WikiConfigLookup
+ * @covers \AEWI\SWS\Application\WikiConfig\WikiConfigLookup
  */
 class WikiConfigLookupTest extends TestCase {
 

@@ -87,17 +87,17 @@ namespace MediaWiki {
   };}};}
  }
 }
-namespace ProfessionalWiki\SWS\EntryPoints {
+namespace AEWI\SWS\EntryPoints {
  class ParserAuthority{public static function of($parser){return new \stdClass;}}
 }
-namespace ProfessionalWiki\SWS\Infrastructure {
+namespace AEWI\SWS\Infrastructure {
  class ParserPageDependencyRecorder{public function __construct($parser){}public function recordDependencyOnSchema($schema){\Harness\State::$dependencies[]=$schema->name->getText();}}
 }
-namespace ProfessionalWiki\SWS\EntryPoints\Content {
+namespace AEWI\SWS\EntryPoints\Content {
  class SchemaContent{public function __construct(private string $text){}public function getText(){return $this->text;}}
- class SubjectContent{public function __construct(private $subject){}public function getPageSubjects(){if($this->subject instanceof \ProfessionalWiki\SWS\Domain\Page\PageSubjects)return $this->subject; return new class($this->subject){public function __construct(private $subject){}public function getMainSubject(){return $this->subject;} public function getAllSubjects(){return new class($this->subject){ public function __construct(private $subject){} public function asArray(){return $this->subject ? [$this->subject] : [];} };}};}}
+ class SubjectContent{public function __construct(private $subject){}public function getPageSubjects(){if($this->subject instanceof \AEWI\SWS\Domain\Page\PageSubjects)return $this->subject; return new class($this->subject){public function __construct(private $subject){}public function getMainSubject(){return $this->subject;} public function getAllSubjects(){return new class($this->subject){ public function __construct(private $subject){} public function asArray(){return $this->subject ? [$this->subject] : [];} };}};}}
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
  class SWSExtension {
   public static function getInstance(){return new self;}
   public function newSubjectResolver($parser){return new class{public function resolveMainByTitle($title){return \Harness\State::$subject;}};}
@@ -106,7 +106,7 @@ namespace ProfessionalWiki\SWS {
   public function newHookPageRebuilder(){return new class{public function rebuild($title){\Harness\State::$rebuilds++;}};}
  }
 }
-namespace ProfessionalWiki\SWS\EntryPoints\Processing {
+namespace AEWI\SWS\EntryPoints\Processing {
  // Scheduling contract only: the real worker is tested in the full MediaWiki fixtures.
  final class InternalPageProcessor {
   public function refresh($title): bool {
@@ -119,17 +119,17 @@ namespace ProfessionalWiki\SWS\EntryPoints\Processing {
 namespace {
  require dirname(__DIR__).'/tests/standalone/autoload.php';
  use Harness\State as S;
- use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty as WP;
- use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
- use ProfessionalWiki\SWS\Domain\Schema\Schema;
- use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
- use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
- use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
- use ProfessionalWiki\SWS\Application\SchemaWikitext;
- use ProfessionalWiki\SWS\EntryPoints\SchemaWikitextHooks as Hooks;
- use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
- use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
- use ProfessionalWiki\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+ use AEWI\SWS\Domain\Schema\Property\WikitextProperty as WP;
+ use AEWI\SWS\Domain\Schema\PropertyCore;
+ use AEWI\SWS\Domain\Schema\Schema;
+ use AEWI\SWS\Domain\Schema\SchemaName;
+ use AEWI\SWS\Domain\Schema\SchemaReference;
+ use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+ use AEWI\SWS\Application\SchemaWikitext;
+ use AEWI\SWS\EntryPoints\SchemaWikitextHooks as Hooks;
+ use AEWI\SWS\EntryPoints\Content\SubjectContent;
+ use AEWI\SWS\EntryPoints\Content\SchemaContent;
+ use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
  use MediaWiki\Title\Title;
  use MediaWiki\Parser\Parser;
  use MediaWiki\Revision\RevisionRecord;
@@ -173,10 +173,10 @@ namespace {
  $job=Hooks::refreshJob($title);check($job->params['recursive']===false&&$job->params['useRecursiveLinksUpdate']===false,'Refresh could recurse');check(!isset($job->params['rootJobTimestamp']),'Refresh can reuse inherited parser output');
  // Category-only schema: ordinary display parse and no-SMW refresh scheduling.
  resetState();
- $category=\ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty::fromPartialJson(new PropertyCore('',false,null),['pageNamespace'=>14,'assignCategories'=>true]);
+ $category=\AEWI\SWS\Domain\Schema\Property\PageProperty::fromPartialJson(new PropertyCore('',false,null),['pageNamespace'=>14,'assignCategories'=>true]);
  S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Kategorien'=>$category]),false);
- S::$subject=\ProfessionalWiki\SWS\Tests\Data\TestSubject::build(schemaName:new SchemaName('Person'),statements:new \ProfessionalWiki\SWS\Domain\Subject\StatementList([new \ProfessionalWiki\SWS\Domain\Statement(new \ProfessionalWiki\SWS\Domain\Schema\PropertyName('Kategorien'),'page',new \ProfessionalWiki\SWS\Domain\Value\StringValue('Kategorie:Goethe'))]));
- $subjects=new \ProfessionalWiki\SWS\Domain\Page\PageSubjects(S::$subject,new \ProfessionalWiki\SWS\Domain\Subject\SubjectMap);
+ S::$subject=\AEWI\SWS\Tests\Data\TestSubject::build(schemaName:new SchemaName('Person'),statements:new \AEWI\SWS\Domain\Subject\StatementList([new \AEWI\SWS\Domain\Statement(new \AEWI\SWS\Domain\Schema\PropertyName('Kategorien'),'page',new \AEWI\SWS\Domain\Value\StringValue('Kategorie:Goethe'))]));
+ $subjects=new \AEWI\SWS\Domain\Page\PageSubjects(S::$subject,new \AEWI\SWS\Domain\Subject\SubjectMap);
  S::$current=new RevisionRecord('Inhalt',new SubjectContent($subjects));
  $parser=new Parser($title);$source='Inhalt';Hooks::onParserBeforeInternalParse($parser,$source,null);
  check($parser->getOutput()->categories===['Goethe'=>''],'Category missing from ordinary display parse');

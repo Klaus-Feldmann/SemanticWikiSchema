@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Subject;
+namespace AEWI\SWS\Domain\Subject;
 
 use InvalidArgumentException;
 

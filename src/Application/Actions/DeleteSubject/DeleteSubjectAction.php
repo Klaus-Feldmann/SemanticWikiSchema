@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\DeleteSubject;
+namespace AEWI\SWS\Application\Actions\DeleteSubject;
 
-use ProfessionalWiki\SWS\Application\SubjectWriteAuthorizer;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectNotFoundException;
-use ProfessionalWiki\SWS\Application\SubjectHostingPageResolver;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\SubjectWriteAuthorizer;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\Subject\Exception\SubjectEditNotAuthorizedException;
+use AEWI\SWS\Application\Subject\Exception\SubjectNotFoundException;
+use AEWI\SWS\Application\SubjectHostingPageResolver;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 
 readonly class DeleteSubjectAction {
 

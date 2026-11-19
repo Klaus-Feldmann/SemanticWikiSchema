@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
-use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
+use AEWI\SWS\Domain\Schema\Property\RelationProperty;
 
 /**
  * Schemas that do not resolve are ignored.

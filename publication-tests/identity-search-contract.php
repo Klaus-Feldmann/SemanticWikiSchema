@@ -16,8 +16,8 @@ namespace MediaWiki\Title {
  class TitleFactory {public function newFromRow($r):Title{return new Title((int)$r->page_id,(int)$r->page_namespace,$r->page_title);}public function newFromLinkTarget($t):Title{return new Title(0,$t->ns,$t->getText());}}
 }
 namespace {
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex as Index;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseIdentityTermIndex as Index;
+use AEWI\SWS\Domain\Page\PageId;
 require __DIR__.'/identity-term-index-contract.php';
 class SearchEngine {}
 final class SearchDatabase implements \Wikimedia\Rdbms\IDatabase,\Wikimedia\Rdbms\IReadableDatabase {
@@ -61,15 +61,15 @@ foreach([[1,'E1'],[2,'E1'],[3,'E2'],[4,'E3']]as[$page,$id]){foreach(Index::rows(
 $index->setSchema(new PageId(10),['labels'=>['en'=>'Human schema'],'descriptions'=>['de'=>'Forschungsbestand']],'S10');
 $index->setSchema(new PageId(11),['labels'=>['en'=>'Human schema']],'PrivateSchema');
 $searchDb=new SearchDatabase($pdo);$provider=new class($searchDb)implements \Wikimedia\Rdbms\IConnectionProvider {public function __construct(private $db){}public function getReplicaDatabase(){return $this->db;}};
-$auth=new class implements \ProfessionalWiki\SWS\Application\PageReadAuthorizer {
- public function authorizeReadByPageId(\ProfessionalWiki\SWS\Domain\Page\PageId $id):bool{return $id->id!==3;}
+$auth=new class implements \AEWI\SWS\Application\PageReadAuthorizer {
+ public function authorizeReadByPageId(\AEWI\SWS\Domain\Page\PageId $id):bool{return $id->id!==3;}
  public function authorizeReadByPageTitle(\MediaWiki\Title\Title $title):bool{return !in_array($title->name,['Private','PrivateSchema'],true);}
 };
-$lookup=new \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup($provider,$auth,new \MediaWiki\Title\TitleFactory());
+$lookup=new \AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectLabelLookup($provider,$auth,new \MediaWiki\Title\TitleFactory());
 $found=$lookup->getSubjectLabelsMatching('Human',10,null);termCheck(count($found)===1&&$found[0]->id==='E1','Actual translated-label query deduplicates languages, duplicate hosts, private and dependent entities');
 termCheck(count($lookup->getSubjectLabelsMatching('E1',10,['S1']))===1,'Explicit ID prefix remains searchable with schema filter');
 termCheck($lookup->getSubjectLabelsMatching('Human',10,['S2'])===[],'Translated search respects selected schema');
-$schemas=new \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup($searchDb,new SearchEngine(),$auth,new \MediaWiki\Title\TitleFactory());
+$schemas=new \AEWI\SWS\Persistence\MediaWiki\DatabaseSchemaNameLookup($searchDb,new SearchEngine(),$auth,new \MediaWiki\Title\TitleFactory());
 $found=$schemas->getSchemaNamesMatching('Human',10);termCheck(count($found)===1&&$found[0]->getText()==='S10','Actual schema query searches translated labels and filters restricted schemas');
 termCheck($schemas->getSchemaNamesMatching('Forschungs',10)[0]->getText()==='S10','Schema description is searchable without scanning revision content');
 $pdo->exec("INSERT INTO page VALUES(5,7474,'Human_old',1)");

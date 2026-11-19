@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Identity;
+namespace AEWI\SWS\Persistence\MediaWiki\Identity;
 
 use LogicException;
-use ProfessionalWiki\SWS\Persistence\Identity\IdentityConnection;
+use AEWI\SWS\Persistence\Identity\IdentityConnection;
 use Wikimedia\Rdbms\IDatabase;
 
 /** Uses the ordinary primary connection. An ambient transaction owns the final commit. */

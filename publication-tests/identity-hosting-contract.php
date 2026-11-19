@@ -3,13 +3,13 @@
 declare( strict_types = 1 );
 require __DIR__.'/identity-transaction-contract.php';
 
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
-use ProfessionalWiki\SWS\Domain\Identity\IdentityKind;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseSubjectPageIndex;
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
+use AEWI\SWS\Domain\Identity\IdentityKind;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
 
 class HostingDatabase extends TransactionHost {
  public function condition(array $where):string{

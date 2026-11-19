@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\EntryPoints\Semantic;
+namespace AEWI\SWS\EntryPoints\Semantic;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
@@ -10,11 +10,11 @@ use MediaWiki\Parser\Parser;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\Application\Semantic\{AnnotationPlan,AnnotationPlanner,FieldSnapshot};
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
+use AEWI\SWS\Application\Semantic\{AnnotationPlan,AnnotationPlanner,FieldSnapshot};
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\EntryPoints\Processing\ProcessingIncomplete;
 
 /** Called only inside the authorized full revision worker, never on the anonymous view path. */
 final class AutomaticAnnotations {
@@ -35,22 +35,22 @@ final class AutomaticAnnotations {
         $pending = [[$subject, $schema]];
         $visited = [$subject->id->text => true];
         $rows = [];
-        $description = $output->getPageProperty( \ProfessionalWiki\SWS\EntryPoints\Processing\EffectivePageDescription::PROPERTY );
+        $description = $output->getPageProperty( \AEWI\SWS\EntryPoints\Processing\EffectivePageDescription::PROPERTY );
         if ( is_string( $description ) && trim( $description ) !== '' ) {
-            $rows['Kurzbeschreibung=' . trim( $description )] = true;
+            $rows[$config['descriptionProperty'] . '=' . trim( $description )] = true;
         }
         $objects = [];
         for ($index = 0; $index < count($pending); $index++) {
             [$current, $currentSchema] = $pending[$index];
             $recorder->recordDependencyOnSchema($current->getSchemaReference());
             $reader = FieldSnapshot::reader($currentSchema,$current,static function () use ($title,$current,$currentSchema,$language,$context,$recorder): array {
-                return \ProfessionalWiki\SWS\EntryPoints\Source\SourceFieldLookup::read(
+                return \AEWI\SWS\EntryPoints\Source\SourceFieldLookup::read(
                     $context, $title, $current, $currentSchema, $language, $recorder
                 );
             });
-            $snapshot = $reader->collectForAnnotations($language, \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore());
+            $snapshot = $reader->collectForAnnotations($language, \AEWI\SWS\Application\Source\SourceDataMode::usesStore());
             $subjectPlan = $planner->build($snapshot);
-            foreach ( ( new \ProfessionalWiki\SWS\Application\Semantic\FieldNoteAnnotations() )->build( $snapshot, $config ) as $row ) { $rows[$row] = true; }
+            foreach ( ( new \AEWI\SWS\Application\Semantic\FieldNoteAnnotations() )->build( $snapshot, $config ) as $row ) { $rows[$row] = true; }
             foreach ($subjectPlan->rows as $row) {
                 $rows[$row] = true;
             }
@@ -79,6 +79,10 @@ final class AutomaticAnnotations {
         foreach (array_keys($names) as $name) {
             $propertyTitle = Title::makeTitleSafe(SMW_NS_PROPERTY,$name);
             if ($propertyTitle !== null) { $recorder->recordDependencyOn($propertyTitle); }
+            foreach ($config['messageDependencies'][$name] ?? [] as $messageKey) {
+                $messageTitle = Title::makeTitleSafe(NS_MEDIAWIKI, $messageKey);
+                if ($messageTitle !== null) { $recorder->recordDependencyOn($messageTitle); }
+            }
         }
         (new SmwAnnotationApplier())->apply($title,$output,$plan);
     }

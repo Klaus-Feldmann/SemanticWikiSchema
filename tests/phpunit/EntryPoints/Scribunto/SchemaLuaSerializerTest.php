@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Scribunto;
+namespace AEWI\SWS\Tests\EntryPoints\Scribunto;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\Property\NumberProperty;
+use AEWI\SWS\Domain\Schema\Property\RelationProperty;
+use AEWI\SWS\Domain\Schema\Property\SelectOption;
+use AEWI\SWS\Domain\Schema\Property\SelectProperty;
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Schema\Property\UrlProperty;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\Scribunto\SchemaLuaSerializer;
+use AEWI\SWS\Domain\Schema\SchemaReference;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Scribunto\SchemaLuaSerializer
+ * @covers \AEWI\SWS\EntryPoints\Scribunto\SchemaLuaSerializer
  */
 class SchemaLuaSerializerTest extends TestCase {
 
@@ -242,7 +242,7 @@ class SchemaLuaSerializerTest extends TestCase {
 	}
 
 	/**
-	 * @param array<string, \ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition> $props
+	 * @param array<string, \AEWI\SWS\Domain\Schema\PropertyDefinition> $props
 	 */
 	private function schemaWith( array $props ): Schema {
 		return new Schema(

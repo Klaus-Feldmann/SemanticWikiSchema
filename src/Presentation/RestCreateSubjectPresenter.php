@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 class RestCreateSubjectPresenter implements CreateSubjectPresenter {
 
@@ -50,7 +50,7 @@ class RestCreateSubjectPresenter implements CreateSubjectPresenter {
 	public function presentSubjectAlreadyExists(): void {
 		$this->apiResponse = [
 			'status' => 'error',
-			'message' => 'Subject already exists',
+			'message' => wfMessage('sws-api-entity-already-exists')->text(),
 		];
 		$this->statusCode = 409;
 	}

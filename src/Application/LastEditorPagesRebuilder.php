@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use MediaWiki\Title\TitleFactory;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\SWS\Persistence\LastEditorPageIdsLookup;
+use AEWI\SWS\Persistence\LastEditorPageIdsLookup;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**

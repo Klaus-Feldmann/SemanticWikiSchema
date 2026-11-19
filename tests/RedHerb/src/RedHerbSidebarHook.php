@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb;
+namespace AEWI\RedHerb;
 
 use MediaWiki\Hook\SidebarBeforeOutputHook;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 use Skin;
 
 class RedHerbSidebarHook implements SidebarBeforeOutputHook {

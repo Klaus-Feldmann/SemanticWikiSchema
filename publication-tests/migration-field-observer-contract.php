@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/identity-direct-fields-contract.php';
-use ProfessionalWiki\SWS\Application\IdentityMigration\MigrationFieldRepairScope as RepairScope;
-use ProfessionalWiki\SWS\EntryPoints\EffectiveFieldLookup;
+use AEWI\SWS\Application\IdentityMigration\MigrationFieldRepairScope as RepairScope;
+use AEWI\SWS\EntryPoints\EffectiveFieldLookup;
 $nObserved=0;function observed(bool $ok,string $why):void{global$nObserved;$nObserved++;if(!$ok)throw new RuntimeException($why);}
 $probe=RepairScope::attempt(fn()=>(new EffectiveFieldLookup(new MediaWiki\Context\TestContext()))->read(new MediaWiki\Title\Title(),['field'=>'Fehlend']));
 observed($probe['error'] instanceof InvalidArgumentException&&$probe['missing'][0]['schemaId']==='S9'&&$probe['missing'][0]['field']==='Fehlend','Actual authorized field read identifies exact missing schema field');

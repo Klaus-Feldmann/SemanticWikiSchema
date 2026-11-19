@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Context\RequestContext;
@@ -12,15 +12,15 @@ use MediaWiki\Request\FauxRequest;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\Specials\SpecialSearch;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\SWSHooks;
 use SearchResult;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 use SpecialPageExecutor;
 
 /**
@@ -30,11 +30,11 @@ use SpecialPageExecutor;
  * Rendered in qqx, so what is asserted of SWS's own strings is which message carries them.
  *
  * @group Database
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onShowSearchHit
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onShowSearchHitTitle
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchGetNearMatchComplete
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
- * @covers \ProfessionalWiki\SWS\Presentation\SubjectSearchHitHtmlBuilder
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onShowSearchHit
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onShowSearchHitTitle
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onSearchGetNearMatchComplete
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
+ * @covers \AEWI\SWS\Presentation\SubjectSearchHitHtmlBuilder
  */
 class SubjectSearchHitRenderingTest extends FullTextSearchTestCase {
 

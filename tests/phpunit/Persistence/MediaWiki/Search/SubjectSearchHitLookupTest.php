@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki\Search;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki\Search;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchHitBuilder;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchTextBuilder;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingSubjectSearchHitBuilder;
+use AEWI\SWS\Application\Search\SubjectSearchHitBuilder;
+use AEWI\SWS\Application\Search\SubjectSearchTextBuilder;
+use AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Tests\TestDoubles\ThrowingSubjectSearchHitBuilder;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use TestLogger;
 
 /**
  * @group Database
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Search\SubjectSearchHitLookup
  */
 class SubjectSearchHitLookupTest extends SWSIntegrationTestCase {
 

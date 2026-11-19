@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Status\Status;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSchemaApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\EntryPoints\REST\GetSchemaApi;
+use AEWI\SWS\EntryPoints\REST\SaveSchemaApi;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 use Wikimedia\Rdbms\IDBAccessObject;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SaveSchemaApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SchemaPageWriteApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SaveSchemaApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SchemaPageWriteApi
  * @group Database
  */
 class SaveSchemaApiTest extends SWSIntegrationTestCase {

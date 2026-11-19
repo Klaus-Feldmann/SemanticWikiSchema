@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\RedHerb;
+namespace AEWI\RedHerb;
 
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
 
 class StaticPagePropertyProvider implements PagePropertyProvider {
 

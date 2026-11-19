@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\CreateSubject;
+namespace AEWI\SWS\Application\Actions\CreateSubject;
 
 readonly class CreateSubjectRequest {
 

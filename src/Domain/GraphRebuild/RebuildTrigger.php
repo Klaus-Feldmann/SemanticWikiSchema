@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\GraphRebuild;
+namespace AEWI\SWS\Domain\GraphRebuild;
 
 /**
  * What started a {@see RebuildRun}, so an operator reading the run records can tell an unattended

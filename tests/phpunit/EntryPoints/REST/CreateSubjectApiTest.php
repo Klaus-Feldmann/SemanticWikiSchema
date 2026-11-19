@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\WikiMap\WikiMap;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetPageSubjectsApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\EntryPoints\REST\CreateSubjectApi;
+use AEWI\SWS\EntryPoints\REST\GetPageSubjectsApi;
+use AEWI\SWS\EntryPoints\REST\GetSubjectApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi
- * @covers \ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectAction
+ * @covers \AEWI\SWS\EntryPoints\REST\CreateSubjectApi
+ * @covers \AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectAction
  * @group Database
  */
 class CreateSubjectApiTest extends SWSIntegrationTestCase {

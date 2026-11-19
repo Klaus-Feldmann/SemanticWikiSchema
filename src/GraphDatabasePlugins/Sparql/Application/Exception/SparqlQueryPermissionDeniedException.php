@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception;
 
 class SparqlQueryPermissionDeniedException extends SparqlQueryException {
 

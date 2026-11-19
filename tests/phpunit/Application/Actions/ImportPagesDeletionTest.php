@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
 use MediaWiki\Page\ProperPageIdentity;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPresenter;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\LayoutContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\MappingContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\PageContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SchemaContentSource;
-use ProfessionalWiki\SWS\Application\Actions\ImportPages\SubjectPageSource;
-use ProfessionalWiki\SWS\Persistence\ImportedPageTitlesLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\PageDeleter;
-use ProfessionalWiki\SWS\Persistence\PageDeletionStatus;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ImportPresenterSpy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\PageContentSaverStub;
-use ProfessionalWiki\SWS\Tests\TestDoubles\PageDeleterSpy;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction;
+use AEWI\SWS\Application\Actions\ImportPages\ImportPresenter;
+use AEWI\SWS\Application\Actions\ImportPages\LayoutContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\MappingContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\PageContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SchemaContentSource;
+use AEWI\SWS\Application\Actions\ImportPages\SubjectPageSource;
+use AEWI\SWS\Persistence\ImportedPageTitlesLookup;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\PageDeleter;
+use AEWI\SWS\Persistence\PageDeletionStatus;
+use AEWI\SWS\Tests\TestDoubles\ImportPresenterSpy;
+use AEWI\SWS\Tests\TestDoubles\PageContentSaverStub;
+use AEWI\SWS\Tests\TestDoubles\PageDeleterSpy;
 
 /**
  * Covers how the import prunes pages it previously created once their source files are gone. The
  * managed-set discovery itself lives in FirstRevisionAuthorPageTitlesLookupTest; here that lookup is
  * a fake so the deletion decision can be tested against controlled managed and current sets.
  *
- * @covers \ProfessionalWiki\SWS\Application\Actions\ImportPages\ImportPagesAction
+ * @covers \AEWI\SWS\Application\Actions\ImportPages\ImportPagesAction
  * @group Database
  */
 class ImportPagesDeletionTest extends MediaWikiIntegrationTestCase {

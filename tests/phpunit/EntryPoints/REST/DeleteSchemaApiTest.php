@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\MainConfigNames;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\REST\DeleteSchemaApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\DeleteSchemaApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SchemaPageWriteApi
+ * @covers \AEWI\SWS\EntryPoints\REST\DeleteSchemaApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SchemaPageWriteApi
  * @group Database
  */
 class DeleteSchemaApiTest extends SWSIntegrationTestCase {

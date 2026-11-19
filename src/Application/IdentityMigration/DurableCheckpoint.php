@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** The external progress acknowledgement must never precede the actual database commit. */
 final readonly class DurableCheckpoint {

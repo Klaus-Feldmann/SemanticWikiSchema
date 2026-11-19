@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** Maintenance-only request scope. No configuration switch or public request parameter can enable it. */
 final class MigrationWriteScope {

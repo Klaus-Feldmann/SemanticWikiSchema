@@ -9,9 +9,9 @@ use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use MediaWiki\Content\WikitextContent;
 use MediaWiki\Deferred\DeferredUpdates;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\Processing\InternalPageProcessor;
 $s=MediaWikiServices::getInstance();$u=$s->getUserFactory()->newFromName('TestAdmin');
 foreach (['Schema:NoSMWProcessing'=>['main'=>new SchemaContent(json_encode(['title'=>'NoSMWProcessing','propertyDefinitions'=>['Programm'=>['type'=>'wikitext','execute'=>true,'wikitext'=>'Privater Schemainhalt']]]))],
 'NoSMWProcessing'=>['main'=>new WikitextContent('Privater Artikel'),'sws'=>new SubjectContent(json_encode(['mainSubject'=>'s123456789abcde','subjects'=>['s123456789abcde'=>['schema'=>'NoSMWProcessing','label'=>'Test','statements'=>[]]]]))]] as $name=>$slots) {

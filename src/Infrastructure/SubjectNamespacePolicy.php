@@ -1,11 +1,11 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /** Namespace eligibility is not authorization. Callers must still check the reader/writer. */
 final class SubjectNamespacePolicy {

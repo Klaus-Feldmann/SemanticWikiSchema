@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\Rdf\PageProjector;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\Rdf\PageProjector;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * A {@see PageProjector} that returns a preset {@see QuadList} regardless of the page, so tests can

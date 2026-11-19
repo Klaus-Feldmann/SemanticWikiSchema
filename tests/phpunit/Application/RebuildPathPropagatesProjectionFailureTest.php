@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\ThrowingGraphDatabasePlugin;
 use RuntimeException;
 
 /**
@@ -18,8 +18,8 @@ use RuntimeException;
  * hook path's failure-isolating decorator instead would swallow the throw and report every page as
  * rebuilt.
  *
- * @covers \ProfessionalWiki\SWS\SWSExtension
- * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
+ * @covers \AEWI\SWS\SWSExtension
+ * @covers \AEWI\SWS\Application\PageRebuilder
  * @group Database
  */
 class RebuildPathPropagatesProjectionFailureTest extends SWSIntegrationTestCase {

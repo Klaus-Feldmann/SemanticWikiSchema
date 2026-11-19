@@ -1,12 +1,12 @@
 {
-  "date": "2026-11-16",
+  "date": "2026-11-13",
   "MediaWiki": "1.47.0-wmf.24",
   "PHP": "8.3.36",
-  "SWS": "0.5.02",
+  "SWS": "0.4.03",
   "SchemaBaseBridge": "0.21.1",
   "parser": "legacy",
   "skin": "Vector 2022",
   "Fuseki": "5.3.0",
-  "runtimeEvidence": "Operator-confirmed installation; read-only live SMW/source/search-API checks on three SWS pages in cache mode",
+  "runtimeEvidence": "Operator confirmation on existing AufEinWort installation",
   "freshInstallerEvidence": "Actual Composer in controlled core layout; no independent full core/database fresh-install test"
 }

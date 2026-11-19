@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Identity;
+namespace AEWI\SWS\Application\Identity;
 
-use ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Identity\LocalizedIdentity;
+use AEWI\SWS\Domain\Subject\Subject;
 
 final class IdentityMetadataWriter {
 	public static function initialize( Subject $subject, string $language, ?array $metadata ): Subject {

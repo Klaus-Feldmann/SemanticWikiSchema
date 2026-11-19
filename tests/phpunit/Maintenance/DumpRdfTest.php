@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Maintenance;
+namespace AEWI\SWS\Tests\Maintenance;
 
 use Exception;
 use MediaWiki\CommentStore\CommentStoreComment;
@@ -11,16 +11,16 @@ use MediaWiki\Maintenance\MaintenanceFatalError;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\SWSRegistrar;
-use ProfessionalWiki\SWS\Maintenance\DumpRdf;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\ThrowingPagePropertyProvider;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\SWSRegistrar;
+use AEWI\SWS\Maintenance\DumpRdf;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\ThrowingPagePropertyProvider;
 use RuntimeException;
 use Wikimedia\Rdbms\DBUnexpectedError;
 
@@ -29,7 +29,7 @@ use Wikimedia\Rdbms\DBUnexpectedError;
 require_once __DIR__ . '/../../../maintenance/DumpRdf.php';
 
 /**
- * @covers \ProfessionalWiki\SWS\Maintenance\DumpRdf
+ * @covers \AEWI\SWS\Maintenance\DumpRdf
  * @group Database
  */
 class DumpRdfTest extends MaintenanceBaseTestCase {

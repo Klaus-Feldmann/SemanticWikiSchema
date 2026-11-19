@@ -18,27 +18,27 @@ namespace MediaWiki\Revision {
 namespace MediaWiki\Title {class TitleFormatter {public function getPrefixedText($page):string{return $page->name;}}}
 namespace {
 require __DIR__.'/identity-term-index-contract.php';
-use ProfessionalWiki\SWS\Domain\Page\{PageSubjects,PageProperties,PageId};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,SubjectLabel,SubjectMap,StatementList};
-use ProfessionalWiki\SWS\Domain\Schema\{SchemaName,SchemaReference};
-use ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity;
-use ProfessionalWiki\SWS\EntryPoints\Content\{SubjectContent,SchemaContent};
+use AEWI\SWS\Domain\Page\{PageSubjects,PageProperties,PageId};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,SubjectLabel,SubjectMap,StatementList};
+use AEWI\SWS\Domain\Schema\{SchemaName,SchemaReference};
+use AEWI\SWS\Domain\Identity\LocalizedIdentity;
+use AEWI\SWS\EntryPoints\Content\{SubjectContent,SchemaContent};
 use MediaWiki\Revision\RevisionRecord;
 class PublishedFixtureContent extends SubjectContent {
  public function __construct(private PageSubjects $subjects){parent::__construct('{}');}
  public function getPageSubjects():PageSubjects{return $this->subjects;}
  public function getSubjectIds():array{return $this->subjects->getAllSubjects()->getIdsAsTextArray();}
 }
-$policy=new class implements \ProfessionalWiki\SWS\Application\RevisionPolicy {
+$policy=new class implements \AEWI\SWS\Application\RevisionPolicy {
  public bool $visible=true;public ?RevisionRecord $published=null;
  public function publishedRevision(RevisionRecord $revision):?RevisionRecord{return $this->visible?($this->published??$revision):null;}
  public function revisionIsReadableBy(RevisionRecord $revision,\MediaWiki\Permissions\Authority $user):bool{return true;}
 };
-$graph=new \ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin();
-$host=new \ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectPageIndex();
-$published=new \ProfessionalWiki\SWS\Tests\TestDoubles\SpyPublishedSubjectIndex();
-$properties=new class implements \ProfessionalWiki\SWS\PagePropertiesSource{public function getPagePropertiesFor(RevisionRecord $revision):?PageProperties{return new PageProperties(['name'=>'Visible page']);}};
-$handler=new \ProfessionalWiki\SWS\EntryPoints\OnRevisionCreatedHandler($graph,$host,$published,$properties,$policy,new \MediaWiki\Title\TitleFormatter(),new \Psr\Log\NullLogger(),$index);
+$graph=new \AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin();
+$host=new \AEWI\SWS\Tests\TestDoubles\SpySubjectPageIndex();
+$published=new \AEWI\SWS\Tests\TestDoubles\SpyPublishedSubjectIndex();
+$properties=new class implements \AEWI\SWS\PagePropertiesSource{public function getPagePropertiesFor(RevisionRecord $revision):?PageProperties{return new PageProperties(['name'=>'Visible page']);}};
+$handler=new \AEWI\SWS\EntryPoints\OnRevisionCreatedHandler($graph,$host,$published,$properties,$policy,new \MediaWiki\Title\TitleFormatter(),new \Psr\Log\NullLogger(),$index);
 $schema=new RevisionRecord(500,201,'S1',['main'=>new SchemaContent('{"formatVersion":2,"id":"S1","labels":{"de":"Person","en":"Human"}}')]);
 $handler->onRevisionCreated($schema);
 termCheck((int)$db->pdo->query("SELECT COUNT(*) FROM sws_search_term WHERE swst_page_id=201")->fetchColumn()===3,'Schema save publishes own labels and key into term index');

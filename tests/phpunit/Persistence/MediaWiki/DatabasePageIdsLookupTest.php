@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Persistence\MediaWiki\DatabasePageIdsLookup;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\DatabasePageIdsLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\DatabasePageIdsLookup
  * @group Database
  */
 class DatabasePageIdsLookupTest extends SWSIntegrationTestCase {

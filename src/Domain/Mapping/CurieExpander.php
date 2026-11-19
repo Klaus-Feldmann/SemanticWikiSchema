@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Mapping;
+namespace AEWI\SWS\Domain\Mapping;
 
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Iri;
 
 /**
  * Expands a Mapping term — a CURIE (`prefix:local` against the Mapping's declared prefixes) or an

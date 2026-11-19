@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use MediaWiki\Utils\MWTimestamp;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
 
 /**
  * Renders what the graph-store surfaces report as JSON.

@@ -1,16 +1,16 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Application\Semantic\FieldSnapshot;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\EntryPoints\Source\{ PublishedSubjectsLookup, SourceFieldLookup };
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Application\Semantic\FieldSnapshot;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\EntryPoints\Source\{ PublishedSubjectsLookup, SourceFieldLookup };
+use AEWI\SWS\SWSExtension;
 
 /** Bounded reads of one local entity; no scans, writes, or independent source requests. */
 final class EffectiveFieldLookup {
@@ -57,16 +57,16 @@ final class EffectiveFieldLookup {
 		$this->dependencies?->recordDependencyOnSchema( $schema?->getReference() ?? $subject->getSchemaReference() );
 		if ( $schema === null ) { throw new \RuntimeException( 'Schema unavailable' ); }
         if ( isset($options['field']) && $schema->getId() !== null && $schema->getFieldReference($options['field']) === null ) {
-            \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationFieldRepairScope::record(
+            \AEWI\SWS\Application\IdentityMigration\MigrationFieldRepairScope::record(
                 $schema->getId()->text,$options['field'],$title->getPrefixedText(),$currentTitle->getPrefixedText()
             );
         }
 		$key = json_encode( [ $title->getArticleID(), $subject->id->text, $language ], JSON_THROW_ON_ERROR );
 		if ( !isset( $this->readers[$key] ) ) {
 			$display = function ( string $name ) use ( $subject ): array {
-				$value = $subject->getStatements()->getStatement( new \ProfessionalWiki\SWS\Domain\Schema\PropertyName( $name ) )?->getValue();
-				if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\MonolingualTextValue ) { return $value->getTexts(); }
-				if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\RelationValue ) {
+				$value = $subject->getStatements()->getStatement( new \AEWI\SWS\Domain\Schema\PropertyName( $name ) )?->getValue();
+				if ( $value instanceof \AEWI\SWS\Domain\Value\MonolingualTextValue ) { return $value->getTexts(); }
+				if ( $value instanceof \AEWI\SWS\Domain\Value\RelationValue ) {
 					return array_map( fn ( $relation ) => $this->relationLabel !== null
 						? ( $this->relationLabel )( $relation ) : $this->relationName( $relation->targetId ), $value->relations );
 				}
@@ -77,15 +77,15 @@ final class EffectiveFieldLookup {
 		}
 		$result = $this->readers[$key]->collect( $options['field'] ?? null, $options['origin'] ?? 'all', $language, $options['includeImages'] ?? false );
 		foreach ( $result['fields'] as &$field ) {
-			$field['sourceNote'] = \ProfessionalWiki\SWS\Application\Semantic\FieldNoteAnnotations::sourceText( $field );
+			$field['sourceNote'] = \AEWI\SWS\Application\Semantic\FieldNoteAnnotations::sourceText( $field );
 		}
 		unset( $field );
 		$result['subject'] += ( $subject->getIdentity()?->toJson() ?? [] );
         $result['schemaIdentity'] = $schema->getId() === null ? null : [ 'id'=>$schema->getId()->text ] + $schema->getIdentity()->toJson();
-        $result['subject']['label'] = $subject->getIdentity()?->label( $language ) ?? \ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName::forSubject( $subject, $page, $title->getPrefixedText() );
+        $result['subject']['label'] = $subject->getIdentity()?->label( $language ) ?? \AEWI\SWS\Domain\Subject\SubjectDisplayName::forSubject( $subject, $page, $title->getPrefixedText() );
 		$result['subject']['storedLabel'] = $subject->getLabel()?->text;
 		$result['subject']['isMainSubject'] = $page->isMainSubject( $subject->id );
-		$result['sourceDataMode'] = \ProfessionalWiki\SWS\Application\Source\SourceDataMode::current();
+		$result['sourceDataMode'] = \AEWI\SWS\Application\Source\SourceDataMode::current();
 		$result['page'] = [ 'id' => $title->getArticleID(), 'title' => $title->getPrefixedText() ];
 		return $result;
 	}
@@ -98,7 +98,7 @@ final class EffectiveFieldLookup {
 			$this->dependencies?->recordDependencyOn( $title );
 			$page = $this->published->page( $title );
 			$target = $page->getAllSubjects()->getSubject( $id );
-			return $target === null ? '' : \ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName::forSubject( $target, $page, $title->getPrefixedText() );
+			return $target === null ? '' : \AEWI\SWS\Domain\Subject\SubjectDisplayName::forSubject( $target, $page, $title->getPrefixedText() );
 		} catch ( \RuntimeException ) { return ''; }
 	}
 

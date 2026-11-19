@@ -57,10 +57,10 @@ namespace IdentityMwHarness {
 }
 namespace {
 	require __DIR__ . '/bootstrap.php';
-	use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-	use ProfessionalWiki\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
-	use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-	use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LegacyIdentity};
+	use AEWI\SWS\EntryPoints\SWSHooks;
+	use AEWI\SWS\Persistence\MediaWiki\Identity\MediaWikiIdentityConnection;
+	use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+	use AEWI\SWS\Domain\Identity\{IdentityKind, LegacyIdentity};
 	$count = 0;
 	function mwIdentityCheck( bool $ok, string $why ): void { global $count; $count++; if ( !$ok ) { throw new RuntimeException( $why ); } }
 	$db = new IdentityMwHarness\Database();

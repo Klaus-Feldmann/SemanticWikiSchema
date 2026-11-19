@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
+namespace AEWI\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Content\ValidationParams;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContentHandler;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SchemaContentHandler;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use StatusValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContentHandler
- * @covers \ProfessionalWiki\SWS\Domain\Schema\DependentSubjectSchemaRules
- * @covers \ProfessionalWiki\SWS\Presentation\PropertyNameProblemMessage
+ * @covers \AEWI\SWS\EntryPoints\Content\SchemaContentHandler
+ * @covers \AEWI\SWS\Domain\Schema\DependentSubjectSchemaRules
+ * @covers \AEWI\SWS\Presentation\PropertyNameProblemMessage
  * @group Database
  */
 class SchemaContentHandlerValidateSaveTest extends SWSIntegrationTestCase {

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentFetcher;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\LayoutPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\PageContentFetcher;
+use AEWI\SWS\Persistence\MediaWiki\WikiPageLayoutLookup;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageLayoutLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\WikiPageLayoutLookup
  */
 class WikiPageLayoutLookupTest extends MediaWikiIntegrationTestCase {
 

@@ -2,34 +2,34 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpySubjectIndexingSearchEngine;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpySubjectIndexingSearchEngine;
 use RuntimeException;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /**
  * What an edit hands the wiki's search engine to index. Searching for it is
- * {@see \ProfessionalWiki\SWS\Tests\EntryPoints\Search\DatabaseSearchEndToEndTest}.
+ * {@see \AEWI\SWS\Tests\EntryPoints\Search\DatabaseSearchEndToEndTest}.
  *
  * @group Database
- * @covers \ProfessionalWiki\SWS\EntryPoints\Search\IndexesSubjectText
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onPageUndeleteComplete
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onAfterImportPage
+ * @covers \AEWI\SWS\EntryPoints\Search\IndexesSubjectText
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onRevisionFromEditComplete
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onPageUndeleteComplete
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onAfterImportPage
  */
 class SubjectSearchIndexingTest extends SWSIntegrationTestCase {
 

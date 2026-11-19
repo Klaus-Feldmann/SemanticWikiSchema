@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain;
+namespace AEWI\SWS\Domain;
 
 /** Repository-qualified identity; preview URLs are deliberately not persisted. */
 final readonly class ImageReference {

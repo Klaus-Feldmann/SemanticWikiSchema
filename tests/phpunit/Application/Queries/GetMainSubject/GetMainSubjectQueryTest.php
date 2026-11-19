@@ -2,33 +2,33 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetMainSubject;
+namespace AEWI\SWS\Tests\Application\Queries\GetMainSubject;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageIdentifiersResolver;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
-use ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageIdentifiersResolver;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectPresenter;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery;
+use AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectResponse;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\TestDoubles\InMemoryPageIdentifiersResolver;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectRepository;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
+ * @covers \AEWI\SWS\Application\Queries\GetMainSubject\GetMainSubjectQuery
  */
 class GetMainSubjectQueryTest extends TestCase {
 

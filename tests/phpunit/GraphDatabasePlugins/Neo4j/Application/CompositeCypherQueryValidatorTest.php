@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CypherQueryValidator;
+use AEWI\SWS\Tests\TestDoubles\SpyCypherQueryValidator;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\CompositeCypherQueryValidator
  */
 class CompositeCypherQueryValidatorTest extends TestCase {
 

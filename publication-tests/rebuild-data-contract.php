@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/identity-hosting-contract.php';
-use ProfessionalWiki\SWS\Application\DataRebuild\DataRebuildCoordinator;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
+use AEWI\SWS\Application\DataRebuild\DataRebuildCoordinator;
+use AEWI\SWS\Domain\Page\PageId;
 $nRebuild=0;function rebuildCheck(bool $ok,string $why):void{global$nRebuild;$nRebuild++;if(!$ok)throw new RuntimeException($why);}
 // A matching normal index row can still have a lost derived hosting row. Rebuild must repair it.
 $db->delete('sws_identity_host',['swsih_id'=>'E1'],__FILE__);

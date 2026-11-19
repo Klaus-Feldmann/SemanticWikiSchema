@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application;
+namespace AEWI\SWS\Tests\Application;
 
 use LogicException;
 use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageRefreshOutcome;
-use ProfessionalWiki\SWS\Application\PageRebuilder;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyOnRevisionCreatedHandler;
+use AEWI\SWS\Application\PageRefreshOutcome;
+use AEWI\SWS\Application\PageRebuilder;
+use AEWI\SWS\Tests\TestDoubles\SpyOnRevisionCreatedHandler;
 use Wikimedia\Rdbms\IDBAccessObject;
 use WikiPage;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\PageRebuilder
+ * @covers \AEWI\SWS\Application\PageRebuilder
  */
 class PageRebuilderTest extends TestCase {
 
@@ -39,7 +39,7 @@ class PageRebuilderTest extends TestCase {
 
 	/**
 	 * @dataProvider skipOutcomeProvider
-	 * @covers \ProfessionalWiki\SWS\Application\PageRefreshOutcome::skipReason
+	 * @covers \AEWI\SWS\Application\PageRefreshOutcome::skipReason
 	 */
 	public function testEverySkipOutcomeExplainsItself( PageRefreshOutcome $outcome ): void {
 		$this->assertNotSame( '', $outcome->skipReason() );
@@ -58,7 +58,7 @@ class PageRebuilderTest extends TestCase {
 
 	/**
 	 * @dataProvider writeOutcomeProvider
-	 * @covers \ProfessionalWiki\SWS\Application\PageRefreshOutcome::skipReason
+	 * @covers \AEWI\SWS\Application\PageRefreshOutcome::skipReason
 	 */
 	public function testAnOutcomeThatWroteHasNoSkipReason( PageRefreshOutcome $outcome ): void {
 		$this->expectException( LogicException::class );

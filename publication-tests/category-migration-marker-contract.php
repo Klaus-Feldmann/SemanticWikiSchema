@@ -3,11 +3,11 @@ declare(strict_types=1);
 require __DIR__.'/category-contract.php';
 
 use MediaWiki\Parser\ParserOutput;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Processing\CategoryAssignments;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\Property\PageProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Processing\CategoryAssignments;
 
 $markerChecks=0;
 function markerCheck(bool $ok,string $why):void{global $markerChecks;$markerChecks++;if(!$ok)throw new RuntimeException($why);}

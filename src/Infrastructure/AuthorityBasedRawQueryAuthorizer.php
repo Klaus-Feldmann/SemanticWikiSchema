@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Permissions\Authority;
-use ProfessionalWiki\SWS\Application\RawQueryAuthorizer;
+use AEWI\SWS\Application\RawQueryAuthorizer;
 
 class AuthorityBasedRawQueryAuthorizer implements RawQueryAuthorizer {
 

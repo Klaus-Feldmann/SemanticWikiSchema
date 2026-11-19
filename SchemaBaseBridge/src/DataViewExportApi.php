@@ -7,9 +7,9 @@ use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\{Response, ResponseInterface, SimpleHandler, StringStream};
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\EntryPoints\REST\ReadOnlyEndpoint;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\EntryPoints\REST\ReadOnlyEndpoint;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\ParamValidator\ParamValidator;
 use RuntimeException;
 
@@ -52,8 +52,7 @@ abstract class DataViewExportApi extends SimpleHandler {
 		$response = $this->getResponseFactory()->create();
 		$response->setHeader( 'Content-Type', $mime );
 		$response->setHeader( 'Cache-Control', 'private, no-store' );
-		$response->setHeader( 'Content-Disposition', 'attachment; filename="sws-' .
-			( $subjectId === null ? 'page-' . $title->getArticleID() : 'subject-' . rawurlencode( $subjectId ) ) . '-data-view.' . $extension . '"' );
+		$response->setHeader( 'Content-Disposition', 'attachment; filename="' . \AEWI\SWS\Presentation\ExportFileName::forDataView($subjectId, $title->getArticleID()) . '.' . $extension . '"' );
 		$response->setHeader( 'X-Content-Type-Options', 'nosniff' );
 		$response->setBody( new StringStream( $body ) );
 		return $response;

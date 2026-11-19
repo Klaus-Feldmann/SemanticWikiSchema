@@ -2,29 +2,29 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
 use DateTimeImmutable;
 use DateTimeZone;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageValue;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
-use ProfessionalWiki\SWS\Domain\Rdf\Quad;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfLiteralFactory;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfNamespaces;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelation;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageValue;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Quad;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfLiteralFactory;
+use AEWI\SWS\Domain\Rdf\RdfNamespaces;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\Relation\TypedRelation;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Schema\Property\SelectProperty;
+use AEWI\SWS\Domain\PropertyType\Types\SelectType;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Subject\SubjectId;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -192,7 +192,7 @@ class RdfPageProjector implements PageProjector {
         $schema = $this->schemaResolver->getSchema( $subject->getSchemaReference() );
         $schemaId = $schema?->getId() ?? $subject->getSchemaReference()->id;
         $reference = $schemaId === null ? $subject->getSchemaReference() :
-            \ProfessionalWiki\SWS\Domain\Schema\SchemaReference::identified( $schemaId, $subject->getSchemaReference()->source );
+            \AEWI\SWS\Domain\Schema\SchemaReference::identified( $schemaId, $subject->getSchemaReference()->source );
         $class = $schemaId === null
             ? $this->namespaces->schemaClass( $schema?->getName() ?? $subject->getSchemaName(), $subject->getSchemaReference()->source )
             : $this->namespaces->identifiedSchemaClass( $schemaId, $subject->getSchemaReference()->source );
@@ -219,7 +219,7 @@ class RdfPageProjector implements PageProjector {
 	/**
 	 * @return Quad[]
 	 */
-	private function projectStatements( Subject $subject, Iri $subjectIri, Iri $graph, PageId $pageId, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference, ?\ProfessionalWiki\SWS\Domain\Schema\Schema $schema ): array {
+	private function projectStatements( Subject $subject, Iri $subjectIri, Iri $graph, PageId $pageId, \AEWI\SWS\Domain\Schema\SchemaReference $reference, ?\AEWI\SWS\Domain\Schema\Schema $schema ): array {
 		$quads = [];
 
 		foreach ( $subject->getStatements()->asArray() as $statement ) {
@@ -253,7 +253,7 @@ class RdfPageProjector implements PageProjector {
 			foreach ( $definition?->getLabels() ?? [] as $language => $label ) {
 				$quads[] = new Quad( $predicate, $this->namespaces->rdfsLabel(), RdfLiteralFactory::languageTagged( $label, $language ), $graph );
 			}
-			if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue ) {
+			if ( $value instanceof \AEWI\SWS\Domain\Value\UrlValue ) {
 				foreach ( $value->parts as $index => $entry ) {
 					$node = new Iri( $subjectIri->value . '/url/' . rawurlencode( $name->text ) . '/' . $index );
 					$quads[] = new Quad( $subjectIri, new Iri( 'urn:sws:aewi:urlEntry' ), $node, $graph );
@@ -276,7 +276,7 @@ class RdfPageProjector implements PageProjector {
 	/**
 	 * @return Quad[]
 	 */
-	private function projectRelations( Subject $subject, Iri $subjectIri, Iri $graph, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $reference ): array {
+	private function projectRelations( Subject $subject, Iri $subjectIri, Iri $graph, \AEWI\SWS\Domain\Schema\SchemaReference $reference ): array {
 		$quads = [];
 
 		foreach ( $subject->getTypedRelations()->relations as $relation ) {
@@ -292,7 +292,7 @@ class RdfPageProjector implements PageProjector {
 	 *
 	 * @return Quad[]
 	 */
-	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph, string $sourceLabel, \ProfessionalWiki\SWS\Domain\Schema\SchemaReference $schema ): array {
+	private function projectRelation( TypedRelation $relation, Iri $subjectIri, Iri $graph, string $sourceLabel, \AEWI\SWS\Domain\Schema\SchemaReference $schema ): array {
 		$targetIri = $this->subjectIris->targetIri( $relation->targetId );
 
 		if ( $targetIri === null ) {

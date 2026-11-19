@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaries;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
-use ProfessionalWiki\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaries;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryLookup;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummaryQuery;
+use AEWI\SWS\Application\SubjectSummaries\SubjectSummarySearchTimeoutException;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\GetSubjectSummariesApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Needs the integration base class for the pages the Subjects are saved on and the database the list is read from.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\GetSubjectSummariesApi
+ * @covers \AEWI\SWS\EntryPoints\REST\GetSubjectSummariesApi
  * @group Database
  */
 class GetSubjectSummariesApiTest extends SWSIntegrationTestCase {

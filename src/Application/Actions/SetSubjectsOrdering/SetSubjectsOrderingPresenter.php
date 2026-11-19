@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering;
+namespace AEWI\SWS\Application\Actions\SetSubjectsOrdering;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Domain\Validation\Violation;
 
 interface SetSubjectsOrderingPresenter {
 

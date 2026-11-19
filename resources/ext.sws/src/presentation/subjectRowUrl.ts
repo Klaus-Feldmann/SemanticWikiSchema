@@ -10,5 +10,5 @@ export function subjectRowUrl( pageName: string, subjectId: string ): string {
 
 /** The Data tab of a page. */
 export function dataTabUrl( pageName: string ): string {
-	return mw.util.getUrl( pageName, { action: 'subjects' } );
+	return mw.util.getUrl( pageName, { action: 'entities' } );
 }

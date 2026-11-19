@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Domain;
+namespace AEWI\SWS\Tests\Domain;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\HistoricalDate;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\HistoricalDateType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeRegistry;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfValueMapperRegistry;
+use AEWI\SWS\Domain\HistoricalDate;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\PropertyType\Types\HistoricalDateType;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeRegistry;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Domain\Rdf\RdfValueMapperRegistry;
 
 class HistoricalDateTest extends TestCase {
 	public function testPrecisionAndCalendar(): void {

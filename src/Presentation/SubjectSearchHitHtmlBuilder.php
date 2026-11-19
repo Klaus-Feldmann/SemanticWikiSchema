@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Language\Language;
 use MessageLocalizer;
-use ProfessionalWiki\SWS\Application\Search\MatchedSearchLine;
-use ProfessionalWiki\SWS\Application\Search\SubjectSearchMatch;
+use AEWI\SWS\Application\Search\MatchedSearchLine;
+use AEWI\SWS\Application\Search\SubjectSearchMatch;
 
 /**
  * The Subject block of a search result row, with matches marked up like MediaWiki's own.
@@ -64,9 +64,13 @@ readonly class SubjectSearchHitHtmlBuilder {
 			$isMatch = !$isMatch;
 		}
 
-		$propertyNames = $line->propertyName === null
+		$propertyName = $line->isDescription
+			? $this->messageLocalizer->msg( 'sws-identity-description' )->text()
+			: $line->propertyName;
+
+		$propertyNames = $propertyName === null
 			? $line->relationPropertyNames
-			: [ ...$line->relationPropertyNames, $line->propertyName ];
+			: [ ...$line->relationPropertyNames, $propertyName ];
 
 		if ( $propertyNames === [] ) {
 			return $value;

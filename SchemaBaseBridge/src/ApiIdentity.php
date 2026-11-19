@@ -5,8 +5,8 @@ namespace SWSBaseBridge;
 
 use ApiBase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 
 final class ApiIdentity extends ApiBase {
 	public function execute(): void {
@@ -17,7 +17,7 @@ final class ApiIdentity extends ApiBase {
 			( $params['descriptions'] && preg_match( '/\A[a-z]{2,12}(?:-[a-z0-9]{1,12})*\z/', $params['language'] ) !== 1 ) ) {
 			$this->dieWithError( 'swsbasebridge-unavailable', 'unavailable' );
 		}
-		$store = \ProfessionalWiki\SWS\Application\Source\SourceDataMode::usesStore();
+		$store = \AEWI\SWS\Application\Source\SourceDataMode::usesStore();
 		$stored = $store ? new StoredSourceLookup( $this->getContext() ) : null;
 		try {
 			$pageSubjects = $stored !== null ? $stored->page( $title ) :

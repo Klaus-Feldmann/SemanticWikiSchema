@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition,PropertyName};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner};
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition,PropertyName};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,StatementList};
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner};
+use AEWI\SWS\Tests\Data\TestSources;
 
 $nDefault=0;function defaultCheck(bool $ok,string $why):void{global $nDefault;$nDefault++;if(!$ok)throw new RuntimeException($why);}
 $registry=TestSources::newPropertyTypeRegistry();
@@ -19,7 +19,7 @@ defaultCheck(!$result['fields'][0]['hasStoredValues']&&serialize($subject)===$be
 defaultCheck($reader->collect('Neu','own')['fields'][0]['values']===[],'Own-only read excludes schema default');
 defaultCheck($reader->collect('Neu','external')['fields'][0]['values']===[],'External-only read excludes schema default');
 $plan=(new AnnotationPlanner(['properties'=>[]]))->build($reader->collectForAnnotations());defaultCheck($plan->rows===['Neu=SWS Migration Feld ergänzt'],'Default is available to SMW lists');
-$own=$subject->withStatements(new StatementList([new ProfessionalWiki\SWS\Domain\Statement(new PropertyName('Neu'),'text',new ProfessionalWiki\SWS\Domain\Value\StringValue('Forschungswert'))]));
+$own=$subject->withStatements(new StatementList([new AEWI\SWS\Domain\Statement(new PropertyName('Neu'),'text',new AEWI\SWS\Domain\Value\StringValue('Forschungswert'))]));
 defaultCheck(FieldSnapshot::reader($schema,$own,$noFetch)->collect('Neu')['fields'][0]['values'][0]['value']==='Forschungswert','Author value overrides placeholder');
 $view=SWSBaseBridge\DataViewAssembler::subject($subject,$schema,[],static fn()=>null,'store');
 defaultCheck($view['fields'][0]['effectiveOrigin']==='schema'&&$view['fields'][0]['ownValues']===[]&&$view['fields'][0]['effectiveValues'][0]['value']==='SWS Migration Feld ergänzt','Complete Data view shares default without claiming author data');

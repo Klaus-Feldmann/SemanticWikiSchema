@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Actions;
+namespace AEWI\SWS\Tests\Application\Actions;
 
-use ProfessionalWiki\SWS\Application\Actions\UpdateStatement\UpdateStatementPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\UpdateStatement\UpdateStatementPresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 class UpdateStatementPresenterSpy implements UpdateStatementPresenter {
 

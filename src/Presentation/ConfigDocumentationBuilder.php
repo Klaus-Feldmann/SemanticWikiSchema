@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
 use MediaWiki\Html\Html;
 use MediaWiki\Parser\Sanitizer;
 use MessageLocalizer;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSchema;
-use ProfessionalWiki\SWS\Application\WikiConfig\ConfigSetting;
+use AEWI\SWS\Application\WikiConfig\ConfigSchema;
+use AEWI\SWS\Application\WikiConfig\ConfigSetting;
 
 /**
  * Renders the on-page reference for the on-wiki configuration page from the config schema, so it can

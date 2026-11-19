@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\SetSubjectsOrdering;
+namespace AEWI\SWS\Application\Actions\SetSubjectsOrdering;
 
 readonly class SetSubjectsOrderingRequest {
 

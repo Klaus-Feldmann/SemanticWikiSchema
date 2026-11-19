@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Value;
+namespace AEWI\SWS\Domain\Value;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\LanguageTag;
+use AEWI\SWS\Domain\LanguageTag;
 
 /**
  * One part of a {@see MonolingualTextValue}: a text and the language it is in.

@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Infrastructure;
+namespace AEWI\SWS\Tests\Infrastructure;
 
 use MediaWiki\User\User;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Infrastructure\UserAccessClass;
+use AEWI\SWS\SWSExtension;
 
 /**
- * @covers \ProfessionalWiki\SWS\Infrastructure\UserAccessClass
+ * @covers \AEWI\SWS\Infrastructure\UserAccessClass
  * @group Database
  */
 class UserAccessClassTest extends MediaWikiIntegrationTestCase {

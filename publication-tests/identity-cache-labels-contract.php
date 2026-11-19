@@ -2,10 +2,10 @@
 declare(strict_types=1);
 require __DIR__.'/source-store-read-contract.php';
 use CollectorHarness\State as C;
-use ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition};
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Identity\LocalizedIdentity;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,PropertyDefinition};
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\SWSExtension;
 C::$mode='cache';C::$cache=[];C::$requests=[];C::$failIds=[];C::$denied=[];C::$cachedQ=[943=>'Q41390'];
 SWSExtension::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Ort'=>PropertyDefinition::fromJson(['type'=>'text','externalProperty'=>['source'=>'wikidata','id'=>'P19']],$registry)]),false);
 $own=readStoreSnapshot($first);$own->setIdentity(new LocalizedIdentity('de',['de'=>'Eigene Benennung'],['de'=>'Eigene Forschung']));$own->setLabel(new SubjectLabel('Eigene Benennung'));setStorePage($own);

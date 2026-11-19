@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Tests\Data\TestSubject;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent
- * @covers \ProfessionalWiki\SWS\Domain\Page\PageSubjects
+ * @covers \AEWI\SWS\EntryPoints\Content\SubjectContent
+ * @covers \AEWI\SWS\Domain\Page\PageSubjects
  */
 class SubjectContentTest extends TestCase {
 

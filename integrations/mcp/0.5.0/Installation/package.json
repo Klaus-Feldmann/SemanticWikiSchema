@@ -1,8 +1,0 @@
-{
-  "name": "aufeinwort-mcp-local",
-  "private": true,
-  "version": "1.0.0",
-  "dependencies": {
-    "@professional-wiki/mediawiki-mcp-server": "0.21.0"
-  }
-}

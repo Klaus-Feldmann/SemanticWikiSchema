@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\GraphDatabase;
+namespace AEWI\SWS\Tests\Domain\GraphDatabase;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
-use ProfessionalWiki\SWS\Domain\GraphDatabase\GraphStoreName;
+use AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry;
+use AEWI\SWS\Domain\GraphDatabase\GraphStoreName;
 use Psr\Log\Test\TestLogger;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry
+ * @covers \AEWI\SWS\Domain\GraphDatabase\GraphDatabasePluginRegistry
  */
 class GraphDatabasePluginRegistryTest extends TestCase {
 

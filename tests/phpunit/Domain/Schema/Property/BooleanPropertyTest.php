@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema\Property;
+namespace AEWI\SWS\Tests\Domain\Schema\Property;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\Property\BooleanProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Domain\Schema\Property\BooleanProperty;
+use AEWI\SWS\Tests\Data\TestProperty;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Schema\Property\BooleanProperty
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType
+ * @covers \AEWI\SWS\Domain\Schema\Property\BooleanProperty
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\BooleanType
  */
 class BooleanPropertyTest extends PropertyTestCase {
 

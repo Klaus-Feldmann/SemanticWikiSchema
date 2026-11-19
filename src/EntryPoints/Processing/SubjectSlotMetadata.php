@@ -1,18 +1,18 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\Content\Renderer\ContentParseParams;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\EntryPoints\Semantic\RevisionDependencies;
-use ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\EntryPoints\Semantic\RevisionDependencies;
+use AEWI\SWS\Infrastructure\SubjectNamespacePolicy;
+use AEWI\SWS\SWSExtension;
 
 /** Saved field metadata in ordinary views; the worker processes the complete revision separately. */
 final class SubjectSlotMetadata {

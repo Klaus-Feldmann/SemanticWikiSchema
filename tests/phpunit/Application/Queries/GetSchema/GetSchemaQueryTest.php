@@ -2,19 +2,19 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetSchema;
+namespace AEWI\SWS\Tests\Application\Queries\GetSchema;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaQuery;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Presentation\SchemaPresentationSerializer;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Application\Queries\GetSchema\GetSchemaQuery;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Presentation\SchemaPresentationSerializer;
+use AEWI\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetSchema\GetSchemaQuery
+ * @covers \AEWI\SWS\Application\Queries\GetSchema\GetSchemaQuery
  */
 class GetSchemaQueryTest extends TestCase {
 

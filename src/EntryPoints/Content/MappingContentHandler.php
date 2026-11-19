@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Content;
+namespace AEWI\SWS\EntryPoints\Content;
 
 use InvalidArgumentException;
 use MediaWiki\Content\Content;
@@ -15,12 +15,12 @@ use MediaWiki\Page\PageReference;
 use MediaWiki\Parser\ParserOutput;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleValue;
-use ProfessionalWiki\SWS\Domain\Mapping\Mapping;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingContentValidator;
-use ProfessionalWiki\SWS\Presentation\MappingPageHtmlBuilder;
-use ProfessionalWiki\SWS\Presentation\MappingPageRendering;
+use AEWI\SWS\Domain\Mapping\Mapping;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\MappingContentValidator;
+use AEWI\SWS\Presentation\MappingPageHtmlBuilder;
+use AEWI\SWS\Presentation\MappingPageRendering;
 use StatusValue;
 use stdClass;
 

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Source;
+namespace AEWI\SWS\Domain\Source;
 
 use Closure;
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * The Sources this wiki knows, keyed by Source key (ADR 23). A wiki farm is simply more registered

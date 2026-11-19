@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\Lua;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\EntryPoints\Lua;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\EmptySparqlQueryException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlStoreUnavailableException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner;
+use AEWI\SWS\Tests\TestDoubles\FakeSparqlQueryEndpoint;
+use AEWI\SWS\Tests\TestDoubles\StubRawQueryAuthorizer;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\EntryPoints\Lua\SparqlQueryRunner
  */
 class SparqlQueryRunnerTest extends TestCase {
 

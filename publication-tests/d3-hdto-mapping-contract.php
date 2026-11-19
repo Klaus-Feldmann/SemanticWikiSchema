@@ -1,9 +1,9 @@
 <?php
 require __DIR__.'/bootstrap.php';
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Identity\SchemaId;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Identity\SchemaId;
+use AEWI\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
 $script=__DIR__.'/../examples/hdto/build_mapping.py';
 $command=['python3',$script,'--artwork','S21','--artist','S22','--museum','S23','--creator','F1','--keeper','F2','--image','F3'];
 $process=proc_open($command,[1=>['pipe','w'],2=>['pipe','w']],$pipes);

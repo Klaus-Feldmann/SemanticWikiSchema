@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Actions\SetMainSubject;
+namespace AEWI\SWS\Application\Actions\SetMainSubject;
 
 readonly class SetMainSubjectRequest {
 

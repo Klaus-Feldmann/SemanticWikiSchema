@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
+use AEWI\SWS\Domain\PropertyType\Types\NumberType;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\NumberType
  */
 class NumberTypeTest extends TestCase {
 

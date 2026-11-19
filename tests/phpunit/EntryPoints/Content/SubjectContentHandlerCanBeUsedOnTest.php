@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Content;
+namespace AEWI\SWS\Tests\EntryPoints\Content;
 
 use MediaWiki\Page\PageIdentity;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContentHandler;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContentHandler;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContentHandler
+ * @covers \AEWI\SWS\EntryPoints\Content\SubjectContentHandler
  * @group Database
  */
 class SubjectContentHandlerCanBeUsedOnTest extends MediaWikiIntegrationTestCase {

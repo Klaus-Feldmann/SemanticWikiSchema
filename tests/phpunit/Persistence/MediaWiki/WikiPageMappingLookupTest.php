@@ -2,27 +2,27 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\Content\MappingContent;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyPageContentFetcher;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\Content\MappingContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\MappingPersistenceDeserializer;
+use AEWI\SWS\Persistence\MediaWiki\PublishedPageJsonLookup;
+use AEWI\SWS\Persistence\MediaWiki\WikiPageMappingLookup;
+use AEWI\SWS\Tests\TestDoubles\SpyPageContentFetcher;
+use AEWI\SWS\Tests\TestDoubles\StubPageReadAuthorizer;
 use Wikimedia\ObjectCache\HashBagOStuff;
 use Wikimedia\ObjectCache\WANObjectCache;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\WikiPageMappingLookup
  */
 class WikiPageMappingLookupTest extends TestCase {
 

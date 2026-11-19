@@ -1,6 +1,6 @@
 <?php
 
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 $namespaceNames = [];
 

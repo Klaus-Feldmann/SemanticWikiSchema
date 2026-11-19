@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use MediaWiki\Skin\SkinComponentUtils;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Presentation\PageToolsBuilder;
+use AEWI\SWS\Presentation\PageToolsBuilder;
 
 /**
- * @covers \ProfessionalWiki\SWS\Presentation\PageToolsBuilder
+ * @covers \AEWI\SWS\Presentation\PageToolsBuilder
  */
 class PageToolsBuilderTest extends MediaWikiIntegrationTestCase {
 

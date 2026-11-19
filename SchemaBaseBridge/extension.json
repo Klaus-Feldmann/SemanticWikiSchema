@@ -3,6 +3,7 @@
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"namemsg": "swsbasebridge-name",
 	"version": "0.21.1",
+	"license-name": "GPL-2.0-or-later",
 	"author": "Softwaredesign: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos.",
 	"type": "other",
 	"manifest_version": 2,

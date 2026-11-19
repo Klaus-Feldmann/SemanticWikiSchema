@@ -1,9 +1,9 @@
 <?php
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,DuplicateFieldNumbers};
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyDefinitions,DuplicateFieldNumbers};
+use AEWI\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use AEWI\SWS\Tests\Data\TestProperty;
 final class SchemaFieldReferenceTest extends TestCase {
  private function schema(string $id,string $label='Person'):Schema{return new Schema(new SchemaName($id),'',new PropertyDefinitions(['F4'=>TestProperty::buildText(),'Geburtsdatum'=>TestProperty::buildText()]),false,new SchemaId($id),new LocalizedIdentity('de',['de'=>$label]));}
  public function testSameKeyInDifferentSchemasIsNotSameField():void{$this->assertFalse($this->schema('S1')->getFieldReference('F4')->equals($this->schema('S2')->getFieldReference('F4')));}

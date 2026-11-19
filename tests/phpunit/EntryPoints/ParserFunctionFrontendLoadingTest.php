@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * A parser function can put SWS UI on any page, including one none of the frontend-loading page kinds cover.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onBeforePageDisplay
  * @group Database
  */
 class ParserFunctionFrontendLoadingTest extends SWSIntegrationTestCase {

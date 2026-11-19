@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure;
+namespace AEWI\SWS\Infrastructure;
 
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\EditNotice\SubjectEditNoticeEnvironment;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Application\EditNotice\SubjectEditNoticeEnvironment;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
 
 /**
  * ContentStabilization reads the main request context when describing pending revisions, and

@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\RevisionRecord;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Application\RevisionPolicy;
 
 class FixedRevisionPolicy implements RevisionPolicy {
 

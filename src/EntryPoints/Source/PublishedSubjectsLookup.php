@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Source;
+namespace AEWI\SWS\EntryPoints\Source;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Processing\{ ProcessingContext, SourceWriteScope };
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Processing\{ ProcessingContext, SourceWriteScope };
+use AEWI\SWS\SWSExtension;
 use RuntimeException;
 use Wikimedia\Rdbms\IDBAccessObject;
 

@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
 /** Observes missing local fields only inside a maintenance-controlled projection attempt. */
 final class MigrationFieldRepairScope {

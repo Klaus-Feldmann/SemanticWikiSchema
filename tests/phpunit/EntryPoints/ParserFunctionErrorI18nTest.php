@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\ViewParserFunction
- * @covers \ProfessionalWiki\SWS\EntryPoints\CreateSubjectParserFunction
- * @covers \ProfessionalWiki\SWS\EntryPoints\MainSubjectParserFunction
+ * @covers \AEWI\SWS\EntryPoints\ViewParserFunction
+ * @covers \AEWI\SWS\EntryPoints\CreateSubjectParserFunction
+ * @covers \AEWI\SWS\EntryPoints\MainSubjectParserFunction
  */
 class ParserFunctionErrorI18nTest extends TestCase {
 

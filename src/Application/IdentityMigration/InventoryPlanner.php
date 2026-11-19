@@ -1,11 +1,11 @@
 <?php
 
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Application\IdentityMigration;
+namespace AEWI\SWS\Application\IdentityMigration;
 
-use ProfessionalWiki\SWS\Application\Identity\IdentityRegistry;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind,LegacyIdentity};
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\Identity\IdentityRegistry;
+use AEWI\SWS\Domain\Identity\{IdentityKind,LegacyIdentity};
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /** Pure preview. Reading existing assignments is permitted; reserving IDs or writing pages is not. */
 final readonly class InventoryPlanner {

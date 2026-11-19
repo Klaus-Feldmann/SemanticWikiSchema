@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Subject;
+namespace AEWI\SWS\Domain\Subject;
 
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Relation\TypedRelationList;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
 
 class Subject {
 
@@ -18,7 +18,7 @@ class Subject {
 		private StatementList $statements,
         private array $fieldNotes = [],
 		private ?SourceSnapshot $sourceSnapshot = null,
-		private ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity = null,
+		private ?\AEWI\SWS\Domain\Identity\LocalizedIdentity $identity = null,
 		private int $fieldKeyVersion = 0,
 	) {
 		$this->setSourceSnapshot( $sourceSnapshot );
@@ -65,8 +65,8 @@ class Subject {
 		return $this->statements;
 	}
 
-	public function getIdentity(): ?\ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity { return $this->identity; }
-	public function setIdentity( \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity $identity ): void {
+	public function getIdentity(): ?\AEWI\SWS\Domain\Identity\LocalizedIdentity { return $this->identity; }
+	public function setIdentity( \AEWI\SWS\Domain\Identity\LocalizedIdentity $identity ): void {
 		$this->identity = $identity;
 		$this->label = SubjectLabel::fromText( $identity->labels[$identity->language] ?? null );
 	}
@@ -88,7 +88,7 @@ class Subject {
 
 	public function getFieldNotes(): array { return $this->fieldNotes; }
     public function setFieldNotes( array $notes ): void {
-        $this->fieldNotes = \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $notes );
+        $this->fieldNotes = \AEWI\SWS\Domain\FieldNotes::validate( $notes );
     }
 
     public function getTypedRelations(): TypedRelationList {

@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
+use AEWI\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
 
 class InMemoryProjectionChangeTimeLookup implements ProjectionChangeTimeLookup {
 

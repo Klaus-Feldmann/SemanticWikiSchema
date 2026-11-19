@@ -1,11 +1,11 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Semantic;
+namespace AEWI\SWS\Application\Semantic;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Schema\FieldLabels;
-use ProfessionalWiki\SWS\Presentation\FieldLabelLanguages;
+use AEWI\SWS\Domain\Schema\FieldLabels;
+use AEWI\SWS\Presentation\FieldLabelLanguages;
 
 /** SMW names follow content-language field labels; explicit mappings retain priority. */
 final class FieldAnnotationName {

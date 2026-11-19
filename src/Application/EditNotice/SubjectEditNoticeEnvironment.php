@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\EditNotice;
+namespace AEWI\SWS\Application\EditNotice;
 
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
 
 /**
  * Makes the ambient request state agree with the page whose notices are being collected, before any

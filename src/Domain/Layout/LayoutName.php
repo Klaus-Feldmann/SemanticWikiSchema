@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Layout;
+namespace AEWI\SWS\Domain\Layout;
 
 use InvalidArgumentException;
 

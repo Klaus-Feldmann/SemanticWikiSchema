@@ -4,12 +4,12 @@ declare(strict_types=1);
 require __DIR__.'/source-refresh-processing-contract.php';
 
 use D2Harness\State as R;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName};
-use ProfessionalWiki\SWS\Domain\Subject\{Subject,SubjectId,SubjectMap};
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Domain\Identity\{SchemaId,LocalizedIdentity};
+use AEWI\SWS\Domain\Schema\{Schema,SchemaName};
+use AEWI\SWS\Domain\Subject\{Subject,SubjectId,SubjectMap};
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
 use MediaWiki\Revision\RevisionRecord;
 
 $extra=0;
@@ -28,7 +28,7 @@ identityRefreshCheck($stored?->getIdentity()==$identity,'Internal source save pr
 identityRefreshCheck($stored?->getFieldNotes()===$old->getFieldNotes(),'Source processing preserves research notes');
 identityRefreshCheck($stored?->getSourceSnapshot()?->getSubjectId()==='E1','New E entity receives its own local source snapshot');
 identityRefreshCheck(R::$page->saveCalls===1,'Source snapshot is stored in one additional revision');
-identityRefreshCheck(\ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt::isCurrent($title,R::$page->revision),'Receipt covers version-2 content and its metadata');
+identityRefreshCheck(\AEWI\SWS\EntryPoints\Processing\SourceRefreshReceipt::isCurrent($title,R::$page->revision),'Receipt covers version-2 content and its metadata');
 $before=R::$page->saveCalls;$processor->refresh($title);
 identityRefreshCheck(R::$page->saveCalls===$before,'Sealed v2 snapshot does not cause a refresh loop');
 R::$mode='cache';editedD2();$processor->refresh($title);

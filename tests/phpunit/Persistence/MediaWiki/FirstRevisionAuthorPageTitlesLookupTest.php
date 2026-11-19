@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\WikitextContent;
@@ -10,12 +10,12 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Title\Title;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 use User;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\FirstRevisionAuthorPageTitlesLookup
  * @group Database
  */
 class FirstRevisionAuthorPageTitlesLookupTest extends SWSIntegrationTestCase {

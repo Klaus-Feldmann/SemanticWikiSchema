@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\QueryException;
 
 /**
  * Maps a QueryException to the localized message that wikitext-facing surfaces

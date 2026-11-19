@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use Generator;
 use MediaWiki\Revision\RevisionAccessException;
 use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Title\TitleFormatter;
-use ProfessionalWiki\SWS\Application\RevisionPolicy;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
+use AEWI\SWS\Application\RevisionPolicy;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectsToPublish;
+use AEWI\SWS\Persistence\MediaWiki\Subject\UnreadableSubjectsException;
 use Psr\Log\LoggerInterface;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\IDBAccessObject;

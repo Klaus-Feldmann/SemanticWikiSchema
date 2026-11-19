@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Schema\Exception\SchemaNotFoundException;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\ViolationSerializer;
+use AEWI\SWS\Application\Schema\Exception\SchemaNotFoundException;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\ViolationSerializer;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class ValidateSubjectApi extends SimpleHandler {
@@ -47,7 +47,7 @@ class ValidateSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Name of the Schema to validate the proposed Subject against.',
+				self::PARAM_DESCRIPTION => 'Name of the Schema to validate the proposed Entity against.',
 			],
 			'label' => [
 				self::PARAM_SOURCE => 'body',

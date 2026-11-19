@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
 use MediaWiki\Rest\StringStream;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\RestGetLayoutPresenter;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\RestGetLayoutPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class GetLayoutApi extends SimpleHandler {

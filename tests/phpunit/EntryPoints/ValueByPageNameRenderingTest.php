@@ -2,24 +2,24 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Interwiki\ClassicInterwikiLookup;
 use MediaWiki\MainConfigNames;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyName;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Value\StringValue;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Schema\PropertyName;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Value\StringValue;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * What a reader sees of a value read by page name. It takes MediaWiki's own parser and page factory,
  * and the database they read pages from, as it is the page factory that refuses a title that cannot be
  * a page.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSValueParserFunction
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectContentRepository
+ * @covers \AEWI\SWS\EntryPoints\SWSValueParserFunction
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectContentRepository
  * @group Database
  */
 class ValueByPageNameRenderingTest extends SWSIntegrationTestCase {

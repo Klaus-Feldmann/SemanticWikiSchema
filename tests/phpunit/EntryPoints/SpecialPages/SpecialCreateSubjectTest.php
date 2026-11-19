@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\SpecialPages;
+namespace AEWI\SWS\Tests\EntryPoints\SpecialPages;
 
 use MediaWiki\Title\Title;
 use PermissionsError;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialCreateSubject;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\SpecialPages\SpecialCreateSubject;
+use AEWI\SWS\SWSExtension;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\SpecialCreateSubject
- * @covers \ProfessionalWiki\SWS\EntryPoints\SpecialPages\EnforcesRestriction
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\SpecialCreateSubject
+ * @covers \AEWI\SWS\EntryPoints\SpecialPages\EnforcesRestriction
  * @group Database
  */
 class SpecialCreateSubjectTest extends SpecialPageTestBase {

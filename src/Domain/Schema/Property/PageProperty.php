@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema\Property;
+namespace AEWI\SWS\Domain\Schema\Property;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\PropertyType\Types\PageType;
 
 /** Text constraints and storage, with a local-page meaning and namespace preference. */
 class PageProperty extends TextProperty {
@@ -36,7 +36,7 @@ class PageProperty extends TextProperty {
 			foreach ( $core->default as $text ) {
 				if ( !is_string( $text ) ) { throw new \InvalidArgumentException( 'Invalid category default' ); }
 				if ( trim( $text ) === '' ) { continue; }
-				$normalized = \ProfessionalWiki\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $text );
+				$normalized = \AEWI\SWS\Domain\PropertyType\Types\LocalPageTitle::normalize( $text );
 				$title = $normalized === null ? null : \MediaWiki\Title\Title::newFromText( $normalized );
 				if ( $title === null ) { throw new \InvalidArgumentException( 'Invalid category default' ); }
 				if ( $title->getNamespace() !== 14 ) {

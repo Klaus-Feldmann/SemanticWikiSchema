@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
 use MediaWiki\User\User;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Hiding who made a revision creates no revision of its own, so none of the hooks the projection is
@@ -19,7 +19,7 @@ use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * the Cypher endpoint is open to (#1246). Changing the visibility of a page's current revision
  * therefore has to reproject the page.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onArticleRevisionVisibilitySet
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onArticleRevisionVisibilitySet
  * @group Database
  */
 class RevisionVisibilityGraphProjectionTest extends SWSIntegrationTestCase {

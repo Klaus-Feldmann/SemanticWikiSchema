@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 /** Display and SMW naming; a label must never resolve or rename a technical field key. */
 final class FieldLabels {

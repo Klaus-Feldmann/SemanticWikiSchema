@@ -10,7 +10,7 @@ Turn a wiki page into structured, queryable data in a few minutes. Try it on the
 periodically) or on [your own wiki](../operations/installation.md).
 
 The place to start is **Overview** in the sidebar's **SWS** section: **Special:SWS** leads to the wiki's Schemas
-and the other SWS pages, and lets you create a Subject.
+and the other SWS pages, and lets you create a Entity.
 
 ## 1. Create a Schema
 
@@ -18,22 +18,22 @@ A Schema describes a kind of thing: a Person, a Building, a Painting. Go to **Sp
 use **Add property definition** for each fact you want to record, giving it a name and a Property Type: text,
 number, date, relation, and so on.
 
-## 2. Create a Subject
+## 2. Create a Entity
 
-A Subject is one thing described with a Schema.
+A Entity is one thing described with a Schema.
 
-1. Open the creator: **Create subject** in the sidebar, then pick a Schema — or the **Create** button on a Schema's
+1. Open the creator: **Create entity** in the sidebar, then pick a Schema — or the **Create** button on a Schema's
    own page, which names it (**Create Person** on `Schema:Person`).
-2. Name the Subject in the **Label** field, and fill in the values.
-3. To point at a Subject that is not there yet, type a name in a relation field and pick **Create "Ada" as a new
+2. Name the Entity in the **Label** field, and fill in the values.
+3. To point at a Entity that is not there yet, type a name in a relation field and pick **Create "Ada" as a new
    Person**. It opens in place, with the tree beside it to move back.
-4. Under **Store the subject on**, choose **This page** where you opened the creator on one, **Another page** you
-   pick, or **A new page**, titled after the Subject's name unless you change the **Page title**.
+4. Under **Store the entity on**, choose **This page** where you opened the creator on one, **Another page** you
+   pick, or **A new page**, titled after the Entity's name unless you change the **Page title**.
 5. Save. Everything made along the way is saved with it.
 
-A page's Main Subject renders automatically as an infobox, or in full on a [subject-first
-wiki](../subject-first-wikis.md), and the page's **Data** tab lets you view and edit all its Subjects. To find a Subject
-again, use **Special:Subjects** or the list at the bottom of its Schema's page.
+A page's Main Entity renders automatically as an infobox, or in full on a [subject-first
+wiki](../subject-first-wikis.md), and the page's **Data** tab lets you view and edit all its Entities. To find a Entity
+again, use **Special:Entities** or the list at the bottom of its Schema's page.
 
 Any page can offer the same creator as a button: add
 [`{{#create_subject: schema=Person}}`](../authoring/parser-functions.md#create_subject) to its wikitext.
@@ -46,12 +46,12 @@ Source edit any page and add:
 {{#view:}}
 ```
 
-With no id it renders the page's Main Subject. [Parser Functions](../authoring/parser-functions.md) covers the
+With no id it renders the page's Main Entity. [Parser Functions](../authoring/parser-functions.md) covers the
 rest, and Layouts control which properties a View shows ([Glossary](../glossary.md#layout)).
 
 ## 4. Query
 
-Add a query to any page. This one lists the labels of the stored Subjects, whatever your data model:
+Add a query to any page. This one lists the labels of the stored Entities, whatever your data model:
 
 ```
 {{#sparql_raw: SELECT DISTINCT ?label WHERE { ?subject <http://www.w3.org/2000/01/rdf-schema#label> ?label } }}
@@ -61,7 +61,7 @@ This needs a SPARQL store; the sandbox and the Docker install have one.
 
 ## Where next
 
-* [Author an ontology mapping](author-an-ontology-mapping.md): publish your Subjects in EDM, CIDOC-CRM, or another
+* [Author an ontology mapping](author-an-ontology-mapping.md): publish your Entities in EDM, CIDOC-CRM, or another
   vocabulary
 * [Glossary](../glossary.md): the vocabulary the UI and these docs share
 

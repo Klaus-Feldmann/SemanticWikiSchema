@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Parser\Parser;
-use ProfessionalWiki\SWS\Application\PageSubjectsLookup;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
-use ProfessionalWiki\SWS\Presentation\ViewHtmlBuilder;
+use AEWI\SWS\Application\PageSubjectsLookup;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
+use AEWI\SWS\Presentation\ViewHtmlBuilder;
 use Throwable;
 
 class MainSubjectParserFunction {

@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Domain\Schema\Property\BooleanProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\DateTimeProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\NumberProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\RelationProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectOption;
-use ProfessionalWiki\SWS\Domain\Schema\Property\SelectProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\TextProperty;
-use ProfessionalWiki\SWS\Domain\Schema\Property\UrlProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReference;
-use ProfessionalWiki\SWS\Domain\Validation\Severity;
+use AEWI\SWS\Domain\Schema\Property\BooleanProperty;
+use AEWI\SWS\Domain\Schema\Property\DateProperty;
+use AEWI\SWS\Domain\Schema\Property\DateTimeProperty;
+use AEWI\SWS\Domain\Schema\Property\NumberProperty;
+use AEWI\SWS\Domain\Schema\Property\RelationProperty;
+use AEWI\SWS\Domain\Schema\Property\SelectOption;
+use AEWI\SWS\Domain\Schema\Property\SelectProperty;
+use AEWI\SWS\Domain\Schema\Property\TextProperty;
+use AEWI\SWS\Domain\Schema\Property\UrlProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Schema\SchemaReference;
+use AEWI\SWS\Domain\Validation\Severity;
 
 class TestProperty {
 

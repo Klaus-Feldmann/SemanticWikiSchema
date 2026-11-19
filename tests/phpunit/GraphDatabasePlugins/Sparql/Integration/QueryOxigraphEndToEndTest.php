@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
 
 /**
  * {@see QuerySparqlEndToEndTestCase} against Oxigraph — the `test_oxigraph` dev-stack service, a
@@ -12,11 +12,11 @@ namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Sparql\Integration;
  * sees only the default graph, never the named graphs SWS projects pages into. That is what SPARQL
  * 1.1 specifies, so a query passing here passes on any conforming store.
  *
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
- * @covers \ProfessionalWiki\SWS\Application\Rdf\OntologyMappingProjector
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryService
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\HttpSparqlQueryEndpoint
+ * @covers \AEWI\SWS\Application\Rdf\OntologyMappingProjector
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\Persistence\SparqlProjectionStore
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Sparql\SparqlPlugin
  * @group Database
  */
 class QueryOxigraphEndToEndTest extends QuerySparqlEndToEndTestCase {

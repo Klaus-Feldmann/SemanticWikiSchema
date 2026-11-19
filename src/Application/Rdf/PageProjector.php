@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /**
  * Projects a {@see Page} to RDF quads in some target vocabulary. The native projection

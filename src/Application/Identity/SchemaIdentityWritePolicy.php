@@ -1,11 +1,11 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Identity;
+namespace AEWI\SWS\Application\Identity;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Identity\{SchemaId, LocalizedIdentity};
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Identity\{SchemaId, LocalizedIdentity};
+use AEWI\SWS\Domain\Schema\SchemaName;
 
 /** Ordinary edits may rename labels, but cannot change identity or reinterpret legacy pages. */
 final class SchemaIdentityWritePolicy {

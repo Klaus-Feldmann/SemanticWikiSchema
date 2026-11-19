@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Rdf;
+namespace AEWI\SWS\Application\Rdf;
 
 /**
  * The outcome of resolving a projection name: either the {@see RdfProjection}, or — when the name is

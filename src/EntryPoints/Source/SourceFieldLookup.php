@@ -1,14 +1,14 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Source;
+namespace AEWI\SWS\EntryPoints\Source;
 
 use MediaWiki\Context\IContextSource;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\PageDependencyRecorder;
-use ProfessionalWiki\SWS\Application\Source\{ SourceDataMode, StoredSourceValues };
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Application\PageDependencyRecorder;
+use AEWI\SWS\Application\Source\{ SourceDataMode, StoredSourceValues };
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Subject\Subject;
 
 /** Shared source contract for direct readers and SMW. No retrieval in store mode. */
 final class SourceFieldLookup {

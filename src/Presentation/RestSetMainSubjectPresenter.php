@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Application\Actions\SetMainSubject\SetMainSubjectPresenter;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\SetMainSubject\SetMainSubjectPresenter;
 
 class RestSetMainSubjectPresenter implements SetMainSubjectPresenter {
 
@@ -31,7 +31,7 @@ class RestSetMainSubjectPresenter implements SetMainSubjectPresenter {
 	}
 
 	public function presentSubjectNotFound(): void {
-		$this->apiResponse = [ 'status' => 'error', 'message' => 'Subject not found on this page' ];
+		$this->apiResponse = [ 'status' => 'error', 'message' => wfMessage('sws-api-entity-not-on-page')->text() ];
 		$this->statusCode = 404;
 	}
 

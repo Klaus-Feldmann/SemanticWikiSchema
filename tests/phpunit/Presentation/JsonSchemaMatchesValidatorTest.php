@@ -2,26 +2,26 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Presentation;
+namespace AEWI\SWS\Tests\Presentation;
 
 use InvalidArgumentException;
 use Opis\JsonSchema\Errors\ErrorFormatter;
 use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Domain\PropertyType\PropertyTypeLookup;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
-use ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
+use AEWI\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Domain\PropertyType\PropertyTypeLookup;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer;
+use AEWI\SWS\Presentation\JsonSchemaSerializer;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Tests\TestDoubles\StubIdGenerator;
 
 /**
  * The JSON Schema document promises that a Subject validating against it draws no Violations. This
@@ -43,7 +43,7 @@ use ProfessionalWiki\SWS\Tests\TestDoubles\StubIdGenerator;
  *
  * Agreement here is agreement on accept-or-reject, not on the reason for rejecting.
  *
- * @covers \ProfessionalWiki\SWS\Presentation\JsonSchemaSerializer
+ * @covers \AEWI\SWS\Presentation\JsonSchemaSerializer
  */
 class JsonSchemaMatchesValidatorTest extends TestCase {
 

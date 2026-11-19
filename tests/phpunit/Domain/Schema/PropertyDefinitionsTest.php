@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinition;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions;
-use ProfessionalWiki\SWS\Tests\Data\TestProperty;
+use AEWI\SWS\Domain\Schema\PropertyDefinition;
+use AEWI\SWS\Domain\Schema\PropertyDefinitions;
+use AEWI\SWS\Tests\Data\TestProperty;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Schema\PropertyDefinitions
+ * @covers \AEWI\SWS\Domain\Schema\PropertyDefinitions
  */
 class PropertyDefinitionsTest extends TestCase {
 

@@ -2,23 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\PropertyType;
+namespace AEWI\SWS\Domain\PropertyType;
 
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateTimeType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\DateType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\HistoricalDateType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\MonolingualTextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\NumberType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\RelationType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\SelectType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\TextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\WikitextValueType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\UrlType;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\ImageType;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\PropertyType\Types\BooleanType;
+use AEWI\SWS\Domain\PropertyType\Types\DateTimeType;
+use AEWI\SWS\Domain\PropertyType\Types\DateType;
+use AEWI\SWS\Domain\PropertyType\Types\HistoricalDateType;
+use AEWI\SWS\Domain\PropertyType\Types\MonolingualTextType;
+use AEWI\SWS\Domain\PropertyType\Types\NumberType;
+use AEWI\SWS\Domain\PropertyType\Types\RelationType;
+use AEWI\SWS\Domain\PropertyType\Types\SelectType;
+use AEWI\SWS\Domain\PropertyType\Types\TextType;
+use AEWI\SWS\Domain\PropertyType\Types\PageType;
+use AEWI\SWS\Domain\PropertyType\Types\WikitextType;
+use AEWI\SWS\Domain\PropertyType\Types\WikitextValueType;
+use AEWI\SWS\Domain\PropertyType\Types\UrlType;
+use AEWI\SWS\Domain\PropertyType\Types\ImageType;
 
 class PropertyTypeRegistry implements PropertyTypeLookup {
 

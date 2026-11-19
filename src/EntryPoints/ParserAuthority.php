@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Parser\Parser;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\User\UserIdentity;
-use ProfessionalWiki\SWS\Infrastructure\UserAccessClass;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Infrastructure\UserAccessClass;
+use AEWI\SWS\SWSExtension;
 
 /**
  * The authority every parse-time read runs against: the user the page is being parsed for. That is

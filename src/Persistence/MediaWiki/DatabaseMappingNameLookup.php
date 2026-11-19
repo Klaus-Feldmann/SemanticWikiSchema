@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki;
+namespace AEWI\SWS\Persistence\MediaWiki;
 
 use InvalidArgumentException;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\PageReadAuthorizer;
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MappingNameLookup;
+use AEWI\SWS\Application\PageReadAuthorizer;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MappingNameLookup;
 use Wikimedia\Rdbms\IDatabase;
 
 class DatabaseMappingNameLookup implements MappingNameLookup {

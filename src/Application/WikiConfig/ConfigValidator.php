@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\WikiConfig;
+namespace AEWI\SWS\Application\WikiConfig;
 
 /**
  * Validates the JSON of the on-wiki configuration page at save time, producing precise per-field errors

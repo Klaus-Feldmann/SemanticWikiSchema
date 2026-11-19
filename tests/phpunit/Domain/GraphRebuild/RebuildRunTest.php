@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\GraphRebuild;
+namespace AEWI\SWS\Tests\Domain\GraphRebuild;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildPhase;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Domain\GraphRebuild\RebuildPhase;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun
+ * @covers \AEWI\SWS\Domain\GraphRebuild\RebuildRun
  */
 class RebuildRunTest extends TestCase {
 

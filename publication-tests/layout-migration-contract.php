@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/identity-projections-contract.php';
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\{LayoutPersistenceDeserializer,LayoutContentValidator};
-use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Persistence\MediaWiki\{LayoutPersistenceDeserializer,LayoutContentValidator};
+use AEWI\SWS\Presentation\LayoutPresentationSerializer;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
 $nLayout=0;function layoutCheck(bool $ok,string $why):void{global$nLayout;$nLayout++;if(!$ok)throw new RuntimeException($why);}
 $reader=new LayoutPersistenceDeserializer($schemaParser);
 $explicit=$reader->deserialize(new LayoutName('New'),' {"schema":{"id":"S1"},"type":"table"}');

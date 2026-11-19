@@ -1,9 +1,9 @@
 <?php
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 use MediaWiki\Rest\{Response, SimpleHandler};
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 class ResolveSchemaIriApi extends SimpleHandler {
  use ReadOnlyEndpoint;
  use SchemaReadEndpoint;

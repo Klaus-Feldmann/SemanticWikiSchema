@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\SpecialPages;
+namespace AEWI\SWS\EntryPoints\SpecialPages;
 
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Message\Message;
 use MediaWiki\SpecialPage\SpecialPage;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
 
 class SpecialSWS extends SpecialPage {
 

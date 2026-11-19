@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence\MediaWiki\Subject;
+namespace AEWI\SWS\Persistence\MediaWiki\Subject;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Content\Content;
@@ -12,19 +12,19 @@ use MediaWiki\Revision\RevisionLookup;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
-use ProfessionalWiki\SWS\Application\PageIdentifiersLookup;
-use ProfessionalWiki\SWS\Application\SubjectRepository;
-use ProfessionalWiki\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSaver;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\PageContentSavingStatus;
+use AEWI\SWS\Application\DependentSubjectGuard;
+use AEWI\SWS\Application\PageIdentifiersLookup;
+use AEWI\SWS\Application\SubjectRepository;
+use AEWI\SWS\Application\Subject\Exception\DependentSubjectRulesViolatedException;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectIdList;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
+use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 class MediaWikiSubjectRepository implements SubjectRepository {
@@ -38,7 +38,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 		private readonly TitleFactory $titleFactory,
 		private readonly IContentHandlerFactory $contentHandlerFactory,
 		private readonly DependentSubjectGuard $dependentSubjectGuard,
-		private readonly ?\ProfessionalWiki\SWS\Application\Source\SchemaResolver $fieldKeySchemas = null,
+		private readonly ?\AEWI\SWS\Application\Source\SchemaResolver $fieldKeySchemas = null,
 	) {
 	}
 
@@ -101,7 +101,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 		$pageSubjects = $content?->getPageSubjects();
 
 		if ( $pageId === null || $content === null || $pageSubjects?->getAllSubjects()->hasSubject( $subject->id ) !== true ) {
-			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Subject not found' );
+			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, wfMessage('sws-api-entity-not-found')->text() );
 		}
 
 		$pageSubjects->updateSubject( $subject );
@@ -156,11 +156,11 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 				$next = SubjectContent::newFromData( $this->dependentSubjectGuard->admit( $previous, $pageSubjects, $suppliedIds ) );
                 $title = str_contains( $content->getText(), '"sourceRefresh"' ) ? $this->titleFactory->newFromID( $parent->getPageId() ) : null;
                 if ( $title !== null ) {
-                    $next = \ProfessionalWiki\SWS\EntryPoints\Processing\SourceRefreshReceipt::carryMetadata( $title, $parent, $next );
+                    $next = \AEWI\SWS\EntryPoints\Processing\SourceRefreshReceipt::carryMetadata( $title, $parent, $next );
                 }
                 return [ self::SLOT_NAME => $next ];
 			},
-			CommentStoreComment::newUnsavedComment( $comment ?? 'Update SWS subject' )
+			CommentStoreComment::newUnsavedComment( $comment ?? wfMessage('sws-edit-summary-update-entity')->inContentLanguage()->text() )
 		);
 	}
 
@@ -170,7 +170,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			[
 				self::SLOT_NAME => $content,
 			],
-			CommentStoreComment::newUnsavedComment( $comment ?? 'Update SWS subject' )
+			CommentStoreComment::newUnsavedComment( $comment ?? wfMessage('sws-edit-summary-update-entity')->inContentLanguage()->text() )
 		);
 	}
 
@@ -235,7 +235,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 					$this->dependentSubjectGuard->admit( PageSubjects::newEmpty(), $pageSubjects, new SubjectIdList( [] ) )
 				),
 			],
-			CommentStoreComment::newUnsavedComment( $comment ?? 'Create a page for a new SWS subject' )
+			CommentStoreComment::newUnsavedComment( $comment ?? wfMessage('sws-edit-summary-create-entity-page')->inContentLanguage()->text() )
 		);
 	}
 

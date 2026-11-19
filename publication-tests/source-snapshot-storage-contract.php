@@ -2,6 +2,7 @@
 
 declare( strict_types = 1 );
 
+require_once __DIR__.'/message-fixture.php';
 require __DIR__ . '/source-snapshot/MediaWikiDoubles.php';
 require __DIR__ . '/source-snapshot-contract.php';
 
@@ -11,16 +12,16 @@ use MediaWiki\Page\WikiPageFactory;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Revision\{ RevisionAccessException, RevisionLookup, RevisionRecord };
 use MediaWiki\Title\TitleFactory;
-use ProfessionalWiki\SWS\Application\DependentSubjectGuard;
-use ProfessionalWiki\SWS\Domain\Page\{ PageId, PageSubjects };
-use ProfessionalWiki\SWS\Domain\Subject\{ SubjectId, SubjectMap };
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\{ PageContentSaver, PageContentSavingStatus };
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\{ MediaWikiSubjectContentRepository, MediaWikiSubjectRepository, SourceSnapshotStore };
-use ProfessionalWiki\SWS\Tests\Data\TestNaming;
-use ProfessionalWiki\SWS\Tests\TestDoubles\{ InMemoryPageIdentifiersLookup, InMemorySubjectLookup };
+use AEWI\SWS\Application\DependentSubjectGuard;
+use AEWI\SWS\Domain\Page\{ PageId, PageSubjects };
+use AEWI\SWS\Domain\Subject\{ SubjectId, SubjectMap };
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Persistence\MediaWiki\{ PageContentSaver, PageContentSavingStatus };
+use AEWI\SWS\Persistence\MediaWiki\Subject\{ MediaWikiSubjectContentRepository, MediaWikiSubjectRepository, SourceSnapshotStore };
+use AEWI\SWS\Tests\Data\TestNaming;
+use AEWI\SWS\Tests\TestDoubles\{ InMemoryPageIdentifiersLookup, InMemorySubjectLookup };
 
-\ProfessionalWiki\SWS\SWSExtension::$deserializer = $deserializer;
+\AEWI\SWS\SWSExtension::$deserializer = $deserializer;
 $authority = new class implements Authority {
 	public bool $read = true;
 	public bool $edit = true;
@@ -102,8 +103,8 @@ checkSource( $rawAfter->getSourceSnapshot()->toJson() === $first->toJson() && $r
 refusesSource( fn () => $rawRepository->editSubjectContent( SubjectContent::newFromData( new PageSubjects( subjectSource( $recovered ), new SubjectMap() ) ), new PageId( 943 ), 'Forge' ), 'Raw repository refuses forged source values' );
 
 $multi = pageForSource();
-$other = new \ProfessionalWiki\SWS\Domain\Subject\Subject( new SubjectId( 's11111111111112' ), null,
-	\ProfessionalWiki\SWS\Tests\Data\TestSchema::reference( 'Person' ), new \ProfessionalWiki\SWS\Domain\Subject\StatementList() );
+$other = new \AEWI\SWS\Domain\Subject\Subject( new SubjectId( 's11111111111112' ), null,
+	\AEWI\SWS\Tests\Data\TestSchema::reference( 'Person' ), new \AEWI\SWS\Domain\Subject\StatementList() );
 $multi->revision->content['sws'] = SubjectContent::newFromData( new PageSubjects( subjectSource(), new SubjectMap( $other ) ) );
 storeForSource( $multi )->save( new PageId( 943 ), 101, [ $first ] );
 $multiAfter = $multi->revision->getContent( 'sws' )->getPageSubjects();
@@ -111,7 +112,7 @@ checkSource( $multiAfter->getMainSubject()->id->text === 's11111111111111' && $m
 $atomic = pageForSource();
 $nonexistentData = $first->toJson(); $nonexistentData['subjectId'] = 's11111111111112';
 try {
-	storeForSource( $atomic )->save( new PageId( 943 ), 101, [ $first, \ProfessionalWiki\SWS\Domain\Source\SourceSnapshot::fromJson( $nonexistentData ) ] );
+	storeForSource( $atomic )->save( new PageId( 943 ), 101, [ $first, \AEWI\SWS\Domain\Source\SourceSnapshot::fromJson( $nonexistentData ) ] );
 	throw new RuntimeException( 'Partial batch written' );
 } catch ( RuntimeException $e ) {
 	checkSource( $e->getMessage() !== 'Partial batch written' && $atomic->saveCalls === 0 && $atomic->revision->getContent( 'sws' )->getPageSubjects()->getMainSubject()->getSourceSnapshot() === null, 'Invalid entity in batch prevents all slot changes' );
@@ -121,6 +122,6 @@ $germanOnly = attemptSource( [ sourceField() ], revision: 103, at: '2026-11-11T1
 refusesSource( fn () => storeForSource( $twoLanguages )->save( new PageId( 943 ), 103, [ $germanOnly ] ), 'Updating one language cannot silently remove another language' );
 $foreignPage = pageForSource();
 $foreignPageData = $first->toJson(); $foreignPageData['languages']['de']['pageId'] = 944;
-refusesSource( fn () => storeForSource( $foreignPage )->save( new PageId( 943 ), 101, [ \ProfessionalWiki\SWS\Domain\Source\SourceSnapshot::fromJson( $foreignPageData ) ] ), 'Snapshot from another host page cannot be written' );
+refusesSource( fn () => storeForSource( $foreignPage )->save( new PageId( 943 ), 101, [ \AEWI\SWS\Domain\Source\SourceSnapshot::fromJson( $foreignPageData ) ] ), 'Snapshot from another host page cannot be written' );
 
 echo "$checks total checks passed, including controlled MediaWiki storage/CAS/edit boundaries (not a live database test).\n";

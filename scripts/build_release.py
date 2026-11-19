@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Build and verify SWS release archives from a committed Git ref, never from untracked local files."""
 from pathlib import Path, PurePosixPath
-from datetime import datetime, timezone
 import argparse, hashlib, io, json, re, stat, subprocess, zipfile
 
 
@@ -33,10 +32,10 @@ def main():
     assert {line.split('  ',1)[1] for line in lines} == set(entries) - {'publication/DISTRIBUTION-SHA256SUMS'}
     for line in lines:
         digest,name=line.split('  ',1);assert hashlib.sha256(entries[name]).hexdigest()==digest,name
-    payload={'install.py':installer,'README.md':git('show',ref+':installer/README.md'),'README.de.md':git('show',ref+':installer/README.de.md'),'COPYING':entries['COPYING'],
+    payload={'install.py':installer,'README.md':git('show',ref+':installer/README.md'),'COPYING':entries['COPYING'],
              'VERSION.json':(json.dumps({'version':version,'commit':ref,'mode':'first-installation','package':composer['name']},indent=2)+'\n').encode()}
     for name,data in entries.items():
-        if name.startswith(('docs/operations/install/','docs/reference/'))or name in ['publication/apache-sws.example.conf','publication/LocalSettings.SemanticWikiSchema.example.php']:
+        if name.startswith('docs/operations/install/')or name in ['publication/apache-sws.example.conf','publication/LocalSettings.SemanticWikiSchema.example.php']:
             payload[name]=data
     # Links outside this small installer payload point to the corresponding tagged source.
     for name,data in list(payload.items()):
@@ -58,14 +57,34 @@ def main():
     payload['SHA256SUMS']=(''.join(hashlib.sha256(data).hexdigest()+'  '+name+'\n'for name,data in sorted(payload.items()))).encode()
     with zipfile.ZipFile(output/installer_name,'w',zipfile.ZIP_DEFLATED) as archive:
         for name,data in sorted(payload.items()):
-            info=zipfile.ZipInfo(f'SemanticWikiSchema-{version}-installer/'+name,date_time=datetime.fromtimestamp(int(git('show','-s','--format=%ct',ref)),timezone.utc).timetuple()[:6]);info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;archive.writestr(info,data)
+            info=zipfile.ZipInfo(f'SemanticWikiSchema-{version}-installer/'+name,date_time=(2026,11,13,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16;archive.writestr(info,data)
     with zipfile.ZipFile(output/installer_name)as archive:
         assert archive.testzip()is None
         base=f'SemanticWikiSchema-{version}-installer/'
         for line in archive.read(base+'SHA256SUMS').decode().splitlines():
             digest,name=line.split('  ',1);assert hashlib.sha256(archive.read(base+name)).hexdigest()==digest
-    (output/'SHA256SUMS').write_text(''.join(hashlib.sha256((output/name).read_bytes()).hexdigest()+'  '+name+'\n'for name in [source_name,installer_name]))
-    result={'version':version,'commit':ref,'sourceFiles':len(entries),'installerFiles':len(payload),'sourceManifestVerified':True,'installerManifestVerified':True,'archives':[source_name,installer_name]}
+    upgrade_name=f'SemanticWikiSchema-{version}-upgrade.zip'
+    upgrade_payload={
+        'upgrade.py':entries['installer/upgrade.py'],
+        'upgrade-profiles.json':entries['installer/upgrade-profiles.json'],
+        'README.md':entries['docs/operations/upgrade-0.6.0.md'],
+        source_name:source,
+        'COPYING':entries['COPYING'],
+    }
+    upgrade_payload['SHA256SUMS']=(''.join(hashlib.sha256(data).hexdigest()+'  '+name+'\n' for name,data in sorted(upgrade_payload.items()))).encode()
+    with zipfile.ZipFile(output/upgrade_name,'w',zipfile.ZIP_DEFLATED) as archive:
+        for name,data in sorted(upgrade_payload.items()):archive.writestr('SemanticWikiSchema-'+version+'-upgrade/'+name,data)
+    with zipfile.ZipFile(output/upgrade_name) as archive:
+        assert archive.testzip() is None
+        for line in archive.read('SemanticWikiSchema-'+version+'-upgrade/SHA256SUMS').decode().splitlines():
+            digest,name=line.split('  ',1);assert hashlib.sha256(archive.read('SemanticWikiSchema-'+version+'-upgrade/'+name)).hexdigest()==digest
+    mcp_name='MediaWiki-MCP-0.21.0-SWS-'+version+'-patch.zip'
+    with zipfile.ZipFile(output/mcp_name,'w',zipfile.ZIP_DEFLATED) as archive:
+        for name,data in sorted(entries.items()):
+            if name.startswith('integrations/mcp/'):archive.writestr('MCP-SWS-'+version+'/'+name[len('integrations/mcp/'):],data)
+    with zipfile.ZipFile(output/mcp_name) as archive:assert archive.testzip() is None
+    (output/'SHA256SUMS').write_text(''.join(hashlib.sha256((output/name).read_bytes()).hexdigest()+'  '+name+'\n'for name in [source_name,installer_name,upgrade_name,mcp_name]))
+    result={'version':version,'commit':ref,'sourceFiles':len(entries),'installerFiles':len(payload),'sourceManifestVerified':True,'installerManifestVerified':True,'archives':[source_name,installer_name,upgrade_name,mcp_name]}
     (output/'ARCHIVE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 
 

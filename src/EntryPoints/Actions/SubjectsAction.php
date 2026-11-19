@@ -2,18 +2,23 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Actions;
+namespace AEWI\SWS\EntryPoints\Actions;
 
 use FormlessAction;
 use MediaWiki\Html\Html;
 use MediaWiki\Message\Message;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\SWSExtension;
 
 class SubjectsAction extends FormlessAction {
 
-	public const string ACTION_NAME = 'subjects';
+	public const string ACTION_NAME = 'entities';
+	public const string LEGACY_ACTION_NAME = 'subjects';
+
+	public static function isActionName( ?string $name ): bool {
+		return $name === self::ACTION_NAME || $name === self::LEGACY_ACTION_NAME;
+	}
 
 	public function getName(): string {
 		return self::ACTION_NAME;
@@ -66,7 +71,7 @@ class SubjectsAction extends FormlessAction {
 			return false;
 		}
 
-		return \ProfessionalWiki\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
+		return \AEWI\SWS\Infrastructure\SubjectNamespacePolicy::allowsTitle( $title );
 	}
 
 }

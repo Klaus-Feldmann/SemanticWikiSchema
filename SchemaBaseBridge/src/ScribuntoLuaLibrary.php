@@ -9,8 +9,8 @@ use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LibraryBase;
 use MediaWiki\Extension\Scribunto\Engines\LuaCommon\LuaError;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\EntryPoints\ParserAuthority;
-use ProfessionalWiki\SWS\Infrastructure\ParserPageDependencyRecorder;
+use AEWI\SWS\EntryPoints\ParserAuthority;
+use AEWI\SWS\Infrastructure\ParserPageDependencyRecorder;
 use Throwable;
 
 /** Read access for the parser's user; all cached results live only in this library instance. */

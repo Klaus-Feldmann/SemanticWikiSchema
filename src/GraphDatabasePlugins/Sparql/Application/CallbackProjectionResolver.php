@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application;
+namespace AEWI\SWS\GraphDatabasePlugins\Sparql\Application;
 
 use Closure;
-use ProfessionalWiki\SWS\Application\Rdf\RdfProjection;
+use AEWI\SWS\Application\Rdf\RdfProjection;
 
 /**
- * A {@see ProjectionResolver} backed by two closures, so {@see \ProfessionalWiki\SWS\SWSExtension}
+ * A {@see ProjectionResolver} backed by two closures, so {@see \AEWI\SWS\SWSExtension}
  * can supply the resolution seam to the store without handing it a reference to itself.
  */
 readonly class CallbackProjectionResolver implements ProjectionResolver {

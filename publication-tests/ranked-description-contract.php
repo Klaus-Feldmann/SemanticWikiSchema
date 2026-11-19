@@ -15,7 +15,7 @@ namespace SWSBaseBridge {
 }
 namespace {
  require __DIR__.'/bootstrap.php';
- use ProfessionalWiki\SWS\EntryPoints\Processing\EffectivePageDescription as Ranked;
+ use AEWI\SWS\EntryPoints\Processing\EffectivePageDescription as Ranked;
  class DescriptionHarness {static $mode='store';static $sources=[];static $calls=[];}
  $n=0;function verify($ok,$why){global $n;$n++;if(!$ok)throw new RuntimeException($why);}
  $t=new \MediaWiki\Title\Title;$u=new \MediaWiki\User\User;$ranked=new Ranked;

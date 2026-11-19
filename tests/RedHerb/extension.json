@@ -12,7 +12,7 @@
 		}
 	},
 	"AutoloadNamespaces": {
-		"ProfessionalWiki\\RedHerb\\": "src/"
+		"AEWI\\RedHerb\\": "src/"
 	},
 	"MessagesDirs": {
 		"RedHerb": [
@@ -23,24 +23,24 @@
 		"RedHerbAliases": "i18n/_Aliases.php"
 	},
 	"Hooks": {
-		"SWSRegistration": "ProfessionalWiki\\RedHerb\\RedHerbHooks::onSWSRegistration",
+		"SWSRegistration": "AEWI\\RedHerb\\RedHerbHooks::onSWSRegistration",
 		"SWSGetFrontendModules": "RedHerbFrontendModulesHook",
 		"SidebarBeforeOutput": "RedHerbSidebarHook"
 	},
 	"HookHandlers": {
 		"RedHerbFrontendModulesHook": {
-			"class": "ProfessionalWiki\\RedHerb\\RedHerbFrontendModulesHook"
+			"class": "AEWI\\RedHerb\\RedHerbFrontendModulesHook"
 		},
 		"RedHerbSidebarHook": {
-			"class": "ProfessionalWiki\\RedHerb\\RedHerbSidebarHook"
+			"class": "AEWI\\RedHerb\\RedHerbSidebarHook"
 		}
 	},
 	"SpecialPages": {
 		"RedHerbSubjectFinder": {
-			"class": "ProfessionalWiki\\RedHerb\\Specials\\SpecialRedHerbSubjectFinder"
+			"class": "AEWI\\RedHerb\\Specials\\SpecialRedHerbSubjectFinder"
 		},
 		"RedHerbContentPageCount": {
-			"class": "ProfessionalWiki\\RedHerb\\Specials\\SpecialRedHerbContentPageCount"
+			"class": "AEWI\\RedHerb\\Specials\\SpecialRedHerbContentPageCount"
 		}
 	},
 	"ResourceModules": {

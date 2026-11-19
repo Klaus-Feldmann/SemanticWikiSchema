@@ -5,8 +5,8 @@ require __DIR__ . '/bootstrap.php';
 require __DIR__ . '/fixtures/SqliteIdentityConnection.php';
 
 use IdentityHarness\SqliteIdentityConnection;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, PersistentId, SchemaId, EntityId, RelationResourceId, LegacyIdentity, IdentityReference};
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Domain\Identity\{IdentityKind, PersistentId, SchemaId, EntityId, RelationResourceId, LegacyIdentity, IdentityReference};
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
 
 $count = 0;
 function checkIdentity( bool $ok, string $why ): void {

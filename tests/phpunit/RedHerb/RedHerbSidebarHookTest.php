@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\RedHerb;
+namespace AEWI\SWS\Tests\RedHerb;
 
 use MediaWiki\Language\RawMessage;
 use MediaWiki\Message\Message;
 use MediaWiki\Permissions\Authority;
 use MediaWiki\Tests\Unit\Permissions\MockAuthorityTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\RedHerb\RedHerbSidebarHook;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\RedHerb\RedHerbSidebarHook;
 use Skin;
 
 /**
- * @covers \ProfessionalWiki\RedHerb\RedHerbSidebarHook
+ * @covers \AEWI\RedHerb\RedHerbSidebarHook
  * @group Database
  */
 class RedHerbSidebarHookTest extends SWSIntegrationTestCase {

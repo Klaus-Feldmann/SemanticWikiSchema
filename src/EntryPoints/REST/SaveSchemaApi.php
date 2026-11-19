@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Request\WebResponse;
 use MediaWiki\Rest\LocalizedHttpException;
 use MediaWiki\Rest\Response;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\DocumentationUrl;
 use UtfNormal\Validator as UtfNormalValidator;
 use Wikimedia\Message\MessageValue;
 use Wikimedia\ParamValidator\ParamValidator;
@@ -36,7 +36,7 @@ class SaveSchemaApi extends SchemaPageWriteApi {
 	protected function getSchemaJson(): string {
 		if ( $this->schemaJson === null ) {
 			$raw = UtfNormalValidator::cleanUp( (string)$this->getRequest()->getBody() );
-			if ( \ProfessionalWiki\SWS\Domain\Schema\DuplicateFieldNumbers::find( $raw ) !== [] ) {
+			if ( \AEWI\SWS\Domain\Schema\DuplicateFieldNumbers::find( $raw ) !== [] ) {
 				throw new LocalizedHttpException( new MessageValue( 'sws-field-number-unique' ), 400 );
 			}
 			$body = json_decode( $raw );

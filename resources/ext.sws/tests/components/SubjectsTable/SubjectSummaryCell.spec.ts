@@ -30,7 +30,7 @@ describe( 'SubjectSummaryCell', () => {
 		const link = mountCell( 'name' ).find( 'a' );
 
 		expect( link.text() ).toBe( 'ZX Spectrum 48K' );
-		expect( link.attributes( 'href' ) ).toBe( '/wiki/Sinclair ZX Spectrum?action=subjects#s1demo1aaaaaaa1' );
+		expect( link.attributes( 'href' ) ).toBe( '/wiki/Sinclair ZX Spectrum?action=entities#s1demo1aaaaaaa1' );
 	} );
 
 	it( 'names the Schema', () => {

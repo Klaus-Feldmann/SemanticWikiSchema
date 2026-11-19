@@ -103,7 +103,7 @@ namespace MediaWiki {
 				return new class {
 					public function getRevisionParserOutput( array $options ): mixed {
 						$parser = new \MediaWiki\Parser\Parser();
-						$context = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current();
+						$context = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current();
 						$parser->startExternalParse( $context->title, null, 1 );
 						$context->observe( $parser );
 						if ( \D2Harness\State::$swsFailure ) { $context->failure = 'SWS schema resolution failed'; }
@@ -142,9 +142,9 @@ namespace D2Harness {
 		public function setExtensionData( mixed ...$args ): void {}
 	}
 }
-namespace ProfessionalWiki\SWS\EntryPoints\Content { class SchemaContent extends \MediaWiki\Content\JsonContent {} }
-namespace ProfessionalWiki\SWS\EntryPoints\Semantic {
-	class WikiAnnotationConfig { public function read( mixed ...$args ): array { return [ 'properties' => [] ]; } }
+namespace AEWI\SWS\EntryPoints\Content { class SchemaContent extends \MediaWiki\Content\JsonContent {} }
+namespace AEWI\SWS\EntryPoints\Semantic {
+	class WikiAnnotationConfig { public function read( mixed ...$args ): array { return [ 'properties' => [], 'descriptionProperty' => 'Kurzbeschreibung' ]; } }
 	class SmwAnnotationApplier {
 		public function apply( mixed $title, mixed $output, mixed $plan ): void {
 			\D2Harness\State::$plans[] = $plan->rows;
@@ -158,7 +158,7 @@ namespace SWSBaseBridge {
 		public function read( mixed $title, array $params, mixed $dependencies, mixed $subject ): array {
 			\D2Harness\State::$liveReads++;
 			$fields = [];
-			foreach ( \ProfessionalWiki\SWS\SWSExtension::$schema->getAllProperties()->asMap() as $name => $property ) {
+			foreach ( \AEWI\SWS\SWSExtension::$schema->getAllProperties()->asMap() as $name => $property ) {
 				if ( ( $binding = $property->getExternalProperty() ) === null ) { continue; }
 				$fields[] = [ 'name' => $name, 'source' => $binding->source, 'propertyId' => $binding->id,
 					'status' => 'resolved', 'values' => [ [ 'kind' => 'text', 'value' => 'Live-Wert' ] ] ];
@@ -170,7 +170,7 @@ namespace SWSBaseBridge {
 	class SourceSnapshotCollector {
 		public function __construct( mixed $context ) {}
 		public function collect( mixed $title, mixed $schema, string $language ): array {
-			$identity = \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext::current()->currentProperty( $title, 'unlinkedwikibase_id' );
+			$identity = \AEWI\SWS\EntryPoints\Processing\ProcessingContext::current()->currentProperty( $title, 'unlinkedwikibase_id' );
 			\D2Harness\State::$collected[] = [ $language, $identity ];
 			$fields = [];
 			foreach ( $schema->getAllProperties()->asMap() as $name => $property ) {

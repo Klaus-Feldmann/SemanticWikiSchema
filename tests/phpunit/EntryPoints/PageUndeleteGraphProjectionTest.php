@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
 
 /**
  * Restoring a page from the archive projects the page as it stands afterwards — once, from its current
@@ -18,7 +18,7 @@ use ProfessionalWiki\SWS\Tests\TestDoubles\SpyGraphDatabasePlugin;
  * projecting each restored revision in turn would write the page as of a revision that is not current,
  * which for a stale revision without Subjects means wiping the live page's Subjects from the graph.
  *
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onPageUndeleteComplete
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onPageUndeleteComplete
  * @group Database
  */
 class PageUndeleteGraphProjectionTest extends SWSIntegrationTestCase {

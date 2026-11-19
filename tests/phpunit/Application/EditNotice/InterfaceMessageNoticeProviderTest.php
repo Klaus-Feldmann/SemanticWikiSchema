@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\EditNotice;
+namespace AEWI\SWS\Tests\Application\EditNotice;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\EditNotice\InterfaceMessageNoticeProvider;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNoticeContext;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubEditNoticeMessageRenderer;
+use AEWI\SWS\Application\EditNotice\InterfaceMessageNoticeProvider;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNoticeContext;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Tests\TestDoubles\StubEditNoticeMessageRenderer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\EditNotice\InterfaceMessageNoticeProvider
+ * @covers \AEWI\SWS\Application\EditNotice\InterfaceMessageNoticeProvider
  */
 class InterfaceMessageNoticeProviderTest extends TestCase {
 

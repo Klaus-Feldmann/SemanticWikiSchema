@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Maintenance;
+namespace AEWI\SWS\Tests\Maintenance;
 
 use ImportStringSource;
 use MediaWiki\Content\Content;
@@ -10,15 +10,15 @@ use MediaWiki\Content\JsonContent;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Tests\Maintenance\MaintenanceBaseTestCase;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\Maintenance\GeneratePerformanceDump;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\SchemaContentValidator;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\EntryPoints\Content\SchemaContent;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\Maintenance\GeneratePerformanceDump;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\SchemaContentValidator;
+use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
+use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataSerializer;
 use SimpleXMLElement;
 
 // The maintenance script is not PSR-4 autoloadable (it lives outside src/), so load it explicitly.
@@ -26,7 +26,7 @@ use SimpleXMLElement;
 require_once __DIR__ . '/../../../maintenance/GeneratePerformanceDump.php';
 
 /**
- * @covers \ProfessionalWiki\SWS\Maintenance\GeneratePerformanceDump
+ * @covers \AEWI\SWS\Maintenance\GeneratePerformanceDump
  * @group Database
  */
 class GeneratePerformanceDumpTest extends MaintenanceBaseTestCase {

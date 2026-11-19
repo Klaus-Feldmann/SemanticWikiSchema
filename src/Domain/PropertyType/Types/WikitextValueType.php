@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\PropertyType\Types;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextValueProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+namespace AEWI\SWS\Domain\PropertyType\Types;
+use AEWI\SWS\Domain\Schema\Property\WikitextValueProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
 
 class WikitextValueType extends TextType {
     public const NAME = 'wikitextValue';

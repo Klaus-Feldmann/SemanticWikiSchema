@@ -1,15 +1,15 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\Processing;
+namespace AEWI\SWS\EntryPoints\Processing;
 
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\RevisionRecord;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Schema\FieldKeyChanges;
-use ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Domain\Schema\FieldKeyChanges;
+use AEWI\SWS\EntryPoints\Content\SubjectContent;
+use AEWI\SWS\SWSExtension;
 use Wikimedia\Rdbms\IDBAccessObject;
 
 /** Only advances schema-declared key changes, using the current CAS parent and read-only actor. */
@@ -45,7 +45,7 @@ final class InternalFieldKeyWriter {
                 throw new ProcessingIncomplete( 'Field-key schema is not publishable', 'pending' );
             }
             $schemaContent = $schemaRevision->getContent( 'main', RevisionRecord::FOR_THIS_USER, $user );
-            if ( !$schemaContent instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent ) { throw new ProcessingIncomplete( 'Invalid field-key schema content' ); }
+            if ( !$schemaContent instanceof \AEWI\SWS\EntryPoints\Content\SchemaContent ) { throw new ProcessingIncomplete( 'Invalid field-key schema content' ); }
             $schema = SWSExtension::getInstance()->getPersistenceSchemaDeserializer()->deserialize( $ref->name, $schemaContent->getText() );
             $schemaRevisions[$key] = [ $schemaTitle, $schemaRevision->getId() ];
             $schemas[$key] = $schema;
@@ -76,7 +76,7 @@ final class InternalFieldKeyWriter {
         }
         SourceWriteScope::run( $title, $updated->getPageSubjects(), static function () use ( $updater, $updated ): void {
             $updater->setContent( 'sws', $updated );
-            $updater->saveRevision( CommentStoreComment::newUnsavedComment( 'Transfer SWS field keys' ), EDIT_UPDATE | EDIT_INTERNAL );
+            $updater->saveRevision( CommentStoreComment::newUnsavedComment( wfMessage('sws-edit-summary-transfer-field-keys')->inContentLanguage()->text() ), EDIT_UPDATE | EDIT_INTERNAL );
             if ( !$updater->wasSuccessful() ) { throw new ProcessingIncomplete( 'Field-key transfer could not be saved', 'superseded' ); }
         } );
     }

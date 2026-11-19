@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace ProfessionalWiki\SWS\Tests\Domain\Schema;
+namespace AEWI\SWS\Tests\Domain\Schema;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\EntryPoints\Processing\EffectivePageDescription as Ranked;
+use AEWI\SWS\EntryPoints\Processing\EffectivePageDescription as Ranked;
 final class RankedDescriptionTest extends TestCase {
  private function item(string $value,string $status='resolved'):array{return ['status'=>$status,'description'=>['value'=>$value,'language'=>'de']];}
  public function testShortdescWinsWithoutAnySourceLookup():void {

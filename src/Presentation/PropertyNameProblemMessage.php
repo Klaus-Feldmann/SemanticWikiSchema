@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameProblem;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyNameRule;
+use AEWI\SWS\Domain\Schema\PropertyNameProblem;
+use AEWI\SWS\Domain\Schema\PropertyNameRule;
 use Wikimedia\Message\ListParam;
 use Wikimedia\Message\ListType;
 use Wikimedia\Message\MessageValue;

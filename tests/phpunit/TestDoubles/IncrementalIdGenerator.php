@@ -2,9 +2,9 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Infrastructure\IdGenerator;
 
 class IncrementalIdGenerator implements IdGenerator {
 

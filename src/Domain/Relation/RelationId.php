@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Relation;
+namespace AEWI\SWS\Domain\Relation;
 
-use ProfessionalWiki\SWS\Infrastructure\IdGenerator;
+use AEWI\SWS\Infrastructure\IdGenerator;
 
 readonly class RelationId {
 

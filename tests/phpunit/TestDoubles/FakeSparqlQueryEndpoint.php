@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\TestDoubles;
+namespace AEWI\SWS\Tests\TestDoubles;
 
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryEndpoint;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\Exception\SparqlQueryFailedException;
+use AEWI\SWS\GraphDatabasePlugins\Sparql\Application\SparqlQueryEndpoint;
 
 /**
  * A SPARQL query endpoint that returns a canned response body (or throws a canned failure) without any

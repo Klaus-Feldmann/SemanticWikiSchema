@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Application;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits
  * @group Database
  */
 class Neo4jQueryLimitsTest extends MediaWikiIntegrationTestCase {

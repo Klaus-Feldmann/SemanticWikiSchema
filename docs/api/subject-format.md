@@ -128,7 +128,7 @@ match the pattern is rejected with `400`.
 
 ## IDs
 
-Subject and Relation IDs are 15-character nanoid-style strings, lexicographically sortable by creation time.
+New Entity IDs use `E` followed by a positive number. Existing 15-character `s` Entity IDs remain readable. Relation IDs retain their 15-character nanoid-style format.
 Subject IDs start with `s` (`s1demo5sssssss1`), Relation IDs with `r` (`r1demo5rrrrrrr1`). See
 [ADR 014](../adr/014-improved-id-format.md).
 
@@ -141,7 +141,7 @@ written bare, never `thisWikiId:s1demo5sssssss1`, and the two forms name the sam
 The keys of a page's `subjects` map are these bare local IDs: a Subject from another Source is fetched from that
 Source and is never stored in a page's content. An entry keyed otherwise is skipped when the page is read.
 
-The 15-character grammar, and the creation-time sorting that comes with it, hold for this wiki's Subjects only.
+The legacy 15-character Entity grammar remains supported for existing local data; new local Entities use registered E IDs.
 
 ## REST API
 

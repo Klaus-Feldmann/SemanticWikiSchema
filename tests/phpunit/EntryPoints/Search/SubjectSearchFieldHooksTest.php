@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\Search;
+namespace AEWI\SWS\Tests\EntryPoints\Search;
 
 use MediaWiki\Content\ContentHandler;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\StubSearchEngine;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\StubSearchEngine;
 use SearchEngine;
 use WikiPage;
 
@@ -19,8 +19,8 @@ use WikiPage;
  * MediaWiki's own hook plumbing — the path CirrusSearch indexes a page by.
  *
  * @group Database
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchIndexFields
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSearchDataForIndex2
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onSearchIndexFields
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onSearchDataForIndex2
  */
 class SubjectSearchFieldHooksTest extends SWSIntegrationTestCase {
 

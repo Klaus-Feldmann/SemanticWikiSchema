@@ -524,7 +524,7 @@ export function setupMwMock(
 		util: () => ( {
 			wikiScript: vi.fn( () => '/rest.php' ),
 			// Query parameters are part of the URL a caller asked for - a Data tab is the page's own
-			// URL plus action=subjects - so the fake carries them rather than dropping them.
+			// URL plus action=entities - so the fake carries them rather than dropping them.
 			getUrl: vi.fn( ( title: string, params?: Record<string, string> ) =>
 				`/wiki/${ title }` + ( params === undefined ? '' : `?${ new URLSearchParams( params ) }` ) ),
 		} ),

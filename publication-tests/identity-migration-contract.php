@@ -3,11 +3,11 @@ declare(strict_types=1);
 require __DIR__.'/bootstrap.php';
 require __DIR__.'/fixtures/SqliteIdentityConnection.php';
 use IdentityHarness\SqliteIdentityConnection;
-use ProfessionalWiki\SWS\Application\IdentityMigration\{InventoryPlanner,MigrationCoordinator,MigrationHost,MigrationJournal,ReferenceRewriter,MigrationWriteScope};
-use ProfessionalWiki\SWS\Persistence\Identity\SqlIdentityRegistry;
-use ProfessionalWiki\SWS\Domain\Identity\IdentityKind;
-use ProfessionalWiki\SWS\Domain\Source\SourceSnapshot;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Application\IdentityMigration\{InventoryPlanner,MigrationCoordinator,MigrationHost,MigrationJournal,ReferenceRewriter,MigrationWriteScope};
+use AEWI\SWS\Persistence\Identity\SqlIdentityRegistry;
+use AEWI\SWS\Domain\Identity\IdentityKind;
+use AEWI\SWS\Domain\Source\SourceSnapshot;
+use AEWI\SWS\Domain\Subject\SubjectId;
 $n=0;function migrationCheck(bool $ok,string $message):void{global$n;$n++;if(!$ok)throw new RuntimeException($message);}
 function migrationRefuses(Closure $f,string $message):void{try{$f();}catch(Throwable $e){migrationCheck(true,$message);return;}throw new RuntimeException('Not refused: '.$message);}
 $db=new SqliteIdentityConnection(':memory:');

@@ -2,22 +2,22 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\GraphRebuild;
+namespace AEWI\SWS\Tests\Application\GraphRebuild;
 
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatus;
-use ProfessionalWiki\SWS\Application\Rdf\RdfPageProjector;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
-use ProfessionalWiki\SWS\Application\GraphRebuild\StoreSyncState;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildRun;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildStatus;
-use ProfessionalWiki\SWS\Domain\GraphRebuild\RebuildTrigger;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
-use ProfessionalWiki\SWS\Persistence\RebuildRunRepository;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemoryProjectionChangeTimeLookup;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatus;
+use AEWI\SWS\Application\Rdf\RdfPageProjector;
+use AEWI\SWS\Application\GraphRebuild\GraphStoreStatusLookup;
+use AEWI\SWS\Application\GraphRebuild\StoreSyncState;
+use AEWI\SWS\Domain\GraphRebuild\RebuildRun;
+use AEWI\SWS\Domain\GraphRebuild\RebuildStatus;
+use AEWI\SWS\Domain\GraphRebuild\RebuildTrigger;
+use AEWI\SWS\Persistence\MediaWiki\DatabaseRebuildRunRepository;
+use AEWI\SWS\Persistence\RebuildRunRepository;
+use AEWI\SWS\Tests\TestDoubles\InMemoryProjectionChangeTimeLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\GraphRebuild\GraphStoreStatusLookup
+ * @covers \AEWI\SWS\Application\GraphRebuild\GraphStoreStatusLookup
  * @group Database
  */
 class GraphStoreStatusLookupTest extends MediaWikiIntegrationTestCase {

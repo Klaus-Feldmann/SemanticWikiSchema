@@ -2,25 +2,25 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\ValidateSubject;
+namespace AEWI\SWS\Tests\Application\Queries\ValidateSubject;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
-use ProfessionalWiki\SWS\Application\Schema\Exception\SchemaNotFoundException;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Application\StatementListBuilder;
-use ProfessionalWiki\SWS\Application\Validation\SubjectValidator;
-use ProfessionalWiki\SWS\Infrastructure\ProductionIdGenerator;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestSources;
-use ProfessionalWiki\SWS\Tests\Data\TestSubjectIds;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySchemaLookup;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySource;
-use ProfessionalWiki\SWS\Tests\TestDoubles\InMemorySubjectLookup;
+use AEWI\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery;
+use AEWI\SWS\Application\Schema\Exception\SchemaNotFoundException;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Application\StatementListBuilder;
+use AEWI\SWS\Application\Validation\SubjectValidator;
+use AEWI\SWS\Infrastructure\ProductionIdGenerator;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestSources;
+use AEWI\SWS\Tests\Data\TestSubjectIds;
+use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
+use AEWI\SWS\Tests\TestDoubles\InMemorySource;
+use AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery
+ * @covers \AEWI\SWS\Application\Queries\ValidateSubject\ValidateSubjectQuery
  */
 class ValidateSubjectQueryTest extends TestCase {
 

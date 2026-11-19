@@ -3,7 +3,7 @@ local api = {}
 function api.collect(options)
     local nw = require('mw.sws')
     if type(nw.collectFields) ~= 'function' then
-        error('WikiSchema: Die gemeinsame PHP-Werteschnittstelle fehlt.', 0)
+        error(mw.message.new('sws-lua-field-interface-missing'):plain(), 0)
     end
     return nw.collectFields(options or {})
 end
@@ -19,9 +19,9 @@ local function options(frame)
     local a = frame.args
     local origin = trim(a.herkunft) or 'alle'
     local origins = { alle = 'all', eigene = 'own', abgerufen = 'external' }
-    if not origins[origin] then error('WikiSchema: Unbekannte Herkunft.', 0) end
+    if not origins[origin] then error(mw.message.new('sws-lua-invalid-origin'):plain(), 0) end
     return { field = trim(a[1]) or trim(a.feld), page = trim(a.seite),
-        subject = trim(a.subjekt), language = trim(a.sprache), origin = origins[origin] }
+        subject = trim(a.entitaet) or trim(a.subjekt), language = trim(a.sprache), origin = origins[origin] }
 end
 
 local function literal(value)
@@ -30,7 +30,7 @@ end
 
 function p.werte(frame)
     local o = options(frame)
-    if not o.field then error('WikiSchema: Feldname fehlt.', 0) end
+    if not o.field then error(mw.message.new('sws-lua-field-required'):plain(), 0) end
     local result, values, seen = api.collect(o), {}, {}
     for _, field in ipairs(result.fields) do
         for _, value in ipairs(field.values) do
@@ -45,11 +45,11 @@ end
 
 function p.wert(frame)
     local o = options(frame)
-    if not o.field then error('WikiSchema: Feldname fehlt.', 0) end
+    if not o.field then error(mw.message.new('sws-lua-field-required'):plain(), 0) end
     local result = api.collect(o)
     local index = tonumber(frame.args.index or '1')
     if not index or index < 1 or index ~= math.floor(index) then
-        error('WikiSchema: Index muss eine positive ganze Zahl sein.', 0)
+        error(mw.message.new('sws-lua-invalid-index'):plain(), 0)
     end
     local unique, seen = {}, {}
     for _, field in ipairs(result.fields) do
@@ -65,7 +65,7 @@ end
 
 function p.label(frame)
     local o = options(frame)
-    if not o.field then error('WikiSchema: Feldname fehlt.', 0) end
+    if not o.field then error(mw.message.new('sws-lua-field-required'):plain(), 0) end
     -- Label-Abfrage benötigt keinen externen Wertabruf.
     o.origin = 'own'
     local result = api.collect(o)
@@ -97,7 +97,7 @@ end
 function p.annotieren(frame)
     local nw = require('mw.sws')
     if type(nw.hasAutomaticAnnotations) ~= 'function' or not nw.hasAutomaticAnnotations() then
-        error('WikiSchema: Fuer dieses Modul wird die Version mit automatischer SMW-Uebernahme benoetigt.', 0)
+        error(mw.message.new('sws-lua-annotations-required'):plain(), 0)
     end
     return ''
 end

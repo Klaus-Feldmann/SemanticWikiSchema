@@ -2,11 +2,11 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Source;
+namespace AEWI\SWS\Domain\Source;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\ImageReference;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\ImageReference;
+use AEWI\SWS\Domain\Subject\SubjectId;
 
 /** A normalized source result, never an author's Statement or field note. */
 final readonly class SourceFieldResult {

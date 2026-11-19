@@ -2,17 +2,17 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\PropertyType\Types;
+namespace AEWI\SWS\Tests\Domain\PropertyType\Types;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType;
-use ProfessionalWiki\SWS\Domain\Schema\Property\BooleanProperty;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
-use ProfessionalWiki\SWS\Domain\Value\BooleanValue;
-use ProfessionalWiki\SWS\Domain\Value\NumberValue;
+use AEWI\SWS\Domain\PropertyType\Types\BooleanType;
+use AEWI\SWS\Domain\Schema\Property\BooleanProperty;
+use AEWI\SWS\Domain\Schema\PropertyCore;
+use AEWI\SWS\Domain\Value\BooleanValue;
+use AEWI\SWS\Domain\Value\NumberValue;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\PropertyType\Types\BooleanType
+ * @covers \AEWI\SWS\Domain\PropertyType\Types\BooleanType
  */
 class BooleanTypeValidateTest extends TestCase {
 

@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetMainSubject;
+namespace AEWI\SWS\Application\Queries\GetMainSubject;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
 
 readonly class GetMainSubjectResponse {
 

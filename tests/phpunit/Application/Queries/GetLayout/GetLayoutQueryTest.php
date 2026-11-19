@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Application\Queries\GetLayout;
+namespace AEWI\SWS\Tests\Application\Queries\GetLayout;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery;
-use ProfessionalWiki\SWS\Application\LayoutLookup;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRules;
-use ProfessionalWiki\SWS\Domain\Layout\Layout;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
+use AEWI\SWS\Application\Queries\GetLayout\GetLayoutPresenter;
+use AEWI\SWS\Application\Queries\GetLayout\GetLayoutQuery;
+use AEWI\SWS\Application\LayoutLookup;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\Domain\Layout\DisplayRules;
+use AEWI\SWS\Domain\Layout\Layout;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Presentation\LayoutPresentationSerializer;
 
 /**
- * @covers \ProfessionalWiki\SWS\Application\Queries\GetLayout\GetLayoutQuery
+ * @covers \AEWI\SWS\Application\Queries\GetLayout\GetLayoutQuery
  */
 class GetLayoutQueryTest extends TestCase {
 

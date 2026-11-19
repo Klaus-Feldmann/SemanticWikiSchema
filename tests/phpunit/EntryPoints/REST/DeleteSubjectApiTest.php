@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\ResponseInterface;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\SWSMockAuthorityTrait;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\EntryPoints\REST\DeleteSubjectApi;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\SWSMockAuthorityTrait;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi
- * @covers \ProfessionalWiki\SWS\Application\Actions\DeleteSubject\DeleteSubjectAction
+ * @covers \AEWI\SWS\EntryPoints\REST\DeleteSubjectApi
+ * @covers \AEWI\SWS\Application\Actions\DeleteSubject\DeleteSubjectAction
  * @group Database
  */
 class DeleteSubjectApiTest extends SWSIntegrationTestCase {

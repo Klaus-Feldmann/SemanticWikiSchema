@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
-use ProfessionalWiki\SWS\Application\Actions\CreateSubject\CreateSubjectRequest;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Presentation\DocumentationUrl;
-use ProfessionalWiki\SWS\Presentation\RestCreateSubjectPresenter;
+use AEWI\SWS\Application\Actions\CreateSubject\CreateSubjectRequest;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Presentation\DocumentationUrl;
+use AEWI\SWS\Presentation\RestCreateSubjectPresenter;
 use Wikimedia\ParamValidator\ParamValidator;
 
 class CreateSubjectApi extends SimpleHandler {
@@ -82,22 +82,22 @@ class CreateSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Display label for the Subject. Optional: omit it, or pass an empty '
-					. 'string, to create a Subject nobody named. Such a Subject is displayed under its page name '
-					. 'when it is the page\'s main Subject, and under its Schema name otherwise.',
+				self::PARAM_DESCRIPTION => 'Display label for the Entity. Optional: omit it, or pass an empty '
+					. 'string, to create a Entity nobody named. Such a Entity is displayed under its page name '
+					. 'when it is the page\'s main Entity, and under its Schema name otherwise.',
 			],
 			'schema' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'Name of the Schema this Subject is an instance of.',
+				self::PARAM_DESCRIPTION => 'Name of the Schema this Entity is an instance of.',
 			],
 			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],
             'statements' => [
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'array',
 				ParamValidator::PARAM_REQUIRED => true,
-				self::PARAM_DESCRIPTION => 'List of Statements (property/value pairs) for the Subject. Nested shape matches the subject JSON format documented at ' . DocumentationUrl::SubjectFormat->value . '.',
+				self::PARAM_DESCRIPTION => 'List of Statements (property/value pairs) for the Entity. Nested shape matches the subject JSON format documented at ' . DocumentationUrl::SubjectFormat->value . '.',
 			],
 			'comment' => [
 				self::PARAM_SOURCE => 'body',
@@ -109,8 +109,8 @@ class CreateSubjectApi extends SimpleHandler {
 				self::PARAM_SOURCE => 'body',
 				ParamValidator::PARAM_TYPE => 'string',
 				ParamValidator::PARAM_REQUIRED => false,
-				self::PARAM_DESCRIPTION => 'Optional Subject ID to assign. Must be a well-formed, unused '
-					. 'Subject ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
+				self::PARAM_DESCRIPTION => 'Optional Entity ID to assign. Must be a well-formed, unused '
+					. 'Entity ID (malformed is rejected with 400, in-use with 409). When omitted, the server '
 					. 'mints one. Pre-mint IDs with POST /sws/v0/subject-ids to wire relations across a batch.',
 			],
 		] + $this->dependentSubjectsParamSettings() + $this->identityParamSettings();

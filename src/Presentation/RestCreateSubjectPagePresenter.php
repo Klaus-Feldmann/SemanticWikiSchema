@@ -2,13 +2,13 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPagePresenter;
-use ProfessionalWiki\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
-use ProfessionalWiki\SWS\Domain\Page\PageIdentifiers;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Validation\Violation;
+use AEWI\SWS\Application\Actions\CreateSubjectPage\CreateSubjectPagePresenter;
+use AEWI\SWS\Application\Queries\GetSubject\GetSubjectResponseItem;
+use AEWI\SWS\Domain\Page\PageIdentifiers;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Validation\Violation;
 
 class RestCreateSubjectPagePresenter implements CreateSubjectPagePresenter {
 
@@ -71,7 +71,7 @@ class RestCreateSubjectPagePresenter implements CreateSubjectPagePresenter {
 	public function presentSubjectAlreadyExists(): void {
 		$this->apiResponse = [
 			'status' => 'error',
-			'message' => 'Subject already exists',
+			'message' => wfMessage('sws-api-entity-already-exists')->text(),
 		];
 		$this->statusCode = 409;
 	}

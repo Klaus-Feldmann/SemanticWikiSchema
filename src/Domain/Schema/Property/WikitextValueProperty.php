@@ -1,8 +1,8 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Domain\Schema\Property;
-use ProfessionalWiki\SWS\Domain\Schema\PropertyCore;
+namespace AEWI\SWS\Domain\Schema\Property;
+use AEWI\SWS\Domain\Schema\PropertyCore;
 
 /** Editable Subject wikitext. Distinct from a central schema template. */
 class WikitextValueProperty extends TextProperty {

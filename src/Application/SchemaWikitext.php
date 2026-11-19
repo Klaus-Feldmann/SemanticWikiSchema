@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application;
-use ProfessionalWiki\SWS\Domain\Schema\Schema;
-use ProfessionalWiki\SWS\Domain\Schema\Property\WikitextProperty;
+namespace AEWI\SWS\Application;
+use AEWI\SWS\Domain\Schema\Schema;
+use AEWI\SWS\Domain\Schema\Property\WikitextProperty;
 
 /** No parser calls or storage writes: only explicit programs in schema order. */
 final class SchemaWikitext {

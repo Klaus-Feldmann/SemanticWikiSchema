@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence;
+namespace AEWI\SWS\Tests\Persistence;
 
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Page\PageDateTime;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
-use ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider;
+use AEWI\SWS\Domain\Page\PageDateTime;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Persistence\CorePagePropertyProvider;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider
+ * @covers \AEWI\SWS\Persistence\CorePagePropertyProvider
  */
 class CorePagePropertyProviderTest extends TestCase {
 

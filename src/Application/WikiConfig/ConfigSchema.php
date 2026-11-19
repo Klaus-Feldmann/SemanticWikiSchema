@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application\WikiConfig;
+namespace AEWI\SWS\Application\WikiConfig;
 
 /**
  * The allowlist of settings the on-wiki configuration page (MediaWiki:SWS) may set. The allowlist is

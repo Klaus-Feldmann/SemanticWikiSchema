@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Jobs;
+namespace AEWI\SWS\EntryPoints\Jobs;
 
 use GenericParameterJob;
 use Job;
 use JobSpecification;
 use MediaWiki\User\UserIdentity;
 use MediaWiki\User\UserIdentityValue;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Reprojects the pages one user is the last editor of, out of band, after a block hid their name or

@@ -1,13 +1,13 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\EntryPoints\REST;
+namespace AEWI\SWS\EntryPoints\REST;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Application\Identity\SchemaIdentityPreparation;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\Identity\SchemaIdentityPreparation;
+use AEWI\SWS\SWSExtension;
 
 /** POST creates a new identity even when another Schema already has the same label. */
 class CreateSchemaApi extends SaveSchemaApi {
@@ -38,7 +38,7 @@ class CreateSchemaApi extends SaveSchemaApi {
                 throw new HttpException('Schema not found',404);
             }
             $content=$revision->getContent('main',\MediaWiki\Revision\RevisionRecord::FOR_THIS_USER,$this->getAuthority());
-            if (!$content instanceof \ProfessionalWiki\SWS\EntryPoints\Content\SchemaContent) { throw new HttpException('Schema content model changed; no page was replaced',409); }
+            if (!$content instanceof \AEWI\SWS\EntryPoints\Content\SchemaContent) { throw new HttpException('Schema content model changed; no page was replaced',409); }
             $this->existingJson = $content->getText();
             $data = json_decode( $this->existingJson ?? '{}', true );
 			if ( ( $data['formatVersion'] ?? 1 ) !== 2 || ( $data['id'] ?? null ) !== $this->prepared['id']->text ) {
@@ -52,7 +52,7 @@ class CreateSchemaApi extends SaveSchemaApi {
         if ($this->existingJson === null) { return null; }
         $extension=SWSExtension::getInstance();
         $schema=$extension->getPersistenceSchemaDeserializer()->deserialize(
-            new \ProfessionalWiki\SWS\Domain\Schema\SchemaName($this->prepared['id']->text),$this->existingJson
+            new \AEWI\SWS\Domain\Schema\SchemaName($this->prepared['id']->text),$this->existingJson
         );
         return $this->getResponseFactory()->createJson(['schema'=>$extension->getSchemaPresentationSerializer()->toArray($schema)]);
     }

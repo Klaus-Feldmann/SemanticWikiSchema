@@ -1,7 +1,7 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Semantic;
+namespace AEWI\SWS\Application\Semantic;
 
 /** Notes are a separate projection. Never turn a source state into a field value. */
 final class FieldNoteAnnotations {

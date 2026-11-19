@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Persistence;
+namespace AEWI\SWS\GraphDatabasePlugins\Neo4j\Persistence;
 
 use Laudis\Neo4j\Contracts\TransactionInterface;
 use Laudis\Neo4j\Databags\SummarizedResult;
-use ProfessionalWiki\SWS\Application\Source\SchemaResolver;
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Relation\TypedRelationList;
-use ProfessionalWiki\SWS\Domain\Statement;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectDisplayName;
+use AEWI\SWS\Application\Source\SchemaResolver;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Relation\TypedRelationList;
+use AEWI\SWS\Domain\Statement;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\SubjectDisplayName;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -187,7 +187,7 @@ class Neo4jSubjectUpdater {
 		foreach ( $statements->asArray() as $statement ) {
 			$propertyTypeName = $statement->getPropertyType();
 			$value = $statement->getValue();
-			if ( $value instanceof \ProfessionalWiki\SWS\Domain\Value\UrlValue
+			if ( $value instanceof \AEWI\SWS\Domain\Value\UrlValue
 				&& array_filter( $value->parts, static fn ( array $entry ): bool => count( $entry ) > 1 ) !== [] ) {
 				$urlEntries[$statement->getPropertyName()->text] = $value->parts;
 			}
@@ -266,7 +266,7 @@ class Neo4jSubjectUpdater {
 		foreach ( $relations->relations as $relation ) {
 			if ( $relation->targetId->isLocal() ) {
 				$target = $this->canonicalize === null ? $relation->targetId : ( $this->canonicalize )( $relation->targetId );
-                $local[] = new \ProfessionalWiki\SWS\Domain\Relation\TypedRelation( $relation->id, $target, $relation->propertyName );
+                $local[] = new \AEWI\SWS\Domain\Relation\TypedRelation( $relation->id, $target, $relation->propertyName );
 				continue;
 			}
 

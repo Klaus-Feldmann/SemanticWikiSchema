@@ -2,11 +2,11 @@
 
 declare( strict_types=1 );
 
-namespace ProfessionalWiki\SWS\Application\Queries\GetLayout;
+namespace AEWI\SWS\Application\Queries\GetLayout;
 
-use ProfessionalWiki\SWS\Application\LayoutLookup;
-use ProfessionalWiki\SWS\Domain\Layout\LayoutName;
-use ProfessionalWiki\SWS\Presentation\LayoutPresentationSerializer;
+use AEWI\SWS\Application\LayoutLookup;
+use AEWI\SWS\Domain\Layout\LayoutName;
+use AEWI\SWS\Presentation\LayoutPresentationSerializer;
 
 readonly class GetLayoutQuery {
 

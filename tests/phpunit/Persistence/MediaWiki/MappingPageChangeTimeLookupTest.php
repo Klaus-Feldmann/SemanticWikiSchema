@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use Wikimedia\Timestamp\ConvertibleTimestamp;
-use ProfessionalWiki\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Application\GraphRebuild\ProjectionChangeTimeLookup;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\MappingPageChangeTimeLookup
  * @group Database
  */
 class MappingPageChangeTimeLookupTest extends SWSIntegrationTestCase {

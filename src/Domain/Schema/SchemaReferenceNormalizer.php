@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Schema;
+namespace AEWI\SWS\Domain\Schema;
 
 /**
  * Rewrites a Schema reference to the one spelling that names its Schema, since a Schema of this wiki

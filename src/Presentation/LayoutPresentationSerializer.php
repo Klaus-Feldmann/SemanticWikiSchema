@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Domain\Layout\DisplayRule;
-use ProfessionalWiki\SWS\Domain\Layout\Layout;
+use AEWI\SWS\Domain\Layout\DisplayRule;
+use AEWI\SWS\Domain\Layout\Layout;
 
 class LayoutPresentationSerializer {
 

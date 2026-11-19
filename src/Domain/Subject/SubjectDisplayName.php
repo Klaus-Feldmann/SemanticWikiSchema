@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Domain\Subject;
+namespace AEWI\SWS\Domain\Subject;
 
-use ProfessionalWiki\SWS\Domain\Page\Page;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Page\Page;
+use AEWI\SWS\Domain\Page\PageSubjects;
 
 /**
  * The name to show for a Subject. A Subject need not have a label, so every surface that displays one

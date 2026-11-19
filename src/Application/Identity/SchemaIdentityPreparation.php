@@ -1,10 +1,10 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Application\Identity;
+namespace AEWI\SWS\Application\Identity;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Domain\Identity\{IdentityKind, LocalizedIdentity};
+use AEWI\SWS\Domain\Identity\{IdentityKind, LocalizedIdentity};
 
 final readonly class SchemaIdentityPreparation {
 	public function __construct( private IdentityRegistry $registry, private string $owner, private string $language ) {}

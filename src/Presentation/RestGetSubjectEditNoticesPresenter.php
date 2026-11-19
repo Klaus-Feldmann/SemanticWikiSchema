@@ -2,10 +2,10 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Presentation;
+namespace AEWI\SWS\Presentation;
 
-use ProfessionalWiki\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
-use ProfessionalWiki\SWS\Domain\EditNotice\SubjectEditNotice;
+use AEWI\SWS\Application\Queries\GetSubjectEditNotices\GetSubjectEditNoticesPresenter;
+use AEWI\SWS\Domain\EditNotice\SubjectEditNotice;
 
 class RestGetSubjectEditNoticesPresenter implements GetSubjectEditNoticesPresenter {
 

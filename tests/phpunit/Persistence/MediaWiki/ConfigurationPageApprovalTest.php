@@ -2,21 +2,21 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Persistence\MediaWiki;
+namespace AEWI\SWS\Tests\Persistence\MediaWiki;
 
-use ProfessionalWiki\SWS\Domain\Mapping\MappingName;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaName;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
-use ProfessionalWiki\SWS\Tests\TestDoubles\FixedRevisionPolicy;
+use AEWI\SWS\Domain\Mapping\MappingName;
+use AEWI\SWS\Domain\Schema\SchemaName;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\TestDoubles\FixedRevisionPolicy;
 
 /**
  * Needs the database for the page revisions. Registering a policy rebuilds the extension singleton but
  * keeps MediaWiki's shared object cache, as a new request would.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\PublishedPageJsonLookup
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\CachingSchemaLookup
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\WikiPageMappingLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\PublishedPageJsonLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\CachingSchemaLookup
+ * @covers \AEWI\SWS\Persistence\MediaWiki\WikiPageMappingLookup
  * @group Database
  */
 class ConfigurationPageApprovalTest extends SWSIntegrationTestCase {

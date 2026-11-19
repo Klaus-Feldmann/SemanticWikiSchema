@@ -55,10 +55,10 @@ namespace MediaWiki\Content\Renderer {
 namespace MediaWiki\Logger {
     class LoggerFactory {public static int $warnings=0;public static function getInstance($key){return new class{public function warning(...$args){LoggerFactory::$warnings++;}};}}
 }
-namespace ProfessionalWiki\SWS\EntryPoints\Content {
+namespace AEWI\SWS\EntryPoints\Content {
     class SubjectContent {public function __construct(private $subjects){} public function getPageSubjects(){return $this->subjects;}}
 }
-namespace ProfessionalWiki\SWS {
+namespace AEWI\SWS {
     class SWSExtension {
         public const NS_SCHEMA=7474,NS_LAYOUT=7476,NS_MAPPING=7478;
         public static function getInstance(){return new self;}
@@ -68,15 +68,15 @@ namespace ProfessionalWiki\SWS {
 }
 namespace {
     require dirname(__DIR__).'/tests/standalone/autoload.php';
-    use ProfessionalWiki\SWS\Domain\Schema\{Schema,SchemaName,PropertyCore,PropertyDefinitions,PropertyName};
-    use ProfessionalWiki\SWS\Domain\Schema\Property\PageProperty;
-    use ProfessionalWiki\SWS\Domain\Subject\{StatementList,SubjectMap};
-    use ProfessionalWiki\SWS\Domain\Statement;
-    use ProfessionalWiki\SWS\Domain\Value\StringValue;
-    use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-    use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-    use ProfessionalWiki\SWS\EntryPoints\Processing\CategoryAssignments;
-    use ProfessionalWiki\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner};
+    use AEWI\SWS\Domain\Schema\{Schema,SchemaName,PropertyCore,PropertyDefinitions,PropertyName};
+    use AEWI\SWS\Domain\Schema\Property\PageProperty;
+    use AEWI\SWS\Domain\Subject\{StatementList,SubjectMap};
+    use AEWI\SWS\Domain\Statement;
+    use AEWI\SWS\Domain\Value\StringValue;
+    use AEWI\SWS\Domain\Page\PageSubjects;
+    use AEWI\SWS\Tests\Data\TestSubject;
+    use AEWI\SWS\EntryPoints\Processing\CategoryAssignments;
+    use AEWI\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner};
     $n=0;
     function check($yes,$message) { global $n; $n++; if (!$yes) throw new \RuntimeException($message); }
     $core=new PropertyCore('',false,null);
@@ -100,7 +100,7 @@ namespace {
     $invalid=new \MediaWiki\Parser\ParserOutput;
     $apply($invalid,$schema,subject('Kategorie:Gueltig','Artikel'));
     check($invalid->categories===['Gueltig'=>'','SWS_Migration_Kategorie_ungültig'=>''],'Invalid legacy category marks page and retains valid assignment without aborting');
-    $type=new \ProfessionalWiki\SWS\Domain\PropertyType\Types\PageType;
+    $type=new \AEWI\SWS\Domain\PropertyType\Types\PageType;
     check(count($type->validate(new StringValue('Artikel'),$category))===1,'Write validation restricts category namespace');
     check($type->validate(new StringValue('Kategorie:Goethe'),$category)===[],'Valid category write');
     $result=FieldSnapshot::reader($schema,$main,static fn()=>[])->collectForAnnotations();
@@ -109,8 +109,8 @@ namespace {
     $plainResult=FieldSnapshot::reader(schema(PageProperty::fromPartialJson($core,['pageNamespace'=>14])),$main,static fn()=>[])->collectForAnnotations();
     check(count((new AnnotationPlanner(['properties'=>[]]))->build($plainResult)->rows)===2,'Normal page field keeps existing SMW behavior');
     $child=TestSubject::build(id:'s22222222222222',statements:new StatementList([new Statement(new PropertyName('Kategorien'),'page',new StringValue('Kategorie:Abhaengig'))]));
-    $relation=new \ProfessionalWiki\SWS\Domain\Relation\Relation(new \ProfessionalWiki\SWS\Domain\Relation\RelationId('r11111111111111'),$child->id);
-    $parent=TestSubject::build(statements:new StatementList([new Statement(new PropertyName('Kind'),'relation',new \ProfessionalWiki\SWS\Domain\Value\RelationValue($relation))]));
+    $relation=new \AEWI\SWS\Domain\Relation\Relation(new \AEWI\SWS\Domain\Relation\RelationId('r11111111111111'),$child->id);
+    $parent=TestSubject::build(statements:new StatementList([new Statement(new PropertyName('Kind'),'relation',new \AEWI\SWS\Domain\Value\RelationValue($relation))]));
     foreach ([true,false] as $dependent) {
         $childSchema=new Schema(new SchemaName('Kind'),'',new PropertyDefinitions(['Kategorien'=>$category]),$dependent);
         $output=new \MediaWiki\Parser\ParserOutput;
@@ -121,30 +121,30 @@ namespace {
     \MediaWiki\MediaWikiServices::$schema=$schema;
     $page=\MediaWiki\Title\Title::newFromText('Metadaten/JSON');
     $params=new \MediaWiki\Content\Renderer\ContentParseParams($page);
-    $content=new \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent(new PageSubjects($main,new SubjectMap));
+    $content=new \AEWI\SWS\EntryPoints\Content\SubjectContent(new PageSubjects($main,new SubjectMap));
     $out=new \MediaWiki\Parser\ParserOutput;$out->addCategory('Goethe','Originalsortierung');
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
     check($out->categories===['Goethe'=>'Originalsortierung','Familie'=>''],'Non-wikitext view includes slot categories and keeps existing sort');
     check(in_array('swsAccessClass',$out->usedOptions,true),'View output records access-class cache variation');
     check(count($out->dependencies)===1,'View output records schema dependency');
-    $emptyContent=new \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent(new PageSubjects(subject(),new SubjectMap));
+    $emptyContent=new \AEWI\SWS\EntryPoints\Content\SubjectContent(new PageSubjects(subject(),new SubjectMap));
     $out=new \MediaWiki\Parser\ParserOutput;
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($emptyContent,$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($emptyContent,$params,$out);
     check($out->categories===[],'View reads supplied empty snapshot, not some current subject');
     \MediaWiki\MediaWikiServices::$readAllowed=false;$out=new \MediaWiki\Parser\ParserOutput;
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
     check($out->categories===[],'Denied viewer receives no category metadata');
     \MediaWiki\MediaWikiServices::$readAllowed=true;
     $page->model='wikitext';$out=new \MediaWiki\Parser\ParserOutput;
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
     check($out->categories===[],'Wikitext keeps existing category rendering path');
     $page->model='json';$out=new \MediaWiki\Parser\ParserOutput;
-    (new \ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingContext($page))->run(static function()use($content,$params,$out){
-        \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
+    (new \AEWI\SWS\EntryPoints\Processing\ProcessingContext($page))->run(static function()use($content,$params,$out){
+        \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
     });
     check($out->categories===[],'Worker slot leaves category application to merged full output');
     \MediaWiki\MediaWikiServices::$schema=null;$out=new \MediaWiki\Parser\ParserOutput;
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories($content,$params,$out);
     check($out->categories===[] && $out->expiry===0 && \MediaWiki\Logger\LoggerFactory::$warnings===1,'Unavailable schema yields no cached partial metadata');
     // 0.3.01: category defaults are inherited dynamically only for empty subject fields.
     $withDefault=PageProperty::fromPartialJson(new PropertyCore('',false,['AufEinWort:Schema Personendaten']),['pageNamespace'=>14,'assignCategories'=>true]);
@@ -169,7 +169,7 @@ namespace {
     check($plainDefault->getDefault()===['AufEinWort:Schema Personendaten'],'Ordinary page-link defaults are not forced into category assignment');
     \MediaWiki\MediaWikiServices::$schema=$defaultSchema;
     $out=new \MediaWiki\Parser\ParserOutput;
-    \ProfessionalWiki\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories(new \ProfessionalWiki\SWS\EntryPoints\Content\SubjectContent(new PageSubjects(subject(),new SubjectMap)),$params,$out);
+    \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories(new \AEWI\SWS\EntryPoints\Content\SubjectContent(new PageSubjects(subject(),new SubjectMap)),$params,$out);
     check($out->categories===['AufEinWort:Schema_Personendaten'=>''],'Non-wikitext slot inherits same schema category');
     echo "$n category schema/validation/merge/removal/SMW checks passed (isolated MediaWiki stand-ins).\n";
 }

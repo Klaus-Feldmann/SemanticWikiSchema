@@ -2,49 +2,49 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints\REST;
+namespace AEWI\SWS\Tests\EntryPoints\REST;
 
 use MediaWiki\Rest\Handler;
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Rest\Response;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
 use MediaWiki\Title\Title;
-use ProfessionalWiki\SWS\Domain\Page\PageId;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Subject\StatementList;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi;
-use ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Presentation\CsrfValidator;
-use ProfessionalWiki\SWS\Tests\Data\TestRelation;
-use ProfessionalWiki\SWS\Tests\Data\TestSchema;
-use ProfessionalWiki\SWS\Tests\Data\TestStatement;
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Domain\Page\PageId;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Subject\StatementList;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\EntryPoints\REST\CreateSubjectApi;
+use AEWI\SWS\EntryPoints\REST\CreateSubjectPageApi;
+use AEWI\SWS\EntryPoints\REST\DeleteSubjectApi;
+use AEWI\SWS\EntryPoints\REST\MoveSubjectApi;
+use AEWI\SWS\EntryPoints\REST\ReplaceSubjectApi;
+use AEWI\SWS\EntryPoints\REST\SetMainSubjectApi;
+use AEWI\SWS\EntryPoints\REST\SetStatementApi;
+use AEWI\SWS\EntryPoints\REST\SetSubjectsOrderingApi;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Presentation\CsrfValidator;
+use AEWI\SWS\Tests\Data\TestRelation;
+use AEWI\SWS\Tests\Data\TestSchema;
+use AEWI\SWS\Tests\Data\TestStatement;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * Goes through real pages: the rules for Dependent Subjects are held by the Subject repository all write
  * endpoints share.
  *
- * @covers \ProfessionalWiki\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
- * @covers \ProfessionalWiki\SWS\Application\DependentSubjectGuard
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\CreateSubjectPageApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\ReplaceSubjectApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetStatementApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\DeleteSubjectApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetMainSubjectApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\SetSubjectsOrderingApi
- * @covers \ProfessionalWiki\SWS\EntryPoints\REST\MoveSubjectApi
+ * @covers \AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository
+ * @covers \AEWI\SWS\Application\DependentSubjectGuard
+ * @covers \AEWI\SWS\EntryPoints\REST\CreateSubjectApi
+ * @covers \AEWI\SWS\EntryPoints\REST\CreateSubjectPageApi
+ * @covers \AEWI\SWS\EntryPoints\REST\ReplaceSubjectApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SetStatementApi
+ * @covers \AEWI\SWS\EntryPoints\REST\DeleteSubjectApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SetMainSubjectApi
+ * @covers \AEWI\SWS\EntryPoints\REST\SetSubjectsOrderingApi
+ * @covers \AEWI\SWS\EntryPoints\REST\MoveSubjectApi
  * @group Database
  */
 class DependentSubjectRestWritesTest extends SWSIntegrationTestCase {

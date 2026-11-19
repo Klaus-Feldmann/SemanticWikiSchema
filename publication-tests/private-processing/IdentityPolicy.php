@@ -6,10 +6,10 @@ if ( \MediaWiki\MediaWikiServices::getInstance()->getMainConfig()->get( 'DBname'
 }
 
 require __DIR__ . '/Fixtures.php';
-use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIdentity;
-use ProfessionalWiki\SWS\EntryPoints\Processing\InternalPageProcessor;
-use ProfessionalWiki\SWS\EntryPoints\Processing\ProcessingIncomplete;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\EntryPoints\Processing\ProcessingIdentity;
+use AEWI\SWS\EntryPoints\Processing\InternalPageProcessor;
+use AEWI\SWS\EntryPoints\Processing\ProcessingIncomplete;
+use AEWI\SWS\SWSExtension;
 $db=$services->getConnectionProvider()->getPrimaryDatabase();$id=ProcessingIdentity::get()->getId();
 $before=$db->newSelectQueryBuilder()->select('*')->from('user')->where(['user_id'=>$id])->caller(__FILE__)->fetchRow();
 $db->newUpdateQueryBuilder()->update('user')->set(['user_token'=>str_repeat('a',32)])->where(['user_id'=>$id])->caller(__FILE__)->execute();
@@ -17,7 +17,7 @@ try {try {ProcessingIdentity::get();throw new RuntimeException('human account ta
 finally {$db->newUpdateQueryBuilder()->update('user')->set(['user_token'=>$before->user_token])->where(['user_id'=>$id])->caller(__FILE__)->execute();}
 $after=$db->newSelectQueryBuilder()->select('*')->from('user')->where(['user_id'=>$id])->caller(__FILE__)->fetchRow();
 checkTest((array)$before===(array)$after,'collision test leaves account record unchanged');
-SWSExtension::getInstance()->getRevisionPolicyRegistry()->setPolicy(new class implements ProfessionalWiki\SWS\Application\RevisionPolicy {
+SWSExtension::getInstance()->getRevisionPolicyRegistry()->setPolicy(new class implements AEWI\SWS\Application\RevisionPolicy {
  public function publishedRevision(MediaWiki\Revision\RevisionRecord $revision): ?MediaWiki\Revision\RevisionRecord {return null;}
  public function revisionIsReadableBy(MediaWiki\Revision\RevisionRecord $revision,MediaWiki\Permissions\Authority $viewer): bool {return true;}
 });

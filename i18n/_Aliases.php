@@ -3,7 +3,7 @@
 $specialPageAliases = [];
 
 $specialPageAliases['en'] = [
-	'NeoJson' => [ 'NeoJson' ],
+	'NeoJson' => [ 'SWSJson', 'NeoJson' ],
 	'Schemas' => [ 'Schemas' ],
 	'Subjects' => [ 'Entities', 'Subjects' ],
 	'Layouts' => [ 'Layouts' ],
@@ -15,6 +15,7 @@ $specialPageAliases['en'] = [
 ];
 
 $specialPageAliases['de'] = [
+ 'NeoJson' => [ 'SWSJson', 'NeoJson' ],
  'Schemas' => [ 'Schemata', 'Schemas' ],
  'Subjects' => [ 'Entitäten', 'Subjekte' ],
  'Subject' => [ 'Entität', 'Subjekt' ],

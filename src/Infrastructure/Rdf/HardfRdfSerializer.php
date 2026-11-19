@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Infrastructure\Rdf;
+namespace AEWI\SWS\Infrastructure\Rdf;
 
-use ProfessionalWiki\SWS\Domain\Rdf\QuadList;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfFormat;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfSerializer;
-use ProfessionalWiki\SWS\Domain\Rdf\RdfStreamWriter;
+use AEWI\SWS\Domain\Rdf\QuadList;
+use AEWI\SWS\Domain\Rdf\RdfFormat;
+use AEWI\SWS\Domain\Rdf\RdfSerializer;
+use AEWI\SWS\Domain\Rdf\RdfStreamWriter;
 use Psr\Log\LoggerInterface;
 
 readonly class HardfRdfSerializer implements RdfSerializer {

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints\Jobs;
+namespace AEWI\SWS\EntryPoints\Jobs;
 
 use GenericParameterJob;
 use Job;
-use ProfessionalWiki\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\Application\GraphRebuild\GraphRebuildCoordinator;
+use AEWI\SWS\SWSExtension;
 
 /**
  * Runs one batch of a background graph rebuild, and queues the next one when the run has work left.

@@ -2,12 +2,12 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Persistence;
+namespace AEWI\SWS\Persistence;
 
-use ProfessionalWiki\SWS\Domain\Page\PageDateTime;
-use ProfessionalWiki\SWS\Domain\Page\PageProperties;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProvider;
-use ProfessionalWiki\SWS\Domain\Page\PagePropertyProviderContext;
+use AEWI\SWS\Domain\Page\PageDateTime;
+use AEWI\SWS\Domain\Page\PageProperties;
+use AEWI\SWS\Domain\Page\PagePropertyProvider;
+use AEWI\SWS\Domain\Page\PagePropertyProviderContext;
 
 class CorePagePropertyProvider implements PagePropertyProvider {
 

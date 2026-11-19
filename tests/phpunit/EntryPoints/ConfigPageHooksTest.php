@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
 use Article;
 use MediaWiki\Context\RequestContext;
@@ -11,13 +11,13 @@ use MediaWiki\Permissions\Authority;
 use MediaWiki\Permissions\UltimateAuthority;
 use MediaWiki\Title\Title;
 use MediaWikiIntegrationTestCase;
-use ProfessionalWiki\SWS\EntryPoints\SWSHooks;
+use AEWI\SWS\EntryPoints\SWSHooks;
 use SkinTemplate;
 
 /**
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onContentHandlerDefaultModelFor
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onJsonValidateSave
- * @covers \ProfessionalWiki\SWS\EntryPoints\SWSHooks::onSkinTemplateNavigationUniversal
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onContentHandlerDefaultModelFor
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onJsonValidateSave
+ * @covers \AEWI\SWS\EntryPoints\SWSHooks::onSkinTemplateNavigationUniversal
  * @group Database
  */
 class ConfigPageHooksTest extends MediaWikiIntegrationTestCase {

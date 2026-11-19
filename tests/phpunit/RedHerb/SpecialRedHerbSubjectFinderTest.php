@@ -2,16 +2,16 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\RedHerb;
+namespace AEWI\SWS\Tests\RedHerb;
 
 use MediaWiki\Context\DerivativeContext;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Output\OutputPage;
-use ProfessionalWiki\RedHerb\Specials\SpecialRedHerbSubjectFinder;
+use AEWI\RedHerb\Specials\SpecialRedHerbSubjectFinder;
 use SpecialPageTestBase;
 
 /**
- * @covers \ProfessionalWiki\RedHerb\Specials\SpecialRedHerbSubjectFinder
+ * @covers \AEWI\RedHerb\Specials\SpecialRedHerbSubjectFinder
  */
 class SpecialRedHerbSubjectFinderTest extends SpecialPageTestBase {
 

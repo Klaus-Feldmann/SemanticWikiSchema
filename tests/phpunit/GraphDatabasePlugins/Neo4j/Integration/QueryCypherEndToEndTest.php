@@ -2,20 +2,20 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\GraphDatabasePlugins\Neo4j\Integration;
+namespace AEWI\SWS\Tests\GraphDatabasePlugins\Neo4j\Integration;
 
 use MediaWiki\Rest\RequestData;
 use MediaWiki\Tests\Rest\Handler\HandlerTestTrait;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
-use ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
-use ProfessionalWiki\SWS\SWSExtension;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Exception\WriteQueryRejectedException;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryLimits;
+use AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryRequest;
+use AEWI\SWS\SWSExtension;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService
- * @covers \ProfessionalWiki\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\EntryPoints\REST\CypherQueryApi
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Application\Neo4jQueryService
+ * @covers \AEWI\SWS\GraphDatabasePlugins\Neo4j\Neo4jPlugin
  * @group Database
  */
 class QueryCypherEndToEndTest extends SWSIntegrationTestCase {

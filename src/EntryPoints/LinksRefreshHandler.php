@@ -2,14 +2,14 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\EntryPoints;
+namespace AEWI\SWS\EntryPoints;
 
 use MediaWiki\Deferred\DeferredUpdates;
 use MediaWiki\Deferred\LinksUpdate\LinksDeletionUpdate;
 use MediaWiki\Deferred\LinksUpdate\LinksTable;
 use MediaWiki\Deferred\LinksUpdate\LinksUpdate;
 use MediaWiki\Page\PageReference;
-use ProfessionalWiki\SWS\SWSExtension;
+use AEWI\SWS\SWSExtension;
 
 /**
  * No revision hook fires when MediaWiki refreshes a page's links without saving it: after an edit to a template
@@ -21,7 +21,7 @@ class LinksRefreshHandler {
 	 * @see LinksUpdateCompleteHook
 	 */
 	public static function onLinksUpdateComplete( LinksUpdate $linksUpdate, mixed $ticket ): void {
-		if ( \ProfessionalWiki\SWS\Application\IdentityMigration\MigrationWriteScope::active() || !self::isRefresh( $linksUpdate ) || !self::changedCategoriesOrPageProperties( $linksUpdate ) ) {
+		if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() || !self::isRefresh( $linksUpdate ) || !self::changedCategoriesOrPageProperties( $linksUpdate ) ) {
 			return;
 		}
 

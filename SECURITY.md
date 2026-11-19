@@ -5,8 +5,9 @@
 Please report security vulnerabilities **privately** — do not open a public
 issue or pull request for a suspected vulnerability.
 
-Use GitHub's private vulnerability reporting:
-[**Report a vulnerability**](https://github.com/ProfessionalWiki/NeoWiki/security/advisories/new).
+For security issues in SWS, contact its maintainer privately:
+[**info@aufeinwort.info**](mailto:info@aufeinwort.info).
+Professional Wiki does not maintain or provide security support for this fork.
 
 A helpful report includes:
 

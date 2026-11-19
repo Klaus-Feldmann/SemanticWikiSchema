@@ -2,7 +2,7 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS;
+namespace AEWI\SWS;
 
 /**
  * Configuration for a single SPARQL 1.1 graph store the SPARQL plugin (#586) projects into and queries.

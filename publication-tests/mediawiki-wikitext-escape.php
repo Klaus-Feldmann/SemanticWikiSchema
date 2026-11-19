@@ -92,3 +92,4 @@ function wfEscapeWikiText( $input ): string {
 	$text = preg_replace( $repl2, '$1&#58;', $text );
 	return $text;
 }
+

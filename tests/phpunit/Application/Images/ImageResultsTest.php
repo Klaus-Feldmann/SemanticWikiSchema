@@ -1,9 +1,9 @@
 <?php
 
 declare( strict_types = 1 );
-namespace ProfessionalWiki\SWS\Tests\Application\Images;
+namespace AEWI\SWS\Tests\Application\Images;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Application\Images\ImageResults;
+use AEWI\SWS\Application\Images\ImageResults;
 
 class ImageResultsTest extends TestCase {
 	private function page( array $info = [] ): array {

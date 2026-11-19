@@ -2,9 +2,9 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Data;
+namespace AEWI\SWS\Tests\Data;
 
-use ProfessionalWiki\SWS\Domain\Subject\SubjectIdParser;
+use AEWI\SWS\Domain\Subject\SubjectIdParser;
 
 class TestSubjectIds {
 

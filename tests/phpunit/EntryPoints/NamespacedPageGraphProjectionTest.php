@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\EntryPoints;
+namespace AEWI\SWS\Tests\EntryPoints;
 
-use ProfessionalWiki\SWS\Tests\Data\TestSubject;
-use ProfessionalWiki\SWS\Tests\SWSIntegrationTestCase;
+use AEWI\SWS\Tests\Data\TestSubject;
+use AEWI\SWS\Tests\SWSIntegrationTestCase;
 
 /**
  * The page node name must carry the full title including the namespace prefix, so that
  * consumers such as the relation value link can build a correct URL for subjects stored
  * on pages outside the main namespace.
  *
- * @covers \ProfessionalWiki\SWS\PagePropertiesBuilder
- * @covers \ProfessionalWiki\SWS\Persistence\CorePagePropertyProvider
+ * @covers \AEWI\SWS\PagePropertiesBuilder
+ * @covers \AEWI\SWS\Persistence\CorePagePropertyProvider
  * @group Database
  */
 class NamespacedPageGraphProjectionTest extends SWSIntegrationTestCase {

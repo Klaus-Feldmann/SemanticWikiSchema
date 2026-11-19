@@ -4,6 +4,6 @@
 		"method": [
 			"POST"
 		],
-		"factory": "ProfessionalWiki\\SWS\\SWSExtension::newCypherQueryApi"
+		"factory": "AEWI\\SWS\\SWSExtension::newCypherQueryApi"
 	}
 ]

@@ -2,18 +2,18 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Application;
+namespace AEWI\SWS\Application;
 
 use InvalidArgumentException;
-use ProfessionalWiki\SWS\Application\Subject\Exception\SubjectIdInUseException;
-use ProfessionalWiki\SWS\Domain\Page\DependentSubjectRules;
-use ProfessionalWiki\SWS\Domain\Page\PageSubjects;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceParser;
-use ProfessionalWiki\SWS\Domain\Schema\SchemaReferenceResolver;
-use ProfessionalWiki\SWS\Domain\Subject\Subject;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectId;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectLabel;
-use ProfessionalWiki\SWS\Domain\Subject\SubjectMap;
+use AEWI\SWS\Application\Subject\Exception\SubjectIdInUseException;
+use AEWI\SWS\Domain\Page\DependentSubjectRules;
+use AEWI\SWS\Domain\Page\PageSubjects;
+use AEWI\SWS\Domain\Schema\SchemaReferenceParser;
+use AEWI\SWS\Domain\Schema\SchemaReferenceResolver;
+use AEWI\SWS\Domain\Subject\Subject;
+use AEWI\SWS\Domain\Subject\SubjectId;
+use AEWI\SWS\Domain\Subject\SubjectLabel;
+use AEWI\SWS\Domain\Subject\SubjectMap;
 
 readonly class DependentSubjectBuilder {
 
@@ -53,14 +53,14 @@ readonly class DependentSubjectBuilder {
 
 			$priorSubject = $pageSubjects->getAllSubjects()->getSubject( $subject->id );
 			$subject->setSourceSnapshot( $priorSubject?->getSourceSnapshot() );
-			if ( \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) === null && $priorSubject?->getIdentity() !== null ) {
+			if ( \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) === null && $priorSubject?->getIdentity() !== null ) {
 				$subject->setIdentity( $priorSubject->getIdentity()->withDefaultLabel( $subject->getLabel()?->text ) );
 			}
 			if ( !array_key_exists( 'fieldNotes', $item ) ) {
                 $prior = $pageSubjects->getAllSubjects()->getSubject( $subject->id );
                 if ( $prior !== null ) { $subject->setFieldNotes( $prior->getFieldNotes() ); }
             }
-            $subject->setFieldNotes( \ProfessionalWiki\SWS\Domain\FieldNotes::forSchema( $subject->getFieldNotes(), $pageSubjects->getAllSubjects()->getSubject( $subject->id )?->getFieldNotes() ?? [], $subject->getFieldNotes() === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) );
+            $subject->setFieldNotes( \AEWI\SWS\Domain\FieldNotes::forSchema( $subject->getFieldNotes(), $pageSubjects->getAllSubjects()->getSubject( $subject->id )?->getFieldNotes() ?? [], $subject->getFieldNotes() === [] ? null : $this->schemaResolver->getSchema( $subject->getSchemaReference() ) ) );
             $subjects->addOrUpdateSubject( $subject );
 		}
 
@@ -112,14 +112,14 @@ readonly class DependentSubjectBuilder {
 
         // Kept, not dropped, so that the rule against labelled Dependent Subjects refuses it.
 		$schemaReference = $schema->getReference();
-		return \ProfessionalWiki\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
+		return \AEWI\SWS\Application\Identity\IdentityMetadataWriter::initialize( new Subject(
 			id: $this->newSubjectIdResolver->resolve( $item['id'] ),
 			label: SubjectLabel::fromText( $item['label'] ?? null ),
 			schema: $schemaReference,
 			statements: $this->statementListBuilder->build( $item['statements'] ),
 			fieldKeyVersion: $schema->getFieldKeyVersion(),
-            fieldNotes: \ProfessionalWiki\SWS\Domain\FieldNotes::validate( $item['fieldNotes'] ?? [] ),
-		), $this->identityLanguage, \ProfessionalWiki\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) );
+            fieldNotes: \AEWI\SWS\Domain\FieldNotes::validate( $item['fieldNotes'] ?? [] ),
+		), $this->identityLanguage, \AEWI\SWS\Domain\Identity\LocalizedIdentity::fromRequest( $item ) );
 	}
 
 	private function takesTheIdOfAnotherSubject( Subject $subject, PageSubjects $pageSubjects, SubjectMap $replaceableSubjects ): bool {

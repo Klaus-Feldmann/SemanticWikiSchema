@@ -2,15 +2,15 @@
 
 declare( strict_types = 1 );
 
-namespace ProfessionalWiki\SWS\Tests\Domain\Rdf;
+namespace AEWI\SWS\Tests\Domain\Rdf;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ProfessionalWiki\SWS\Domain\Rdf\Iri;
-use ProfessionalWiki\SWS\Domain\Rdf\Literal;
+use AEWI\SWS\Domain\Rdf\Iri;
+use AEWI\SWS\Domain\Rdf\Literal;
 
 /**
- * @covers \ProfessionalWiki\SWS\Domain\Rdf\Iri
+ * @covers \AEWI\SWS\Domain\Rdf\Iri
  */
 class IriTest extends TestCase {
 
