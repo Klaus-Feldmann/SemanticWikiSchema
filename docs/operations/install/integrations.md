@@ -1,4 +1,4 @@
-# Optional sources, SMW and MCP
+# Optional sources, SMW and User AI
 
 For the operator adding external data or semantic querying after local data entry works.
 
@@ -35,8 +35,14 @@ Install and configure SMW separately. SWS can generate annotations from configur
 
 SMW is optional. Local SWS storage, the Data tab and direct SWS queries do not require it. `integrations/smw/` supplies the optional wiki-side query material.
 
-## Scribunto and MCP
+## Scribunto
 
-Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces. The optional MCP adapter in `integrations/mcp/` is a separately versioned integration; use the [complete integration package for MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) and its compatibility checks. It is not installed or authenticated by the SWS installer.
+Scribunto enables the `mw.sws` / `mw.swsbase` Lua interfaces.
+
+## User AI (UAI)
+
+User AI (UAI) is the separately installed integration for AI-assisted access to MediaWiki and SWS. Connect through UAI and follow its approval flow in MediaWiki for changes. For category-based searches, use MediaWiki's category memberships alongside SWS entity fields. This also covers categories added by transcluded templates.
+
+The former standalone MediaWiki MCP adapter belongs to earlier SWS releases. UAI supplies its own MCP connector.
 
 [Graph Explorer setup](graph-explorer.md) · [Installation index](README.md)

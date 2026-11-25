@@ -13,7 +13,7 @@ Schema-based metadata and research data for MediaWiki. **SWS is an independent f
 - A local entity store for configured Wikidata/Wikibase values. `store` is the default; the previous cached resolution is available as `cache`. Own SWS labels and entered values have precedence over imported labels and values.
 - Optional automatic Semantic MediaWiki annotations and direct SWS queries from Wikitext and Lua.
 - A bundled Graph Explorer with the current schema IDs and labels, linked entity cards, images and source identities. It requires a separately configured SPARQL service.
-- JSON/RDF exports and optional MCP integration for external tools.
+- JSON/RDF exports and [optional User AI (UAI) integration](docs/operations/install/integrations.md#user-ai-uai).
 
 A source binding makes data available only when the associated entity, property and usable source response exist. SWS does not infer missing research facts.
 
@@ -33,4 +33,4 @@ This fork is maintained by AufEinWort, not by Professional Wiki or the original 
 
 Based on NeoWiki by Professional Wiki, Jeroen De Dauw, Morne Alberts, Alistair3149 and the upstream contributors. Their copyright notices and the **GPL-2.0-or-later** license are retained; see [COPYING](COPYING) and [the original project description](README-UPSTREAM.md).
 
-The bundled Zazuko Graph Explorer retains its **LGPL** license, corresponding sources and dependency notices. The separate MCP integration retains the MCP project's license. This publication does not imply endorsement by the upstream projects or OpenAI.
+The bundled Zazuko Graph Explorer retains its **LGPL** license, corresponding sources and dependency notices. The legacy MediaWiki MCP integration retains its original license. This publication does not imply endorsement by the upstream projects or OpenAI.
