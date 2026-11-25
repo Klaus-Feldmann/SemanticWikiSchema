@@ -6,7 +6,7 @@ SWS bietet mehrsprachige Benennungen, Quellenbindungen zu Wikidata und lokaler W
 
 **[Funktionen, sämtliche Einstellungen und Voraussetzungen](docs/reference/SWS-0.5.02.de.md)** · **[Installation](docs/operations/install/de/README.md)** · **[English](README.md)**
 
-Wir empfehlen, das vorhandene MediaWiki zunächst über MCP mit einer KI zu verbinden und SWS mit deren Unterstützung einzurichten. Die Referenz beschreibt die Unterstützung bei Installation, Nutzung und Schemaerstellung.
+Für die optionale KI-Anbindung steht [User AI (UAI)](docs/operations/install/de/erweiterungen.md#user-ai-uai) zur Verfügung.
 
 Geprüfte Umgebung: MediaWiki 1.47.0-wmf.24, PHP 8.3.36, Legacy-Parser und Vector 2022. Zusätzliche Dienste und Erweiterungen sind je nach gewünschter Funktion erforderlich.
 
