@@ -13,10 +13,13 @@ use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
 final class ProcessingHooks {
     public static ?Title $movedFrom = null;
 
-    public static function queue( Title $title, ?Title $old = null ): void {
-        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ) { return; }
+    public static function queue( Title $title, ?Title $old = null ): bool {
+        // A rejected update must let the current worker fail. A new job would reset the retry count.
+        if ( \AEWI\SWS\Application\IdentityMigration\MigrationWriteScope::active() ||
+            InternalPageProcessor::isRefreshing( $title ) ) { return false; }
         MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title,
             [ 'page' => true ] + ( $old ? [ 'movedFrom' => $old->getPrefixedText() ] : [] ) ) );
+        return true;
     }
 
     public static function onRevisionDataUpdates( $title, $renderedRevision, array &$updates ): void {
@@ -72,8 +75,9 @@ final class ProcessingHooks {
         if ( !$title || !InternalPageProcessor::manages( $title ) ) { return; }
         $stamp = $data->getExtensionData( ProcessingResult::STAMP );
         if ( !ProcessingResult::isCurrent( $title, $stamp ) ) {
-            self::queue( $title );
-            throw new ProcessingIncomplete( 'SemanticWikiSchema: incomplete/stale SMW update refused; complete refresh queued.' );
+            $queued = self::queue( $title );
+            throw new ProcessingIncomplete( 'SemanticWikiSchema: incomplete/stale SMW update refused' .
+                ( $queued ? '; complete refresh queued.' : '.' ) );
         }
         if ( ( $stamp['semanticHash'] ?? null ) !== ProcessingResult::semanticHash( $data ) ) {
             // Do not create a fresh self-repeating job for a deterministic integration error.

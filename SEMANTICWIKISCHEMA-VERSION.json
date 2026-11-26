@@ -1,7 +1,7 @@
 {
   "name": "SemanticWikiSchema",
   "bridgeVersion": "0.21.1",
-  "prepared": "2026-11-25",
+  "prepared": "2026-11-26",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
     "commit": "92cf0e347d40899647cdbb1312c4f0dc09768ae3",
@@ -32,15 +32,15 @@
       "Subjekt"
     ]
   },
-  "extensionVersion": "0.7.0.2",
-  "developmentBuild": "0.7.0.2",
+  "extensionVersion": "0.7.0.3",
+  "developmentBuild": "0.7.0.3",
   "developmentStage": "release-candidate",
-  "baseVersion": "0.6.0",
+  "baseVersion": "0.7.0.2",
   "releaseStatus": "public beta",
   "publicationAllowed": true,
   "runtimeLiveInstallVerified": false,
   "existingDataMigrationRequired": false,
-  "runtimeVerification": "Feature changes accepted on AufEinWort; release archives and upgrade tested separately",
+  "runtimeVerification": "Based on the published 0.7.0.2 release with the page refresh retry fix",
   "fieldIdentity": {
     "scope": "schema + exact field key, for every valid spelling",
     "automaticNumbering": false,
@@ -63,8 +63,8 @@
     ],
     "automaticFieldNumbering": false
   },
-  "version": "0.7.0.2",
-  "derivedDataRebuildRequired": true,
+  "version": "0.7.0.3",
+  "derivedDataRebuildRequired": false,
   "phpNamespace": "AEWI\\SWS",
   "namespaceRenameRequiresDataMigration": false,
   "priorAlphaLiveAcceptanceReported": true,

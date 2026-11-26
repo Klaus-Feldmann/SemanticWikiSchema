@@ -17,6 +17,7 @@ use AEWI\SWS\SWSExtension;
 use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\EntryPoints\Processing\ProcessingHooks;
 use AEWI\SWS\EntryPoints\Processing\UserWikitextProcessor;
 use Throwable;
 
@@ -112,10 +113,11 @@ final class SchemaWikitextHooks {
 			DeferredUpdates::addCallableUpdate( static function () use ( $title ): void {
 				try {
 					$ok = self::refreshPage( $title );
-					if ( !$ok ) { MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title, [ 'page' => true ] ) ); }
+					if ( !$ok ) { ProcessingHooks::queue( $title ); }
 				} catch ( Throwable $e ) {
-					LoggerFactory::getInstance( 'SWS' )->error( 'Schema wikitext page refresh failed; queued retry', [ 'exception' => $e ] );
-					MediaWikiServices::getInstance()->getJobQueueGroup()->push( new SchemaWikitextRefreshJob( $title, [ 'page' => true ] ) );
+					$queued = ProcessingHooks::queue( $title );
+					LoggerFactory::getInstance( 'SWS' )->error( $queued ? 'Schema wikitext page refresh failed; queued retry' :
+						'Schema wikitext page refresh failed', [ 'exception' => $e ] );
 				}
 			} );
 		} catch ( Throwable $e ) {

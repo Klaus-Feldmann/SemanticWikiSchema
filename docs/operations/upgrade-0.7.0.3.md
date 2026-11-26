@@ -1,6 +1,6 @@
-# SWS 0.6.0 → 0.7.0.2
+# Upgrade auf SWS 0.7.0.3
 
-Der direkte Upgradepfad gilt für die veröffentlichte Version 0.6.0. Das Austauschpaket unterstützt auch den bekannten 0.6.0-Stand mit der damaligen Kompatibilitätsanpassung. Für ältere Stände siehe [Upgrade auf 0.6.0](upgrade-0.6.0.md).
+Das Upgrade-Paket unterstützt die veröffentlichten Versionen 0.6.0 und 0.7.0.2. Das Austauschpaket unterstützt auch den bekannten 0.6.0-Stand mit der damaligen Kompatibilitätsanpassung. Für ältere Stände siehe [Upgrade auf 0.6.0](upgrade-0.6.0.md).
 
 ## Manuelle Installation
 
@@ -20,7 +20,7 @@ Der direkte Upgradepfad gilt für die veröffentlichte Version 0.6.0. Das Austau
 
 ## Composer-Installation
 
-Wiki-Datenbank und lokale Konfiguration sichern. Schreibzugriffe sperren und PHP-Webprozesse sowie dauerhafte Job-Prozesse anhalten. In `composer.local.json` das Paket `aufeinwort/semantic-wikischema` auf `0.7.0.2` setzen und im MediaWiki-Stammverzeichnis ausführen.
+Wiki-Datenbank und lokale Konfiguration sichern. Schreibzugriffe sperren und PHP-Webprozesse sowie dauerhafte Job-Prozesse anhalten. In `composer.local.json` das Paket `aufeinwort/semantic-wikischema` auf `0.7.0.3` setzen und im MediaWiki-Stammverzeichnis ausführen.
 
 ```sh
 composer update aufeinwort/semantic-wikischema --with-dependencies
@@ -28,7 +28,9 @@ composer update aufeinwort/semantic-wikischema --with-dependencies
 
 ## Wartung nach dem Codewechsel
 
-Im MediaWiki-Stammverzeichnis mit dem Installationskonto in dieser Reihenfolge ausführen. Jeden Befehl erfolgreich abschließen, bevor der nächste beginnt.
+Beim Upgrade von 0.7.0.2 genügt es, die Web- und Job-Prozesse wieder zu starten. Bereits eingereihte Jobs werden mit dem neuen Code abgearbeitet.
+
+Beim Upgrade von 0.6.0 die folgenden Befehle im MediaWiki-Stammverzeichnis mit dem Installationskonto in dieser Reihenfolge ausführen. Jeden Befehl erfolgreich abschließen, bevor der nächste beginnt.
 
 ```sh
 php maintenance/run.php update

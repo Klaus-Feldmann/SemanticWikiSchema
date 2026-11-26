@@ -1,8 +1,8 @@
-# Semantic WikiSchema (SWS) 0.7.0.2
+# Semantic WikiSchema (SWS) 0.7.0.3
 
 Schema-based metadata and research data for MediaWiki. **SWS is an independent fork of [NeoWiki](https://neowiki.ai), not maintained or supported by Professional Wiki.**
 
-[Installation](publication/INSTALLATION.md) · [Upgrade from 0.6.0](docs/operations/upgrade-0.7.0.2.md) · [Release notes](RELEASE-NOTES.md)
+[Installation](publication/INSTALLATION.md) · [Upgrade from 0.6.0 or 0.7.0.2](docs/operations/upgrade-0.7.0.3.md) · [Release notes](RELEASE-NOTES.md)
 
 ## What this version provides
 
@@ -19,7 +19,7 @@ A source binding makes data available only when the associated entity, property 
 
 ## Installation and upgrade
 
-Use the [first-installation guide](docs/operations/install/README.md) for a new SWS installation or the [0.6.0 upgrade guide](docs/operations/upgrade-0.7.0.2.md) for an existing one. Built browser assets are included. Stop persistent PHP/job processes before replacing the extension and restart them afterward.
+Use the [first-installation guide](docs/operations/install/README.md) for a new SWS installation or the [upgrade guide](docs/operations/upgrade-0.7.0.3.md) for an existing one. Built browser assets are included. Stop persistent PHP/job processes before replacing the extension and restart them afterward.
 
 ## Documentation and support
 

@@ -19,7 +19,7 @@ Für den Dauerbetrieb den vorhandenen Dienstmanager oder die geplante Jobausfüh
 
 Anschließend prüfen:
 
-1. `Spezial:Version` zeigt SemanticWikiSchema 0.7.0.2 und SchemaBaseBridge 0.21.1.
+1. `Spezial:Version` zeigt SemanticWikiSchema 0.7.0.3 und SchemaBaseBridge 0.21.1.
 2. `Spezial:Schemata` lädt die Schemaliste.
 3. Ein Schema mit einem Textfeld anlegen: Die Seite erhält eine S-ID; das Label lässt sich ändern.
 4. Auf einer Testseite unter „Daten“ eine Entität anlegen und einen Wert speichern. Nach dem Neuladen bleiben E-ID und Wert erhalten.
