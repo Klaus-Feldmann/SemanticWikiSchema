@@ -1,4 +1,4 @@
-# SWS 0.6.0 erstmals installieren
+# SWS 0.7.0.2 erstmals installieren
 
 
 Für den Betreiber eines vorhandenen MediaWiki, der SWS erstmals hinzufügt. [English](../README.md).

@@ -1,4 +1,5 @@
 {
+	"sws-version-group-semantic": "Semantic extensions",
 	"sws-property-editor-labels": "Field labels",
 	"sws-property-editor-labels-description": "One label per language. The technical field key stays unchanged.",
 	"sws-field-number-unique": "The field key must be unique within this schema.",
@@ -12,7 +13,7 @@
 		]
 	},
 	"sws-name": "Semantic WikiSchema",
-	"sws-description": "Schema-based research data with Wikidata/Wikibase sources, optional automatic SMW annotations and MCP access.",
+	"sws-description": "Schema-based research data with Wikidata/Wikibase sources, optional automatic SMW annotations and optional Semantic AI integration.",
 	"right-sws-schema-edit": "Create and edit Semantic WikiSchema schemas",
 	"right-sws-layout-edit": "Create and edit Semantic WikiSchema layouts",
 	"right-sws-mapping-edit": "Create and edit Semantic WikiSchema ontology mappings",
@@ -773,5 +774,7 @@
 	"sws-api-entity-save-failed": "The entity could not be saved",
 	"sws-api-entity-search-timeout": "The search took too long. Search within one Schema to search fewer entities.",
 	"sws-entity-description-missing-category": "SWS main entity description missing",
-	"sws-entity-description-missing-category-desc": "Pages whose SWS main entity has no own description in any language. Dependent or secondary entities do not trigger this category."
+	"sws-entity-description-missing-category-desc": "Pages whose SWS main entity has no own description in any language. Dependent or secondary entities do not trigger this category.",
+	"sws-field-validation-category": "SWS field validation maintenance",
+	"sws-field-validation-category-desc": "Pages where a saved SWS entity has an invalid field value or a missing required value."
 }

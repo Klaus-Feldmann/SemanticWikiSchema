@@ -1,7 +1,7 @@
 {
   "name": "SemanticWikiSchema",
   "bridgeVersion": "0.21.1",
-  "prepared": "2026-11-19",
+  "prepared": "2026-11-25",
   "upstreamBase": {
     "repository": "ProfessionalWiki/NeoWiki",
     "commit": "92cf0e347d40899647cdbb1312c4f0dc09768ae3",
@@ -32,15 +32,15 @@
       "Subjekt"
     ]
   },
-  "extensionVersion": "0.6.0",
-  "developmentBuild": "0.6.0",
-  "developmentStage": "release",
-  "baseVersion": "0.5.02",
-  "releaseStatus": "release; qualified on MediaWiki development build",
+  "extensionVersion": "0.7.0.2",
+  "developmentBuild": "0.7.0.2",
+  "developmentStage": "release-candidate",
+  "baseVersion": "0.6.0",
+  "releaseStatus": "public beta",
   "publicationAllowed": true,
-  "runtimeLiveInstallVerified": true,
+  "runtimeLiveInstallVerified": false,
   "existingDataMigrationRequired": false,
-  "runtimeVerification": "Operator-confirmed installed 0.6 candidate; final version metadata only",
+  "runtimeVerification": "Feature changes accepted on AufEinWort; release archives and upgrade tested separately",
   "fieldIdentity": {
     "scope": "schema + exact field key, for every valid spelling",
     "automaticNumbering": false,
@@ -63,10 +63,10 @@
     ],
     "automaticFieldNumbering": false
   },
-  "version": "0.6.0",
-  "derivedDataRebuildRequired": false,
+  "version": "0.7.0.2",
+  "derivedDataRebuildRequired": true,
   "phpNamespace": "AEWI\\SWS",
   "namespaceRenameRequiresDataMigration": false,
   "priorAlphaLiveAcceptanceReported": true,
-  "searchIndexRefreshForExistingDescriptions": "Targeted reindex needed for pages whose existing descriptions have not reached the search index; no automatic global rebuild is scheduled."
+  "searchIndexRefreshForExistingDescriptions": "Existing pages may need targeted reindexing for localized labels and descriptions."
 }

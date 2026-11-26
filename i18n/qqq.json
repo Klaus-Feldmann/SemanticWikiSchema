@@ -602,5 +602,7 @@
 	"sws-api-entity-save-failed": "User-facing entity API failure; HTTP statuses and machine-readable identifiers stay unchanged.",
 	"sws-api-entity-search-timeout": "User-facing entity API failure; HTTP statuses and machine-readable identifiers stay unchanged.",
 	"sws-entity-description-missing-category": "Tracking category name, without the Category namespace prefix. Administrators can override this message to choose a different category; an empty string or hyphen disables this hint. Applies only to the page main entity, not secondary entities.",
-	"sws-entity-description-missing-category-desc": "Description shown on Special:TrackingCategories for the missing main entity description tracking category."
+	"sws-entity-description-missing-category-desc": "Description shown on Special:TrackingCategories for the missing main entity description tracking category.",
+	"sws-field-validation-category": "Tracking category name without namespace. Use a hyphen to disable the category.",
+	"sws-field-validation-category-desc": "Description for the saved entity field validation tracking category on Special:TrackingCategories."
 }

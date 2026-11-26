@@ -41,6 +41,7 @@ final class SubjectSlotMetadata {
         try {
             // Stage into a separate output: a later field error must not leave partial metadata.
             $staged = new ParserOutput();
+            FieldValidationCategory::showPublished( $staged, $title, $params->getRevId() );
             ( new UserWikitextProcessor() )->apply( $title, $staged, $subjects, $authority, $resolve, $params->getRevId() );
             if ( $title->getContentModel() !== 'wikitext' && $main !== null && $main->getSchemaReference()->isLocal() ) {
                 ( new CategoryAssignments() )->apply( $staged, $resolve( $main->getSchemaReference() ), $subjects, $main, $resolve );

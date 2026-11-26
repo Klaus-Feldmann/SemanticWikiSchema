@@ -67,7 +67,7 @@ def main():
     upgrade_payload={
         'upgrade.py':entries['installer/upgrade.py'],
         'upgrade-profiles.json':entries['installer/upgrade-profiles.json'],
-        'README.md':entries['docs/operations/upgrade-0.6.0.md'],
+        'README.md':entries[f'docs/operations/upgrade-{version}.md'],
         source_name:source,
         'COPYING':entries['COPYING'],
     }
@@ -78,13 +78,8 @@ def main():
         assert archive.testzip() is None
         for line in archive.read('SemanticWikiSchema-'+version+'-upgrade/SHA256SUMS').decode().splitlines():
             digest,name=line.split('  ',1);assert hashlib.sha256(archive.read('SemanticWikiSchema-'+version+'-upgrade/'+name)).hexdigest()==digest
-    mcp_name='MediaWiki-MCP-0.21.0-SWS-'+version+'-patch.zip'
-    with zipfile.ZipFile(output/mcp_name,'w',zipfile.ZIP_DEFLATED) as archive:
-        for name,data in sorted(entries.items()):
-            if name.startswith('integrations/mcp/'):archive.writestr('MCP-SWS-'+version+'/'+name[len('integrations/mcp/'):],data)
-    with zipfile.ZipFile(output/mcp_name) as archive:assert archive.testzip() is None
-    (output/'SHA256SUMS').write_text(''.join(hashlib.sha256((output/name).read_bytes()).hexdigest()+'  '+name+'\n'for name in [source_name,installer_name,upgrade_name,mcp_name]))
-    result={'version':version,'commit':ref,'sourceFiles':len(entries),'installerFiles':len(payload),'sourceManifestVerified':True,'installerManifestVerified':True,'archives':[source_name,installer_name,upgrade_name,mcp_name]}
+    (output/'SHA256SUMS').write_text(''.join(hashlib.sha256((output/name).read_bytes()).hexdigest()+'  '+name+'\n'for name in [source_name,installer_name,upgrade_name]))
+    result={'version':version,'commit':ref,'sourceFiles':len(entries),'installerFiles':len(payload),'sourceManifestVerified':True,'installerManifestVerified':True,'archives':[source_name,installer_name,upgrade_name]}
     (output/'ARCHIVE-VERIFICATION.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
 
 

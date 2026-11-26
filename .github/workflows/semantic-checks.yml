@@ -25,7 +25,6 @@ jobs:
         run: |
           python3 installer/tests/test_install.py
           python3 installer/tests/test_upgrade.py
-          python3 -m unittest discover -s integrations/mcp/tests
           python3 installer/tests/composer_first_install.py
       - name: Install isolated PHP test dependencies
         run: composer install --working-dir=publication-tests/dependencies --no-interaction --prefer-dist
@@ -55,4 +54,9 @@ jobs:
           npm install --ignore-scripts
           npm test
       - name: Verify release archives
-        run: python3 scripts/build_release.py --output "${{ runner.temp }}/sws-release"
+        run: |
+          if python3 -c 'import json; import sys; sys.exit(0 if json.load(open("SEMANTICWIKISCHEMA-VERSION.json"))["publicationAllowed"] else 1)'; then
+            python3 scripts/build_release.py --output "${{ runner.temp }}/sws-release"
+          else
+            python3 scripts/build_test_package.py --output "${{ runner.temp }}/sws-candidate"
+          fi

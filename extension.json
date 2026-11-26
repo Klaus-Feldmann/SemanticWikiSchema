@@ -1,7 +1,8 @@
 {
 	"name": "SemanticWikiSchema",
+	"type": "semantic",
 	"namemsg": "sws-name",
-	"version": "0.6.0",
+	"version": "0.7.0.2",
 	"author": "Softwaredesign und Weiterentwicklung des Forks: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos. Basiert auf [https://neowiki.ai NeoWiki] von [https://professional.wiki/ Professional Wiki], [https://www.entropywins.wtf/mediawiki Jeroen De Dauw], Morne Alberts, [https://www.mediawiki.org/wiki/User:Alistair3149 Alistair3149] und [https://github.com/ProfessionalWiki/NeoWiki/graphs/contributors?all=1 weiteren Mitwirkenden].",
 	"url": "https://github.com/Klaus-Feldmann/SemanticWikiSchema",
 	"license-name": "GPL-2.0-or-later",
@@ -30,6 +31,8 @@
 		"AEWI\\RedHerb\\": "tests/RedHerb/src"
 	},
 	"Hooks": {
+		"ExtensionTypes": "AEWI\\SWS\\EntryPoints\\SWSHooks::onExtensionTypes",
+		"RestCheckCanExecute": "AEWI\\SWS\\EntryPoints\\REST\\BrowserSessionAccess::onRestCheckCanExecute",
 		"MediaWikiServices": [
 			"AEWI\\SWS\\EntryPoints\\SWSHooks::onMediaWikiServices",
 			"AEWI\\SWS\\EntryPoints\\Processing\\ProcessingHooks::onServices"
@@ -1384,7 +1387,8 @@
 				"resources/prefixSearch/api.js"
 			],
 			"dependencies": [
-				"mediawiki.api"
+				"mediawiki.api",
+				"mediawiki.util"
 			]
 		},
 		"ext.sws.prefixSearch": {
@@ -1428,6 +1432,7 @@
 		"swsprocessingstatus": "AEWI\\SWS\\EntryPoints\\Api\\ApiProcessingStatus"
 	},
 	"TrackingCategories": [
-		"sws-entity-description-missing-category"
+		"sws-entity-description-missing-category",
+		"sws-field-validation-category"
 	]
 }

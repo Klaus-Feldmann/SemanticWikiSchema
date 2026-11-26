@@ -91,6 +91,19 @@ class ReplaceSubjectActionTest extends TestCase {
 		$this->newAction()->replace( $subject->id, null, [], null );
 	}
 
+	public function testStalePageRevisionDoesNotReachTheWrite(): void {
+		$subject = TestSubject::build( id: self::SUBJECT_ID, schemaName: new SchemaName( self::SCHEMA_NAME ) );
+		$this->subjectRepository->updateSubject( $subject );
+		$this->subjectRepository->baseRevisionForTest = 42;
+		$before = serialize( $subject );
+		try {
+			$this->newAction()->replace( $subject->id, 'Should not save', [], null, baseRevisionId: 41 );
+			$this->fail( 'Stale page revision admitted' );
+		} catch ( \AEWI\SWS\Application\Subject\Exception\SubjectRevisionConflictException ) {
+			$this->assertSame( $before, serialize( $subject ) );
+		}
+	}
+
 	private function newAction(
 		?SubjectWriteAuthorizer $authorizer = null,
 		bool $validationEnforced = false,

@@ -1,9 +1,0 @@
-{
-  "swsVersion": "0.6.0",
-  "mcpBaseVersion": "0.21.0",
-  "upstreamCommit": "34d772b03afd4e4104cc0f5c8a1ce3db7c9e5ea4",
-  "patchRevision": 5,
-  "patchId": "sws-0.6.0-mcp-0.21.0-r5",
-  "helpVersion": "0.6.0/patch-5",
-  "publicationAllowed": true
-}

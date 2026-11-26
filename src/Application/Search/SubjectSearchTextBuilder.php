@@ -14,7 +14,7 @@ use AEWI\SWS\Domain\Subject\Subject;
 
 /**
  * What a page's Subjects add to the wiki's search index, one searchable string per line: each Subject's
- * label and own localized descriptions, plus what each Statement's Property Type says its value contributes. Property and Schema names
+ * own localized labels and descriptions, plus what each Statement's Property Type says its value contributes. Property and Schema names
  * stay out: they match every page using them rather than the one being looked for.
  */
 readonly class SubjectSearchTextBuilder {
@@ -46,6 +46,15 @@ readonly class SubjectSearchTextBuilder {
 
 		if ( $label !== null ) {
 			$lines[] = new SubjectSearchLine( null, $label->text );
+		}
+
+		$labels = $label === null ? [] : [ $label->text ];
+		foreach ( $subject->getIdentity()?->labels ?? [] as $localizedLabel ) {
+			$text = trim( $localizedLabel );
+			if ( $text !== '' && !in_array( $text, $labels, true ) ) {
+				$labels[] = $text;
+				$lines[] = new SubjectSearchLine( null, $text );
+			}
 		}
 
 		$descriptions = [];

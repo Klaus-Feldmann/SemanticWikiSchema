@@ -122,6 +122,15 @@ final class InternalPageProcessor {
             $sourceSnapshots = $captureSources && $context->useStoredSources && $subjects !== null
                 ? ( new SourceSnapshotCapture() )->capture( $title, $revision, $subjects, $user, $resolveSchema ) : [];
             $sourcePreparation = $sourceSnapshots !== [];
+            if ( !$sourcePreparation && $subjects?->hasSubjects() ) {
+                FieldValidationCategory::apply( $output, $subjects, $revision->getId(),
+                    static function ( $entity, $all ) use ( $user, $resolveSchema ) {
+                        static $validator;
+                        $validator ??= SWSExtension::getInstance()->newSubjectValidator( $user );
+                        return $validator->validate( $entity->getStatements(), $resolveSchema( $entity->getSchemaReference() ), $all );
+                    }
+                );
+            }
             if ( $subject !== null && $schema !== null ) {
                 ( new CategoryAssignments() )->apply( $output, $schema, $subjects, $subject, $resolveSchema );
             }

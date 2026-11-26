@@ -12,6 +12,25 @@ use AEWI\SWS\Domain\Schema\PropertyName;
 
 /** All saved field metadata is staged before the existing complete-revision commit gate. */
 final class UserWikitextProcessor {
+    public const BODY_RENDERED = 'sws-field-wikitext-in-body';
+
+    /** Values in stored Entity order, then field order. Field notes have their own presentation. */
+    public static function bodyValues( PageSubjects $subjects, \Closure $resolveSchema ): array {
+        $values = [];
+        foreach ( $subjects->getAllSubjects()->asArray() as $subject ) {
+            $reference = $subject->getSchemaReference();
+            if ( !$reference->isLocal() ) { continue; }
+            $schema = $resolveSchema( $reference );
+            foreach ( $schema?->getAllProperties()->asMap() ?? [] as $name => $property ) {
+                if ( !$property instanceof WikitextValueProperty ) { continue; }
+                $statement = $subject->getStatements()->getStatement( new PropertyName( $name ) );
+                $parts = $statement?->getValue()->toScalars() ?? [];
+                array_push( $values, ...$parts );
+            }
+        }
+        return $values;
+    }
+
     public function apply( Title $title, ParserOutput $output, PageSubjects $subjects, User $user,
         \Closure $resolveSchema, ?int $revisionId = null ): void {
         foreach ( $subjects->getAllSubjects()->asArray() as $subject ) {
@@ -20,7 +39,7 @@ final class UserWikitextProcessor {
             foreach ( $schema->getAllProperties()->asMap() as $name => $property ) {
                 if ( $property->isSchemaExecution() ) { continue; }
                 $values = [];
-                if ( $property instanceof WikitextValueProperty ) {
+                if ( $property instanceof WikitextValueProperty && !$output->getExtensionData( self::BODY_RENDERED ) ) {
                     $statement = $subject->getStatements()->getStatement( new PropertyName( $name ) );
                     $values = $statement?->getValue()->toScalars() ?? [];
                 }

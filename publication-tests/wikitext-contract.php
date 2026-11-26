@@ -2,7 +2,7 @@
 // Isolated integration contract: real SWS hooks, stand-in MediaWiki services/parser/job execution.
 namespace Harness {
  final class State {
-  public static $schema,$subject,$old,$parser,$current=null,$fail=false,$error=false;
+  public static $schema,$subject,$old,$parser,$current=null,$fail=false,$error=false,$published=true;
   public static array $deferred=[],$queued=[],$dependencies=[],$ids=[],$conditions=[];
   public static int $refresh=0,$purges=0,$rebuilds=0,$logs=0;
  }
@@ -35,6 +35,7 @@ namespace MediaWiki\Revision {
  class RevisionRecord {
   public const RAW=1, DELETED_TEXT=2; public function userCan(...$args){return true;}
   public function __construct(public $main,public $neo=null,public bool $inherited=false){}
+  public function getId(){return 42;}
   public function getContent($role){return $role==='main'?$this->main:$this->neo;}
   public function hasSlot($role){return $role==='main'||$this->neo!==null;}
   public function getSlot($role,$audience){return new SlotRecord($this->inherited);}
@@ -100,7 +101,17 @@ namespace AEWI\SWS\EntryPoints\Content {
 namespace AEWI\SWS {
  class SWSExtension {
   public static function getInstance(){return new self;}
-  public function newSubjectResolver($parser){return new class{public function resolveMainByTitle($title){return \Harness\State::$subject;}};}
+  public function newSubjectResolver($parser){return new class{
+   public function getPageSubjectsByTitle($title){
+    return \Harness\State::$subject === null ? null : new \AEWI\SWS\Domain\Page\PageSubjects(
+     \Harness\State::$subject, new \AEWI\SWS\Domain\Subject\SubjectMap
+    );
+   }
+  };}
+  public function getRevisionPolicy(){return new class{
+   public function publishedRevision($revision){return \Harness\State::$published ? $revision : null;}
+   public function revisionIsReadableBy($revision,$authority){return true;}
+  };}
   public function getSchemaResolverFor($authority){return $this->getSchemaResolver();}
   public function getSchemaResolver(){return new class{public function getSchema($ref){if(\Harness\State::$error)throw new \RuntimeException('lookup failed');return \Harness\State::$schema;}};}
   public function newHookPageRebuilder(){return new class{public function rebuild($title){\Harness\State::$rebuilds++;}};}
@@ -138,7 +149,7 @@ namespace {
  function resetState(){S::$deferred=[];S::$queued=[];S::$dependencies=[];S::$refresh=0;S::$purges=0;S::$rebuilds=0;S::$old=null;S::$fail=false;S::$error=false;}
  function drain(){while(S::$deferred){$f=array_shift(S::$deferred);$f();}}
  S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Notiz'=>field(false,'{{NichtAusfuehren}}'),'SMW'=>field(true,'{{SWS}}'),'Weiter'=>field(true,'{{PAGENAME}}')]),false);
- S::$subject=new class{public function getSchemaReference(){return SchemaReference::local(new SchemaName('Person'));}};
+ S::$subject=\AEWI\SWS\Tests\Data\TestSubject::build(schemaName:new SchemaName('Person'));
  check(SchemaWikitext::programs(S::$schema)===['{{NichtAusfuehren}}','{{SWS}}','{{PAGENAME}}'],'Only explicit programs run, in schema order');
  check(SchemaWikitext::append('Seiteninhalt',[])==='Seiteninhalt','Empty program changes page');
  check(SchemaWikitext::append('Seiteninhalt',['{{SWS}}'])==="Seiteninhalt\n\n{{SWS}}",'Program is not appended');
@@ -183,5 +194,18 @@ namespace {
  check($source==='Inhalt','Category assignment edited page wikitext');
  Hooks::onRevisionFromEditComplete($page,S::$current,false,null,$tags);
  check(count(S::$deferred)===1,'Category-only save without SMW did not schedule refresh');
+ $documentation=\AEWI\SWS\Domain\Schema\Property\WikitextValueProperty::fromPartialJson(new PropertyCore('',false,null),[]);
+ S::$schema=new Schema(new SchemaName('Person'),'',new PropertyDefinitions(['Dokumentation'=>$documentation]),false);
+ $calls="{{Beschreibung}}\n{{Weitere Dokumentation}}";
+ S::$subject=\AEWI\SWS\Tests\Data\TestSubject::build(schemaName:new SchemaName('Person'),statements:new \AEWI\SWS\Domain\Subject\StatementList([
+  new \AEWI\SWS\Domain\Statement(new \AEWI\SWS\Domain\Schema\PropertyName('Dokumentation'),'wikitextValue',new \AEWI\SWS\Domain\Value\StringValue($calls))
+ ]));
+ $source='<includeonly>Vorlageninhalt</includeonly>';
+ Hooks::onParserBeforeInternalParse(new Parser($title),$source,null);
+ check(str_ends_with($source,$calls),'Multiline field missing from the direct host parse');
+ S::$published=false;
+ $source='Original';Hooks::onParserBeforeInternalParse(new Parser($title),$source,null);
+ check($source==='Original','Unpublished Wikitext field must not enter the page body');
+ S::$published=true;
  echo "$checks wikitext hook/storage/refresh contract checks passed (isolated MediaWiki stand-ins).\n";
 }

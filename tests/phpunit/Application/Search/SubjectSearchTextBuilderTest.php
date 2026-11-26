@@ -35,6 +35,15 @@ use AEWI\SWS\Tests\TestDoubles\InMemorySchemaLookup;
  */
 class SubjectSearchTextBuilderTest extends TestCase {
 
+	public function testLocalizedLabelsAreIndexedWithLocalizedDescriptions(): void {
+		$subject = TestSubject::build( label: null );
+		$subject->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity(
+			'de', [ 'de' => 'Zitat', 'fr' => 'Citation', 'en' => 'Quotation', 'it' => 'Citation' ],
+			[ 'de' => 'Kennzeichnet ein Zitat.' ]
+		) );
+		$this->assertSame( "Zitat\nCitation\nQuotation\nKennzeichnet ein Zitat.", $this->textForSubjects( $subject ) );
+	}
+
 	public function testDescriptionsInAllLanguagesAreIndexedWithoutAStatement(): void {
 		$subject = TestSubject::build( label: null );
 		$subject->setIdentity( new \AEWI\SWS\Domain\Identity\LocalizedIdentity(

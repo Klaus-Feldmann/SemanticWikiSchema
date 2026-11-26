@@ -63,7 +63,8 @@ readonly class ReplaceSubjectAction {
 		array $dependentSubjects = [],
         ?array $fieldNotes = null,
 		?array $identity = null,
-		?int $fieldKeyVersion = null
+		?int $fieldKeyVersion = null,
+		?int $baseRevisionId = null
 	): void {
 		$pageIdentifiers = $this->hostingPageResolver->resolveReadableHostingPage( $subjectId );
 
@@ -75,7 +76,12 @@ readonly class ReplaceSubjectAction {
 			throw new SubjectEditNotAuthorizedException();
 		}
 
-		$subject = $this->subjectRepository->getSubject( $subjectId );
+		$base = $baseRevisionId === null
+			? null
+			: $this->subjectRepository->getSubjectsByPageId( $pageIdentifiers->getId(), $baseRevisionId );
+		$subject = $base === null
+			? $this->subjectRepository->getSubject( $subjectId )
+			: $base->getAllSubjects()->getSubject( $subjectId );
 
 		if ( $subject === null ) {
 			throw SubjectNotFoundException::forId( $subjectId );
@@ -94,8 +100,8 @@ readonly class ReplaceSubjectAction {
 			}
 		}
 
-		$pageSubjects = $dependentSubjects === [] ?
-			PageSubjects::newEmpty() : $this->subjectRepository->getSubjectsByPageId( $pageIdentifiers->getId() );
+		$pageSubjects = $dependentSubjects === [] ? PageSubjects::newEmpty() :
+			( $base ?? $this->subjectRepository->getSubjectsByPageId( $pageIdentifiers->getId() ) );
 		$newDependentSubjects = $this->dependentSubjectBuilder->build( $dependentSubjects, $subjectId, $pageSubjects );
 
 		$priorViolations = $this->proposedSubjectValidator->validate( $subject );
@@ -126,7 +132,7 @@ readonly class ReplaceSubjectAction {
 		}
 
 		try {
-			$status = $this->subjectRepository->updateSubject( $subject, $comment, $newDependentSubjects );
+			$status = $this->subjectRepository->updateSubject( $subject, $comment, $newDependentSubjects, $baseRevisionId );
 		} catch ( DependentSubjectRulesViolatedException $exception ) {
 			$this->presenter->presentValidationFailed( array_merge( $allViolations, $exception->violations ) );
 			return;

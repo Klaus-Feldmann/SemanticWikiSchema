@@ -29,7 +29,7 @@ watch( () => [ context?.value.pageId, context?.value.subject, props.property.nam
 	html.value = null;
 	failed.value = false;
 	loading.value = false;
-	if ( type !== 'wikitextValue' || !pageid || !subject || text === '' ) { return; }
+	if ( !note || type !== 'wikitextValue' || !pageid || !subject || text === '' ) { return; }
 	loading.value = true;
 	try {
 		const result = await loadSavedWikitext( pageid, subject, field, note );

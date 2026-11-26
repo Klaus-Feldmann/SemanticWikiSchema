@@ -8,8 +8,6 @@ The bundled Graph Explorer is Zazuko Graph Explorer, derived from Ontodia, under
 
 Source: https://github.com/zazuko/graph-explorer/tree/a748252d29b40e9f4fd41f18a88c0485d236e991
 
-The optional MCP patch targets ProfessionalWiki/MediaWiki-MCP-Server 0.20.1, commit `5b979b5a64f8dbb3596b95efc0c1d3f570505646`. Its license is preserved as integrations/mcp/LICENSE-UPSTREAM. Patch source and tests are provided separately from SWS. No account credentials, OAuth token store or private-wiki discovery adapter is included.
-
 Historical-person names and date fixtures in regression tests are public test material, not a research-corpus export. Live authentication/debug logs are not shipped. Existing upstream demo passwords are public disposable-demo examples, not credentials for AufEinWort.
 
 Additional license/notice texts for the nine bundled JavaScript dependency packages are in third-party/graph-notices/. REFERENCE-PACKAGES.json records their versions from the matching upstream reference lockfile; the captured maps remain the source of the exact bundled implementation.

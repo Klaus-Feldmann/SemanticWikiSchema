@@ -37,10 +37,16 @@ Ohne Q-ID kann der Helfer den Seitentitel über den Sitelink der deutschsprachig
 
 Nur eine Dateikopie laden. Wird der Helfer bereits über einen anderen Pfad eingebunden, nicht zusätzlich die Paketkopie laden. Die zugehörige Magic-Word-Datei bindet er selbst ein. Seine Einstellungen sind von den 22 registrierten SWS-Optionen getrennt. Standortspezifische Speicherbenennungs- oder Deepcat-/Fuseki-Dateien sind keine allgemeinen SWS-Voraussetzungen.
 
-## SMW, Lua und MCP
+## SMW und Lua
 
 SMW separat installieren und konfigurieren. Der Attributname folgt der Feldbenennung in der Wiki-Inhaltssprache, ersatzweise der technischen Feldkennung, ohne automatischen Schema-ID-Präfix. Anmerkungen folgen derselben Benennung. Eine Änderung der maßgeblichen Benennung wirkt nach erneuter Verarbeitung auf den SMW-Namen; eine ausdrückliche Zuordnung hat Vorrang. Bestehende Attribute müssen geeignete Datentypen besitzen; zusätzliche Namensräume sind in SMW gesondert freizugeben. SWS kann auch ohne SMW Daten speichern und direkt abfragen.
 
-Scribunto stellt die Lua-Abfragen bereit. Das [vollständige Integrationspaket für MediaWiki MCP 0.21.0](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/mcp-sws-0.5.0) ist ein separates Integrationspaket; der SWS-Installer richtet keine MCP-Anmeldung ein.
+Scribunto stellt die Lua-Abfragen `mw.sws` und `mw.swsbase` bereit.
+
+## User AI (UAI)
+
+[User AI (UAI)](https://www.mediawiki.org/wiki/Extension:User_AI) bindet KI-Assistenten an MediaWiki und SWS an und wird separat installiert. Die Verbindung läuft über UAI, Änderungen folgen dem Freigabeverfahren im Wiki. Für die Suche nach Kategorien werden die tatsächlichen Kategoriezuordnungen in MediaWiki zusammen mit den SWS-Entitätsfeldern ausgewertet. Das erfasst auch Kategorien, die durch eingebundene Vorlagen gesetzt werden.
+
+Der frühere eigenständige MediaWiki-MCP-Adapter gehört zu älteren SWS-Versionen. UAI stellt seinen eigenen MCP-Connector bereit. SWS lässt sich auch eigenständig über die MediaWiki-Oberfläche nutzen.
 
 [Englische Detailanleitung](../integrations.md) · [Installationsübersicht](README.md)

@@ -33,6 +33,28 @@ describe( 'PrefixSearch Action API', () => {
 } );
 
 describe( 'Supplemental title substring lookup', () => {
+	it( 'finds a Schema by localized label and keeps the canonical ID title', async () => {
+		const get = vi.fn().mockResolvedValue( {} );
+		const fetch = vi.fn().mockResolvedValue( { ok: true, json: async () => [ {
+			pageId: 11, title: 'Schema:S11', url: '/wiki/Schema:S11', identityLanguage: 'de',
+			labels: { de: 'Vorlage', en: 'Template' }, descriptions: { de: 'Vorlagenbestand' }
+		} ] } );
+		vi.stubGlobal( 'fetch', fetch );
+		vi.stubGlobal( 'mw', {
+			Api: class { get = get; },
+			util: { wikiScript: () => '/w/rest.php' },
+			config: { get: ( key: string ) => ( {
+				wgSWSSchemaNamespace: 7474, wgUserLanguage: 'de', wgSWSPrefixSearchSubstringFallback: false
+			} as Record<string, unknown> )[ key ] }
+		} );
+		expect( await api.search( 'Vorlage', 10, 7474 ) ).toEqual( [ {
+			pageId: 11, title: 'Schema:S11', url: '/wiki/Schema:S11',
+			displayTitle: 'Vorlage', description: 'Vorlagenbestand'
+		} ] );
+		expect( fetch ).toHaveBeenCalledWith(
+			'/w/rest.php/sws/v0/schema-names/Vorlage?details=1', { credentials: 'same-origin' }
+		);
+	} );
 	it( 'fills slots with title-only substring matches without displacing native results', async () => {
 		const get = vi.fn().mockResolvedValueOnce( { query: { pages: [ { pageid: 1, ns: 14, title: 'Kategorie:Wissenschaft' } ] } } )
 			.mockResolvedValueOnce( { query: { pages: [ { pageid: 1, ns: 14, title: 'Kategorie:Wissenschaft' }, { pageid: 2, ns: 14, title: 'Kategorie:Sprachwissenschaft' } ] } } );

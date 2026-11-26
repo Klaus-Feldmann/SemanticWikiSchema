@@ -1,11 +1,13 @@
-# Semantic WikiSchema 0.5.02
+# Semantic WikiSchema 0.7.0.2
 
-- SMW-Attributnamen folgen der Feldbenennung in der Wiki-Inhaltssprache, ersatzweise der Feldkennung, ohne automatischen Schema-ID-Präfix. Anmerkungen folgen derselben Benennung; ausdrückliche Zuordnungen haben Vorrang.
-- SHORTDESC aus Seite/Schema hat Vorrang vor lokaler Wikibase und Wikidata. Die erste nicht leere Beschreibung wird Suchuntertitel und automatische SMW-Annotation Kurzbeschreibung. Eigene Schemafelder können zusätzliche Werte erzeugen.
-- Die Suche liest den gespeicherten Untertitel und ruft beim Tippen keine externen Beschreibungen ab. Hauptsuche und Schema-Seitenfelder nutzen denselben Suchweg.
-- Vollständige englische und deutsche Funktions-/Konfigurationsreferenz mit allen 22 registrierten Einstellungen, Array-Unteroptionen, Voraussetzungen und KI-unterstützter Installation und Schemaerstellung.
-- Vorhandene Verarbeitungsdiagnose und die separat versionierte MCP-Integration bleiben erhalten.
+Änderungen gegenüber der veröffentlichten Version 0.6.0.
 
-[Installation](docs/operations/install/de/README.md) · [Referenz](docs/reference/SWS-0.5.02.de.md). Der Installer ist für Erstinstallation vorgesehen. Nach Austausch einer bestehenden Installation betroffene SWS-Seiten neu verarbeiten und Jobs betreiben. Für diese Ausgabeänderungen sind keine neue SQL-Struktur, Identitätsmigration oder Suchindex-Neuerstellung nötig.
+- **KI-Anbindung.** User AI (UAI) ist die optionale Anbindung für Assistenten. Der bisherige Patch für den eigenständigen MediaWiki MCP Server entfällt. Kategorienbasierte Recherchen können die tatsächlichen Seitenkategorien einschließlich der Kategorien aus eingebundenen Vorlagen mit den Entitätsdaten kombinieren.
+- **Entitätsbearbeitung.** Direkte authentifizierte SWS-REST-Zugriffe verwenden eine MediaWiki-Browsersitzung. Berechtigte UAI-Aufrufe nutzen die dafür vorgesehenen Schnittstellen. Beim Ersetzen einer Entität kann die gelesene Basisrevision mitgegeben werden. Eine veraltete Basis wird mit HTTP 409 abgewiesen.
+- **Suche.** Die Titelsuche findet Schemata anhand ihrer Benennungen. Die Entitätssuche berücksichtigt Benennungen und Beschreibungen.
+- **Wikitext.** Der freie mehrzeilige Wikitext einer Entität wird auf der zugehörigen Wikiseite ausgeführt. Beim Einbinden einer Vorlage wird dieser Entitätswikitext nicht mit eingebunden.
+- **Feldvalidierung.** Seiten mit ungültigen Feldwerten oder fehlenden Pflichtwerten erhalten mit der SWS-Verarbeitung die konfigurierbare Kategorie „SWS Wartung Feldeingabe“.
+- **Kategoriefelder.** Feldbenennungen bleiben beim Einlesen eines Standardwerts erhalten.
+- **Spezial:Version.** SWS erscheint unter „Semantische Erweiterungen“, SchemaBaseBridge unter „Wikibase-Erweiterungen“.
 
-Geprüfter Core: MediaWiki 1.47.0-wmf.24, PHP 8.3.36, Legacy-Parser, Vector 2022.
+[Installation](docs/operations/install/de/README.md) · [Direktes Upgrade von 0.6.0](docs/operations/upgrade-0.7.0.2.md) · [User AI](https://www.mediawiki.org/wiki/Extension:User_AI)

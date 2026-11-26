@@ -34,6 +34,8 @@ namespace MediaWiki\Title {
 		public function getDBkey(): string { return str_replace( ' ', '_', $this->name ); }
 		public function getPrefixedText(): string { return $this->namespace === 0 ? $this->name : 'Schema:' . $this->name; }
 		public function getNamespace(): int { return $this->namespace; }
+		public static function newFromText( string $name, int $namespace = 0 ): self { return new self( $name, 0, $namespace ); }
+		public function isExternal(): bool { return false; }
 		public function canExist(): bool { return true; }
 		public function getContentModel(): string { return 'wikitext'; }
 		public function exists( int $flags = 0 ): bool { return true; }
@@ -153,6 +155,13 @@ namespace AEWI\SWS {
 		public function getRevisionPolicy(): mixed { return self::$policy; }
 		public function getPersistenceSchemaDeserializer(): mixed { return new \AEWI\SWS\Persistence\MediaWiki\SchemaPersistenceDeserializer( \AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry() ); }
 		public function getSchemaResolverFor( mixed $authority ): mixed { return new class { public function getSchema( mixed $ref ): mixed { return SWSExtension::$schema; } }; }
+		public function newSubjectValidator( mixed $authority ): \AEWI\SWS\Application\Validation\SubjectValidator {
+			return new \AEWI\SWS\Application\Validation\SubjectValidator(
+				\AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry(),
+				new \AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup(),
+				\AEWI\SWS\Tests\Data\TestSources::newRegistry()
+			);
+		}
 		public function newSubjectResolver( mixed $parser ): mixed { return ( self::$resolver )(); }
 		public function newHookPageRebuilder(): mixed { return new class { public function rebuild( mixed $title ): void {} }; }
 		public static \AEWI\SWS\Persistence\MediaWiki\Subject\SubjectContentDataDeserializer $deserializer;

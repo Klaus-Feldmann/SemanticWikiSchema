@@ -2,7 +2,7 @@
 	"name": "aufeinwort/semantic-wikischema",
 	"type": "mediawiki-extension",
 	"license": "GPL-2.0-or-later",
-	"description": "Schema-based research data entry with Wikidata/Wikibase sources, automatic SMW annotations and MCP access.",
+	"description": "Schema-based research data entry with Wikidata/Wikibase sources, automatic SMW annotations and optional User AI integration.",
 	"keywords": [
 		"MediaWiki",
 		"knowledge graph",

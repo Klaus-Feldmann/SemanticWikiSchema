@@ -17,6 +17,7 @@ use AEWI\SWS\SWSExtension;
 use AEWI\SWS\Persistence\MediaWiki\Subject\SubjectSlotReader;
 use AEWI\SWS\Persistence\MediaWiki\Subject\MediaWikiSubjectRepository;
 use AEWI\SWS\EntryPoints\Jobs\SchemaWikitextRefreshJob;
+use AEWI\SWS\EntryPoints\Processing\UserWikitextProcessor;
 use Throwable;
 
 final class SchemaWikitextHooks {
@@ -34,15 +35,37 @@ final class SchemaWikitextHooks {
 		if ( $revisionId && $revisionId < $title->getLatestRevID() ) { return; }
 		try {
 			$extension = SWSExtension::getInstance();
-			$subject = $extension->newSubjectResolver( $parser )->resolveMainByTitle( $title );
+			$subjects = $extension->newSubjectResolver( $parser )->getPageSubjectsByTitle( $title );
+			if ( $subjects === null ) { return; }
+			$authority = ParserAuthority::of( $parser );
+			$resolver = $extension->getSchemaResolverFor( $authority );
+			$recorder = new ParserPageDependencyRecorder( $parser );
+			$schemas = [];
+			$resolveSchema = static function ( $ref ) use ( $recorder, $resolver, &$schemas ) {
+				$key = $ref->getText();
+				if ( !array_key_exists( $key, $schemas ) ) {
+					$recorder->recordDependencyOnSchema( $ref );
+					$schemas[$key] = $resolver->getSchema( $ref );
+				}
+				return $schemas[$key];
+			};
+			$subject = $subjects->getMainSubject();
+			$revision = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
+			$policy = $extension->getRevisionPolicy();
+			if ( $revision && $policy->publishedRevision( $revision )?->getId() === $revision->getId()
+				&& $policy->revisionIsReadableBy( $revision, $authority ) ) {
+				$values = UserWikitextProcessor::bodyValues( $subjects, $resolveSchema );
+				if ( $values !== [] ) {
+					// Transclusion fetches the stored main-slot source without this host-page parse.
+					$text = SchemaWikitext::append( $text, [ implode( "\n\n", $values ) ] );
+					$parser->getOutput()->setExtensionData( UserWikitextProcessor::BODY_RENDERED, true );
+				}
+			}
 			if ( $subject === null || !$subject->getSchemaReference()->isLocal() ) { return; }
 			$reference = $subject->getSchemaReference();
-			( new ParserPageDependencyRecorder( $parser ) )->recordDependencyOnSchema( $reference );
-			$schema = $extension->getSchemaResolverFor( ParserAuthority::of( $parser ) )->getSchema( $reference );
+			$schema = $resolveSchema( $reference );
 			if ( $schema === null ) { return; }
 			// Include schema categories in ordinary view parses as well as in the sealed worker output.
-			$authority = ParserAuthority::of( $parser );
-			$revision = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title );
 			if ( $revision && $revision->userCan( RevisionRecord::DELETED_TEXT, $authority ) ) {
 				$pageSubjects = SubjectSlotReader::read( $revision )?->getPageSubjects();
 				if ( $pageSubjects !== null && $pageSubjects->getMainSubject() == $subject ) {

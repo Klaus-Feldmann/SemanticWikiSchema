@@ -42,7 +42,7 @@ final class ApiRenderWikitext extends ApiBase {
             if ( !$schema ) { continue; }
             foreach ( $schema->getAllProperties()->asMap() as $name => $property ) {
                 if ( !$all && $name !== ( $params['field'] ?? '' ) ) { continue; }
-                foreach ( [ 'value', 'note' ] as $kind ) {
+                foreach ( ( $params['notesonly'] ?? false ) ? [ 'note' ] : [ 'value', 'note' ] as $kind ) {
                     if ( !$all && ( $params['note'] ?? false ) !== ( $kind === 'note' ) ) { continue; }
                     if ( $kind === 'note' ) {
                         if ( ( $property->getFieldNotes()['type'] ?? null ) !== 'wikitext' || $property->isSchemaExecution() ) { continue; }
@@ -73,6 +73,7 @@ final class ApiRenderWikitext extends ApiBase {
             'subject' => [ self::PARAM_TYPE => 'string', self::PARAM_DFLT => '' ],
             'field' => [ self::PARAM_TYPE => 'string', self::PARAM_DFLT => '' ],
             'all' => [ self::PARAM_TYPE => 'boolean', self::PARAM_DFLT => false ],
+            'notesonly' => [ self::PARAM_TYPE => 'boolean', self::PARAM_DFLT => false ],
             'note' => [ self::PARAM_TYPE => 'boolean', self::PARAM_DFLT => false ] ];
     }
     public function isWriteMode(): bool { return false; }

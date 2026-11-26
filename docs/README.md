@@ -1,6 +1,6 @@
 # SWS Documentation
 
-[Install SWS 0.4.03](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
+[Install SWS 0.7.0.2](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 
@@ -45,7 +45,7 @@ For developers building on SWS from outside the wiki.
 * [RDF Export](api/rdf-export.md) — RDF per page, per Subject and in bulk: IRI scheme, endpoint, projections
 * [JSON Schema](api/json-schema.md) — a Schema's Subjects as a JSON Schema document, for validating data before upload
 * [MediaWiki API](api/mediawiki-api.md) — pages, revisions, users, recent changes, and search, through the Action API
-* [MCP](api/mcp.md) — connect AI agents through the MediaWiki MCP Server
+* [User AI (UAI)](operations/install/integrations.md#user-ai-uai) — optional AI integration
 
 ## Extending
 

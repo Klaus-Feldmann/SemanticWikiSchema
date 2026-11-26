@@ -27,7 +27,8 @@ interface SubjectRepository extends SubjectLookup {
 	public function updateSubject(
 		Subject $subject,
 		?string $comment = null,
-		SubjectMap $dependentSubjects = new SubjectMap()
+		SubjectMap $dependentSubjects = new SubjectMap(),
+		?int $baseRevisionId = null
 	): PageContentSavingStatus;
 
 	/**
@@ -42,7 +43,7 @@ interface SubjectRepository extends SubjectLookup {
 	/**
 	 * TODO: document exceptions
 	 */
-	public function getSubjectsByPageId( PageId $pageId ): PageSubjects;
+	public function getSubjectsByPageId( PageId $pageId, ?int $baseRevisionId = null ): PageSubjects;
 
 	/**
 	 * Returns the outcome of the save. A PageContentSavingStatus::ERROR means the write did not land

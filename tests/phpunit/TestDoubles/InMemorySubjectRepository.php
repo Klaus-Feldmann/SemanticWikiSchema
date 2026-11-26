@@ -99,11 +99,15 @@ class InMemorySubjectRepository implements SubjectRepository {
 		return $found;
 	}
 
+	public ?int $baseRevisionForTest = null;
+
 	public function updateSubject(
 		Subject $subject,
 		?string $comment = null,
-		SubjectMap $dependentSubjects = new SubjectMap()
+		SubjectMap $dependentSubjects = new SubjectMap(),
+		?int $baseRevisionId = null
 	): PageContentSavingStatus {
+		$this->requireCurrentBaseRevision( $baseRevisionId );
 		$this->refuseIfAsked();
 
 		if ( $this->failNextSave ) {
@@ -153,7 +157,14 @@ class InMemorySubjectRepository implements SubjectRepository {
 	 * nothing until it saves. Handing out the stored object instead would let a mutation that was
 	 * never saved - or whose save failed - show up in the next read.
 	 */
-	public function getSubjectsByPageId( PageId $pageId ): PageSubjects {
+	private function requireCurrentBaseRevision( ?int $baseRevisionId ): void {
+		if ( $baseRevisionId !== null && $baseRevisionId !== $this->baseRevisionForTest ) {
+			throw new \AEWI\SWS\Application\Subject\Exception\SubjectRevisionConflictException();
+		}
+	}
+
+	public function getSubjectsByPageId( PageId $pageId, ?int $baseRevisionId = null ): PageSubjects {
+		$this->requireCurrentBaseRevision( $baseRevisionId );
 		if ( array_key_exists( $pageId->id, $this->subjectsByPage ) ) {
 			return self::copyOf( $this->subjectsByPage[$pageId->id] );
 		}

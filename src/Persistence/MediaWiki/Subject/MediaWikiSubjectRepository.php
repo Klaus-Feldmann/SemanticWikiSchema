@@ -26,6 +26,7 @@ use AEWI\SWS\EntryPoints\Content\SubjectContent;
 use AEWI\SWS\Persistence\MediaWiki\PageContentSaver;
 use AEWI\SWS\Persistence\MediaWiki\PageContentSavingStatus;
 use Wikimedia\Rdbms\IDBAccessObject;
+use AEWI\SWS\Application\Subject\Exception\SubjectRevisionConflictException;
 
 class MediaWikiSubjectRepository implements SubjectRepository {
 
@@ -70,8 +71,13 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 	 * and save back, so a slot holding another content model has to stop the write rather than read
 	 * as no Subjects and be saved over.
 	 */
-	private function getContentByPageId( PageId $pageId ): ?SubjectContent {
-		$revision = $this->revisionLookup->getRevisionByPageId( $pageId->id );
+	private function getContentByPageId( PageId $pageId, ?int $baseRevisionId = null ): ?SubjectContent {
+		$revision = $baseRevisionId === null
+			? $this->revisionLookup->getRevisionByPageId( $pageId->id )
+			: $this->revisionLookup->getRevisionByPageId( $pageId->id, 0, IDBAccessObject::READ_LATEST );
+		if ( $baseRevisionId !== null && $revision?->getId() !== $baseRevisionId ) {
+			throw new SubjectRevisionConflictException();
+		}
 
 		if ( $revision === null ) {
 			return null;
@@ -94,10 +100,11 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 	public function updateSubject(
 		Subject $subject,
 		?string $comment = null,
-		SubjectMap $dependentSubjects = new SubjectMap()
+		SubjectMap $dependentSubjects = new SubjectMap(),
+		?int $baseRevisionId = null
 	): PageContentSavingStatus {
 		$pageId = $this->getPageIdForSubject( $subject->id );
-		$content = $pageId === null ? null : $this->getContentByPageId( $pageId );
+		$content = $pageId === null ? null : $this->getContentByPageId( $pageId, $baseRevisionId );
 		$pageSubjects = $content?->getPageSubjects();
 
 		if ( $pageId === null || $content === null || $pageSubjects?->getAllSubjects()->hasSubject( $subject->id ) !== true ) {
@@ -110,7 +117,7 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			$pageSubjects->putSubject( $dependentSubject );
 		}
 
-		return $this->saveGuarded( $pageSubjects, $dependentSubjects->getIds(), $pageId, $comment );
+		return $this->saveGuarded( $pageSubjects, $dependentSubjects->getIds(), $pageId, $comment, $baseRevisionId );
 	}
 
 	/**
@@ -120,13 +127,17 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 		PageSubjects $pageSubjects,
 		SubjectIdList $suppliedIds,
 		PageId $pageId,
-		?string $comment
+		?string $comment,
+		?int $baseRevisionId = null
 	): PageContentSavingStatus {
 		$revision = $this->revisionLookup->getRevisionByPageId( $pageId->id, 0, IDBAccessObject::READ_LATEST );
+		if ( $baseRevisionId !== null && $revision?->getId() !== $baseRevisionId ) {
+			throw new SubjectRevisionConflictException();
+		}
 		if ( $revision === null ) {
 			return new PageContentSavingStatus( PageContentSavingStatus::ERROR, 'Page not found' );
 		}
-		return $this->pageContentSaver->updateContentAtRevision(
+		$status = $this->pageContentSaver->updateContentAtRevision(
 			$pageId,
 			$revision->getId(),
 			function ( \MediaWiki\Revision\RevisionRecord $parent ) use ( $pageSubjects, $suppliedIds ): array {
@@ -162,6 +173,14 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 			},
 			CommentStoreComment::newUnsavedComment( $comment ?? wfMessage('sws-edit-summary-update-entity')->inContentLanguage()->text() )
 		);
+		if (
+			$baseRevisionId !== null &&
+			$status->status === PageContentSavingStatus::ERROR &&
+			$this->revisionLookup->getRevisionByPageId( $pageId->id, 0, IDBAccessObject::READ_LATEST )?->getId() !== $baseRevisionId
+		) {
+			throw new SubjectRevisionConflictException();
+		}
+		return $status;
 	}
 
 	private function saveContent( SubjectContent $content, PageId $pageId, ?string $comment = null ): PageContentSavingStatus {
@@ -202,8 +221,8 @@ class MediaWikiSubjectRepository implements SubjectRepository {
 		return $this->getContentByPageId( $pageId )?->getPageSubjects()->getMainSubject();
 	}
 
-	public function getSubjectsByPageId( PageId $pageId ): PageSubjects {
-		return $this->getContentByPageId( $pageId )?->getPageSubjects() ?? PageSubjects::newEmpty();
+	public function getSubjectsByPageId( PageId $pageId, ?int $baseRevisionId = null ): PageSubjects {
+		return $this->getContentByPageId( $pageId, $baseRevisionId )?->getPageSubjects() ?? PageSubjects::newEmpty();
 	}
 
 	public function savePageSubjects( PageSubjects $pageSubjects, PageId $pageId, ?string $comment = null ): PageContentSavingStatus {

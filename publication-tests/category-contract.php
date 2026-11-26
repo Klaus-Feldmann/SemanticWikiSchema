@@ -10,8 +10,9 @@ namespace MediaWiki\Title {
         public function isSamePageAs($other){return $this->text===$other->text;}
         public function getArticleID(){return 1;}
         public function getLatestRevID(){return 1;}
-        public static function newFromText($text) {
+        public static function newFromText($text,$namespace=0) {
             if (trim($text)==='' || preg_match('/[\[\]{}|<>]/',$text)) return null;
+            if ($namespace===14 && !str_contains($text,':')) $text='Kategorie:'.$text;
             return new self(str_replace('_',' ',trim($text)));
         }
         public function getNamespace() { return str_starts_with($this->text,'Kategorie:') ? 14 : 0; }
@@ -24,7 +25,8 @@ namespace MediaWiki\Title {
 namespace MediaWiki\User { class User {public function authorizeRead(...$args){return \MediaWiki\MediaWikiServices::$readAllowed;}} }
 namespace MediaWiki\Parser {
     class ParserOutput {
-        public array $categories=[], $usedOptions=[], $dependencies=[];public $expiry=null;
+        public array $categories=[], $usedOptions=[], $dependencies=[], $props=[];public $expiry=null;
+        public function setPageProperty($name,$value){$this->props[$name]=$value;}
         public function recordOption($key){$this->usedOptions[]=$key;}
         public function updateCacheExpiry($seconds){$this->expiry=$seconds;}
         public function addTemplate($title,...$args){$this->dependencies[]=$title;}
@@ -37,9 +39,12 @@ namespace MediaWiki\Parser {
 }
 namespace MediaWiki {
     class MediaWikiServices {
-        public static bool $readAllowed=true;public static $schema;
+        public static bool $readAllowed=true;public static $schema;public static array $props=[];
         public static function getInstance() { return new self; }
         public function getMainConfig(){return new class{public function get($key){return [];}};}
+        public function getPageProps(){return new class{public function getProperties($title,$name){
+            return isset(MediaWikiServices::$props[$name]) ? [$title->getArticleID()=>MediaWikiServices::$props[$name]] : [];
+        }};}
         public function getUserFactory(){return new class{public function newFromUserIdentity($identity){return new \MediaWiki\User\User;}};}
         public function getNamespaceInfo() { return new class { public function getCanonicalNamespaces() { return [0=>'',14=>'Category']; } public function isContent($ns){return $ns===0;} }; }
     }
@@ -78,6 +83,11 @@ namespace {
     use AEWI\SWS\EntryPoints\Processing\CategoryAssignments;
     use AEWI\SWS\Application\Semantic\{FieldSnapshot,AnnotationPlanner};
     $n=0;
+    $validationMessage='SWS Wartung Feldeingabe';
+    function wfMessage($key){return new class {
+        public function inContentLanguage(){return $this;}
+        public function text(){return $GLOBALS['validationMessage'];}
+    };}
     function check($yes,$message) { global $n; $n++; if (!$yes) throw new \RuntimeException($message); }
     $core=new PropertyCore('',false,null);
     $category=PageProperty::fromPartialJson($core,['pageNamespace'=>14,'assignCategories'=>true,'multiple'=>true]);
@@ -171,5 +181,40 @@ namespace {
     $out=new \MediaWiki\Parser\ParserOutput;
     \AEWI\SWS\EntryPoints\Processing\SubjectSlotMetadata::addCategories(new \AEWI\SWS\EntryPoints\Content\SubjectContent(new PageSubjects(subject(),new SubjectMap)),$params,$out);
     check($out->categories===['AufEinWort:Schema_Personendaten'=>''],'Non-wikitext slot inherits same schema category');
+    $labeled=PageProperty::fromPartialJson(new PropertyCore('',true,['Kategorie:Standard'],labels:['de'=>'Hauptkategorie','en'=>'Main category']),['pageNamespace'=>14,'assignCategories'=>true]);
+    check($labeled->toJson()['labels']===['de'=>'Hauptkategorie','en'=>'Main category'],'Category-default normalization preserves field labels');
+    $maintenance=\AEWI\SWS\EntryPoints\Processing\FieldValidationCategory::class;
+    $invalid=new PageSubjects(subject('Kategorie:Vorhanden'),new SubjectMap(TestSubject::build(id:'E12')));
+    $clean=new PageSubjects(subject('Kategorie:Vorhanden'),new SubjectMap);
+    $validator=new \AEWI\SWS\Application\Validation\SubjectValidator(
+        \AEWI\SWS\Tests\Data\TestSources::newPropertyTypeRegistry(),
+        new \AEWI\SWS\Tests\TestDoubles\InMemorySubjectLookup(),
+        \AEWI\SWS\Tests\Data\TestSources::newRegistry()
+    );
+    $requiredSchema=schema($labeled);
+    $validate=static fn($entity,$all) => $validator->validate($entity->getStatements(),$requiredSchema,$all);
+    $out=new \MediaWiki\Parser\ParserOutput;
+    $maintenance::apply($out,$invalid,1,$validate);
+    check($out->categories===['SWS_Wartung_Feldeingabe'=>''],'Missing required field in another entity marks its page');
+    \MediaWiki\MediaWikiServices::$props=$out->props;
+    $view=new \MediaWiki\Parser\ParserOutput;
+    $maintenance::showPublished($view,$page,2);
+    check($view->categories===[],'Does not apply an earlier revision’s warning');
+    $maintenance::showPublished($view,$page,1);
+    check($view->categories===$out->categories,'Ordinary parse displays the published category');
+    $out=new \MediaWiki\Parser\ParserOutput;
+    $maintenance::apply($out,$clean,2,$validate);
+    check($out->categories===[]&&$out->props===[],'Correction removes the derived marker and category');
+    $out=new \MediaWiki\Parser\ParserOutput;
+    $maintenance::apply($out,new PageSubjects(subject('Keine Kategorie'),new SubjectMap),3,$validate);
+    check($out->categories===['SWS_Wartung_Feldeingabe'=>''],'Invalid stored category marks its page');
+    $out=new \MediaWiki\Parser\ParserOutput;
+    $validationMessage='Eigene Feldwartung';
+    $maintenance::apply($out,$invalid,2,$validate);
+    check($out->categories===['Eigene_Feldwartung'=>''],'Local message overrides the category');
+    $validationMessage='-';
+    $out=new \MediaWiki\Parser\ParserOutput;
+    $maintenance::apply($out,$invalid,2,$validate);
+    check($out->categories===[],'A hyphen disables the category');
     echo "$n category schema/validation/merge/removal/SMW checks passed (isolated MediaWiki stand-ins).\n";
 }

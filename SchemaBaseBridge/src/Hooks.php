@@ -6,6 +6,10 @@ namespace SWSBaseBridge;
 use AEWI\SWS\EntryPoints\SWSRegistrar;
 
 final class Hooks {
+	public static function onExtensionTypes( array &$types ): void {
+		$types['wikibase'] ??= wfMessage( 'swsbasebridge-version-group-wikibase' )->text();
+	}
+
 	public static function onSWSRegistration( SWSRegistrar $registrar ): void {
 		$registrar->addPagePropertyProvider( new WikidataPagePropertyProvider() );
 	}

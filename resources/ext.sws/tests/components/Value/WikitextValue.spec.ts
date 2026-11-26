@@ -14,10 +14,10 @@ import { Neo } from '@/Neo';
 import type { ValueInputExposes } from '@/components/Value/ValueInputContract';
 const get = vi.fn();
 const using = vi.fn().mockResolvedValue( undefined );
-function batch( item: unknown ) { return { swsrenderwikitext: { entries: { [ JSON.stringify( [ 's11111111111111', 'Anmerkung', 'value' ] ) ]: item } } }; }
+function batch( item: unknown ) { return { swsrenderwikitext: { entries: { [ JSON.stringify( [ 's11111111111111', 'Anmerkung', 'note' ] ) ]: item } } }; }
 const property = () => createPropertyDefinitionFromJson( 'Anmerkung', { type: 'wikitextValue', multiple: true } ) as TextProperty;
-function display( text = '[[Brünn]]' ) {
- return mount( WikitextDisplay, { props: { property: property(), value: newWikitextValue( text ) }, global: {
+function display( text = '[[Brünn]]', note = false ) {
+ return mount( WikitextDisplay, { props: { property: property(), value: newWikitextValue( text ), note }, global: {
   provide: { [ WikitextContextKey as symbol ]: ref( { pageId: 123, subject: 's11111111111111' } ) },
   mocks: { $i18n: createI18nMock() },
  } } );
@@ -37,36 +37,42 @@ describe( 'editable subject Wikitext', () => {
   await flushPromises();
   expect( ( w.vm as unknown as ValueInputExposes ).getCurrentValue() ).toEqual( newWikitextValue( '  [[Brünn]]\n' ) );
  } );
- it( 'shows parser HTML for the saved field using its host identity', async () => {
+ it( 'shows parser HTML for the saved field note using its host identity', async () => {
   get.mockResolvedValue( batch( { source: '[[Brünn]]', html: '<p><a href="/wiki/Brünn">Brünn</a></p>', modules: [ 'ext.example' ], styles: [] } ) );
-  const w = display(); await flushPromises();
-  expect( get ).toHaveBeenCalledWith( { action: 'swsrenderwikitext', pageid: 123, all: true, format: 'json' } );
+  const w = display( undefined, true ); await flushPromises();
+  expect( get ).toHaveBeenCalledWith( { action: 'swsrenderwikitext', pageid: 123, all: true, notesonly: true, format: 'json' } );
   expect( w.get( 'a' ).text() ).toBe( 'Brünn' );
   expect( using ).toHaveBeenCalledWith( [ 'ext.example' ] );
   expect( w.find( 'pre' ).exists() ).toBe( false );
  } );
  it( 'does not render an answer for a different saved value', async () => {
   get.mockResolvedValue( batch( { source: 'different', html: '<b>Wrong result</b>' } ) );
-  const w = display(); await flushPromises();
+  const w = display( undefined, true ); await flushPromises();
   expect( w.find( 'b' ).exists() ).toBe( false );
   expect( w.get( 'pre' ).text() ).toBe( '[[Brünn]]' );
   expect( w.text() ).toContain( 'sws-wikitext-render-error' );
  } );
  it( 'keeps failed source escaped and visible', async () => {
   get.mockRejectedValue( new Error( 'unavailable' ) );
-  const w = display( '<script>source</script>' ); await flushPromises();
+  const w = display( '<script>source</script>', true ); await flushPromises();
   expect( w.find( 'script' ).exists() ).toBe( false );
   expect( w.get( 'pre' ).text() ).toBe( '<script>source</script>' );
  } );
  it( 'does not display a page batch whose source no longer matches the edited field', async () => {
   let finish!: ( value: unknown ) => void;
   get.mockImplementationOnce( () => new Promise( resolve => { finish = resolve; } ) );
-  const w = display(); await flushPromises();
+  const w = display( undefined, true ); await flushPromises();
   await w.setProps( { value: newWikitextValue( '[[Brno]]' ) } );
   finish( batch( { source: '[[Brünn]]', html: '<b>Old</b>' } ) ); await flushPromises();
   expect( w.find( 'b' ).exists() ).toBe( false );
   expect( w.text() ).toContain( 'sws-wikitext-render-error' );
   expect( w.get( 'pre' ).text() ).toBe( '[[Brno]]' );
+ } );
+ it( 'shows saved field source without parsing it in the entity UI', async () => {
+  const w = display( '{{Beschreibung}}\n{{Weitere Dokumentation}}' );
+  await flushPromises();
+  expect( get ).not.toHaveBeenCalled();
+  expect( w.get( 'pre' ).text() ).toBe( '{{Beschreibung}}\n{{Weitere Dokumentation}}' );
  } );
  it( 'does not send unsaved or context-free text to the parser', async () => {
   const w = createTestWrapper( WikitextDisplay, { property: property(), value: newWikitextValue( '[[Brünn]]' ) } );

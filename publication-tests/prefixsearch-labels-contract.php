@@ -10,6 +10,9 @@ namespace MediaWiki {
         public function getNamespaces() { return [-2=>'Medium',-1=>'Spezial',0 => '',1=>'Diskussion', 14 => 'Kategorie', 10 => 'Vorlage',828=>'Modul']; }
     }
 }
+namespace AEWI\SWS {
+    class SWSExtension { const NS_SCHEMA = 7480; }
+}
 namespace MediaWiki\Output {
     class OutputPage {
         public $vars = []; public $modules = []; public $styles = [];
@@ -34,6 +37,7 @@ namespace {
     check(array_column($out->vars['wgSWSPrefixSearchNamespaces'],'id') === [14,0,10]);
     check(array_column($out->vars['wgSWSPrefixSearchNamespaces'],'label') === ['Kategorie','Artikel','Vorlage']);
     check($out->modules === ['ext.sws.prefixSearch']);
+    check($out->vars['wgSWSSchemaNamespace'] === 7480);
     $c=['search'=>true]; \AEWI\SWS\EntryPoints\PrefixSearchHooks::onSkinPageReadyConfig(null,$c); check($c['search']===false);
     $s->values['SWSPrefixSearchNamespaces']=null; $out=new \MediaWiki\Output\OutputPage();
     \AEWI\SWS\EntryPoints\PrefixSearchHooks::onBeforePageDisplay($out,null);

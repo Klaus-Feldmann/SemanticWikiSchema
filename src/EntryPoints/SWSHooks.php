@@ -77,6 +77,10 @@ use Throwable;
 use WikiPage;
 
 class SWSHooks {
+	public static function onExtensionTypes( array &$types ): void {
+		$types['semantic'] ??= wfMessage( 'sws-version-group-semantic' )->text();
+	}
+
 
 	private const SPECIAL_PAGE_CLASS_PREFIX = 'AEWI\\SWS\\EntryPoints\\SpecialPages\\';
 

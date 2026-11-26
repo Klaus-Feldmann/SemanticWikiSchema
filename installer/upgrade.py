@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Checked, reversible folder upgrade from known SWS 0.5.x distributions to 0.6.0."""
+"""Checked, reversible folder upgrade from known SWS 0.6.0 distributions to 0.7.0.2."""
 from pathlib import Path, PurePosixPath
 import argparse, datetime, hashlib, json, os, shutil, stat, tempfile, zipfile
-VERSION = '0.6.0'
+VERSION = '0.7.0.2'
 ROOT = Path(__file__).resolve().parent
 PRESERVE = {'graph-explorer/config.js'}
 SKIP = {'.git', 'node_modules', '__pycache__', '.DS_Store', '.phpunit.result.cache'}
@@ -29,8 +29,14 @@ def match_profile(target):
     actual = inventory(target)
     for profile in profiles():
         if all(actual.get(name) == digest for name, digest in profile['checked'].items()):
+            legacy = target / 'integrations/mcp'
+            if legacy.exists():
+                owned = set(profile['owned'])
+                extra = [path for path in actual if path.startswith('integrations/mcp/') and path not in owned]
+                if extra:
+                    raise RuntimeError('Additional files in the former MCP integration require manual review')
             return profile, actual
-    raise RuntimeError('Unknown or modified 0.5.x code. No files changed; review manually.')
+    raise RuntimeError('Unknown or modified 0.6.0 code. No files changed; review manually.')
 
 
 def read_payload(archive):
@@ -103,7 +109,7 @@ def apply(target, archive, backups):
     profile, before = match_profile(target)
     entries = read_payload(archive)
     backups.mkdir(parents=True, exist_ok=True, mode=0o700)
-    backup = Path(tempfile.mkdtemp(prefix='sws-0.6.0-', dir=backups))
+    backup = Path(tempfile.mkdtemp(prefix='sws-0.7.0.2-', dir=backups))
     original = backup / 'original'
     shutil.copytree(target, original, symlinks=True)
     if inventory(original) != before:
@@ -115,6 +121,13 @@ def apply(target, archive, backups):
             old = stage / name
             if name not in entries and name not in PRESERVE and old.is_file():
                 old.unlink()
+        legacy = stage / 'integrations/mcp'
+        if legacy.is_dir():
+            # Only known files were removed. Refuse to discard any remaining local content.
+            for path in sorted(legacy.rglob('*'), key=lambda path: len(path.parts), reverse=True):
+                if path.is_dir() and not path.is_symlink():
+                    path.rmdir()
+            legacy.rmdir()
         for name, data in entries.items():
             path = stage / name
             if name in PRESERVE and path.exists():
@@ -133,8 +146,8 @@ def apply(target, archive, backups):
     finally:
         if stage.exists():
             shutil.rmtree(stage)
-    print('Upgraded to 0.6.0. Backup:', backup)
-    print('Restart PHP/job processes. Continue with the upgrade guide; no database operation was performed.')
+    print('Upgraded to ' + VERSION + '. Backup:', backup)
+    print('Run the maintenance commands from the upgrade guide before restarting web PHP and persistent job processes.')
     return backup
 
 
@@ -163,7 +176,7 @@ def rollback(target, backup, apply_changes):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--extension', type=Path, required=True)
-    parser.add_argument('--source', type=Path, default=ROOT / 'SemanticWikiSchema-0.6.0-source.zip')
+    parser.add_argument('--source', type=Path, default=ROOT / 'SemanticWikiSchema-0.7.0.2-source.zip')
     parser.add_argument('--backup-dir', type=Path)
     parser.add_argument('--rollback', type=Path)
     parser.add_argument('--apply', action='store_true')
@@ -183,11 +196,11 @@ def main():
         desired = read_payload(args.source)
         current = inventory(target)
         if any(name not in PRESERVE and current.get(name) != hashlib.sha256(data).hexdigest() for name, data in desired.items()):
-            raise RuntimeError('Version is 0.6.0 but files differ; no changes made')
-        print('Exact 0.6.0 release already installed; nothing changed')
+            raise RuntimeError('Version is 0.7.0.2 but files differ; no changes made')
+        print('Exact 0.7.0.2 release already installed; nothing changed')
         return
-    if not version.startswith('0.5.'):
-        raise RuntimeError('Only known SWS 0.5.x releases are supported')
+    if version != '0.6.0':
+        raise RuntimeError('Only known SWS 0.6.0 distributions are supported')
     profile, _ = match_profile(target)
     read_payload(args.source)
     if not args.apply:

@@ -46,7 +46,7 @@ class PageProperty extends TextProperty {
 				$defaults[] = $title->getPrefixedText();
 			}
 			$core = new PropertyCore( $core->description, $core->required, array_values( array_unique( $defaults ) ),
-				$core->constraintSeverities, $core->wikiLink, $core->externalProperty, $core->fieldNotes );
+				$core->constraintSeverities, $core->wikiLink, $core->externalProperty, $core->fieldNotes, $core->labels );
 		}
 		return new self( $core, $property['multiple'] ?? false, $property['uniqueItems'] ?? false,
 			$property['minLength'] ?? null, $property['maxLength'] ?? null, $namespace, $assign );

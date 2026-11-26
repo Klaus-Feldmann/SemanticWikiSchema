@@ -25,14 +25,16 @@ function sws0201save($name,$content){global $services,$admin;
 }
 $schemaName='SWS0201Wikitext';$id='s66666666666666';
 sws0201save('Vorlage:SWS0201 Fixture',new WikitextContent('[[Kategorie:SWS0201 Vorlage]]<span>SWS0201 Template</span>'));
+sws0201save('Vorlage:SWS0201 More',new WikitextContent('<span>SWS0201 Second documentation</span>'));
 sws0201save('Schema:'.$schemaName,new SchemaContent(json_encode(['propertyDefinitions'=>[
  'Vorlage'=>['type'=>'wikitext','wikitext'=>'[[Kategorie:SWS0201 Schema]]'],
  'Anmerkung'=>['type'=>'wikitextValue','multiple'=>true],
  'Text'=>['type'=>'text']
 ]],JSON_THROW_ON_ERROR)));
-$title=Title::newFromText('SWS0201 Wikitexttest');$mainText='Unveränderter Artikeltext.';
+$title=Title::newFromText('Vorlage:SWS0201 Wikitexttest');
+$mainText='<includeonly>SWS0201 Included body</includeonly>';
 sws0201save($title->getPrefixedText(),new WikitextContent($mainText));
-$source='[[Brünn]] [https://example.org Quelle] {{SWS0201 Fixture}} [[Kategorie:SWS0201 Feld]] [[SWS0201Beleg::ja]]';
+$source="[[Brünn]] [https://example.org Quelle] {{SWS0201 Fixture}} [[Kategorie:SWS0201 Feld]] [[SWS0201Beleg::ja]]\n{{SWS0201 More}}";
 foreach([[$source],['[[Brno]] [[Kategorie:SWS0201 Geändert]]'],[]]as $index=>$values){
  $subjects=(new SubjectContent(json_encode(['mainSubject'=>$id,'subjects'=>[$id=>['label'=>'Wikitexttest','schema'=>$schemaName,'statements'=>[
   'Anmerkung'=>['type'=>'wikitextValue','value'=>$values],
@@ -53,6 +55,16 @@ foreach([[$source],['[[Brno]] [[Kategorie:SWS0201 Geändert]]'],[]]as $index=>$v
  if($index===0){sws0201check(str_contains($html,'href=')&&str_contains($html,'example.org')&&str_contains($html,'SWS0201 Template'),'Links and template rendered by real MediaWiki parser');}
  $view=$services->getRevisionRenderer()->getRenderedRevision($revision,ParserOptions::newFromUser($admin),$admin)->getRevisionParserOutput();
  sws0201check(in_array('SWS0201_Feld',$view->getCategoryNames(),true)===($index===0),'Ordinary view field metadata matches saved values');
+ $viewHtml=$view->getContentHolderText();
+ sws0201check(str_contains($viewHtml,'SWS0201 Second documentation')===($index===0),'Saved Wikitext is rendered in the template page body');
+ sws0201check(!str_contains($viewHtml,'SWS0201 Included body'),'Includeonly body is excluded from the template page view');
+ $caller=Title::newFromText('SWS0201 Caller');
+ sws0201save($caller->getPrefixedText(),new WikitextContent('{{SWS0201 Wikitexttest}}'));
+ $callerRevision=$services->getRevisionLookup()->getRevisionByTitle($caller);
+ $transclusion=$services->getRevisionRenderer()->getRenderedRevision($callerRevision,ParserOptions::newFromUser($admin),$admin)->getRevisionParserOutput();
+ $includedHtml=$transclusion->getContentHolderText();
+ sws0201check(str_contains($includedHtml,'SWS0201 Included body')&&!str_contains($includedHtml,'SWS0201 Second documentation'),'Only main-slot template source is transcluded');
+ sws0201check(!in_array('SWS0201_Feld',$transclusion->getCategoryNames(),true),'Field category stays on the template page');
  if($services->hasService('SMW.ParserDataFactory')){
   $data=SMW\Services\ServicesFactory::getInstance()->getStore()->getSemanticData(SMW\DataItems\WikiPage::newFromTitle($title));
   $property=$data->getProperties()['SWS0201Beleg']??null;$actual=$property?$data->getPropertyValues($property):[];

@@ -5,7 +5,7 @@
 	"version": "0.21.1",
 	"license-name": "GPL-2.0-or-later",
 	"author": "Softwaredesign: [https://aufeinwort.info/ Klaus Feldmann / AufEinWort], Programmierung: ChatGPT/Sophos.",
-	"type": "other",
+	"type": "wikibase",
 	"manifest_version": 2,
 	"requires": {
 		"MediaWiki": ">= 1.47.0-wmf.24",
@@ -17,6 +17,7 @@
 		"SWSBaseBridge\\": "src/"
 	},
 	"Hooks": {
+		"ExtensionTypes": "SWSBaseBridge\\Hooks::onExtensionTypes",
 		"SWSRegistration": "SWSBaseBridge\\Hooks::onSWSRegistration",
 		"ScribuntoExternalLibraries": "SWSBaseBridge\\Hooks::onScribuntoExternalLibraries",
 		"BeforePageDisplay": "SWSBaseBridge\\Hooks::onBeforePageDisplay"

@@ -36,7 +36,7 @@ $api=new \SWSBaseBridge\ApiIdentity($params,$context);$api->execute();$value=$ap
 check($value['displayDescription']['text']==='Eigene Seitenbeschreibung','SHORTDESC overrides source for display');
 check($value['descriptions'][0]['text']==='Astronom','full source descriptions retained');
 $view=(new \SWSBaseBridge\DataViewLookup($context))->read(new \MediaWiki\Title\Title(),'de');
-check($view['displayDescription']['text']==='Eigene Seitenbeschreibung' && $view['pageDescription']['origin']==='shortdesc','MCP read view uses same selection');
+check($view['displayDescription']['text']==='Eigene Seitenbeschreibung' && $view['pageDescription']['origin']==='shortdesc','API read view uses same selection');
 \Harness\State::$shortdesc=null;\Harness\State::$pagePropError=true;
 $view=(new \SWSBaseBridge\DataViewLookup($context))->read(new \MediaWiki\Title\Title(),'de');
 check($view['pageDescription']['status']==='unavailable' && !$view['complete'],'page description error explicit');

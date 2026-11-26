@@ -25,6 +25,7 @@ final class PrefixSearchHooks {
     public static function onBeforePageDisplay( OutputPage $out, $skin ): void {
         $config = MediaWikiServices::getInstance()->getMainConfig();
         $out->addJsConfigVars( 'wgSWSPrefixSearchNamespaces', self::namespaces() );
+        $out->addJsConfigVars( 'wgSWSSchemaNamespace', \AEWI\SWS\SWSExtension::NS_SCHEMA );
         $out->addJsConfigVars( 'wgSWSPrefixSearchSubstringFallback', $config->get( 'SWSPrefixSearchSubstringFallback' ) );
         if ( !$config->get( 'SWSPrefixSearchEnabled' ) || self::namespaces() === [] ) {
             return;

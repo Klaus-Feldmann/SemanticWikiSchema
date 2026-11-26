@@ -5,6 +5,8 @@ declare( strict_types = 1 );
 namespace AEWI\SWS\EntryPoints\REST;
 
 use InvalidArgumentException;
+use AEWI\SWS\Application\Subject\Exception\SubjectRevisionConflictException;
+use Wikimedia\ParamValidator\TypeDef\IntegerDef;
 use MediaWiki\Rest\HttpException;
 use MediaWiki\Rest\Response;
 use MediaWiki\Rest\SimpleHandler;
@@ -20,6 +22,8 @@ use Wikimedia\ParamValidator\ParamValidator;
 class ReplaceSubjectApi extends SimpleHandler {
 
 	use TakesDependentSubjects;
+
+	public const SUPPORTS_BASE_REVISION = true;
 
 	public function __construct(
 		private readonly CsrfValidator $csrfValidator
@@ -46,8 +50,14 @@ class ReplaceSubjectApi extends SimpleHandler {
 				$body['dependentSubjects'] ?? [],
                 $body['fieldNotes'] ?? null,
 				$this->identityFromBody( $body ),
-				$body['fieldKeyVersion'] ?? null
+				$body['fieldKeyVersion'] ?? null,
+				$body['baseRevisionId'] ?? null
 			);
+		} catch ( SubjectRevisionConflictException ) {
+			return $this->getResponseFactory()->createHttpError( 409, [
+				'status' => 'error',
+				'message' => 'The page changed after the supplied base revision. Reload the entity before editing.',
+			] );
 		} catch ( InvalidArgumentException $e ) {
 			return $this->getResponseFactory()->createHttpError( 400, [
 				'status' => 'error',
@@ -92,6 +102,12 @@ class ReplaceSubjectApi extends SimpleHandler {
 				self::PARAM_DESCRIPTION => 'New display label. Replaces the stored one entirely: omitting it, or '
 					. 'passing an empty string, leaves the Entity with no label, just as an omitted property name '
 					. 'deletes its Statement.',
+			],
+			'baseRevisionId' => [
+				self::PARAM_SOURCE => 'body',
+				ParamValidator::PARAM_TYPE => 'integer',
+				ParamValidator::PARAM_REQUIRED => false,
+				IntegerDef::PARAM_MIN => 1,
 			],
 			'fieldKeyVersion' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'integer', ParamValidator::PARAM_REQUIRED => false ],
 			'fieldNotes' => [ self::PARAM_SOURCE => 'body', ParamValidator::PARAM_TYPE => 'array', ParamValidator::PARAM_REQUIRED => false ],

@@ -25,18 +25,18 @@ class UpgradeTests(unittest.TestCase):
         (self.wiki / 'LocalSettings.php').write_text('keep local settings')
         (self.wiki / 'maintenance').mkdir()
         (self.wiki / 'maintenance/run.php').write_text('core')
-        self.write('extension.json', json.dumps({'version': '0.5.02'}))
+        self.write('extension.json', json.dumps({'version': '0.6.0'}))
         self.write('src/Old.php', '<?php old')
         self.write('vendor/autoload.php', '<?php dependencies')
         self.write('graph-explorer/config.js', 'local endpoint')
         self.write('my-notes.txt', 'keep local notes')
         self.before = m.inventory(self.target)
-        self.profile = {'name': 'test-0.5.02', 'checked': {n: self.before[n] for n in ['extension.json', 'src/Old.php']}, 'owned': ['extension.json', 'src/Old.php', 'graph-explorer/config.js']}
+        self.profile = {'name': 'test-0.6.0', 'checked': {n: self.before[n] for n in ['extension.json', 'src/Old.php']}, 'owned': ['extension.json', 'src/Old.php', 'graph-explorer/config.js']}
         p = patch.object(m, 'profiles', return_value=[self.profile])
         p.start()
         self.addCleanup(p.stop)
         self.archive = self.base / 'source.zip'
-        self.payload = {'extension.json': json.dumps({'version': '0.6.0'}).encode(), 'src/New.php': b'<?php new', 'graph-explorer/config.js': b'default endpoint'}
+        self.payload = {'extension.json': json.dumps({'version': m.VERSION}).encode(), 'src/New.php': b'<?php new', 'graph-explorer/config.js': b'default endpoint'}
         self.make_archive()
         self.backups = self.base / 'private-backups'
 

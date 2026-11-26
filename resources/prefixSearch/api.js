@@ -1,4 +1,23 @@
 'use strict';
+async function findSchemas( term ) {
+	const url = mw.util.wikiScript( 'rest' ) + '/sws/v0/schema-names/' + encodeURIComponent( term ) + '?details=1';
+	const response = await fetch( url, { credentials: 'same-origin' } );
+	if ( !response.ok ) { throw new Error( 'SWS Schema search failed' ); }
+	const schemas = await response.json();
+	const language = mw.config.get( 'wgUserLanguage' );
+	const contentLanguage = mw.config.get( 'wgContentLanguage' );
+	function localized( values, defaultLanguage ) {
+		return [ language, contentLanguage, defaultLanguage, 'en' ]
+			.map( ( code ) => values && values[ code ] )
+			.find( ( value ) => typeof value === 'string' && value.trim() !== '' );
+	}
+	return schemas.map( ( schema ) => ( {
+		pageId: schema.pageId, title: schema.title, url: schema.url,
+		displayTitle: localized( schema.labels, schema.identityLanguage ) || schema.title,
+		description: localized( schema.descriptions, schema.identityLanguage ) || schema.description
+	} ) );
+}
+
 /** Shared title lookup: preserve native completion, enrich metadata, then fill missing slots. */
 function search( text, limit, namespace ) {
 	const count = Math.max( 1, Math.min( limit, 20 ) );
@@ -30,9 +49,20 @@ function search( text, limit, namespace ) {
 					redirectFrom: redirect && redirect.from };
 			} );
 	}
+	const term = text.trim();
+	const schemaNamespace = mw.config && mw.config.get( 'wgSWSSchemaNamespace' );
+	const schemaResults = Number.isInteger( schemaNamespace ) && namespace === schemaNamespace && term && term.length <= 255 ?
+		findSchemas( term ).catch( () => [] ) : Promise.resolve( [] );
 	return api.get( params ).then( async ( data ) => {
 		const primary = results( data );
-		const term = text.trim();
+		for ( const schema of await schemaResults ) {
+			const index = primary.findIndex( ( page ) => page.pageId === schema.pageId );
+			if ( index === -1 ) {
+				primary.push( schema );
+			} else {
+				primary[ index ] = Object.assign( {}, primary[ index ], schema );
+			}
+		}
 		const enabled = !mw.config || mw.config.get( 'wgSWSPrefixSearchSubstringFallback' ) !== false;
 		if ( !enabled || primary.length >= count || term.length < 3 || term.length > 255 || namespace === undefined || namespace === null ) {
 			return primary.slice( 0, count );

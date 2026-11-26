@@ -1,4 +1,5 @@
 {
+	"sws-version-group-semantic": "Semantische Erweiterungen",
 	"sws-property-editor-labels": "Feldbenennungen",
 	"sws-property-editor-labels-description": "Je Sprache eine Benennung. Die technische Feldkennung bleibt unverändert.",
 	"sws-field-number-unique": "Die Feldkennung muss innerhalb dieses Schemas eindeutig sein.",
@@ -12,7 +13,7 @@
 		]
 	},
 	"sws-name": "Semantic WikiSchema",
-	"sws-description": "Schema-gesteuerte Forschungsdaten mit Wikidata-/Wikibase-Anbindung, optionalen automatischen SMW-Annotationen und MCP-Zugriff.",
+	"sws-description": "Schema-gesteuerte Forschungsdaten mit Wikidata-/Wikibase-Anbindung, optionalen automatischen SMW-Annotationen und optionaler Semantic-AI-Anbindung.",
 	"right-sws-schema-edit": "Semantic WikiSchema-Schemata erstellen und bearbeiten",
 	"right-sws-layout-edit": "Semantic WikiSchema-Layouts erstellen und bearbeiten",
 	"right-sws-mapping-edit": "Semantic WikiSchema-Ontologiezuordnungen erstellen und bearbeiten",
@@ -773,5 +774,7 @@
 	"sws-api-entity-save-failed": "Die Entität konnte nicht gespeichert werden",
 	"sws-api-entity-search-timeout": "Die Suche dauerte zu lange. Grenze sie auf ein Schema ein.",
 	"sws-entity-description-missing-category": "SWS Entitätsbeschreibung fehlt",
-	"sws-entity-description-missing-category-desc": "Seiten mit einer SWS-Hauptentität ohne eigene Beschreibung in irgendeiner Sprache. Unterentitäten werden nicht berücksichtigt."
+	"sws-entity-description-missing-category-desc": "Seiten mit einer SWS-Hauptentität ohne eigene Beschreibung in irgendeiner Sprache. Unterentitäten werden nicht berücksichtigt.",
+	"sws-field-validation-category": "SWS Wartung Feldeingabe",
+	"sws-field-validation-category-desc": "Seiten, auf denen eine gespeicherte SWS-Entität einen ungültigen Feldwert oder einen fehlenden Pflichtwert hat."
 }

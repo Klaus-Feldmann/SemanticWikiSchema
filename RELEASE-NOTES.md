@@ -1,9 +1,13 @@
-# Semantic WikiSchema 0.6.0
+# Semantic WikiSchema 0.7.0.2
 
-- Clarify that SWS is an independent fork of [NeoWiki](https://neowiki.ai), not maintained or supported by Professional Wiki. Upstream credits and licenses remain intact.
-- Direct SWS security reports to [info@aufeinwort.info](mailto:info@aufeinwort.info).
-- Move SWS PHP classes to the `AEWI\SWS` namespace.
+Changes since the published 0.6.0 release.
 
-Includes minor terminology and interface adjustments. See the [0.5.x upgrade guide](docs/operations/upgrade-0.6.0.md) before replacing an existing installation.
+- **AI integration.** User AI (UAI) is the optional assistant integration. This release removes the patch for the former standalone MediaWiki MCP server. Category-based searches can combine entity data with wiki page memberships, including categories assigned by transcluded templates.
+- **Entity editing.** Direct authenticated SWS REST access uses a MediaWiki browser session. Authorized UAI requests use the designated endpoints. An entity replacement can include a base revision. SWS rejects a stale base with HTTP 409.
+- **Search.** Title search finds schemas by label. Entity search uses labels and descriptions.
+- **Wikitext.** Free multiline entity wikitext renders on its own wiki page and stays on that page when the template is transcluded.
+- **Field validation.** SWS processing adds a configurable tracking category to pages with invalid field values or missing required values.
+- **Category fields.** Field labels survive category-default normalization.
+- **Special:Version.** SWS appears under semantic extensions, and SchemaBaseBridge appears under Wikibase extensions.
 
-Qualified on MediaWiki 1.47.0-wmf.24 with the legacy parser and PHP 8.3; distributed as a prerelease while that environment remains a development build.
+[Installation](docs/operations/install/README.md) · [Direct upgrade from 0.6.0](docs/operations/upgrade-0.7.0.2.md) · [User AI](https://www.mediawiki.org/wiki/Extension:User_AI)
