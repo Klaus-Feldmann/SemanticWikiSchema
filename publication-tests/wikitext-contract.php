@@ -120,6 +120,7 @@ namespace AEWI\SWS {
 namespace AEWI\SWS\EntryPoints\Processing {
  // Scheduling contract only: the real worker is tested in the full MediaWiki fixtures.
  final class InternalPageProcessor {
+  public static function isRefreshing( \MediaWiki\Title\Title $title ): bool { return false; }
   public function refresh($title): bool {
    \Harness\State::$refresh++;
    if(\Harness\State::$fail){return false;}

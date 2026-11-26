@@ -1,6 +1,6 @@
 # SWS Documentation
 
-[Install SWS 0.7.0.2](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
+[Install SWS 0.7.0.3](operations/install/README.md) · [Installation auf Deutsch](operations/install/de/README.md).
 
 ## User guide
 

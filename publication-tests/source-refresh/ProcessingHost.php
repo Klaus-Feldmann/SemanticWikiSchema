@@ -17,6 +17,8 @@ namespace D2Harness {
 		public static ?string $foreignHtml = null;
         public static ?string $shortdesc = null;
 		public static ?\Closure $afterCollect = null;
+		public static ?\Closure $afterRender = null;
+		public static array $warnings = [];
 	}
 }
 namespace MediaWiki\Revision { class SlotRecord { public const MAIN = 'main'; } }
@@ -86,7 +88,16 @@ namespace MediaWiki\Deferred {
 	}
 }
 namespace MediaWiki\Logger {
-	class LoggerFactory { public static function getInstance( string $name ): mixed { return new class { public function error( mixed ...$args ): void {} public function warning( mixed ...$args ): void {} }; } }
+	class LoggerFactory {
+		public static function getInstance( string $name ): mixed {
+			return new class {
+				public function error( mixed ...$args ): void {}
+				public function warning( string $message, array $context = [] ): void {
+					\D2Harness\State::$warnings[] = $context;
+				}
+			};
+		}
+	}
 }
 namespace MediaWiki {
 	class MediaWikiServices {
@@ -109,6 +120,7 @@ namespace MediaWiki {
 						if ( \D2Harness\State::$swsFailure ) { $context->failure = 'SWS schema resolution failed'; }
 						$parser->output->setPageProperty( 'unlinkedwikibase_id', \D2Harness\State::$q );
                         if ( \D2Harness\State::$shortdesc !== null ) { $parser->output->setPageProperty( 'shortdesc', \D2Harness\State::$shortdesc ); }
+						if ( \D2Harness\State::$afterRender !== null ) { ( \D2Harness\State::$afterRender )( $parser->output ); }
 						return $parser->output;
 					}
 				};

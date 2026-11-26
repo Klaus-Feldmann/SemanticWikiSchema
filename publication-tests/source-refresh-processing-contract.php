@@ -142,10 +142,10 @@ d2check( S::$collected === [] && S::$page->saveCalls === 0, 'Publication gate pr
 
 resetD2();
 S::$afterCollect = static function (): void {
-	S::$schemaRevision = new RevisionRecord( 201, 901, S::$schemaRevision->content );
+	S::$schemaRevision = new RevisionRecord( S::$schemaRevision->getId() + 1, 901, S::$schemaRevision->content );
 };
-d2refuses( fn () => $processor->refresh( $title ), 'Schema change during source request rejects outdated result' );
-d2check( S::$page->saveCalls === 0, 'Changed schema causes no source write' );
+d2refuses( fn () => $processor->refresh( $title ), 'Repeated schema changes during source collection reject both outdated results' );
+d2check( count( S::$collected ) === 2 && S::$page->saveCalls === 0, 'One preparation retry still causes no outdated source write' );
 resetD2();
 S::$page->beforeSave = static function ( WikiPage $page ): void {
 	$page->revision = new RevisionRecord( 103, 943, [ 'main' => new JsonContent( 'Neue Bearbeitung' ), 'sws' => $page->revision->getContent( 'sws' ) ], 101 );

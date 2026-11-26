@@ -1,4 +1,4 @@
-# Semantic WikiSchema (SWS) 0.7.0.2
+# Semantic WikiSchema (SWS) 0.7.0.3
 
 SWS erfasst strukturierte Metadaten und Forschungsdaten getrennt vom Artikeltext. Ein Schema legt die Felder fest; Autoren bearbeiten die zugehörigen Entitäten unter dem Reiter **Daten**. Wiederverwendbare Definitionen und stabile Kennungen ermöglichen die gemeinsame Pflege und direkte Abfrage der Daten.
 
@@ -39,4 +39,4 @@ Geprüfte Umgebung: MediaWiki 1.47.0-wmf.24, PHP 8.3.36, Legacy-Parser und Vecto
 
 Softwaredesign: Klaus Feldmann / AufEinWort. Programmierung: ChatGPT/Sophos. [Mitwirkende](composer.json) · [Lizenz: GPL-2.0-or-later](COPYING).
 
-[SWS 0.7.0.2 herunterladen](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.7.0.2) · [Release notes](RELEASE-NOTES.md)
+[SWS 0.7.0.3 herunterladen](https://github.com/Klaus-Feldmann/SemanticWikiSchema/releases/tag/v0.7.0.3) · [Release notes](RELEASE-NOTES.md)

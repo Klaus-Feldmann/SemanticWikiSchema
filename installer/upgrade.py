@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Checked, reversible folder upgrade from known SWS 0.6.0 distributions to 0.7.0.2."""
+"""Checked, reversible folder upgrade from known SWS 0.6.0 and 0.7.0.2 distributions to 0.7.0.3."""
 from pathlib import Path, PurePosixPath
 import argparse, datetime, hashlib, json, os, shutil, stat, tempfile, zipfile
-VERSION = '0.7.0.2'
+VERSION = '0.7.0.3'
 ROOT = Path(__file__).resolve().parent
 PRESERVE = {'graph-explorer/config.js'}
 SKIP = {'.git', 'node_modules', '__pycache__', '.DS_Store', '.phpunit.result.cache'}
@@ -36,7 +36,7 @@ def match_profile(target):
                 if extra:
                     raise RuntimeError('Additional files in the former MCP integration require manual review')
             return profile, actual
-    raise RuntimeError('Unknown or modified 0.6.0 code. No files changed; review manually.')
+    raise RuntimeError('Unknown or modified SWS code. No files changed; review manually.')
 
 
 def read_payload(archive):
@@ -109,7 +109,7 @@ def apply(target, archive, backups):
     profile, before = match_profile(target)
     entries = read_payload(archive)
     backups.mkdir(parents=True, exist_ok=True, mode=0o700)
-    backup = Path(tempfile.mkdtemp(prefix='sws-0.7.0.2-', dir=backups))
+    backup = Path(tempfile.mkdtemp(prefix='sws-0.7.0.3-', dir=backups))
     original = backup / 'original'
     shutil.copytree(target, original, symlinks=True)
     if inventory(original) != before:
@@ -176,7 +176,7 @@ def rollback(target, backup, apply_changes):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--extension', type=Path, required=True)
-    parser.add_argument('--source', type=Path, default=ROOT / 'SemanticWikiSchema-0.7.0.2-source.zip')
+    parser.add_argument('--source', type=Path, default=ROOT / 'SemanticWikiSchema-0.7.0.3-source.zip')
     parser.add_argument('--backup-dir', type=Path)
     parser.add_argument('--rollback', type=Path)
     parser.add_argument('--apply', action='store_true')
@@ -196,11 +196,11 @@ def main():
         desired = read_payload(args.source)
         current = inventory(target)
         if any(name not in PRESERVE and current.get(name) != hashlib.sha256(data).hexdigest() for name, data in desired.items()):
-            raise RuntimeError('Version is 0.7.0.2 but files differ; no changes made')
-        print('Exact 0.7.0.2 release already installed; nothing changed')
+            raise RuntimeError('Version is 0.7.0.3 but files differ; no changes made')
+        print('Exact 0.7.0.3 release already installed; nothing changed')
         return
-    if version != '0.6.0':
-        raise RuntimeError('Only known SWS 0.6.0 distributions are supported')
+    if version not in ('0.6.0', '0.7.0.2'):
+        raise RuntimeError('Only known SWS 0.6.0 and 0.7.0.2 distributions are supported')
     profile, _ = match_profile(target)
     read_payload(args.source)
     if not args.apply:

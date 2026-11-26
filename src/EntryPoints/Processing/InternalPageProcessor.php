@@ -17,6 +17,16 @@ use Wikimedia\Rdbms\IDBAccessObject;
 final class InternalPageProcessor {
     public const MANAGED = 'semantic-sws-internal-managed';
 
+    /** @var list<Title> Pages currently being refreshed in this process. */
+    private static array $refreshing = [];
+
+    public static function isRefreshing( Title $title ): bool {
+        foreach ( self::$refreshing as $activeTitle ) {
+            if ( $activeTitle->isSamePageAs( $title ) ) { return true; }
+        }
+        return false;
+    }
+
     public static function manages( Title $title, ?RevisionRecord $revision = null ): bool {
         if ( !$title->canExist() ) { return false; }
         $services = MediaWikiServices::getInstance();
@@ -173,21 +183,28 @@ final class InternalPageProcessor {
 
     public function refresh( Title $title, ?Title $movedFrom = null, bool $refreshSources = false, bool $strictProjection = false ): bool {
         if ( !$title->exists( IDBAccessObject::READ_LATEST ) ) { return true; }
+        if ( self::isRefreshing( $title ) ) {
+            throw new ProcessingIncomplete( 'SemanticWikiSchema: recursive refresh of the same page refused.' );
+        }
+        self::$refreshing[] = $title;
+        try {
+            return $this->refreshPage( $title, $movedFrom, $refreshSources, $strictProjection );
+        } finally {
+            array_pop( self::$refreshing );
+        }
+    }
+
+    private function refreshPage( Title $title, ?Title $movedFrom, bool $refreshSources, bool $strictProjection ): bool {
         ProcessingState::record( $title, 'pending', $title->getLatestRevID() );
+        $retryAvailable = true;
         try {
             ( new InternalFieldKeyWriter() )->apply( $title );
-            $current = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
-            $result = $this->prepare( $title, \AEWI\SWS\Application\Source\SourceDataMode::usesStore() && ( $refreshSources || !SourceRefreshReceipt::isCurrent( $title, $current ) ) );
-            $result->assertCurrent();
+            $result = $this->prepareForRefresh( $title, $refreshSources, false, $retryAvailable );
             if ( $result->isSourcePreparation ) {
                 // Write outside ProcessingContext: saving a revision renders it again.
                 ( new InternalSourceSnapshotWriter() )->save( $result );
                 // The final output and SMW plan must belong to the new stored revision.
-                $result = $this->prepare( $title );
-                $result->assertCurrent();
-                if ( !SourceRefreshReceipt::isCurrent( $title, $result->revision ) ) {
-                    throw new ProcessingIncomplete( 'Source revision or dependencies changed before final processing.', 'superseded' );
-                }
+                $result = $this->prepareForRefresh( $title, false, true, $retryAvailable );
             }
         }
         catch ( \Throwable $e ) {
@@ -218,5 +235,27 @@ final class InternalPageProcessor {
             ProcessingState::record( $title, 'complete', $result->revision->getId(), $result->stamp, 'secondary-data-updates' );
         }
         return true;
+    }
+
+    /** One retry shared by both preparation stages. Never repeat a source or projection write. */
+    private function prepareForRefresh( Title $title, bool $refreshSources, bool $requireReceipt, bool &$retryAvailable ): ProcessingResult {
+        while ( true ) {
+            try {
+                $captureSources = false;
+                if ( !$requireReceipt && \AEWI\SWS\Application\Source\SourceDataMode::usesStore() ) {
+                    $current = MediaWikiServices::getInstance()->getRevisionLookup()->getRevisionByTitle( $title, 0, IDBAccessObject::READ_LATEST );
+                    $captureSources = $refreshSources || !SourceRefreshReceipt::isCurrent( $title, $current );
+                }
+                $result = $this->prepare( $title, $captureSources );
+                $result->assertCurrent();
+                if ( $requireReceipt && !SourceRefreshReceipt::isCurrent( $title, $result->revision ) ) {
+                    throw new ProcessingIncomplete( 'Source revision or dependencies changed before final processing.', 'superseded' );
+                }
+                return $result;
+            } catch ( ProcessingIncomplete $e ) {
+                if ( $e->state !== 'superseded' || !$retryAvailable ) { throw $e; }
+                $retryAvailable = false;
+            }
+        }
     }
 }
